@@ -10,7 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-@IdClass(EmployeeOffStatusId.class)
+@IdClass(EmployeeOffStatus.EmployeeOffStatusId.class)
 public class EmployeeOffStatus {
 	@Id
 	@ManyToOne(fetch = FetchType.EAGER)
@@ -117,5 +117,25 @@ public class EmployeeOffStatus {
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
 	}
+	
+	public static class EmployeeOffStatusId implements Serializable {
+		private CompanyYearOff companyYearOff;
+		private Employee employee;
 
+		public CompanyYearOff getCompanyYearOff() {
+			return companyYearOff;
+		}
+
+		public void setCompanyYearOff(CompanyYearOff companyYearOff) {
+			this.companyYearOff = companyYearOff;
+		}
+
+		public Employee getEmployee() {
+			return employee;
+		}
+
+		public void setEmployee(Employee employee) {
+			this.employee = employee;
+		}
+	}
 }
