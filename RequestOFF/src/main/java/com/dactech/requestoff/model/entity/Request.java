@@ -2,6 +2,8 @@ package com.dactech.requestoff.model.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -11,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Entity
 public class Request {
 	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "employee_id")
@@ -23,7 +26,6 @@ public class Request {
 	private String responeMessage;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "day_off_type_id")
-	@JsonProperty("day_off_type")
 	private DayOffType dayOffType;
 	private long recipientId;
 	private int validFlag;
@@ -54,14 +56,6 @@ public class Request {
 		this.insertOperator = insertOperator;
 		this.updateDate = updateDate;
 		this.updateOperator = updateOperator;
-	}
-
-	public DayOffType getDayOffType() {
-		return dayOffType;
-	}
-
-	public void setDayOffType(DayOffType dayOffType) {
-		this.dayOffType = dayOffType;
 	}
 
 	public long getId() {
@@ -118,6 +112,14 @@ public class Request {
 
 	public void setResponeMessage(String responeMessage) {
 		this.responeMessage = responeMessage;
+	}
+
+	public DayOffType getDayOffType() {
+		return dayOffType;
+	}
+
+	public void setDayOffType(DayOffType dayOffType) {
+		this.dayOffType = dayOffType;
 	}
 
 	public long getRecipientId() {

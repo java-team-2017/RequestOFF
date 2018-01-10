@@ -1,19 +1,18 @@
 package com.dactech.requestoff.model.entity;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 @Entity
-public class EmployeeOffStatus {
+public class EmployeeOffStatus implements Serializable{
 	@Id
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "year_id")
-	@JsonProperty("year")
 	private CompanyYearOff companyYearOff;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "employee_id")
@@ -30,8 +29,8 @@ public class EmployeeOffStatus {
 		super();
 	}
 
-	public EmployeeOffStatus(CompanyYearOff companyYearOff, Employee employee, long remainHours, long totalHours, int validFlag,
-			String insertDate, long insertOperator, String updateDate, long updateOperator) {
+	public EmployeeOffStatus(CompanyYearOff companyYearOff, Employee employee, long remainHours, long totalHours,
+			int validFlag, String insertDate, long insertOperator, String updateDate, long updateOperator) {
 		super();
 		this.companyYearOff = companyYearOff;
 		this.employee = employee;

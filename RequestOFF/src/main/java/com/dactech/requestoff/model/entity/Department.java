@@ -1,28 +1,41 @@
 package com.dactech.requestoff.model.entity;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 @Entity
 public class Department {
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	private String name;
-	@OneToMany(mappedBy = "department_id", fetch = FetchType.EAGER)
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "manager_id")
 	private Employee manager;
 	private int validFlag;
 	private String insertDate;
 	private long insertOperator;
 	private String updateDate;
 	private long updateOperator;
-	
+
+	@OneToMany(mappedBy = "department", fetch = FetchType.LAZY)
+	private List<Team> listTeam;
+
+	public Department() {
+		super();
+	}
+
 	public Department(long id, String name, Employee manager, int validFlag, String insertDate, long insertOperator,
-			String updateDate, long updateOperator) {
+			String updateDate, long updateOperator, List<Team> listTeam) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -32,9 +45,7 @@ public class Department {
 		this.insertOperator = insertOperator;
 		this.updateDate = updateDate;
 		this.updateOperator = updateOperator;
-	}
-
-	public Department() {
+		this.listTeam = listTeam;
 	}
 
 	public long getId() {
@@ -100,4 +111,13 @@ public class Department {
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
 	}
+
+	public List<Team> getListTeam() {
+		return listTeam;
+	}
+
+	public void setListTeam(List<Team> listTeam) {
+		this.listTeam = listTeam;
+	}
+
 }

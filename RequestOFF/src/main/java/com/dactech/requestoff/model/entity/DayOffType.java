@@ -1,29 +1,44 @@
 package com.dactech.requestoff.model.entity;
 
+import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+@Entity
 public class DayOffType {
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	private String name;
-	private int maxHour;
+	private int paymentFlag;
 	private int validFlag;
 	private String insertDate;
 	private long insertOperator;
 	private String updateDate;
 	private long updateOperator;
+	@OneToMany(mappedBy = "dayOffType", fetch = FetchType.LAZY)
+	private List<Request> listRequest;
 
 	public DayOffType() {
 	}
 
-	public DayOffType(long id, String name, int maxHour, int validFlag, String insertDate, long insertOperator,
-			String updateDate, long updateOperator) {
+	public DayOffType(long id, String name, int paymentFlag, int validFlag, String insertDate, long insertOperator,
+			String updateDate, long updateOperator, List<Request> listRequest) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.maxHour = maxHour;
+		this.paymentFlag = paymentFlag;
 		this.validFlag = validFlag;
 		this.insertDate = insertDate;
 		this.insertOperator = insertOperator;
 		this.updateDate = updateDate;
 		this.updateOperator = updateOperator;
+		this.listRequest = listRequest;
 	}
 
 	public long getId() {
@@ -42,12 +57,12 @@ public class DayOffType {
 		this.name = name;
 	}
 
-	public int getMaxHour() {
-		return maxHour;
+	public int getPaymentFlag() {
+		return paymentFlag;
 	}
 
-	public void setMaxHour(int maxHour) {
-		this.maxHour = maxHour;
+	public void setPaymentFlag(int paymentFlag) {
+		this.paymentFlag = paymentFlag;
 	}
 
 	public int getValidFlag() {
@@ -88,6 +103,14 @@ public class DayOffType {
 
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
+	}
+
+	public List<Request> getListRequest() {
+		return listRequest;
+	}
+
+	public void setListRequest(List<Request> listRequest) {
+		this.listRequest = listRequest;
 	}
 
 }

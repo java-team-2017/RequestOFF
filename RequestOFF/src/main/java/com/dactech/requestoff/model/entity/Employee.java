@@ -8,45 +8,54 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.persistence.OneToOne;
 
 @Entity
 public class Employee {
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	@ManyToMany
-	@JoinTable(name = "team_employee", joinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"))
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	private String name;
 	private String gender;
 	private String birthday;
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne
 	@JoinColumn(name = "position_id")
-	@JsonProperty("position")
 	private Position position;
 	private String email;
 	private long phone;
-	private String start_working_date;
-	private String official_working_date;
+	private String startWorkingDate;
+	private String officialWorkingDate;
 	private int validFlag;
 	private String insertDate;
 	private long insertOperator;
 	private String updateDate;
 	private long updateOperator;
 	@OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
-	private List<Employee> listEmployee;
-	
+	private List<Request> listRequest;
+
 	@OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
 	private List<EmployeeOffStatus> listEmployeeOffStatus;
-	
+
+	@OneToOne(mappedBy = "manager")
+	private Department department;
+
+	@OneToOne(mappedBy = "leader")
+	private Team team;
+
+	@ManyToMany(mappedBy = "listEmployee")
+	private List<Team> listTeam;
+
+	public Employee() {
+	}
+
 	public Employee(long id, String name, String gender, String birthday, Position position, String email, long phone,
-			String start_working_date, String official_working_date, int validFlag, String insertDate,
-			long insertOperator, String updateDate, long updateOperator) {
+			String startWorkingDate, String officialWorkingDate, int validFlag, String insertDate, long insertOperator,
+			String updateDate, long updateOperator, List<Request> listRequest,
+			List<EmployeeOffStatus> listEmployeeOffStatus, Department department, Team team, List<Team> listTeam) {
+		super();
 		this.id = id;
 		this.name = name;
 		this.gender = gender;
@@ -54,16 +63,18 @@ public class Employee {
 		this.position = position;
 		this.email = email;
 		this.phone = phone;
-		this.start_working_date = start_working_date;
-		this.official_working_date = official_working_date;
+		this.startWorkingDate = startWorkingDate;
+		this.officialWorkingDate = officialWorkingDate;
 		this.validFlag = validFlag;
 		this.insertDate = insertDate;
 		this.insertOperator = insertOperator;
 		this.updateDate = updateDate;
 		this.updateOperator = updateOperator;
-	}
-
-	public Employee() {
+		this.listRequest = listRequest;
+		this.listEmployeeOffStatus = listEmployeeOffStatus;
+		this.department = department;
+		this.team = team;
+		this.listTeam = listTeam;
 	}
 
 	public long getId() {
@@ -122,20 +133,20 @@ public class Employee {
 		this.phone = phone;
 	}
 
-	public String getStart_working_date() {
-		return start_working_date;
+	public String getStartWorkingDate() {
+		return startWorkingDate;
 	}
 
-	public void setStart_working_date(String start_working_date) {
-		this.start_working_date = start_working_date;
+	public void setStartWorkingDate(String startWorkingDate) {
+		this.startWorkingDate = startWorkingDate;
 	}
 
-	public String getOfficial_working_date() {
-		return official_working_date;
+	public String getOfficialWorkingDate() {
+		return officialWorkingDate;
 	}
 
-	public void setOfficial_working_date(String official_working_date) {
-		this.official_working_date = official_working_date;
+	public void setOfficialWorkingDate(String officialWorkingDate) {
+		this.officialWorkingDate = officialWorkingDate;
 	}
 
 	public int getValidFlag() {
@@ -177,4 +188,45 @@ public class Employee {
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
 	}
+
+	public List<Request> getListRequest() {
+		return listRequest;
+	}
+
+	public void setListRequest(List<Request> listRequest) {
+		this.listRequest = listRequest;
+	}
+
+	public List<EmployeeOffStatus> getListEmployeeOffStatus() {
+		return listEmployeeOffStatus;
+	}
+
+	public void setListEmployeeOffStatus(List<EmployeeOffStatus> listEmployeeOffStatus) {
+		this.listEmployeeOffStatus = listEmployeeOffStatus;
+	}
+
+	public Department getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(Department department) {
+		this.department = department;
+	}
+
+	public Team getTeam() {
+		return team;
+	}
+
+	public void setTeam(Team team) {
+		this.team = team;
+	}
+
+	public List<Team> getListTeam() {
+		return listTeam;
+	}
+
+	public void setListTeam(List<Team> listTeam) {
+		this.listTeam = listTeam;
+	}
+
 }

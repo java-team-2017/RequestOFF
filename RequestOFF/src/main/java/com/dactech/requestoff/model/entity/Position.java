@@ -2,12 +2,17 @@ package com.dactech.requestoff.model.entity;
 
 import java.util.List;
 
-import javax.persistence.FetchType;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+@Entity
 public class Position {
 	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	private String name;
 	private int validFlag;
@@ -15,14 +20,15 @@ public class Position {
 	private long insertOperator;
 	private String updateDate;
 	private long updateOperator;
-	@OneToMany(mappedBy = "position", fetch = FetchType.LAZY)
-	private List<Position> listPosition;
+	@OneToMany(mappedBy = "position", cascade = CascadeType.ALL)
+	private List<Employee> listEmployee;
 
 	public Position() {
 	}
 
 	public Position(long id, String name, int validFlag, String insertDate, long insertOperator, String updateDate,
-			long updateOperator) {
+			long updateOperator, List<Employee> listEmployee) {
+		super();
 		this.id = id;
 		this.name = name;
 		this.validFlag = validFlag;
@@ -30,6 +36,7 @@ public class Position {
 		this.insertOperator = insertOperator;
 		this.updateDate = updateDate;
 		this.updateOperator = updateOperator;
+		this.listEmployee = listEmployee;
 	}
 
 	public long getId() {
@@ -86,6 +93,14 @@ public class Position {
 
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
+	}
+
+	public List<Employee> getListEmployee() {
+		return listEmployee;
+	}
+
+	public void setListEmployee(List<Employee> listEmployee) {
+		this.listEmployee = listEmployee;
 	}
 
 }

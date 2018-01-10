@@ -1,46 +1,58 @@
 package com.dactech.requestoff.model.entity;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 @Entity
 public class Team {
 	@Id
-	@ManyToMany
-	@JoinTable(name = "team_employee", joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"))
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 	private String name;
-	private int leaderId;
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "leader_id")
+	private Employee leader;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "department_id")
-	private Department departmentId;
+	private Department department;
 	private int validFlag;
 	private String insertDate;
 	private long insertOperator;
 	private String updateDate;
 	private long updateOperator;
 
+	@ManyToMany
+	@JoinTable(name = "team_employee", joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"))
+	private List<Employee> listEmployee;
+
 	public Team() {
 		super();
 	}
 
-	public Team(int id, String name, int leaderId, Department departmentId, int validFlag, String insertDate,
-			long insertOperator, String updateDate, long updateOperator) {
+	public Team(int id, String name, Employee leader, Department department, int validFlag, String insertDate,
+			long insertOperator, String updateDate, long updateOperator, List<Employee> listEmployee) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.leaderId = leaderId;
-		this.departmentId = departmentId;
+		this.leader = leader;
+		this.department = department;
 		this.validFlag = validFlag;
 		this.insertDate = insertDate;
 		this.insertOperator = insertOperator;
 		this.updateDate = updateDate;
 		this.updateOperator = updateOperator;
+		this.listEmployee = listEmployee;
 	}
 
 	public int getId() {
@@ -59,20 +71,20 @@ public class Team {
 		this.name = name;
 	}
 
-	public int getLeaderId() {
-		return leaderId;
+	public Employee getLeader() {
+		return leader;
 	}
 
-	public void setLeaderId(int leaderId) {
-		this.leaderId = leaderId;
+	public void setLeader(Employee leader) {
+		this.leader = leader;
 	}
 
-	public Department getDepartmentId() {
-		return departmentId;
+	public Department getDepartment() {
+		return department;
 	}
 
-	public void setDepartmentId(Department departmentId) {
-		this.departmentId = departmentId;
+	public void setDepartment(Department department) {
+		this.department = department;
 	}
 
 	public int getValidFlag() {
@@ -113,6 +125,14 @@ public class Team {
 
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
+	}
+
+	public List<Employee> getListEmployee() {
+		return listEmployee;
+	}
+
+	public void setListEmployee(List<Employee> listEmployee) {
+		this.listEmployee = listEmployee;
 	}
 
 }
