@@ -17,7 +17,7 @@ import javax.persistence.OneToOne;
 public class Team {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int id;
+	private long id;
 	private String name;
 	@OneToOne
 	@JoinColumn(name = "leader_id")
@@ -39,7 +39,7 @@ public class Team {
 		super();
 	}
 
-	public Team(int id, String name, Employee leader, Department department, int validFlag, String insertDate,
+	public Team(long id, String name, Employee leader, Department department, int validFlag, String insertDate,
 			long insertOperator, String updateDate, long updateOperator, List<Employee> listEmployee) {
 		super();
 		this.id = id;
@@ -54,11 +54,11 @@ public class Team {
 		this.listEmployee = listEmployee;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
