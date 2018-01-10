@@ -5,15 +5,18 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class EmployeeOffStatus implements Serializable{
+@IdClass(EmployeeOffStatusId.class)
+public class EmployeeOffStatus {
 	@Id
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "year_id")
 	private CompanyYearOff companyYearOff;
+	@Id
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "employee_id")
 	private Employee employee;
