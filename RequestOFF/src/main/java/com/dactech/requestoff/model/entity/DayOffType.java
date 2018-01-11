@@ -9,6 +9,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 public class DayOffType {
 	@Id
@@ -22,6 +25,7 @@ public class DayOffType {
 	private String updateDate;
 	private long updateOperator;
 	@OneToMany(mappedBy = "dayOffType", fetch = FetchType.LAZY)
+	@JsonIgnoreProperties("dayOffType")
 	private List<Request> listRequest;
 
 	public DayOffType() {

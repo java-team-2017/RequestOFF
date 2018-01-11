@@ -26,6 +26,7 @@ public class Request {
 	private String responseMessage;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "day_off_type_id")
+	@JsonIgnoreProperties("listRequest")
 	private DayOffType dayOffType;
 	private long recipientId;
 	private int validFlag;

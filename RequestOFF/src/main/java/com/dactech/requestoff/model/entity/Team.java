@@ -23,7 +23,7 @@ public class Team {
 	private String name;
 	@OneToOne
 	@JoinColumn(name = "leader_id")
-	@JsonIgnoreProperties(value = {"listTeam", "team", "listRequest", "listEmployeeOffStatus"})
+	@JsonIgnoreProperties(value = {"listTeam", "team"})
 	private Employee leader;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "department_id")
@@ -37,7 +37,7 @@ public class Team {
 
 	@ManyToMany
 	@JoinTable(name = "team_employee", joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"))
-	@JsonIgnoreProperties(value = {"listTeam", "team","listRequest", "listEmployeeOffStatus"})
+	@JsonIgnoreProperties(value = {"listTeam", "team"})
 	private List<Employee> listEmployee;
 
 	public Team() {

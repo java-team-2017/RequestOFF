@@ -17,6 +17,7 @@ public class EmployeeOffStatus {
 	@Id
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "year_id")
+	@JsonIgnoreProperties("listEmployeeOffStatus")
 	private CompanyYearOff companyYearOff;
 	@Id
 	@ManyToOne(fetch = FetchType.EAGER)
