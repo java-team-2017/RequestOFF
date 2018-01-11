@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class Request {
@@ -17,7 +17,7 @@ public class Request {
 	private long id;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "employee_id")
-	@JsonProperty("employee")
+	@JsonIgnoreProperties("listRequest")
 	private Employee employee;
 	private String startDate;
 	private String endDate;

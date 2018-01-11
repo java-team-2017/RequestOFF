@@ -11,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 public class Department {
 	@Id
@@ -19,6 +21,7 @@ public class Department {
 	private String name;
 	@OneToOne
 	@JoinColumn(name = "manager_id")
+	@JsonIgnoreProperties(value = {"department", "listRequest", "listEmployeeOffStatus"})
 	private Employee manager;
 	private int validFlag;
 	private String insertDate;
@@ -27,6 +30,7 @@ public class Department {
 	private long updateOperator;
 
 	@OneToMany(mappedBy = "department", fetch = FetchType.LAZY)
+	@JsonIgnoreProperties("department")
 	private List<Team> listTeam;
 
 	public Department() {

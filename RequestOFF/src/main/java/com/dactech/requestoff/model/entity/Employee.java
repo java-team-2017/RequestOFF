@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 public class Employee {
 	@Id
@@ -23,6 +25,7 @@ public class Employee {
 	private String birthday;
 	@ManyToOne
 	@JoinColumn(name = "position_id")
+	@JsonIgnoreProperties("listEmployee")
 	private Position position;
 	private String email;
 	private long phone;
@@ -33,19 +36,25 @@ public class Employee {
 	private long insertOperator;
 	private String updateDate;
 	private long updateOperator;
+	
 	@OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+	@JsonIgnoreProperties("employee")
 	private List<Request> listRequest;
 
 	@OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+	@JsonIgnoreProperties("employee")
 	private List<EmployeeOffStatus> listEmployeeOffStatus;
 
 	@OneToOne(mappedBy = "manager")
+	@JsonIgnoreProperties("manager")
 	private Department department;
 
 	@OneToOne(mappedBy = "leader")
+	@JsonIgnoreProperties(value = {"leader", "listEmployee"})
 	private Team team;
 
 	@ManyToMany(mappedBy = "listEmployee")
+	@JsonIgnoreProperties(value = {"leader", "listEmployee"})
 	private List<Team> listTeam;
 
 	public Employee() {

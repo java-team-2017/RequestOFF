@@ -9,6 +9,8 @@ import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @IdClass(EmployeeOffStatus.EmployeeOffStatusId.class)
 public class EmployeeOffStatus {
@@ -19,6 +21,7 @@ public class EmployeeOffStatus {
 	@Id
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "employee_id")
+	@JsonIgnoreProperties("listEmployeeOffStatus")
 	private Employee employee;
 	private long remainHours;
 	private long totalHours;
