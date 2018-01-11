@@ -1,5 +1,9 @@
 package com.dactech.requestoff.service;
 
-public interface DayOffTypeService {
+import com.dactech.requestoff.model.request.DayOffTypeRegistRequest;
+import com.dactech.requestoff.model.response.DayOffTypeRegistResponse;
 
+public interface DayOffTypeService {
+	
+	public DayOffTypeRegistResponse saveDayOffType(DayOffTypeRegistRequest dayOffTypeRegistRequest);
 }
