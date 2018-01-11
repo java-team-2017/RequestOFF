@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.request.DepartmentRegistRequest;
+import com.dactech.requestoff.model.request.DepartmentSearchRequest;
 import com.dactech.requestoff.model.response.DepartmentRegistResponse;
+import com.dactech.requestoff.model.response.DepartmentSearchResponse;
 import com.dactech.requestoff.service.DepartmentService;
 
 @RestController
@@ -17,27 +19,13 @@ public class DepartmentController {
 	@Autowired
 	DepartmentService departmentService;
 	
-	@RequestMapping(value = "/department", method = RequestMethod.POST)
+	@RequestMapping(value = "/department_regist", method = RequestMethod.POST)
 	public DepartmentRegistResponse registDepartment(@RequestBody DepartmentRegistRequest departmentRegistRequest) {
-		Department department;
-		
-		if(departmentService.getDepartment(departmentRegistRequest.getId()) != null) {
-			department = departmentService.getDepartment(departmentRegistRequest.getId());
-		}
-		else {
-			department = new Department();
-		}
-		
-		department.setName(departmentRegistRequest.getName());
-		
-		Employee manager = new Employee();
-		manager.setId(departmentRegistRequest.getManagerId());
-		department.setManager(manager);
-		
-		departmentService.registDepartment(department);
-		
-		DepartmentRegistResponse departmentRegistResponse = new DepartmentRegistResponse(department.getId());
-		
-		return departmentRegistResponse;
+		return departmentService.registDepartment(departmentRegistRequest);
+	}
+	
+	@RequestMapping(value = "/department_search", method = RequestMethod.POST)
+	public DepartmentSearchResponse searchDepartment(@RequestBody DepartmentSearchRequest departmentSearchRequest) {
+		return departmentService.search(departmentSearchRequest);
 	}
 }
