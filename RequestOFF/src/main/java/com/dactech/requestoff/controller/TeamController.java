@@ -17,7 +17,7 @@ import com.dactech.requestoff.service.TeamService;
 public class TeamController {
 	@Autowired
 	TeamService teamService;
-	
+
 	@RequestMapping(value = "/team_regist")
 	public TeamRegistResponse teamRegist(@RequestBody TeamRegistRequest teamRegistRequest) {
 		TeamRegistResponse response = new TeamRegistResponse();
@@ -31,7 +31,8 @@ public class TeamController {
 		response.setStatusInfo(statusInfo);
 		return response;
 	}
-@RequestMapping(value = "/team_search", method = RequestMethod.POST)
+
+	@RequestMapping(value = "/team_search", method = RequestMethod.POST)
 	public TeamSearchResponse teamSearch(@RequestBody TeamSearchRequest teamSearchRequest) {
 		return teamService.teamSearch(teamSearchRequest);
 	}
