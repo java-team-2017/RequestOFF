@@ -18,7 +18,7 @@ public class TeamController {
 	@Autowired
 	TeamService teamService;
 
-	@RequestMapping(value = "/team_regist")
+	@RequestMapping(value = "/team/regist")
 	public TeamRegistResponse teamRegist(@RequestBody TeamRegistRequest teamRegistRequest) {
 		TeamRegistResponse response = new TeamRegistResponse();
 		StatusInfo statusInfo = null;
