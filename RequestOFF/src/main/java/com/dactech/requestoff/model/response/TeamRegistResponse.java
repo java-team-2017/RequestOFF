@@ -1,6 +1,8 @@
 package com.dactech.requestoff.model.response;
 
-public class TeamRegistResponse {
+import com.dactech.requestoff.model.common.Common;
+
+public class TeamRegistResponse extends Common {
 	private long id;
 
 	public TeamRegistResponse() {
