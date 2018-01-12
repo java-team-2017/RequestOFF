@@ -8,6 +8,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 public class Position {
 	@Id
@@ -20,6 +22,7 @@ public class Position {
 	private String updateDate;
 	private long updateOperator;
 	@OneToMany(mappedBy = "position")
+	@JsonIgnoreProperties("position")
 	private List<Employee> listEmployee;
 
 	public Position() {

@@ -7,6 +7,8 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 public class CompanyYearOff {
 	@Id
@@ -19,6 +21,7 @@ public class CompanyYearOff {
 	private String updateDate;
 	private long updateOperator;
 	@OneToMany(mappedBy = "companyYearOff", fetch = FetchType.LAZY)
+	@JsonIgnoreProperties("companyYearOff")
 	private List<EmployeeOffStatus> listEmployeeOffStatus;
 
 	public CompanyYearOff() {

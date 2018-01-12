@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class Request {
@@ -17,15 +17,16 @@ public class Request {
 	private long id;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "employee_id")
-	@JsonProperty("employee")
+	@JsonIgnoreProperties("listRequest")
 	private Employee employee;
-	private String startDate;
-	private String endDate;
+	private String from;
+	private String to;
 	private String reason;
 	private long status;
-	private String responeMessage;
+	private String responseMessage;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "day_off_type_id")
+	@JsonIgnoreProperties("listRequest")
 	private DayOffType dayOffType;
 	private long recipientId;
 	private int validFlag;
@@ -38,17 +39,17 @@ public class Request {
 		super();
 	}
 
-	public Request(long id, Employee employee, String startDate, String endDate, String reason, long status,
-			String responeMessage, DayOffType dayOffType, long recipientId, int validFlag, String insertDate,
+	public Request(long id, Employee employee, String from, String to, String reason, long status,
+			String responseMessage, DayOffType dayOffType, long recipientId, int validFlag, String insertDate,
 			long insertOperator, String updateDate, long updateOperator) {
 		super();
 		this.id = id;
 		this.employee = employee;
-		this.startDate = startDate;
-		this.endDate = endDate;
+		this.from = from;
+		this.to = to;
 		this.reason = reason;
 		this.status = status;
-		this.responeMessage = responeMessage;
+		this.responseMessage = responseMessage;
 		this.dayOffType = dayOffType;
 		this.recipientId = recipientId;
 		this.validFlag = validFlag;
@@ -74,20 +75,20 @@ public class Request {
 		this.employee = employee;
 	}
 
-	public String getStartDate() {
-		return startDate;
+	public String getFrom() {
+		return from;
 	}
 
-	public void setStartDate(String startDate) {
-		this.startDate = startDate;
+	public void setFrom(String from) {
+		this.from = from;
 	}
 
-	public String getEndDate() {
-		return endDate;
+	public String getTo() {
+		return to;
 	}
 
-	public void setEndDate(String endDate) {
-		this.endDate = endDate;
+	public void setTo(String to) {
+		this.to = to;
 	}
 
 	public String getReason() {
@@ -106,12 +107,12 @@ public class Request {
 		this.status = status;
 	}
 
-	public String getResponeMessage() {
-		return responeMessage;
+	public String getResponseMessage() {
+		return responseMessage;
 	}
 
-	public void setResponeMessage(String responeMessage) {
-		this.responeMessage = responeMessage;
+	public void setResponseMessage(String responseMessage) {
+		this.responseMessage = responseMessage;
 	}
 
 	public DayOffType getDayOffType() {
