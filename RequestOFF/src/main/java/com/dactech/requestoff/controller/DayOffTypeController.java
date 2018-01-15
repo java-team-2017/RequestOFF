@@ -19,7 +19,7 @@ public class DayOffTypeController {
 
 	@RequestMapping(value = "/registDayOffType", method = RequestMethod.POST)
 	public DayOffTypeRegistResponse insert(@RequestBody DayOffTypeRegistRequest dayOffTypeRegistRequest) {
-		DayOffTypeRegistResponse dayOffTypeRegistResponse = dayOffTypeService.saveDayOffType(dayOffTypeRegistRequest);
+		DayOffTypeRegistResponse dayOffTypeRegistResponse = dayOffTypeService.registDayOffType(dayOffTypeRegistRequest);
 		return dayOffTypeRegistResponse;
 	}
 

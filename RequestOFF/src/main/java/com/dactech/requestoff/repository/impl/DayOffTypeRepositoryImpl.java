@@ -37,13 +37,13 @@ public class DayOffTypeRepositoryImpl implements DayOffTypeRepositoryCustom {
 			}
 		}
 
-		if (dayOffTypeSearchRequest.getPaymentFlag() != -1) {
+		if (dayOffTypeSearchRequest.getPaymentFlag() == 0 || dayOffTypeSearchRequest.getPaymentFlag() == 1) {
 			String sqlString = whereClause ? " WHERE " : " AND ";
 			sqlQuery.append(sqlString + " payment_flag = '" + dayOffTypeSearchRequest.getPaymentFlag() + "'");
 			whereClause = false;
 		}
 
-		if (dayOffTypeSearchRequest.getValidFlag() != 0) {
+		if (dayOffTypeSearchRequest.getValidFlag() == 0 || dayOffTypeSearchRequest.getValidFlag() == 1) {
 			String sqlString = whereClause ? " WHERE " : " AND ";
 			sqlQuery.append(sqlString + "valid_flag = '" + dayOffTypeSearchRequest.getValidFlag() + "'");
 		}

@@ -1,12 +1,16 @@
 package com.dactech.requestoff.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.Position;
 import com.dactech.requestoff.model.request.EmployeeRegistRequest;
+import com.dactech.requestoff.model.request.EmployeeSearchRequest;
 import com.dactech.requestoff.model.response.EmployeeRegistResponse;
+import com.dactech.requestoff.model.response.EmployeeSearchResponse;
 import com.dactech.requestoff.repository.EmployeeRepository;
 import com.dactech.requestoff.service.EmployeeService;
 
@@ -39,6 +43,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 		
 		employeeRepository.save(employee);
 		return new EmployeeRegistResponse(employee.getId());
+	}
+
+	@Override
+	public EmployeeSearchResponse employeeSearch(EmployeeSearchRequest employeeSearchRequest) {
+		List<Employee> listEmployee = employeeRepository.search(employeeSearchRequest);
+		EmployeeSearchResponse response =  new EmployeeSearchResponse();
+		response.setEmployees(listEmployee);
+		return response;
 	}
 
 }

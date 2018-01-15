@@ -20,7 +20,7 @@ public class DayOffTypeServiceImpl implements DayOffTypeService {
 	DayOffTypeRepository dayOffTypeRepository;
 
 	@Override
-	public DayOffTypeRegistResponse saveDayOffType(DayOffTypeRegistRequest dayOffTypeRegistRequest) {
+	public DayOffTypeRegistResponse registDayOffType(DayOffTypeRegistRequest dayOffTypeRegistRequest) {
 		DayOffType dayOffType;
 
 		if (dayOffTypeRegistRequest.getId() != 0) {
