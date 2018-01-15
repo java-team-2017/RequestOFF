@@ -17,13 +17,13 @@ public class DayOffTypeController {
 	@Autowired
 	DayOffTypeService dayOffTypeService;
 
-	@RequestMapping(value = "/registDayOffType", method = RequestMethod.POST)
+	@RequestMapping(value = "/dayOffType/regist", method = RequestMethod.POST)
 	public DayOffTypeRegistResponse insert(@RequestBody DayOffTypeRegistRequest dayOffTypeRegistRequest) {
 		DayOffTypeRegistResponse dayOffTypeRegistResponse = dayOffTypeService.registDayOffType(dayOffTypeRegistRequest);
 		return dayOffTypeRegistResponse;
 	}
 
-	@RequestMapping(value = "/searchDayOffType", method = RequestMethod.POST)
+	@RequestMapping(value = "/dayOffType/search", method = RequestMethod.POST)
 	public DayOffTypeSearchResponse search(@RequestBody DayOffTypeSearchRequest dayOffTypeSearchRequest) {
 		DayOffTypeSearchResponse dayOffTypeSearchResponse = dayOffTypeService.searchDayOffType(dayOffTypeSearchRequest);
 		return dayOffTypeSearchResponse;
