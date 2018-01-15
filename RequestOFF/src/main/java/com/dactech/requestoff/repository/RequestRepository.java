@@ -6,5 +6,5 @@ import com.dactech.requestoff.model.entity.Request;
 import com.dactech.requestoff.repository.custom.RequestRepositoryCustom;
 
 public interface RequestRepository extends JpaRepository<Request, Long>, RequestRepositoryCustom{
-
+	public Request findById(long id);
 }

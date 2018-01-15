@@ -19,7 +19,7 @@ public class DepartmentController {
 	@Autowired
 	DepartmentService departmentService;
 	
-	@RequestMapping(value = "/department_regist", method = RequestMethod.POST)
+	@RequestMapping(value = "/department/regist", method = RequestMethod.POST)
 	public DepartmentRegistResponse registDepartment(@RequestBody DepartmentRegistRequest departmentRegistRequest) {
 		return departmentService.registDepartment(departmentRegistRequest);
 	}

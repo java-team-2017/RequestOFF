@@ -2,14 +2,14 @@ package com.dactech.requestoff.model.response;
 
 import com.dactech.requestoff.model.common.Common;
 
-public class DepartmentRegistResponse extends Common{
+public class RequestRegistResponse extends Common {
 	private long id;
 
-	public DepartmentRegistResponse() {
+	public RequestRegistResponse() {
 		super();
 	}
 
-	public DepartmentRegistResponse(long id) {
+	public RequestRegistResponse(long id) {
 		super();
 		this.id = id;
 	}
@@ -21,5 +21,5 @@ public class DepartmentRegistResponse extends Common{
 	public void setId(long id) {
 		this.id = id;
 	}
-	
+
 }
