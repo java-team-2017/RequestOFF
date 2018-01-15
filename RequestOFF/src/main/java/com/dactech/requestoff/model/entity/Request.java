@@ -19,8 +19,8 @@ public class Request {
 	@JoinColumn(name = "employee_id")
 	@JsonIgnoreProperties("listRequest")
 	private Employee employee;
-	private String from;
-	private String to;
+	private String fromTime;
+	private String toTime;
 	private String reason;
 	private long status;
 	private String responseMessage;
@@ -39,14 +39,14 @@ public class Request {
 		super();
 	}
 
-	public Request(long id, Employee employee, String from, String to, String reason, long status,
+	public Request(long id, Employee employee, String fromTime, String toTime, String reason, long status,
 			String responseMessage, DayOffType dayOffType, long recipientId, int validFlag, String insertDate,
 			long insertOperator, String updateDate, long updateOperator) {
 		super();
 		this.id = id;
 		this.employee = employee;
-		this.from = from;
-		this.to = to;
+		this.fromTime = fromTime;
+		this.toTime = toTime;
 		this.reason = reason;
 		this.status = status;
 		this.responseMessage = responseMessage;
@@ -75,20 +75,20 @@ public class Request {
 		this.employee = employee;
 	}
 
-	public String getFrom() {
-		return from;
+	public String getFromTime() {
+		return fromTime;
 	}
 
-	public void setFrom(String from) {
-		this.from = from;
+	public void setFromTime(String fromTime) {
+		this.fromTime = fromTime;
 	}
 
-	public String getTo() {
-		return to;
+	public String getToTime() {
+		return toTime;
 	}
 
-	public void setTo(String to) {
-		this.to = to;
+	public void setToTime(String toTime) {
+		this.toTime = toTime;
 	}
 
 	public String getReason() {
