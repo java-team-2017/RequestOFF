@@ -27,11 +27,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 		if (employeeRegistRequest.getId() == 0) { // insert new Employee
 			employee = new Employee();
-			employee.setValidFlag(1);
 		} else { // update Employee
 			employee = employeeRepository.findById(employeeRegistRequest.getId());
 		}
 		
+		employee.setValidFlag(employeeRegistRequest.getValidFlag());
 		employee.setName(employeeRegistRequest.getName());
 		employee.setGender(employeeRegistRequest.getGender());
 		employee.setBirthday(employeeRegistRequest.getBirthday());

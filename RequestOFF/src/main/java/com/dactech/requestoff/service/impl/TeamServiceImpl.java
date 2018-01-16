@@ -38,7 +38,7 @@ public class TeamServiceImpl implements TeamService {
 			team = teamRepository.findById(teamRegistRequest.getId());
 		}
 
-		team.setValidFlag(1);
+		team.setValidFlag(teamRegistRequest.getValidFlag());
 		team.setName(teamRegistRequest.getName());
 		team.setDepartment(department);
 		team.setLeader(leader);
