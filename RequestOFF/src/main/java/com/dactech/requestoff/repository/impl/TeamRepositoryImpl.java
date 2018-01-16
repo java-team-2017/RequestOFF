@@ -23,7 +23,7 @@ public class TeamRepositoryImpl implements TeamRepositoryCustom {
 			whereClause.append(" AND id = '" + teamSearchRequest.getId() + "'");
 		}
 
-		if (teamSearchRequest.getName() != "") {
+		if (teamSearchRequest.getName() != null && teamSearchRequest.getName() != "") {
 			if (teamSearchRequest.getNameMatchStatus() != 1) {
 				whereClause.append(" AND name like '%" + teamSearchRequest.getName() + "%'");
 			} else {

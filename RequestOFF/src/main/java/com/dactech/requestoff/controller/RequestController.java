@@ -22,7 +22,7 @@ public class RequestController {
 		return requestService.regist(requestRegistRequest);
 	}
 
-	@RequestMapping(value = "request_search", method = RequestMethod.POST)
+	@RequestMapping(value = "/request/search", method = RequestMethod.POST)
 	public RequestSearchResponse requestSearch(@RequestBody RequestSearchRequest requestSearchRequest) {
 		return requestService.requestSearch(requestSearchRequest);
 	}

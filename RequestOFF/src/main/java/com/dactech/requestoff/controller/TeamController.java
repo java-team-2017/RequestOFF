@@ -18,7 +18,7 @@ public class TeamController {
 	@Autowired
 	TeamService teamService;
 
-	@RequestMapping(value = "/team/regist")
+	@RequestMapping(value = "/team/regist", method = RequestMethod.POST)
 	public TeamRegistResponse teamRegist(@RequestBody TeamRegistRequest teamRegistRequest) {
 		TeamRegistResponse response = new TeamRegistResponse();
 		StatusInfo statusInfo = null;
@@ -32,7 +32,7 @@ public class TeamController {
 		return response;
 	}
 
-	@RequestMapping(value = "/team_search", method = RequestMethod.POST)
+	@RequestMapping(value = "/team/search", method = RequestMethod.POST)
 	public TeamSearchResponse teamSearch(@RequestBody TeamSearchRequest teamSearchRequest) {
 		return teamService.teamSearch(teamSearchRequest);
 	}

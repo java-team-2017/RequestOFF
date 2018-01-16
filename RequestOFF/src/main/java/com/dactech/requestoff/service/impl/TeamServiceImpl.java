@@ -26,16 +26,15 @@ public class TeamServiceImpl implements TeamService {
 
 	@Override
 	public TeamRegistResponse teamRegist(TeamRegistRequest teamRegistRequest) {
-		Team team;
+
 		Department department = new Department();
 		department.setId(teamRegistRequest.getDepartmentId());
 		Employee leader = new Employee();
 		leader.setId(teamRegistRequest.getLeaderId());
 
-		if (teamRegistRequest.getId() == 0) { // register new team
+		Team team = teamRepository.findById(teamRegistRequest.getId());
+		if (team == null) { // register new team
 			team = new Team();
-		} else { // update team
-			team = teamRepository.findById(teamRegistRequest.getId());
 		}
 
 		team.setValidFlag(teamRegistRequest.getValidFlag());

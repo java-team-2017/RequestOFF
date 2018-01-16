@@ -21,14 +21,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public EmployeeRegistResponse employeeRegist(EmployeeRegistRequest employeeRegistRequest) {
-		Employee employee;
+		
 		Position position = new Position();
 		position.setId(employeeRegistRequest.getPositionId());
 
-		if (employeeRegistRequest.getId() == 0) { // insert new Employee
+		Employee employee = employeeRepository.findById(employeeRegistRequest.getId());
+		if (employee == null) { // insert new Employee
 			employee = new Employee();
-		} else { // update Employee
-			employee = employeeRepository.findById(employeeRegistRequest.getId());
 		}
 		
 		employee.setValidFlag(employeeRegistRequest.getValidFlag());

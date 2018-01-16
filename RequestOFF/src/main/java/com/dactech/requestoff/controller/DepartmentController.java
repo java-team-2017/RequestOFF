@@ -24,7 +24,7 @@ public class DepartmentController {
 		return departmentService.registDepartment(departmentRegistRequest);
 	}
 	
-	@RequestMapping(value = "/department_search", method = RequestMethod.POST)
+	@RequestMapping(value = "/department/search", method = RequestMethod.POST)
 	public DepartmentSearchResponse searchDepartment(@RequestBody DepartmentSearchRequest departmentSearchRequest) {
 		return departmentService.search(departmentSearchRequest);
 	}
