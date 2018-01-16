@@ -27,11 +27,11 @@ public class DayOffTypeRepositoryImpl implements DayOffTypeRepositoryCustom {
 
 		if (dayOffTypeSearchRequest.getName() != null && dayOffTypeSearchRequest.getName() != "") {
 			if (dayOffTypeSearchRequest.getNameMatchStatus() != 1) {
-				String sqlString = whereClause ? " WHERE " : "";
+				String sqlString = whereClause ? " WHERE " : " AND ";
 				sqlQuery.append(sqlString + "name like '%" + dayOffTypeSearchRequest.getName() + "%'");
 				whereClause = false;
 			} else {
-				String sqlString = whereClause ? " WHERE " : "";
+				String sqlString = whereClause ? " WHERE " : " AND ";
 				sqlQuery.append(sqlString + "name = '" + dayOffTypeSearchRequest.getName() + "'");
 				whereClause = false;
 			}

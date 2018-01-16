@@ -28,9 +28,15 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 		}
 
 		if (employeeSearchRequest.getName() != null && employeeSearchRequest.getName() != "") {
-			String sqlString = whereClause ? " WHERE " : " AND ";
-			sqlQuery.append(sqlString + "name like '%" + employeeSearchRequest.getName() + "%'");
-			whereClause = false;
+			if (employeeSearchRequest.getNameMatchStatus() != 1) {
+				String sqlString = whereClause ? " WHERE " : " AND ";
+				sqlQuery.append(sqlString + "name like '%" + employeeSearchRequest.getName() + "%'");
+				whereClause = false;
+			} else {
+				String sqlString = whereClause ? " WHERE " : " AND ";
+				sqlQuery.append(sqlString + "name = '" + employeeSearchRequest.getName() + "'");
+				whereClause = false;
+			}
 		}
 
 		if (employeeSearchRequest.getGender() != null && employeeSearchRequest.getGender() != "") {

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class EmployeeSearchRequest {
 	private long id;
 	private String name;
+	@JsonProperty("name_match_status")
+	private int nameMatchStatus;
 	private String gender;
 	private String birthday;
 	@JsonProperty("position_id")
@@ -22,19 +24,12 @@ public class EmployeeSearchRequest {
 		super();
 	}
 
-	public EmployeeSearchRequest(long id, String name, String gender, String birthday, long positionId, String email,
-			long phone, String startWorkingDate, String officalWorkingDate, int validFlag) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.gender = gender;
-		this.birthday = birthday;
-		this.positionId = positionId;
-		this.email = email;
-		this.phone = phone;
-		this.startWorkingDate = startWorkingDate;
-		this.officalWorkingDate = officalWorkingDate;
-		this.validFlag = validFlag;
+	@Override
+	public String toString() {
+		return "EmployeeSearchRequest [id=" + id + ", name=" + name + ", nameMatchStatus=" + nameMatchStatus
+				+ ", gender=" + gender + ", birthday=" + birthday + ", positionId=" + positionId + ", email=" + email
+				+ ", phone=" + phone + ", startWorkingDate=" + startWorkingDate + ", officalWorkingDate="
+				+ officalWorkingDate + ", validFlag=" + validFlag + "]";
 	}
 
 	public long getId() {
@@ -51,6 +46,14 @@ public class EmployeeSearchRequest {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public int getNameMatchStatus() {
+		return nameMatchStatus;
+	}
+
+	public void setNameMatchStatus(int nameMatchStatus) {
+		this.nameMatchStatus = nameMatchStatus;
 	}
 
 	public String getGender() {
