@@ -121,25 +121,26 @@ public class EmployeeOffStatus {
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
 	}
-	
-	public static class EmployeeOffStatusId implements Serializable {
-		private CompanyYearOff companyYearOff;
-		private Employee employee;
 
-		public CompanyYearOff getCompanyYearOff() {
+	public static class EmployeeOffStatusId implements Serializable {
+		private long companyYearOff;
+		private long employee;
+
+		public long getCompanyYearOff() {
 			return companyYearOff;
 		}
 
-		public void setCompanyYearOff(CompanyYearOff companyYearOff) {
+		public void setCompanyYearOff(long companyYearOff) {
 			this.companyYearOff = companyYearOff;
 		}
 
-		public Employee getEmployee() {
+		public long getEmployee() {
 			return employee;
 		}
 
-		public void setEmployee(Employee employee) {
+		public void setEmployee(long employee) {
 			this.employee = employee;
 		}
+
 	}
 }
