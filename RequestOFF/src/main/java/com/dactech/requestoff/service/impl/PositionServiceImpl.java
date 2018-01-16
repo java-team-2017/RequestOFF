@@ -26,9 +26,11 @@ public class PositionServiceImpl implements PositionService {
 		if (positionRegistRequest.getId() != 0) {
 			position = positionRepository.findByid(positionRegistRequest.getId());
 			position.setName(positionRegistRequest.getName());
+			position.setValidFlag(positionRegistRequest.getValidFlag());
 		} else {
 			position = new Position();
 			position.setName(positionRegistRequest.getName());
+			position.setValidFlag(positionRegistRequest.getValidFlag());
 		}
 
 		positionRepository.save(position);
