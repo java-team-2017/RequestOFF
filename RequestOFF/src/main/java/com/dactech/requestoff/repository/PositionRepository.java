@@ -6,5 +6,5 @@ import com.dactech.requestoff.model.entity.Position;
 import com.dactech.requestoff.repository.custom.PositionRepositoryCustom;
 
 public interface PositionRepository extends JpaRepository<Position, Long>, PositionRepositoryCustom{
-	public Position findByid(long id);
+	public Position findById(long id);
 }

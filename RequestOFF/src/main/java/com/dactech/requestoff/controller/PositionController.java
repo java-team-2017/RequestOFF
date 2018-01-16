@@ -16,13 +16,13 @@ import com.dactech.requestoff.service.PositionService;
 public class PositionController {
 	@Autowired
 	PositionService positionService;
-	
+
 	@RequestMapping(value = "/position/regist", method = RequestMethod.POST)
 	public PositionRegistResponse insert(@RequestBody PositionRegistRequest positionRegistRequest) {
 		PositionRegistResponse positionRegistResponse = positionService.registPosition(positionRegistRequest);
 		return positionRegistResponse;
 	}
-	
+
 	@RequestMapping(value = "/position/search", method = RequestMethod.POST)
 	public PositionSearchResponse search(@RequestBody PositionSearchRequest positionSearchRequest) {
 		PositionSearchResponse positionSearchResponse = positionService.searchPosition(positionSearchRequest);

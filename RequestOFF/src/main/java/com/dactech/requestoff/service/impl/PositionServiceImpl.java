@@ -24,14 +24,13 @@ public class PositionServiceImpl implements PositionService {
 		Position position;
 
 		if (positionRegistRequest.getId() != 0) {
-			position = positionRepository.findByid(positionRegistRequest.getId());
-			position.setName(positionRegistRequest.getName());
-			position.setValidFlag(positionRegistRequest.getValidFlag());
+			position = positionRepository.findById(positionRegistRequest.getId());
 		} else {
 			position = new Position();
-			position.setName(positionRegistRequest.getName());
-			position.setValidFlag(positionRegistRequest.getValidFlag());
 		}
+
+		position.setName(positionRegistRequest.getName());
+		position.setValidFlag(positionRegistRequest.getValidFlag());
 
 		positionRepository.save(position);
 		return new PositionRegistResponse(position.getId());

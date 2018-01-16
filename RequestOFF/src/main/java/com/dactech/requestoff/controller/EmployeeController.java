@@ -21,7 +21,7 @@ public class EmployeeController {
 	EmployeeRegistResponse employeeRegist(@RequestBody EmployeeRegistRequest employeeRegistRequest) {
 		return employeeService.employeeRegist(employeeRegistRequest);
 	}
-	
+
 	@RequestMapping(value = "/employee/search", method = RequestMethod.POST)
 	EmployeeSearchResponse employeeSearch(@RequestBody EmployeeSearchRequest employeeSearchRequest) {
 		return employeeService.employeeSearch(employeeSearchRequest);

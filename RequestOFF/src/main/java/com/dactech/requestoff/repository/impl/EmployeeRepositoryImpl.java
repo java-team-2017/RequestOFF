@@ -19,7 +19,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 	public List<Employee> search(EmployeeSearchRequest employeeSearchRequest) {
 		boolean whereClause = true;
 		Query query = null;
-		StringBuilder sqlJoinQuery = new StringBuilder("SELECT * FROM employee INNER JOIN team_employee ON employee.id = team_employee.employee_id INNER JOIN team ON team_employee.team_id = team.id ");
+		StringBuilder sqlJoinQuery = new StringBuilder(
+				"SELECT * FROM employee INNER JOIN team_employee ON employee.id = team_employee.employee_id INNER JOIN team ON team_employee.team_id = team.id ");
 		StringBuilder sqlQuery = new StringBuilder("SELECT * FROM employee ");
 
 		if (employeeSearchRequest.getId() != 0) {

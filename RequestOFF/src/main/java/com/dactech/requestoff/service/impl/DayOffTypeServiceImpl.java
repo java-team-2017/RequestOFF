@@ -25,15 +25,13 @@ public class DayOffTypeServiceImpl implements DayOffTypeService {
 
 		if (dayOffTypeRegistRequest.getId() != 0) {
 			dayOffType = dayOffTypeRepository.findById(dayOffTypeRegistRequest.getId());
-			dayOffType.setName(dayOffTypeRegistRequest.getNameDayOffType());
-			dayOffType.setPaymentFlag(dayOffTypeRegistRequest.getPaymentFlag());
-			dayOffType.setValidFlag(dayOffTypeRegistRequest.getValidFlag());
 		} else {
 			dayOffType = new DayOffType();
-			dayOffType.setName(dayOffTypeRegistRequest.getNameDayOffType());
-			dayOffType.setPaymentFlag(dayOffTypeRegistRequest.getPaymentFlag());
-			dayOffType.setValidFlag(dayOffTypeRegistRequest.getValidFlag());
 		}
+
+		dayOffType.setName(dayOffTypeRegistRequest.getNameDayOffType());
+		dayOffType.setPaymentFlag(dayOffTypeRegistRequest.getPaymentFlag());
+		dayOffType.setValidFlag(dayOffTypeRegistRequest.getValidFlag());
 
 		dayOffTypeRepository.save(dayOffType);
 		return new DayOffTypeRegistResponse(dayOffType.getId());

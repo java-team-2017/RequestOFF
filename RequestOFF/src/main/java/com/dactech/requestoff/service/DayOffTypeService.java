@@ -6,8 +6,8 @@ import com.dactech.requestoff.model.response.DayOffTypeRegistResponse;
 import com.dactech.requestoff.model.response.DayOffTypeSearchResponse;
 
 public interface DayOffTypeService {
-	
+
 	public DayOffTypeRegistResponse registDayOffType(DayOffTypeRegistRequest dayOffTypeRegistRequest);
-	
+
 	public DayOffTypeSearchResponse searchDayOffType(DayOffTypeSearchRequest dayOffTypeSearchRequest);
 }

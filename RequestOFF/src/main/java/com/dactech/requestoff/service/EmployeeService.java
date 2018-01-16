@@ -7,6 +7,6 @@ import com.dactech.requestoff.model.response.EmployeeSearchResponse;
 
 public interface EmployeeService {
 	EmployeeRegistResponse employeeRegist(EmployeeRegistRequest employeeRegistRequest);
-	
+
 	EmployeeSearchResponse employeeSearch(EmployeeSearchRequest employeeSearchRequest);
 }
