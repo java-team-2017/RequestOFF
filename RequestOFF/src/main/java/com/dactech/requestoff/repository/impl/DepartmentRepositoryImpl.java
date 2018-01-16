@@ -7,6 +7,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import com.dactech.requestoff.model.entity.Department;
+import com.dactech.requestoff.model.request.DepartmentSearchRequest;
 import com.dactech.requestoff.repository.custom.DepartmentRepositoryCustom;
 
 public class DepartmentRepositoryImpl implements DepartmentRepositoryCustom {
@@ -15,19 +16,24 @@ public class DepartmentRepositoryImpl implements DepartmentRepositoryCustom {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Department> search(long id, String name, long managerId, int validFlag) {
+	public List<Department> search(DepartmentSearchRequest departmentSearchRequest) {
 		String sqlQuery = "SELECT * FROM department";
-		if(id != 0) {
-			sqlQuery += " AND id = " + id + "";
+		if(departmentSearchRequest.getId() != 0) {
+			sqlQuery += " AND id = " + departmentSearchRequest.getId() + "";
 		}
-		if(name != "") {
-			sqlQuery += " AND name like '%" + name + "%'";
+		if(departmentSearchRequest.getName() != "") {
+			if(departmentSearchRequest.getNameMatchStatus() == 0) {
+				sqlQuery += " AND name like '%" + departmentSearchRequest.getName() + "%'";
+			}
+			else {
+				sqlQuery += " AND name = '" + departmentSearchRequest.getName() + "'";
+			}
 		}
-		if(managerId != 0) {
-			sqlQuery += " AND manager_id = " + managerId + "";
+		if(departmentSearchRequest.getManagerId() != 0) {
+			sqlQuery += " AND manager_id = " + departmentSearchRequest.getManagerId() + "";
 		}
-		if(validFlag != -1) {
-			sqlQuery += " AND valid_flag = " + validFlag + "";
+		if(departmentSearchRequest.getValidFlag() != -1) {
+			sqlQuery += " AND valid_flag = " + departmentSearchRequest.getValidFlag() + "";
 		}
 		
 		if(sqlQuery.indexOf("AND") >= 0) {

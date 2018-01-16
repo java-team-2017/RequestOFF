@@ -46,8 +46,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 	}
 	
 	public DepartmentSearchResponse search(DepartmentSearchRequest departmentSearchRequest) {
-		List<Department> listDepartment = departmentRepository.search(departmentSearchRequest.getId(), departmentSearchRequest.getName(),
-																		departmentSearchRequest.getManagerId(), departmentSearchRequest.getValidFlag());
+		List<Department> listDepartment = departmentRepository.search(departmentSearchRequest);
 		DepartmentSearchResponse departmentSearchResponse = new DepartmentSearchResponse(listDepartment);
 		return departmentSearchResponse;
 	}
