@@ -32,6 +32,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 		manager.setId(departmentRegistRequest.getManagerId());
 		department.setManager(manager);
 		
+		department.setValidFlag(departmentRegistRequest.getValidFlag());
+		
 		departmentRepository.save(department);
 		
 		DepartmentRegistResponse departmentRegistResponse = new DepartmentRegistResponse(department.getId());

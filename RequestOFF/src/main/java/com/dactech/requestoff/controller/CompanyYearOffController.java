@@ -16,7 +16,7 @@ public class CompanyYearOffController {
 	CompanyYearOffService companyYearOffService;
 	
 	@RequestMapping(value = "/companyYearOff/regist", method = RequestMethod.POST)
-	public CompanyYearOffRegistResponse regist(@RequestBody CompanyYearOffRegistRequest companyYearOffRequest) {
-		return companyYearOffService.regist(companyYearOffRequest);
+	public CompanyYearOffRegistResponse regist(@RequestBody CompanyYearOffRegistRequest companyYearOffRegistRequest) {
+		return companyYearOffService.regist(companyYearOffRegistRequest);
 	}
 }

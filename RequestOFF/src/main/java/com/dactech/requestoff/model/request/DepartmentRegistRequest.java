@@ -7,16 +7,19 @@ public class DepartmentRegistRequest {
 	private String name;
 	@JsonProperty("manager_id")
 	private long managerId;
+	@JsonProperty("valid_flag")
+	private int validFlag;
 
-	public DepartmentRegistRequest(long id, String name, long managerId) {
+	public DepartmentRegistRequest() {
+		super();
+	}
+
+	public DepartmentRegistRequest(long id, String name, long managerId, int validFlag) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.managerId = managerId;
-	}
-
-	public DepartmentRegistRequest() {
-		super();
+		this.validFlag = validFlag;
 	}
 
 	public long getId() {
@@ -41,6 +44,14 @@ public class DepartmentRegistRequest {
 
 	public void setManagerId(long managerId) {
 		this.managerId = managerId;
+	}
+
+	public int getValidFlag() {
+		return validFlag;
+	}
+
+	public void setValidFlag(int validFlag) {
+		this.validFlag = validFlag;
 	}
 
 }
