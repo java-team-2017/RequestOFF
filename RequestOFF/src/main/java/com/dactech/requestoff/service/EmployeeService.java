@@ -11,6 +11,6 @@ public interface EmployeeService {
 	EmployeeRegistResponse employeeRegist(EmployeeRegistRequest employeeRegistRequest);
 
 	EmployeeSearchResponse employeeSearch(EmployeeSearchRequest employeeSearchRequest);
-	
+
 	EmployeeDetailsResponse employeeDetails(EmployeeDetailsRequest employeeDetailsRequest);
 }

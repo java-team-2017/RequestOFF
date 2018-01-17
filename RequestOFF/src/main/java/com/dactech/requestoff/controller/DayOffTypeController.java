@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dactech.requestoff.model.request.DayOffTypeDetailsRequest;
 import com.dactech.requestoff.model.request.DayOffTypeRegistRequest;
 import com.dactech.requestoff.model.request.DayOffTypeSearchRequest;
+import com.dactech.requestoff.model.response.DayOffTypeDetailsResponse;
 import com.dactech.requestoff.model.response.DayOffTypeRegistResponse;
 import com.dactech.requestoff.model.response.DayOffTypeSearchResponse;
 import com.dactech.requestoff.service.DayOffTypeService;
@@ -29,4 +31,10 @@ public class DayOffTypeController {
 		return dayOffTypeSearchResponse;
 	}
 
+	@RequestMapping(value = "/dayOffType/details", method = RequestMethod.POST)
+	public DayOffTypeDetailsResponse details(@RequestBody DayOffTypeDetailsRequest dayOffTypeDetailsRequest) {
+		DayOffTypeDetailsResponse dayOffTypeDetailsResponse = dayOffTypeService
+				.detailsDayOffType(dayOffTypeDetailsRequest);
+		return dayOffTypeDetailsResponse;
+	}
 }
