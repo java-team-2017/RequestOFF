@@ -6,7 +6,11 @@ import org.springframework.stereotype.Service;
 import com.dactech.requestoff.model.entity.CompanyYearOff;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.EmployeeOffStatus;
+import com.dactech.requestoff.model.request.DepartmentDetailsRequest;
+import com.dactech.requestoff.model.request.EmployeeOffStatusDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatusRegistRequest;
+import com.dactech.requestoff.model.response.DepartmentDetailsResponse;
+import com.dactech.requestoff.model.response.EmployeeOffStatusDetailsResponse;
 import com.dactech.requestoff.model.response.EmployeeOffStatusRegistResponse;
 import com.dactech.requestoff.repository.CompanyYearOffRepository;
 import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
@@ -43,5 +47,11 @@ public class EmployeeOffStatusServiceImpl implements EmployeeOffStatusService {
 		return new EmployeeOffStatusRegistResponse(employeeOffStatus.getCompanyYearOff().getId(),
 				employeeOffStatus.getEmployee().getId());
 	}
-
+	
+	@Override
+	public EmployeeOffStatusDetailsResponse details(EmployeeOffStatusDetailsRequest employeeOffStatusDetailsRequest) {
+		EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.details(employeeOffStatusDetailsRequest);
+		EmployeeOffStatusDetailsResponse employeeOffStatusDetailsResponse = new EmployeeOffStatusDetailsResponse(employeeOffStatus);
+		return employeeOffStatusDetailsResponse;
+	}
 }
