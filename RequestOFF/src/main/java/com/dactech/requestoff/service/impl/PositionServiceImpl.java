@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.Position;
+import com.dactech.requestoff.model.request.PositionDetailsRequest;
 import com.dactech.requestoff.model.request.PositionRegistRequest;
 import com.dactech.requestoff.model.request.PositionSearchRequest;
+import com.dactech.requestoff.model.response.PositionDetailsResponse;
 import com.dactech.requestoff.model.response.PositionRegistResponse;
 import com.dactech.requestoff.model.response.PositionSearchResponse;
 import com.dactech.requestoff.repository.PositionRepository;
@@ -42,6 +44,13 @@ public class PositionServiceImpl implements PositionService {
 		List<Position> listPosition = positionRepository.search(positionSearchRequest);
 		PositionSearchResponse response = new PositionSearchResponse();
 		response.setListPosition(listPosition);
+		return response;
+	}
+
+	@Override
+	public PositionDetailsResponse detailsPosition(PositionDetailsRequest positionDetailsRequest) {
+		Position position = positionRepository.findById(positionDetailsRequest.getId());
+		PositionDetailsResponse response = new PositionDetailsResponse(position);
 		return response;
 	}
 

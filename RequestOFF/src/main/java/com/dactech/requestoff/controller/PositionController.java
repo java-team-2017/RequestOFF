@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dactech.requestoff.model.request.PositionDetailsRequest;
 import com.dactech.requestoff.model.request.PositionRegistRequest;
 import com.dactech.requestoff.model.request.PositionSearchRequest;
+import com.dactech.requestoff.model.response.PositionDetailsResponse;
 import com.dactech.requestoff.model.response.PositionRegistResponse;
 import com.dactech.requestoff.model.response.PositionSearchResponse;
 import com.dactech.requestoff.service.PositionService;
@@ -28,4 +30,11 @@ public class PositionController {
 		PositionSearchResponse positionSearchResponse = positionService.searchPosition(positionSearchRequest);
 		return positionSearchResponse;
 	}
+
+	@RequestMapping(value = "/position/details", method = RequestMethod.POST)
+	public PositionDetailsResponse details(@RequestBody PositionDetailsRequest positionDetailsRequest) {
+		PositionDetailsResponse positionDetailsResponse = positionService.detailsPosition(positionDetailsRequest);
+		return positionDetailsResponse;
+	}
+
 }
