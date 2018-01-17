@@ -7,6 +7,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import com.dactech.requestoff.model.entity.Request;
+import com.dactech.requestoff.model.request.RequestDetailRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
 import com.dactech.requestoff.repository.custom.RequestRepositoryCustom;
 
@@ -66,6 +67,21 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		Query query = entityManager.createNativeQuery(queryString.toString(), Request.class);
 		List<Request> requests = query.getResultList();
 		return requests;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Request detail(RequestDetailRequest requestDetailRequest) {
+		String sqlQuery = "SELECT * FROM request WHERE id = " + requestDetailRequest.getId();
+		Query query = entityManager.createNativeQuery(sqlQuery, Request.class);
+		List<Request> listRequest = query.getResultList();
+		
+		if(listRequest.size() > 0) {
+			return listRequest.get(0);
+		}
+		else {
+			return new Request();
+		}
 	}
 
 }

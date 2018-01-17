@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import com.dactech.requestoff.model.entity.DayOffType;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.Request;
+import com.dactech.requestoff.model.request.RequestDetailRequest;
 import com.dactech.requestoff.model.request.RequestRegistRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
+import com.dactech.requestoff.model.response.RequestDetailResponse;
 import com.dactech.requestoff.model.response.RequestRegistResponse;
 import com.dactech.requestoff.model.response.RequestSearchResponse;
 import com.dactech.requestoff.repository.RequestRepository;
@@ -57,4 +59,10 @@ public class RequestServiceImpl implements RequestService{
 		return new RequestSearchResponse(requests);
 	}
 
+	@Override
+	public RequestDetailResponse detail(RequestDetailRequest requestDetailRequest) {
+		Request request = requestRepository.detail(requestDetailRequest);
+		RequestDetailResponse requestDetailResponse = new RequestDetailResponse(request);
+		return requestDetailResponse;
+	}
 }

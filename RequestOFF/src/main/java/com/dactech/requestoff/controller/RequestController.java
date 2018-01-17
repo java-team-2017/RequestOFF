@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dactech.requestoff.model.request.RequestDetailRequest;
 import com.dactech.requestoff.model.request.RequestRegistRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
+import com.dactech.requestoff.model.response.RequestDetailResponse;
 import com.dactech.requestoff.model.response.RequestRegistResponse;
 import com.dactech.requestoff.model.response.RequestSearchResponse;
 import com.dactech.requestoff.service.RequestService;
@@ -25,5 +27,10 @@ public class RequestController {
 	@RequestMapping(value = "/request/search", method = RequestMethod.POST)
 	public RequestSearchResponse requestSearch(@RequestBody RequestSearchRequest requestSearchRequest) {
 		return requestService.requestSearch(requestSearchRequest);
+	}
+	
+	@RequestMapping(value = "/request/detail", method = RequestMethod.POST)
+	public RequestDetailResponse detail(@RequestBody RequestDetailRequest requestDetailRequest) {
+		return requestService.detail(requestDetailRequest);
 	}
 }
