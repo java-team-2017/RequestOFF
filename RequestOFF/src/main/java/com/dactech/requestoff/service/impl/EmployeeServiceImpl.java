@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.Position;
+import com.dactech.requestoff.model.request.EmployeeDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeRegistRequest;
 import com.dactech.requestoff.model.request.EmployeeSearchRequest;
+import com.dactech.requestoff.model.response.EmployeeDetailsResponse;
 import com.dactech.requestoff.model.response.EmployeeRegistResponse;
 import com.dactech.requestoff.model.response.EmployeeSearchResponse;
 import com.dactech.requestoff.repository.EmployeeRepository;
@@ -21,7 +23,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public EmployeeRegistResponse employeeRegist(EmployeeRegistRequest employeeRegistRequest) {
-		
+
 		Position position = new Position();
 		position.setId(employeeRegistRequest.getPositionId());
 
@@ -29,7 +31,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		if (employee == null) { // insert new Employee
 			employee = new Employee();
 		}
-		
+
 		employee.setValidFlag(employeeRegistRequest.getValidFlag());
 		employee.setName(employeeRegistRequest.getName());
 		employee.setGender(employeeRegistRequest.getGender());
@@ -39,7 +41,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		employee.setPhone(employeeRegistRequest.getPhone());
 		employee.setStartWorkingDate(employeeRegistRequest.getStartWorkingDate());
 		employee.setOfficialWorkingDate(employeeRegistRequest.getOfficialWorkingDate());
-		
+
 		employeeRepository.save(employee);
 		return new EmployeeRegistResponse(employee.getId());
 	}
@@ -47,8 +49,15 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public EmployeeSearchResponse employeeSearch(EmployeeSearchRequest employeeSearchRequest) {
 		List<Employee> listEmployee = employeeRepository.search(employeeSearchRequest);
-		EmployeeSearchResponse response =  new EmployeeSearchResponse();
+		EmployeeSearchResponse response = new EmployeeSearchResponse();
 		response.setEmployees(listEmployee);
+		return response;
+	}
+
+	@Override
+	public EmployeeDetailsResponse employeeDetails(EmployeeDetailsRequest employeeDetailsRequest) {
+		Employee employee = employeeRepository.findById(employeeDetailsRequest.getId());
+		EmployeeDetailsResponse response = new EmployeeDetailsResponse(employee);
 		return response;
 	}
 
