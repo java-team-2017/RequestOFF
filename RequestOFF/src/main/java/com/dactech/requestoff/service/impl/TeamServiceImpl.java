@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.Team;
+import com.dactech.requestoff.model.request.TeamDetailsRequest;
 import com.dactech.requestoff.model.request.TeamRegistRequest;
 import com.dactech.requestoff.model.request.TeamSearchRequest;
+import com.dactech.requestoff.model.response.TeamDetailsResponse;
 import com.dactech.requestoff.model.response.TeamRegistResponse;
 import com.dactech.requestoff.model.response.TeamSearchResponse;
 import com.dactech.requestoff.repository.TeamRepository;
@@ -51,6 +53,13 @@ public class TeamServiceImpl implements TeamService {
 	public TeamSearchResponse teamSearch(TeamSearchRequest teamSearchRequest) {
 		List<Team> teams = teamRepository.searchTeam(teamSearchRequest);
 		return new TeamSearchResponse(teams);
+	}
+
+	@Override
+	public TeamDetailsResponse teamDetails(TeamDetailsRequest teamDetailsRequest) {
+		Team team = teamRepository.findById(teamDetailsRequest.getId());
+		TeamDetailsResponse response = new TeamDetailsResponse(team);
+		return response;
 	}
 
 }

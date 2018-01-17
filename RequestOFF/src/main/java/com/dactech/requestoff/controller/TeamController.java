@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dactech.requestoff.model.common.StatusInfo;
+import com.dactech.requestoff.model.request.TeamDetailsRequest;
 import com.dactech.requestoff.model.request.TeamRegistRequest;
 import com.dactech.requestoff.model.request.TeamSearchRequest;
+import com.dactech.requestoff.model.response.TeamDetailsResponse;
 import com.dactech.requestoff.model.response.TeamRegistResponse;
 import com.dactech.requestoff.model.response.TeamSearchResponse;
 import com.dactech.requestoff.service.TeamService;
@@ -35,5 +37,11 @@ public class TeamController {
 	@RequestMapping(value = "/team/search", method = RequestMethod.POST)
 	public TeamSearchResponse teamSearch(@RequestBody TeamSearchRequest teamSearchRequest) {
 		return teamService.teamSearch(teamSearchRequest);
+	}
+
+	@RequestMapping(value = "/team/details", method = RequestMethod.POST)
+	public TeamDetailsResponse details(@RequestBody TeamDetailsRequest teamDetailsRequest) {
+		TeamDetailsResponse teamDetailsResponse = teamService.teamDetails(teamDetailsRequest);
+		return teamDetailsResponse;
 	}
 }
