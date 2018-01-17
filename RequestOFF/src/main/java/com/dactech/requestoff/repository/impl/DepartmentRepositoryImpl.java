@@ -7,6 +7,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import com.dactech.requestoff.model.entity.Department;
+import com.dactech.requestoff.model.request.DepartmentDetailsRequest;
 import com.dactech.requestoff.model.request.DepartmentSearchRequest;
 import com.dactech.requestoff.repository.custom.DepartmentRepositoryCustom;
 
@@ -19,7 +20,7 @@ public class DepartmentRepositoryImpl implements DepartmentRepositoryCustom {
 	public List<Department> search(DepartmentSearchRequest departmentSearchRequest) {
 		String sqlQuery = "SELECT * FROM department";
 		if(departmentSearchRequest.getId() != 0) {
-			sqlQuery += " AND id = " + departmentSearchRequest.getId() + "";
+			sqlQuery += " AND id = " + departmentSearchRequest.getId();
 		}
 		if(departmentSearchRequest.getName() != "") {
 			if(departmentSearchRequest.getNameMatchStatus() == 0) {
@@ -30,10 +31,10 @@ public class DepartmentRepositoryImpl implements DepartmentRepositoryCustom {
 			}
 		}
 		if(departmentSearchRequest.getManagerId() != 0) {
-			sqlQuery += " AND manager_id = " + departmentSearchRequest.getManagerId() + "";
+			sqlQuery += " AND manager_id = " + departmentSearchRequest.getManagerId();
 		}
 		if(departmentSearchRequest.getValidFlag() != -1) {
-			sqlQuery += " AND valid_flag = " + departmentSearchRequest.getValidFlag() + "";
+			sqlQuery += " AND valid_flag = " + departmentSearchRequest.getValidFlag();
 		}
 		
 		if(sqlQuery.indexOf("AND") >= 0) {
@@ -44,5 +45,20 @@ public class DepartmentRepositoryImpl implements DepartmentRepositoryCustom {
 		
 		List<Department> listDepartment = query.getResultList();
 		return listDepartment;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Department details(DepartmentDetailsRequest departmentDetailsRequest) {
+		String sqlQuery = "SELECT * FROM department WHERE id = " + departmentDetailsRequest.getId();
+		Query query = entityManager.createNativeQuery(sqlQuery, Department.class);
+		List<Department> listDepartment = query.getResultList();
+		
+		if(listDepartment.size() > 0) {
+			return listDepartment.get(0);
+		}
+		else {
+			return new Department();
+		}
 	}
 }

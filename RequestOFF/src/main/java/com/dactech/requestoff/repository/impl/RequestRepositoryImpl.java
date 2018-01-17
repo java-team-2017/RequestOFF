@@ -7,7 +7,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import com.dactech.requestoff.model.entity.Request;
-import com.dactech.requestoff.model.request.RequestDetailRequest;
+import com.dactech.requestoff.model.request.RequestDetailsRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
 import com.dactech.requestoff.repository.custom.RequestRepositoryCustom;
 
@@ -71,8 +71,8 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public Request detail(RequestDetailRequest requestDetailRequest) {
-		String sqlQuery = "SELECT * FROM request WHERE id = " + requestDetailRequest.getId();
+	public Request details(RequestDetailsRequest requestDetailsRequest) {
+		String sqlQuery = "SELECT * FROM request WHERE id = " + requestDetailsRequest.getId();
 		Query query = entityManager.createNativeQuery(sqlQuery, Request.class);
 		List<Request> listRequest = query.getResultList();
 		

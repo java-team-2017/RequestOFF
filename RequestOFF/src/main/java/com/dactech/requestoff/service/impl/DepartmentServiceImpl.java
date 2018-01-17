@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
+import com.dactech.requestoff.model.request.DepartmentDetailsRequest;
 import com.dactech.requestoff.model.request.DepartmentRegistRequest;
 import com.dactech.requestoff.model.request.DepartmentSearchRequest;
+import com.dactech.requestoff.model.response.DepartmentDetailsResponse;
 import com.dactech.requestoff.model.response.DepartmentRegistResponse;
 import com.dactech.requestoff.model.response.DepartmentSearchResponse;
 import com.dactech.requestoff.repository.DepartmentRepository;
@@ -49,5 +51,12 @@ public class DepartmentServiceImpl implements DepartmentService {
 		List<Department> listDepartment = departmentRepository.search(departmentSearchRequest);
 		DepartmentSearchResponse departmentSearchResponse = new DepartmentSearchResponse(listDepartment);
 		return departmentSearchResponse;
+	}
+	
+	@Override
+	public DepartmentDetailsResponse details(DepartmentDetailsRequest departmentDetailsRequest) {
+		Department department = departmentRepository.details(departmentDetailsRequest);
+		DepartmentDetailsResponse departmentDetailsResponse = new DepartmentDetailsResponse(department);
+		return departmentDetailsResponse;
 	}
 }
