@@ -3,7 +3,7 @@ package com.dactech.requestoff.model.response;
 import com.dactech.requestoff.model.entity.CompanyYearOff;
 
 public class CompanyYearOffDetailsResponse {
-	CompanyYearOff companyYearOff;
+	private CompanyYearOff companyYearOff;
 
 	public CompanyYearOffDetailsResponse() {
 		super();

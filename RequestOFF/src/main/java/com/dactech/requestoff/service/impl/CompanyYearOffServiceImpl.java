@@ -1,13 +1,17 @@
 package com.dactech.requestoff.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.CompanyYearOff;
 import com.dactech.requestoff.model.request.CompanyYearOffDetailsRequest;
 import com.dactech.requestoff.model.request.CompanyYearOffRegistRequest;
+import com.dactech.requestoff.model.request.CompanyYearOffSearchRequest;
 import com.dactech.requestoff.model.response.CompanyYearOffDetailsResponse;
 import com.dactech.requestoff.model.response.CompanyYearOffRegistResponse;
+import com.dactech.requestoff.model.response.CompanyYearOffSearchResponse;
 import com.dactech.requestoff.repository.CompanyYearOffRepository;
 import com.dactech.requestoff.service.CompanyYearOffService;
 
@@ -33,6 +37,13 @@ public class CompanyYearOffServiceImpl implements CompanyYearOffService{
 		
 		CompanyYearOffRegistResponse companyYearOffRegistResponse = new CompanyYearOffRegistResponse(companyYearOff.getId());
 		return companyYearOffRegistResponse;
+	}
+	
+	@Override
+	public CompanyYearOffSearchResponse search(CompanyYearOffSearchRequest companyYearOffSearchRequest) {
+		List<CompanyYearOff> listCompanyYearOff = companyYearOffRepository.search(companyYearOffSearchRequest);
+		CompanyYearOffSearchResponse companyYearOffSearchResponse = new CompanyYearOffSearchResponse(listCompanyYearOff);
+		return companyYearOffSearchResponse;
 	}
 	
 	@Override
