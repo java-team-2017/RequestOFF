@@ -1,17 +1,19 @@
 package com.dactech.requestoff.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.CompanyYearOff;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.EmployeeOffStatus;
-import com.dactech.requestoff.model.request.DepartmentDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatusDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatusRegistRequest;
-import com.dactech.requestoff.model.response.DepartmentDetailsResponse;
+import com.dactech.requestoff.model.request.EmployeeOffStatusSearchRequest;
 import com.dactech.requestoff.model.response.EmployeeOffStatusDetailsResponse;
 import com.dactech.requestoff.model.response.EmployeeOffStatusRegistResponse;
+import com.dactech.requestoff.model.response.EmployeeOffStatusSearchResponse;
 import com.dactech.requestoff.repository.CompanyYearOffRepository;
 import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
@@ -53,5 +55,13 @@ public class EmployeeOffStatusServiceImpl implements EmployeeOffStatusService {
 		EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.details(employeeOffStatusDetailsRequest);
 		EmployeeOffStatusDetailsResponse employeeOffStatusDetailsResponse = new EmployeeOffStatusDetailsResponse(employeeOffStatus);
 		return employeeOffStatusDetailsResponse;
+	}
+
+	@Override
+	public EmployeeOffStatusSearchResponse search(EmployeeOffStatusSearchRequest employeeOffStatusSearchRequest) {
+		List<EmployeeOffStatus> listEmployeeOffStatus = employeeOffStatusRepository.search(employeeOffStatusSearchRequest);
+		EmployeeOffStatusSearchResponse response = new EmployeeOffStatusSearchResponse();
+		response.setListEmployeeOffStatus(listEmployeeOffStatus);
+		return response;
 	}
 }

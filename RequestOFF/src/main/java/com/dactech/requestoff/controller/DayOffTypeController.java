@@ -33,8 +33,7 @@ public class DayOffTypeController {
 
 	@RequestMapping(value = "/dayOffType/details", method = RequestMethod.POST)
 	public DayOffTypeDetailsResponse details(@RequestBody DayOffTypeDetailsRequest dayOffTypeDetailsRequest) {
-		DayOffTypeDetailsResponse dayOffTypeDetailsResponse = dayOffTypeService
-				.detailsDayOffType(dayOffTypeDetailsRequest);
+		DayOffTypeDetailsResponse dayOffTypeDetailsResponse = dayOffTypeService.detailsDayOffType(dayOffTypeDetailsRequest);
 		return dayOffTypeDetailsResponse;
 	}
 }
