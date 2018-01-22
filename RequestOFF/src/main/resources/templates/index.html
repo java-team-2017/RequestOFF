@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Insert title here</title>
+</head>
+<body>
+	<h1 align="center">This is index page</h1>
+	<span sec:authorize="isAuthenticated()"> | Logged user: <span
+		sec:authentication="name"></span> | Roles: <span
+		sec:authentication="principal.authorities"></span> | <a
+		th:href="@{/logout}">Sign Out</a>
+	</span>
+</body>
+</html>

@@ -3,6 +3,7 @@ package com.dactech.requestoff.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.Employee;
@@ -21,6 +22,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Autowired
 	EmployeeRepository employeeRepository;
 
+	@Autowired
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
+
 	@Override
 	public EmployeeRegistResponse employeeRegist(EmployeeRegistRequest employeeRegistRequest) {
 
@@ -38,6 +42,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		employee.setBirthday(employeeRegistRequest.getBirthday());
 		employee.setPosition(position);
 		employee.setEmail(employeeRegistRequest.getEmail());
+		employee.setPassword(bCryptPasswordEncoder.encode(employeeRegistRequest.getPassword()));
 		employee.setPhone(employeeRegistRequest.getPhone());
 		employee.setStartWorkingDate(employeeRegistRequest.getStartWorkingDate());
 		employee.setOfficialWorkingDate(employeeRegistRequest.getOfficialWorkingDate());

@@ -10,6 +10,7 @@ public class EmployeeRegistRequest {
 	@JsonProperty("position_id")
 	private long positionId;
 	private String email;
+	private String password;
 	private long phone;
 	@JsonProperty("start_working_date")
 	private String startWorkingDate;
@@ -19,10 +20,12 @@ public class EmployeeRegistRequest {
 	private int validFlag;
 
 	public EmployeeRegistRequest() {
+		super();
+		// TODO Auto-generated constructor stub
 	}
 
 	public EmployeeRegistRequest(long id, String name, String gender, String birthday, long positionId, String email,
-			long phone, String startWorkingDate, String officialWorkingDate, int validFlag) {
+			String password, long phone, String startWorkingDate, String officialWorkingDate, int validFlag) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -30,6 +33,7 @@ public class EmployeeRegistRequest {
 		this.birthday = birthday;
 		this.positionId = positionId;
 		this.email = email;
+		this.password = password;
 		this.phone = phone;
 		this.startWorkingDate = startWorkingDate;
 		this.officialWorkingDate = officialWorkingDate;
@@ -82,6 +86,14 @@ public class EmployeeRegistRequest {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public long getPhone() {

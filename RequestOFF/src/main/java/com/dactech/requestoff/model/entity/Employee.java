@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
@@ -28,6 +29,8 @@ public class Employee {
 	@JsonIgnoreProperties("listEmployee")
 	private Position position;
 	private String email;
+	@JsonIgnore
+	private String password;
 	private long phone;
 	private String startWorkingDate;
 	private String officialWorkingDate;
@@ -36,7 +39,7 @@ public class Employee {
 	private long insertOperator;
 	private String updateDate;
 	private long updateOperator;
-	
+
 	@OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
 	@JsonIgnoreProperties("employee")
 	private List<Request> listRequest;
@@ -50,20 +53,27 @@ public class Employee {
 	private Department department;
 
 	@OneToOne(mappedBy = "leader")
-	@JsonIgnoreProperties(value = {"leader", "listEmployee"})
+	@JsonIgnoreProperties(value = { "leader", "listEmployee" })
 	private Team team;
 
 	@ManyToMany(mappedBy = "listEmployee")
-	@JsonIgnoreProperties(value = {"leader", "listEmployee"})
+	@JsonIgnoreProperties(value = { "leader", "listEmployee" })
 	private List<Team> listTeam;
 
+	@ManyToMany(mappedBy = "listEmployee")
+	@JsonIgnoreProperties(value = { "listEmployee" })
+	private List<Role> listRole;
+
 	public Employee() {
+		super();
+		// TODO Auto-generated constructor stub
 	}
 
-	public Employee(long id, String name, String gender, String birthday, Position position, String email, long phone,
-			String startWorkingDate, String officialWorkingDate, int validFlag, String insertDate, long insertOperator,
-			String updateDate, long updateOperator, List<Request> listRequest,
-			List<EmployeeOffStatus> listEmployeeOffStatus, Department department, Team team, List<Team> listTeam) {
+	public Employee(long id, String name, String gender, String birthday, Position position, String email,
+			String password, long phone, String startWorkingDate, String officialWorkingDate, int validFlag,
+			String insertDate, long insertOperator, String updateDate, long updateOperator, List<Request> listRequest,
+			List<EmployeeOffStatus> listEmployeeOffStatus, Department department, Team team, List<Team> listTeam,
+			List<Role> listRole) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -71,6 +81,7 @@ public class Employee {
 		this.birthday = birthday;
 		this.position = position;
 		this.email = email;
+		this.password = password;
 		this.phone = phone;
 		this.startWorkingDate = startWorkingDate;
 		this.officialWorkingDate = officialWorkingDate;
@@ -84,6 +95,7 @@ public class Employee {
 		this.department = department;
 		this.team = team;
 		this.listTeam = listTeam;
+		this.listRole = listRole;
 	}
 
 	public long getId() {
@@ -132,6 +144,14 @@ public class Employee {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public long getPhone() {
@@ -236,6 +256,14 @@ public class Employee {
 
 	public void setListTeam(List<Team> listTeam) {
 		this.listTeam = listTeam;
+	}
+
+	public List<Role> getListRole() {
+		return listRole;
+	}
+
+	public void setListRole(List<Role> listRole) {
+		this.listRole = listRole;
 	}
 
 }
