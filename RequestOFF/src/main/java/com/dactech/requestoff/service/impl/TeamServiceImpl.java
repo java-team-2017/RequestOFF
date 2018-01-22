@@ -27,7 +27,7 @@ public class TeamServiceImpl implements TeamService {
 	TeamRepository teamRepository;
 
 	@Override
-	public TeamRegistResponse teamRegist(TeamRegistRequest teamRegistRequest) {
+	public TeamRegistResponse teamRegist(TeamRegistRequest teamRegistRequest) throws Exception {
 
 		Department department = new Department();
 		department.setId(teamRegistRequest.getDepartmentId());
@@ -35,8 +35,12 @@ public class TeamServiceImpl implements TeamService {
 		leader.setId(teamRegistRequest.getLeaderId());
 
 		Team team = teamRepository.findById(teamRegistRequest.getId());
-		if (team == null) { // register new team
+
+		if (team == null) { // regist new Team
 			team = new Team();
+		} else if (!team.getUpdateDate().equals(teamRegistRequest.getUpdateDate())) { // update case, check update date
+			throw new Exception("Someone updated Team with id " + teamRegistRequest.getId() + " at "
+					+ teamRegistRequest.getUpdateDate());
 		}
 
 		team.setValidFlag(teamRegistRequest.getValidFlag());

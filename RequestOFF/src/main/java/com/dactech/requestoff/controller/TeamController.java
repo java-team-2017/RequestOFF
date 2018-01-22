@@ -36,7 +36,16 @@ public class TeamController {
 
 	@RequestMapping(value = "/team/search", method = RequestMethod.POST)
 	public TeamSearchResponse teamSearch(@RequestBody TeamSearchRequest teamSearchRequest) {
-		return teamService.teamSearch(teamSearchRequest);
+		TeamSearchResponse response;
+		try {
+			response = teamService.teamSearch(teamSearchRequest);
+			response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
+		} catch (Exception e) {
+			response = new TeamSearchResponse();
+			response.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
+		}
+
+		return response;
 	}
 
 	@RequestMapping(value = "/team/details", method = RequestMethod.POST)

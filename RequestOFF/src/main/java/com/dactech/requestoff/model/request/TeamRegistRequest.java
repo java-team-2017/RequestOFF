@@ -9,18 +9,21 @@ public class TeamRegistRequest {
 	private long leaderId;
 	@JsonProperty("department_id")
 	private long departmentId;
+	@JsonProperty("update_date")
+	private String updateDate;
 	@JsonProperty("valid_flag")
 	private int validFlag;
 
 	public TeamRegistRequest() {
 	}
 
-	public TeamRegistRequest(long id, String name, long leaderId, long departmentId, int validFlag) {
+	public TeamRegistRequest(long id, String name, long leaderId, long departmentId, String updateDate, int validFlag) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.leaderId = leaderId;
 		this.departmentId = departmentId;
+		this.updateDate = updateDate;
 		this.validFlag = validFlag;
 	}
 
@@ -54,6 +57,14 @@ public class TeamRegistRequest {
 
 	public void setDepartmentId(long departmentId) {
 		this.departmentId = departmentId;
+	}
+
+	public String getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(String updateDate) {
+		this.updateDate = updateDate;
 	}
 
 	public int getValidFlag() {

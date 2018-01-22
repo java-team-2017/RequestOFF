@@ -8,7 +8,7 @@ import com.dactech.requestoff.model.response.TeamRegistResponse;
 import com.dactech.requestoff.model.response.TeamSearchResponse;
 
 public interface TeamService {
-	TeamRegistResponse teamRegist(TeamRegistRequest teamRegistRequest);
+	TeamRegistResponse teamRegist(TeamRegistRequest teamRegistRequest) throws Exception;
 
 	TeamSearchResponse teamSearch(TeamSearchRequest teamSearchRequest);
 
