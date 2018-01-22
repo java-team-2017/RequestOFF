@@ -11,6 +11,8 @@ public class EmployeeOffStatusRegistRequest {
 	private long remainHours;
 	@JsonProperty("total_hours")
 	private long totalHours;
+	@JsonProperty("update_date")
+	private String updateDate;
 	@JsonProperty("valid_flag")
 	private int validFlag;
 
@@ -19,12 +21,14 @@ public class EmployeeOffStatusRegistRequest {
 		// TODO Auto-generated constructor stub
 	}
 
-	public EmployeeOffStatusRegistRequest(long yearId, long employeeId, long remainHours, long totalHours, int validFlag) {
+	public EmployeeOffStatusRegistRequest(long yearId, long employeeId, long remainHours, long totalHours,
+			String updateDate, int validFlag) {
 		super();
 		this.yearId = yearId;
 		this.employeeId = employeeId;
 		this.remainHours = remainHours;
 		this.totalHours = totalHours;
+		this.updateDate = updateDate;
 		this.validFlag = validFlag;
 	}
 
@@ -58,6 +62,14 @@ public class EmployeeOffStatusRegistRequest {
 
 	public void setTotalHours(long totalHours) {
 		this.totalHours = totalHours;
+	}
+
+	public String getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(String updateDate) {
+		this.updateDate = updateDate;
 	}
 
 	public int getValidFlag() {

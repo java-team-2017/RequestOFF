@@ -36,7 +36,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			employee = new Employee();
 		} else if (!employee.getUpdateDate().equals(employeeRegistRequest.getUpdateDate())) { // update case, check update date
 			throw new Exception("Someone updated Employee with id " + employeeRegistRequest.getId() + " at "
-					+ employeeRegistRequest.getUpdateDate());
+					+ employee.getUpdateDate());
 		}
 
 		employee.setValidFlag(employeeRegistRequest.getValidFlag());

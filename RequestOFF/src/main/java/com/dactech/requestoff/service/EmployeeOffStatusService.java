@@ -8,7 +8,7 @@ import com.dactech.requestoff.model.response.EmployeeOffStatusRegistResponse;
 import com.dactech.requestoff.model.response.EmployeeOffStatusSearchResponse;
 
 public interface EmployeeOffStatusService {
-	EmployeeOffStatusRegistResponse employeeOffStatusRegist(EmployeeOffStatusRegistRequest employeeOffStatusRegistRequest);
+	EmployeeOffStatusRegistResponse employeeOffStatusRegist(EmployeeOffStatusRegistRequest employeeOffStatusRegistRequest) throws Exception;
 
 	public EmployeeOffStatusSearchResponse search(EmployeeOffStatusSearchRequest employeeOffStatusSearchRequest);
 

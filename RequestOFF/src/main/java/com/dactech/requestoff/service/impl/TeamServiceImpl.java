@@ -40,7 +40,7 @@ public class TeamServiceImpl implements TeamService {
 			team = new Team();
 		} else if (!team.getUpdateDate().equals(teamRegistRequest.getUpdateDate())) { // update case, check update date
 			throw new Exception("Someone updated Team with id " + teamRegistRequest.getId() + " at "
-					+ teamRegistRequest.getUpdateDate());
+					+ team.getUpdateDate());
 		}
 
 		team.setValidFlag(teamRegistRequest.getValidFlag());

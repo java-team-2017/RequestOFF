@@ -29,7 +29,7 @@ public class EmployeeOffStatusServiceImpl implements EmployeeOffStatusService {
 	CompanyYearOffRepository companyYearOffRepository;
 
 	@Override
-	public EmployeeOffStatusRegistResponse employeeOffStatusRegist(EmployeeOffStatusRegistRequest eOSRRequest) {
+	public EmployeeOffStatusRegistResponse employeeOffStatusRegist(EmployeeOffStatusRegistRequest eOSRRequest) throws Exception {
 		EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(eOSRRequest.getYearId(),
 				eOSRRequest.getEmployeeId());
 		if (employeeOffStatus == null) {
@@ -38,6 +38,9 @@ public class EmployeeOffStatusServiceImpl implements EmployeeOffStatusService {
 			Employee employee = employeeRepository.findById(eOSRRequest.getEmployeeId());
 			employeeOffStatus.setEmployee(employee);
 			employeeOffStatus.setCompanyYearOff(companyYearOff);
+		} else if (!employeeOffStatus.getUpdateDate().equals(eOSRRequest.getUpdateDate())) { // update case, check update date
+			throw new Exception("Someone updated EmployeeOffStatus at "
+					+ employeeOffStatus.getUpdateDate());
 		}
 
 		employeeOffStatus.setRemainHours(eOSRRequest.getRemainHours());
