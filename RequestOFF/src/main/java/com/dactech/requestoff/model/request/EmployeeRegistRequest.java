@@ -16,6 +16,8 @@ public class EmployeeRegistRequest {
 	private String startWorkingDate;
 	@JsonProperty("official_working_date")
 	private String officialWorkingDate;
+	@JsonProperty("update_date")
+	private String updateDate;
 	@JsonProperty("valid_flag")
 	private int validFlag;
 
@@ -25,7 +27,8 @@ public class EmployeeRegistRequest {
 	}
 
 	public EmployeeRegistRequest(long id, String name, String gender, String birthday, long positionId, String email,
-			String password, long phone, String startWorkingDate, String officialWorkingDate, int validFlag) {
+			String password, long phone, String startWorkingDate, String officialWorkingDate, String updateDate,
+			int validFlag) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -37,6 +40,7 @@ public class EmployeeRegistRequest {
 		this.phone = phone;
 		this.startWorkingDate = startWorkingDate;
 		this.officialWorkingDate = officialWorkingDate;
+		this.updateDate = updateDate;
 		this.validFlag = validFlag;
 	}
 
@@ -118,6 +122,14 @@ public class EmployeeRegistRequest {
 
 	public void setOfficialWorkingDate(String officialWorkingDate) {
 		this.officialWorkingDate = officialWorkingDate;
+	}
+
+	public String getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(String updateDate) {
+		this.updateDate = updateDate;
 	}
 
 	public int getValidFlag() {

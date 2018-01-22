@@ -26,7 +26,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Override
-	public EmployeeRegistResponse employeeRegist(EmployeeRegistRequest employeeRegistRequest) {
+	public EmployeeRegistResponse employeeRegist(EmployeeRegistRequest employeeRegistRequest) throws Exception {
 
 		Position position = new Position();
 		position.setId(employeeRegistRequest.getPositionId());
@@ -34,6 +34,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 		Employee employee = employeeRepository.findById(employeeRegistRequest.getId());
 		if (employee == null) { // insert new Employee
 			employee = new Employee();
+		} else if (!employee.getUpdateDate().equals(employeeRegistRequest.getUpdateDate())) { // update case, check update date
+			throw new Exception("Someone updated Employee with id " + employeeRegistRequest.getId() + " at "
+					+ employeeRegistRequest.getUpdateDate());
 		}
 
 		employee.setValidFlag(employeeRegistRequest.getValidFlag());
