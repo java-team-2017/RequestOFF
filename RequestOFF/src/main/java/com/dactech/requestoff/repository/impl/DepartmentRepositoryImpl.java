@@ -46,19 +46,4 @@ public class DepartmentRepositoryImpl implements DepartmentRepositoryCustom {
 		List<Department> listDepartment = query.getResultList();
 		return listDepartment;
 	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public Department details(DepartmentDetailsRequest departmentDetailsRequest) {
-		String sqlQuery = "SELECT * FROM department WHERE id = " + departmentDetailsRequest.getId();
-		Query query = entityManager.createNativeQuery(sqlQuery, Department.class);
-		List<Department> listDepartment = query.getResultList();
-		
-		if(listDepartment.size() > 0) {
-			return listDepartment.get(0);
-		}
-		else {
-			return new Department();
-		}
-	}
 }

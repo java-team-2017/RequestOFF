@@ -9,5 +9,4 @@ import com.dactech.requestoff.model.request.DepartmentSearchRequest;
 public interface DepartmentRepositoryCustom {
 	public List<Department> search(DepartmentSearchRequest departmentSearchRequest);
 	
-	public Department details(DepartmentDetailsRequest departmentDetailsRequest);
 }

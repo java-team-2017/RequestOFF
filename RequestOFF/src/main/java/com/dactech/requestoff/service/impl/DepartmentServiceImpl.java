@@ -21,11 +21,17 @@ public class DepartmentServiceImpl implements DepartmentService {
 	@Autowired
 	DepartmentRepository departmentRepository;
 	
-	public DepartmentRegistResponse registDepartment(DepartmentRegistRequest departmentRegistRequest) {
-		Department department = departmentRepository.findById(departmentRegistRequest.getId());
+	public DepartmentRegistResponse registDepartment(DepartmentRegistRequest departmentRegistRequest) throws Exception {
+		DepartmentRegistResponse departmentRegistResponse = new DepartmentRegistResponse();
 		
+		Department department = departmentRepository.findById(departmentRegistRequest.getId());
 		if(department == null) {
 			department = new Department();
+		}
+		else {
+			if(departmentRegistRequest.getUpdateDate().equals( department.getUpdateDate() ) == false) {
+				throw new Exception("Someone updated Department with id " + departmentRegistRequest.getId() + " at " + department.getUpdateDate());
+			}
 		}
 		
 		department.setName(departmentRegistRequest.getName());
@@ -38,7 +44,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 		
 		departmentRepository.save(department);
 		
-		DepartmentRegistResponse departmentRegistResponse = new DepartmentRegistResponse(department.getId());
+		departmentRegistResponse.setId(department.getId());
 		
 		return departmentRegistResponse;
 	}
@@ -55,7 +61,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 	
 	@Override
 	public DepartmentDetailsResponse details(DepartmentDetailsRequest departmentDetailsRequest) {
-		Department department = departmentRepository.details(departmentDetailsRequest);
+		Department department = departmentRepository.findById(departmentDetailsRequest.getId());
 		DepartmentDetailsResponse departmentDetailsResponse = new DepartmentDetailsResponse(department);
 		return departmentDetailsResponse;
 	}

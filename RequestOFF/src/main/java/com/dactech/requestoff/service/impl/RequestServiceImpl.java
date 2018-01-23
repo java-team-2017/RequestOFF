@@ -23,11 +23,18 @@ public class RequestServiceImpl implements RequestService{
 	RequestRepository requestRepository;
 	
 	@Override
-	public RequestRegistResponse regist(RequestRegistRequest requestRegistRequest) {
+	public RequestRegistResponse regist(RequestRegistRequest requestRegistRequest) throws Exception{
+		RequestRegistResponse requestRegistResponse = new RequestRegistResponse();
+		
 		Request request = requestRepository.findById(requestRegistRequest.getId());
 		
 		if(request == null) {
 			request = new Request();
+		}
+		else {
+			if(requestRegistRequest.getUpdateDate().equals(request.getUpdateDate()) == false) {
+				throw new Exception("Someone updated Request with id " + requestRegistRequest.getId() + " at " + request.getUpdateDate());
+			}
 		}
 		
 		Employee employee = new Employee();
@@ -48,8 +55,7 @@ public class RequestServiceImpl implements RequestService{
 		request.setValidFlag(requestRegistRequest.getValidFlag());
 		
 		requestRepository.save(request);
-		
-		RequestRegistResponse requestRegistResponse = new RequestRegistResponse(request.getId());	
+		requestRegistResponse.setId(request.getId());
 		return requestRegistResponse;
 	}
 
@@ -61,7 +67,7 @@ public class RequestServiceImpl implements RequestService{
 
 	@Override
 	public RequestDetailsResponse details(RequestDetailsRequest requestDetailsRequest) {
-		Request request = requestRepository.details(requestDetailsRequest);
+		Request request = requestRepository.findById(requestDetailsRequest.getId());
 		RequestDetailsResponse requestDetailsResponse = new RequestDetailsResponse(request);
 		return requestDetailsResponse;
 	}

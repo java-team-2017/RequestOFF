@@ -10,17 +10,21 @@ public class CompanyYearOffRegistRequest {
 	private int currentYearFlag;
 	@JsonProperty("valid_flag")
 	private int validFlag;
+	@JsonProperty("update_date")
+	private String updateDate;
 
 	public CompanyYearOffRegistRequest() {
 		super();
 	}
 
-	public CompanyYearOffRegistRequest(long id, int dayOffResetFlag, int currentYearFlag, int validFlag) {
+	public CompanyYearOffRegistRequest(long id, int dayOffResetFlag, int currentYearFlag, int validFlag,
+			String updateDate) {
 		super();
 		this.id = id;
 		this.dayOffResetFlag = dayOffResetFlag;
 		this.currentYearFlag = currentYearFlag;
 		this.validFlag = validFlag;
+		this.updateDate = updateDate;
 	}
 
 	public long getId() {
@@ -53,6 +57,14 @@ public class CompanyYearOffRegistRequest {
 
 	public void setValidFlag(int validFlag) {
 		this.validFlag = validFlag;
+	}
+
+	public String getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(String updateDate) {
+		this.updateDate = updateDate;
 	}
 
 }

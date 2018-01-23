@@ -37,9 +37,16 @@ public class EmployeeOffStatusController {
 	}
 
 	@RequestMapping(value = "/employeeOffStatus/details", method = RequestMethod.POST)
-	EmployeeOffStatusDetailsResponse details(
-			@RequestBody EmployeeOffStatusDetailsRequest employeeOffStatusDetailsRequest) {
-		return employeeOffStatusService.details(employeeOffStatusDetailsRequest);
+	EmployeeOffStatusDetailsResponse details(@RequestBody EmployeeOffStatusDetailsRequest employeeOffStatusDetailsRequest) {
+		EmployeeOffStatusDetailsResponse employeeOffStatusDetailsResponse = new EmployeeOffStatusDetailsResponse();
+		try {
+			employeeOffStatusDetailsResponse = employeeOffStatusService.details(employeeOffStatusDetailsRequest);
+			employeeOffStatusDetailsResponse.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
+		} catch (Exception e) {
+			employeeOffStatusDetailsResponse.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
+		}
+		
+		return employeeOffStatusDetailsResponse;
 	}
 
 	@RequestMapping(value = "/employeeOffStatus/search", method = RequestMethod.POST)

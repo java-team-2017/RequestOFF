@@ -1,9 +1,9 @@
 package com.dactech.requestoff.model.response;
 
+import com.dactech.requestoff.model.common.Common;
 import com.dactech.requestoff.model.entity.Request;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class RequestDetailsResponse {
+public class RequestDetailsResponse extends Common {
 	Request request;
 
 	public RequestDetailsResponse() {

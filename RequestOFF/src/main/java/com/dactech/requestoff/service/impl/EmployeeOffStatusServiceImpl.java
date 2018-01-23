@@ -55,7 +55,8 @@ public class EmployeeOffStatusServiceImpl implements EmployeeOffStatusService {
 	
 	@Override
 	public EmployeeOffStatusDetailsResponse details(EmployeeOffStatusDetailsRequest employeeOffStatusDetailsRequest) {
-		EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.details(employeeOffStatusDetailsRequest);
+		EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(employeeOffStatusDetailsRequest.getYearId(), 
+																					employeeOffStatusDetailsRequest.getEmployeeId());
 		EmployeeOffStatusDetailsResponse employeeOffStatusDetailsResponse = new EmployeeOffStatusDetailsResponse(employeeOffStatus);
 		return employeeOffStatusDetailsResponse;
 	}

@@ -21,12 +21,18 @@ public class CompanyYearOffServiceImpl implements CompanyYearOffService{
 	CompanyYearOffRepository companyYearOffRepository;
 	
 	@Override
-	public CompanyYearOffRegistResponse regist(CompanyYearOffRegistRequest companyYearOffRegistRequest) {
+	public CompanyYearOffRegistResponse regist(CompanyYearOffRegistRequest companyYearOffRegistRequest) throws Exception{
+		CompanyYearOffRegistResponse companyYearOffRegistResponse = new CompanyYearOffRegistResponse();
 		CompanyYearOff companyYearOff = companyYearOffRepository.findById(companyYearOffRegistRequest.getId());
 		
 		if(companyYearOff == null) {
 			companyYearOff = new CompanyYearOff();
 			companyYearOff.setId(companyYearOffRegistRequest.getId());
+		}
+		else {
+			if(companyYearOffRegistRequest.getUpdateDate().equals( companyYearOff.getUpdateDate() ) == false) {
+				throw new Exception("Someone updated CompanyYearOff with id " + companyYearOffRegistRequest.getId() + " at " + companyYearOff.getUpdateDate());
+			}
 		}
 		
 		companyYearOff.setDayOffResetFlag(companyYearOffRegistRequest.getDayOffResetFlag());
@@ -35,7 +41,7 @@ public class CompanyYearOffServiceImpl implements CompanyYearOffService{
 		
 		companyYearOffRepository.save(companyYearOff);
 		
-		CompanyYearOffRegistResponse companyYearOffRegistResponse = new CompanyYearOffRegistResponse(companyYearOff.getId());
+		companyYearOffRegistResponse.setId(companyYearOff.getId());
 		return companyYearOffRegistResponse;
 	}
 	
@@ -48,7 +54,7 @@ public class CompanyYearOffServiceImpl implements CompanyYearOffService{
 	
 	@Override
 	public CompanyYearOffDetailsResponse details(CompanyYearOffDetailsRequest companyYearOffDetailsRequest) {
-		CompanyYearOff companyYearOff = companyYearOffRepository.details(companyYearOffDetailsRequest);
+		CompanyYearOff companyYearOff = companyYearOffRepository.findById(companyYearOffDetailsRequest.getId());
 		CompanyYearOffDetailsResponse companyYearOffDetailsResponse = new CompanyYearOffDetailsResponse(companyYearOff);
 		return companyYearOffDetailsResponse;
 	}

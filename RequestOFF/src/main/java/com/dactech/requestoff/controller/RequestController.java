@@ -13,8 +13,6 @@ import com.dactech.requestoff.model.request.RequestSearchRequest;
 import com.dactech.requestoff.model.response.RequestDetailsResponse;
 import com.dactech.requestoff.model.response.RequestRegistResponse;
 import com.dactech.requestoff.model.response.RequestSearchResponse;
-import com.dactech.requestoff.model.response.TeamRegistResponse;
-import com.dactech.requestoff.model.response.TeamSearchResponse;
 import com.dactech.requestoff.service.RequestService;
 
 @RestController
@@ -24,7 +22,16 @@ public class RequestController {
 
 	@RequestMapping(value = "/request/regist", method = RequestMethod.POST)
 	public RequestRegistResponse regist(@RequestBody RequestRegistRequest requestRegistRequest) {
-		return requestService.regist(requestRegistRequest);
+		RequestRegistResponse requestRegistResponse = new RequestRegistResponse();
+		StatusInfo statusInfo = null;
+		try {
+			requestRegistResponse = requestService.regist(requestRegistRequest);
+			statusInfo = new StatusInfo(StatusInfo.SUCCESS, null);
+		} catch (Exception e) {
+			statusInfo = new StatusInfo(StatusInfo.ERROR, e.getMessage());
+		}
+		requestRegistResponse.setStatusInfo(statusInfo);
+		return requestRegistResponse;
 	}
 
 	@RequestMapping(value = "/request/search", method = RequestMethod.POST)
@@ -34,7 +41,6 @@ public class RequestController {
 			response = requestService.requestSearch(requestSearchRequest);
 			response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
 		} catch (Exception e) {
-			response = new RequestSearchResponse();
 			response.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
 		}
 
@@ -43,6 +49,14 @@ public class RequestController {
 
 	@RequestMapping(value = "/request/details", method = RequestMethod.POST)
 	public RequestDetailsResponse details(@RequestBody RequestDetailsRequest requestDetailsRequest) {
-		return requestService.details(requestDetailsRequest);
+		RequestDetailsResponse requestDetailsResponse = new RequestDetailsResponse();
+		try {
+			requestDetailsResponse = requestService.details(requestDetailsRequest);
+			requestDetailsResponse.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
+		} catch (Exception e) {
+			requestDetailsResponse.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
+		}
+		
+		return requestDetailsResponse;
 	}
 }

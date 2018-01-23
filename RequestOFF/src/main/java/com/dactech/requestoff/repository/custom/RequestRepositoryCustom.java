@@ -8,6 +8,4 @@ import com.dactech.requestoff.model.request.RequestSearchRequest;
 
 public interface RequestRepositoryCustom {
 	public List<Request> searchRequest(RequestSearchRequest requestSearchRequest);
-	
-	public Request details(RequestDetailsRequest requestDetailsRequest);
 }

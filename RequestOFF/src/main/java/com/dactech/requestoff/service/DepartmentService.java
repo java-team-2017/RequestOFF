@@ -9,7 +9,7 @@ import com.dactech.requestoff.model.response.DepartmentRegistResponse;
 import com.dactech.requestoff.model.response.DepartmentSearchResponse;
 
 public interface DepartmentService {
-	public DepartmentRegistResponse registDepartment(DepartmentRegistRequest departmentRegistRequest);
+	public DepartmentRegistResponse registDepartment(DepartmentRegistRequest departmentRegistRequest) throws Exception;
 	
 	public Department getDepartment(long id);
 	

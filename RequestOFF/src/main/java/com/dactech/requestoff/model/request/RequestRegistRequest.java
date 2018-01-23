@@ -20,13 +20,15 @@ public class RequestRegistRequest {
 	private long recipientId;
 	@JsonProperty("valid_flag")
 	private int validFlag;
+	@JsonProperty("update_date")
+	private String updateDate;
 
 	public RequestRegistRequest() {
 		super();
 	}
 
 	public RequestRegistRequest(long id, long employeeId, String fromTime, String toTime, String reason, long status,
-			String responseMessage, long dayOffTypeId, long recipientId, int validFlag) {
+			String responseMessage, long dayOffTypeId, long recipientId, int validFlag, String updateDate) {
 		super();
 		this.id = id;
 		this.employeeId = employeeId;
@@ -38,6 +40,7 @@ public class RequestRegistRequest {
 		this.dayOffTypeId = dayOffTypeId;
 		this.recipientId = recipientId;
 		this.validFlag = validFlag;
+		this.updateDate = updateDate;
 	}
 
 	public long getId() {
@@ -118,6 +121,14 @@ public class RequestRegistRequest {
 
 	public void setValidFlag(int validFlag) {
 		this.validFlag = validFlag;
+	}
+
+	public String getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(String updateDate) {
+		this.updateDate = updateDate;
 	}
 
 }

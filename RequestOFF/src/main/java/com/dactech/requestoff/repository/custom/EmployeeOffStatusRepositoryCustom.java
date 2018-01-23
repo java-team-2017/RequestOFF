@@ -9,5 +9,4 @@ import com.dactech.requestoff.model.request.EmployeeOffStatusSearchRequest;
 public interface EmployeeOffStatusRepositoryCustom {
 	public List<EmployeeOffStatus> search(EmployeeOffStatusSearchRequest employeeOffStatusSearchRequest);
 
-	public EmployeeOffStatus details(EmployeeOffStatusDetailsRequest employeeOffStatusDetailsRequest);
 }

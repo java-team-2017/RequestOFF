@@ -68,20 +68,5 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		List<Request> requests = query.getResultList();
 		return requests;
 	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public Request details(RequestDetailsRequest requestDetailsRequest) {
-		String sqlQuery = "SELECT * FROM request WHERE id = " + requestDetailsRequest.getId();
-		Query query = entityManager.createNativeQuery(sqlQuery, Request.class);
-		List<Request> listRequest = query.getResultList();
-		
-		if(listRequest.size() > 0) {
-			return listRequest.get(0);
-		}
-		else {
-			return new Request();
-		}
-	}
 
 }

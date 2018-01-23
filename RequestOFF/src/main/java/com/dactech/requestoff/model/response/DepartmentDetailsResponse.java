@@ -1,8 +1,9 @@
 package com.dactech.requestoff.model.response;
 
+import com.dactech.requestoff.model.common.Common;
 import com.dactech.requestoff.model.entity.Department;
 
-public class DepartmentDetailsResponse {
+public class DepartmentDetailsResponse extends Common{
 	Department department;
 
 	public DepartmentDetailsResponse() {

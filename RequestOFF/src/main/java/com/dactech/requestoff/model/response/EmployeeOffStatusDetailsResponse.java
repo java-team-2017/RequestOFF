@@ -1,9 +1,10 @@
 package com.dactech.requestoff.model.response;
 
+import com.dactech.requestoff.model.common.Common;
 import com.dactech.requestoff.model.entity.EmployeeOffStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class EmployeeOffStatusDetailsResponse {
+public class EmployeeOffStatusDetailsResponse extends Common{
 	@JsonProperty("employee_off_status")
 	EmployeeOffStatus employeeOffStatus;
 

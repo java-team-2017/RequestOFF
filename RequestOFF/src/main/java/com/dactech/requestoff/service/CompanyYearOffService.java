@@ -8,7 +8,7 @@ import com.dactech.requestoff.model.response.CompanyYearOffRegistResponse;
 import com.dactech.requestoff.model.response.CompanyYearOffSearchResponse;
 
 public interface CompanyYearOffService {
-	public CompanyYearOffRegistResponse regist(CompanyYearOffRegistRequest companyYearOffRegistRequest);
+	public CompanyYearOffRegistResponse regist(CompanyYearOffRegistRequest companyYearOffRegistRequest) throws Exception;
 	
 	public CompanyYearOffSearchResponse search(CompanyYearOffSearchRequest companyYearOffSearchRequest);
 	

@@ -2,9 +2,10 @@ package com.dactech.requestoff.model.response;
 
 import java.util.List;
 
+import com.dactech.requestoff.model.common.Common;
 import com.dactech.requestoff.model.entity.CompanyYearOff;
 
-public class CompanyYearOffSearchResponse {
+public class CompanyYearOffSearchResponse extends Common{
 	private List<CompanyYearOff> listCompanyYearOff;
 
 	public CompanyYearOffSearchResponse() {

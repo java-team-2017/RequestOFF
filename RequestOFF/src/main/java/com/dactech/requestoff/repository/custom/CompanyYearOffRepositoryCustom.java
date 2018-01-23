@@ -10,5 +10,4 @@ import com.dactech.requestoff.model.response.CompanyYearOffSearchResponse;
 public interface CompanyYearOffRepositoryCustom {
 	public List<CompanyYearOff> search(CompanyYearOffSearchRequest companyYearOffSearchRequest);
 	
-	public CompanyYearOff details(CompanyYearOffDetailsRequest companyYearOffDetailsRequest);
 }

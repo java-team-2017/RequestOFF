@@ -9,17 +9,20 @@ public class DepartmentRegistRequest {
 	private long managerId;
 	@JsonProperty("valid_flag")
 	private int validFlag;
+	@JsonProperty("update_date")
+	private String updateDate;
 
 	public DepartmentRegistRequest() {
 		super();
 	}
 
-	public DepartmentRegistRequest(long id, String name, long managerId, int validFlag) {
+	public DepartmentRegistRequest(long id, String name, long managerId, int validFlag, String updateDate) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.managerId = managerId;
 		this.validFlag = validFlag;
+		this.updateDate = updateDate;
 	}
 
 	public long getId() {
@@ -52,6 +55,14 @@ public class DepartmentRegistRequest {
 
 	public void setValidFlag(int validFlag) {
 		this.validFlag = validFlag;
+	}
+
+	public String getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(String updateDate) {
+		this.updateDate = updateDate;
 	}
 
 }

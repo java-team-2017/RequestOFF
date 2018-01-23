@@ -8,7 +8,7 @@ import com.dactech.requestoff.model.response.RequestRegistResponse;
 import com.dactech.requestoff.model.response.RequestSearchResponse;
 
 public interface RequestService {
-	public RequestRegistResponse regist(RequestRegistRequest requestRegistRequest);
+	public RequestRegistResponse regist(RequestRegistRequest requestRegistRequest) throws Exception;
 	
 	RequestSearchResponse requestSearch(RequestSearchRequest requestSearchRequest);
 	
