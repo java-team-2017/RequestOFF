@@ -49,6 +49,14 @@ public class CompanyYearOffController {
 	
 	@RequestMapping(value = "/companyYearOff/details", method = RequestMethod.POST)
 	public CompanyYearOffDetailsResponse details(@RequestBody CompanyYearOffDetailsRequest companyYearOffDetailsRequest) {
-		return companyYearOffService.details(companyYearOffDetailsRequest);
+		CompanyYearOffDetailsResponse response;
+		try {
+			response = companyYearOffService.details(companyYearOffDetailsRequest);
+			response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
+		} catch (Exception e) {
+			response = new CompanyYearOffDetailsResponse();
+			response.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
+		}
+		return response;
 	}
 }
