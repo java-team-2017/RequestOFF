@@ -1,8 +1,9 @@
 package com.dactech.requestoff.model.response;
 
+import com.dactech.requestoff.model.common.Common;
 import com.dactech.requestoff.model.entity.Position;
 
-public class PositionDetailsResponse {
+public class PositionDetailsResponse extends Common {
 	private Position position;
 
 	public PositionDetailsResponse() {

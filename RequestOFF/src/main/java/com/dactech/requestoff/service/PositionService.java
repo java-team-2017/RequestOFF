@@ -8,7 +8,7 @@ import com.dactech.requestoff.model.response.PositionRegistResponse;
 import com.dactech.requestoff.model.response.PositionSearchResponse;
 
 public interface PositionService {
-	public PositionRegistResponse registPosition(PositionRegistRequest positionRegistRequest);
+	public PositionRegistResponse registPosition(PositionRegistRequest positionRegistRequest) throws Exception;
 
 	public PositionSearchResponse searchPosition(PositionSearchRequest positionSearchRequest);
 

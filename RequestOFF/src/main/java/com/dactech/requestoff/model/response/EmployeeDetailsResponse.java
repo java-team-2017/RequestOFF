@@ -1,8 +1,9 @@
 package com.dactech.requestoff.model.response;
 
+import com.dactech.requestoff.model.common.Common;
 import com.dactech.requestoff.model.entity.Employee;
 
-public class EmployeeDetailsResponse {
+public class EmployeeDetailsResponse extends Common {
 	private Employee employee;
 
 	public EmployeeDetailsResponse() {

@@ -22,15 +22,18 @@ public class PositionServiceImpl implements PositionService {
 	PositionRepository positionRepository;
 
 	@Override
-	public PositionRegistResponse registPosition(PositionRegistRequest positionRegistRequest) {
+	public PositionRegistResponse registPosition(PositionRegistRequest positionRegistRequest) throws Exception {
 		Position position;
+		position = positionRepository.findById(positionRegistRequest.getId());
 
-		if (positionRegistRequest.getId() != 0) {
-			position = positionRepository.findById(positionRegistRequest.getId());
-		} else {
+		if (position == null) {
 			position = new Position();
-		}
+			position.setId(positionRegistRequest.getId());
+		} else if (!position.getUpdateDate().equals(positionRegistRequest.getUpdateDate())) {
+			throw new Exception("Someone updated position with id " + positionRegistRequest.getId() + " at "
+					+ position.getUpdateDate());
 
+		}
 		position.setName(positionRegistRequest.getName());
 		position.setValidFlag(positionRegistRequest.getValidFlag());
 

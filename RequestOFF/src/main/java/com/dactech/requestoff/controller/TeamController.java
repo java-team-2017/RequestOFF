@@ -49,8 +49,16 @@ public class TeamController {
 	}
 
 	@RequestMapping(value = "/team/details", method = RequestMethod.POST)
-	public TeamDetailsResponse details(@RequestBody TeamDetailsRequest teamDetailsRequest) {
-		TeamDetailsResponse teamDetailsResponse = teamService.teamDetails(teamDetailsRequest);
-		return teamDetailsResponse;
+	public TeamDetailsResponse teamDetails(@RequestBody TeamDetailsRequest teamDetailsRequest) {
+		TeamDetailsResponse response = new TeamDetailsResponse();
+		StatusInfo statusInfo = null;
+		try {
+			response = teamService.teamDetails(teamDetailsRequest);
+			statusInfo = new StatusInfo(StatusInfo.SUCCESS, null);
+		} catch (Exception e) {
+			statusInfo = new StatusInfo(StatusInfo.ERROR, e.getMessage());
+		}
+		response.setStatusInfo(statusInfo);
+		return response;
 	}
 }

@@ -13,7 +13,6 @@ import com.dactech.requestoff.model.request.EmployeeSearchRequest;
 import com.dactech.requestoff.model.response.EmployeeDetailsResponse;
 import com.dactech.requestoff.model.response.EmployeeRegistResponse;
 import com.dactech.requestoff.model.response.EmployeeSearchResponse;
-import com.dactech.requestoff.model.response.TeamSearchResponse;
 import com.dactech.requestoff.service.EmployeeService;
 
 @RestController
@@ -37,12 +36,30 @@ public class EmployeeController {
 
 	@RequestMapping(value = "/employee/search", method = RequestMethod.POST)
 	EmployeeSearchResponse employeeSearch(@RequestBody EmployeeSearchRequest employeeSearchRequest) {
-		return employeeService.employeeSearch(employeeSearchRequest);
+		EmployeeSearchResponse response = new EmployeeSearchResponse();
+		StatusInfo statusInfo = null;
+		try {
+			response = employeeService.employeeSearch(employeeSearchRequest);
+			statusInfo = new StatusInfo(StatusInfo.SUCCESS, null);
+		} catch (Exception e) {
+			statusInfo = new StatusInfo(StatusInfo.ERROR, e.getMessage());
+		}
+		response.setStatusInfo(statusInfo);
+		return response;
 	}
 
 	@RequestMapping(value = "/employee/details", method = RequestMethod.POST)
 	EmployeeDetailsResponse employeeDetails(@RequestBody EmployeeDetailsRequest employeeDetailsRequest) {
-		return employeeService.employeeDetails(employeeDetailsRequest);
+		EmployeeDetailsResponse response = new EmployeeDetailsResponse();
+		StatusInfo statusInfo = null;
+		try {
+			response = employeeService.employeeDetails(employeeDetailsRequest);
+			statusInfo = new StatusInfo(StatusInfo.SUCCESS, null);
+		} catch (Exception e) {
+			statusInfo = new StatusInfo(StatusInfo.ERROR, e.getMessage());
+		}
+		response.setStatusInfo(statusInfo);
+		return response;
 	}
 
 }

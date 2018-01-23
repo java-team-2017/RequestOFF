@@ -2,9 +2,10 @@ package com.dactech.requestoff.model.response;
 
 import java.util.List;
 
+import com.dactech.requestoff.model.common.Common;
 import com.dactech.requestoff.model.entity.DayOffType;
 
-public class DayOffTypeSearchResponse {
+public class DayOffTypeSearchResponse extends Common {
 	private List<DayOffType> listDayOffType;
 
 	public DayOffTypeSearchResponse() {

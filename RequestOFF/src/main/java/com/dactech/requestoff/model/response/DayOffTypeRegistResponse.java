@@ -1,19 +1,23 @@
 package com.dactech.requestoff.model.response;
 
-public class DayOffTypeRegistResponse {
-	private long dayOffTypeRegistId;
+import com.dactech.requestoff.model.common.Common;
 
-	public DayOffTypeRegistResponse(long dayOffTypeRegistId) {
-		super();
-		this.dayOffTypeRegistId = dayOffTypeRegistId;
+public class DayOffTypeRegistResponse extends Common {
+	private long id;
+
+	public DayOffTypeRegistResponse() {
 	}
 
-	public long getDayOffTypeRegistId() {
-		return dayOffTypeRegistId;
+	public DayOffTypeRegistResponse(long id) {
+		this.id = id;
 	}
 
-	public void setDayOffTypeRegistId(long dayOffTypeRegistId) {
-		this.dayOffTypeRegistId = dayOffTypeRegistId;
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 }

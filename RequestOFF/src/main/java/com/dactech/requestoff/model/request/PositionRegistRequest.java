@@ -7,16 +7,17 @@ public class PositionRegistRequest {
 	private String name;
 	@JsonProperty("valid_flag")
 	private int validFlag;
+	@JsonProperty("update_date")
+	private String updateDate;
 
 	public PositionRegistRequest() {
-		super();
 	}
 
-	public PositionRegistRequest(long id, String name, int validFlag) {
-		super();
+	public PositionRegistRequest(long id, String name, int validFlag, String updateDate) {
 		this.id = id;
 		this.name = name;
 		this.validFlag = validFlag;
+		this.updateDate = updateDate;
 	}
 
 	public long getId() {
@@ -41,6 +42,14 @@ public class PositionRegistRequest {
 
 	public void setValidFlag(int validFlag) {
 		this.validFlag = validFlag;
+	}
+
+	public String getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(String updateDate) {
+		this.updateDate = updateDate;
 	}
 
 }
