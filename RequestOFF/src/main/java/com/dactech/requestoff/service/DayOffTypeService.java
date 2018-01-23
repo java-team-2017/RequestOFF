@@ -9,7 +9,7 @@ import com.dactech.requestoff.model.response.DayOffTypeSearchResponse;
 
 public interface DayOffTypeService {
 
-	public DayOffTypeRegistResponse registDayOffType(DayOffTypeRegistRequest dayOffTypeRegistRequest);
+	public DayOffTypeRegistResponse registDayOffType(DayOffTypeRegistRequest dayOffTypeRegistRequest) throws Exception;
 
 	public DayOffTypeSearchResponse searchDayOffType(DayOffTypeSearchRequest dayOffTypeSearchRequest);
 

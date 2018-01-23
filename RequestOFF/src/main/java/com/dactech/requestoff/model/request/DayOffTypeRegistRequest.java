@@ -11,17 +11,19 @@ public class DayOffTypeRegistRequest {
 	private int paymentFlag;
 	@JsonProperty("valid_flag")
 	private int validFlag;
+	@JsonProperty("update_date")
+	private String updateDate;
 
 	public DayOffTypeRegistRequest() {
 		super();
 	}
 
-	public DayOffTypeRegistRequest(int id, String nameDayOffType, int paymentFlag, int validFlag) {
-		super();
+	public DayOffTypeRegistRequest(int id, String nameDayOffType, int paymentFlag, int validFlag, String updateDate) {
 		this.id = id;
 		this.nameDayOffType = nameDayOffType;
 		this.paymentFlag = paymentFlag;
 		this.validFlag = validFlag;
+		this.updateDate = updateDate;
 	}
 
 	public int getId() {
@@ -54,6 +56,14 @@ public class DayOffTypeRegistRequest {
 
 	public void setValidFlag(int validFlag) {
 		this.validFlag = validFlag;
+	}
+
+	public String getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(String updateDate) {
+		this.updateDate = updateDate;
 	}
 
 }

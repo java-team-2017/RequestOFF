@@ -36,31 +36,19 @@ public class CompanyYearOffController {
 	
 	@RequestMapping(value = "/companyYearOff/search", method = RequestMethod.POST)
 	public CompanyYearOffSearchResponse search(@RequestBody CompanyYearOffSearchRequest companyYearOffSearchRequest) {
-		CompanyYearOffSearchResponse companyYearOffSearchResponse = new CompanyYearOffSearchResponse();
-		StatusInfo statusInfo = null;
+		CompanyYearOffSearchResponse response;
 		try {
-			companyYearOffSearchResponse = companyYearOffService.search(companyYearOffSearchRequest);
-			statusInfo = new StatusInfo(StatusInfo.SUCCESS, null);
+			response = companyYearOffService.search(companyYearOffSearchRequest);
+			response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
 		} catch (Exception e) {
-			statusInfo = new StatusInfo(StatusInfo.ERROR, e.getMessage());
+			response = new CompanyYearOffSearchResponse();
+			response.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
 		}
-		companyYearOffSearchResponse.setStatusInfo(statusInfo);
-		
-		return companyYearOffSearchResponse;
+		return response;
 	}
 	
 	@RequestMapping(value = "/companyYearOff/details", method = RequestMethod.POST)
 	public CompanyYearOffDetailsResponse details(@RequestBody CompanyYearOffDetailsRequest companyYearOffDetailsRequest) {
-		CompanyYearOffDetailsResponse companyYearOffDetailsResponse = new CompanyYearOffDetailsResponse();
-		StatusInfo statusInfo = null;
-		try {
-			companyYearOffDetailsResponse = companyYearOffService.details(companyYearOffDetailsRequest);
-			statusInfo = new StatusInfo(StatusInfo.SUCCESS, null);
-		} catch (Exception e) {
-			statusInfo = new StatusInfo(StatusInfo.ERROR, e.getMessage());
-		}
-		companyYearOffDetailsResponse.setStatusInfo(statusInfo);
-		
-		return companyYearOffDetailsResponse;
+		return companyYearOffService.details(companyYearOffDetailsRequest);
 	}
 }

@@ -22,13 +22,17 @@ public class DayOffTypeServiceImpl implements DayOffTypeService {
 	DayOffTypeRepository dayOffTypeRepository;
 
 	@Override
-	public DayOffTypeRegistResponse registDayOffType(DayOffTypeRegistRequest dayOffTypeRegistRequest) {
+	public DayOffTypeRegistResponse registDayOffType(DayOffTypeRegistRequest dayOffTypeRegistRequest) throws Exception {
 		DayOffType dayOffType;
+		dayOffType = dayOffTypeRepository.findById(dayOffTypeRegistRequest.getId());
 
-		if (dayOffTypeRegistRequest.getId() != 0) {
-			dayOffType = dayOffTypeRepository.findById(dayOffTypeRegistRequest.getId());
-		} else {
+		if (dayOffType == null) {
 			dayOffType = new DayOffType();
+			dayOffType.setId(dayOffTypeRegistRequest.getId());
+		} else if (!dayOffType.getUpdateDate().equals(dayOffTypeRegistRequest.getUpdateDate())) {
+			throw new Exception("Someone updated day_off_type with id " + dayOffTypeRegistRequest.getId() + " at "
+					+ dayOffType.getUpdateDate());
+
 		}
 
 		dayOffType.setName(dayOffTypeRegistRequest.getNameDayOffType());

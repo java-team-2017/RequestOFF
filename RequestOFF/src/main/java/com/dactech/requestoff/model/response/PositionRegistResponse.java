@@ -1,6 +1,8 @@
 package com.dactech.requestoff.model.response;
 
-public class PositionRegistResponse {
+import com.dactech.requestoff.model.common.Common;
+
+public class PositionRegistResponse extends Common {
 	private long id;
 
 	public PositionRegistResponse() {

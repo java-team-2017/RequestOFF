@@ -2,9 +2,10 @@ package com.dactech.requestoff.model.response;
 
 import java.util.List;
 
+import com.dactech.requestoff.model.common.Common;
 import com.dactech.requestoff.model.entity.Position;
 
-public class PositionSearchResponse {
+public class PositionSearchResponse extends Common {
 	private List<Position> listPosition;
 
 	public PositionSearchResponse() {
