@@ -22,13 +22,13 @@ public class DefaultController {
 		return "/error/403";
 	}
 	
-	@RequestMapping(value = "/bootstrap", method = RequestMethod.GET)
-	public String bootstrap() {
-		return "/bootstrap";
+	@GetMapping("/layout")
+	public String layout() {
+		return "/layout";
 	}
 	
-	@RequestMapping(value = "/statistic", method = RequestMethod.GET)
-	public String statistic() {
-		return "/statistic";
+	@GetMapping("/requestBrowsing")
+	public String requestBrowsing() {
+		return "/requestBrowsing";
 	}
 }

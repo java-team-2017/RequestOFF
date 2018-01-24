@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1"/>
+<title>Request Browsing</title>
+<!-- <link rel="stylesheet" type="text/css" href="requestBrowsing.css" /> -->
+<script src="jquery-3.2.1.js"></script>
+<script src="jquery.serializejson.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+	var employeeArr = [
+		{'name': 'Minh Hien', 'from': '23/1/2018 10:10:SA', 'to': '23/1/2018 14:10:CH', 'reason': 'Ốm'},
+		{'name': 'Hai Nhi', 'from': '23/1/2018 10:10:SA', 'to': '23/1/2018 14:10:CH', 'reason': 'Ốm'},
+		{'name': 'Binh Thien', 'from': '23/1/2018 10:10:SA', 'to': '23/1/2018 14:10:CH', 'reason': 'Ốm'},
+	];
+	
+	$(function(){
+		loadTable(employeeArr);
+	
+	});
+	function loadTable(employees){	
+		var html = '';	
+		$.each(employees, function(index, object) {
+					var row = '<tr>'
+					row += '<td><input type="checkbox" name="record" /></td>';
+					row += '<td data-toggle="modal" data-target="#myModal">' + object.name + '</td>';
+					row += '<td data-toggle="modal" data-target="#myModal">' + object.from + '</td>';
+					row += '<td data-toggle="modal" data-target="#myModal">' + object.to + '</td>';
+					row += '<td data-toggle="modal" data-target="#myModal">' + object.reason + '</td>';
+					row += '<td><button type="button" >Approve</button></td>';
+					row += '<td><button type="button" >Deny</button></td>';
+					row += '</tr>'
+					html += row;
+		});
+		$("#myTable > tbody").empty().append(html);
+	}
+</script>
+</head>
+<body>
+	<h3 align="center">Request Browsing</h3>
+	
+	<p align="center">
+		<label> 
+			Employee: <input type="text" name="employee" id="employee" value="" /><br></br>
+		</label> 
+		<label> 
+			Team: <input type="text" name="team" id="team" value="" />
+		</label> 
+		<label style="font-weight: bold"> Request Status: 
+			<select name="status" id="status" value="">
+					<option value="">Approved</option>
+					<option value="">Denied</option>
+					<option value="">Waiting</option>
+					<option value="">Response</option>
+			</select>
+		</label>
+		
+		<p style="font-weight: bold" align="center">
+				From: <input type="datetime-local" name="from" />
+				To: <input type="datetime-local" name="to" />
+		</p>
+	</p>
+	<table align="center" id="myTable" border="1">
+				<thead>
+					<tr>
+						<th name="select"><span>Select</span></th>
+						<th name="name"><span>Employee</span></th>
+						<th name="from"><span>From</span></th>
+						<th name="to"><span>To</span></th>
+						<th name="reason"><span>Reason</span></th>
+						<th name="approve"><span>Approve</span></th>
+						<th name="deny"><span>Deny</span></th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+	</table>
+	<p align="center">
+		<button type="button" class="btn btn-default" >Approve</button>
+		<button type="button" class="btn btn-default" >Deny</button>
+	</p>
+
+	<div class="modal fade" id="myModal" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Details</h4>
+				</div>
+				<div class="modal-body">
+					<label class="col-md-3 control-label">Employee</label>
+					<div class="col-md-9">
+						<p>Minh Hien</p>
+					</div>
+
+					<label class="col-md-3 control-label">Position</label>
+					<div class="col-md-9">
+						<p>Intern</p>
+					</div>
+
+					<label class="col-md-3 control-label">Team</label>
+					<div class="col-md-9">
+						<p>Intern</p>
+					</div>
+
+					<label class="col-md-3 control-label">Department</label>
+					<div class="col-md-9">
+						<p>Java</p>
+					</div>
+
+					<label class="col-md-3 control-label">From</label>
+					<div class="col-md-9">
+						<p>23/1/2018 10:10:SA</p>
+					</div>
+
+					<label class="col-md-3 control-label">Reason</label>
+					<div class="col-md-9">
+						<p>Ốm</p>
+					</div>
+
+					<label class="col-md-3 control-label">Day Off Type</label>
+					<div class="col-md-9">
+						<p>1</p>
+					</div>
+
+					<div class="form-group">
+						<label>Response Message</label>
+						<textarea id="subject" name="subject"
+							placeholder="Write message..."
+							style="height: 115px; width: 100%;"></textarea>
+					</div>
+					
+					<p align="center">
+						<button type="button">Approve</button>
+						<button type="button">Deny</button>
+						<button type="button">Send</button>
+						<button type="button">Cancel</button>
+					</p>
+
+					<label> Forward request to : <select name="status" id="status" value="">
+							<option value="">Employee1</option>
+							<option value="">Employee2</option>
+							<option value="">Employee3</option>
+					</select>
+					</label>
+					<button type="button">Forward</button>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	<style type="text/css">
+/* button {
+	color: black;
+	background-color: 66CCFF;
+	border-width: 1px;
+	border-style: Groove;
+	font-size: 12px;
+	font-weight: bold;
+	height: 26px;
+	width: 80px;
+	border-radius: 7px;
+} */
+/* .not-active {
+   pointer-events: none;
+   cursor: default;
+   color:gray;
+   text-decoration:none
+}
+.active{
+	color:black;
+	text-decoration:none;
+}
+
+.active:hover{
+	color:red;
+} */
+
+button:hover {
+	color: Navy;
+	background-color: Silver;
+	cursor: pointer;
+}
+
+input {
+	border-radius: 10px;
+	height: 30px;
+	padding: 5px;
+}
+
+select {
+	border-radius: 10px;
+	font-size: 12px;
+	font-weight: bold;
+	height: 30px;
+	padding: 5px;
+	width: 200px;
+}
+
+select:hover {
+	color: Navy;
+	background-color: Silver;
+	cursor: pointer;
+}
+
+table {
+	background-color: FFCCCC;
+	width: 50%;
+}
+
+table tr:nth-child(even) {
+	background-color: #eee;
+}
+
+table tr:nth-child(odd) {
+	background-color: #fff;
+}
+
+table th {
+	background-color: black;
+	color: white;
+}
+
+th {
+	text-align: center;
+}
+tbody {
+	border-radius: 15px;
+	border: none solid #6297BC;
+	text-align: center;
+	height: 29px;
+	padding: 5px;
+}
+btn-group {
+	align: center;
+}
+</style>
+</body>
+</html>
