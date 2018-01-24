@@ -31,4 +31,9 @@ public class DefaultController {
 	public String requestBrowsing() {
 		return "/requestBrowsing";
 	}
+	
+	@RequestMapping(value = "/statistic", method = RequestMethod.GET)
+	public String statistic() {
+		return "/statistic";
+	}
 }
