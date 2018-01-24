@@ -36,4 +36,14 @@ public class DefaultController {
 	public String statistic() {
 		return "/statistic";
 	}
+	
+	@GetMapping("/requestHistory")
+	public String requestHistoryScreen() {
+		return "requestHistory";
+	}
+	
+	@GetMapping("/createRequest")
+	public String createRequestScreen() {
+		return "createRequest";
+	}
 }
