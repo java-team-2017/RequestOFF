@@ -21,4 +21,14 @@ public class DefaultController {
 	public String error403() {
 		return "/error/403";
 	}
+	
+	@RequestMapping(value = "/bootstrap", method = RequestMethod.GET)
+	public String bootstrap() {
+		return "/bootstrap";
+	}
+	
+	@RequestMapping(value = "/statistic", method = RequestMethod.GET)
+	public String statistic() {
+		return "/statistic";
+	}
 }
