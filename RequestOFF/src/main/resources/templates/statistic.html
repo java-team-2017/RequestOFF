@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Hr statistic screen</title>
+	<link rel="stylesheet"	type="text/css" href="./bootstrap/css/bootstrap.min.css" />
+	<script src="jquery-3.2.1.js"></script>
+	<script src="./bootstrap/js/bootstrap.min.js"></script>
+</head>
+
+<script type="text/javascript">
+//<![CDATA[ 
+	$(function() {
+		//=====================================================================
+		// # Initialize form
+		//=====================================================================
+		var listDayOffType;
+		var listDepartment;
+		var listTeam;
+
+		
+		//dayOffType combobox
+		$.ajax({
+			url : "/dayOffType/search",
+			type : "post",
+			dataType :"json",
+			contentType : "application/json",
+			data : JSON.stringify({
+				"payment_flag_id": -1,
+				"valid_flag_id": 1
+			}),
+			success : function (dayOffTypeSearchResponse){
+				if (dayOffTypeSearchResponse.status_info.status == 0) {
+					listDayOffType = dayOffTypeSearchResponse.listDayOffType;
+					$('#dayOffType').empty().append('<option value=""></option>');
+					$.each(listDayOffType, function(index, dayOffType) {
+						$('#dayOffType').append('<option value="' + dayOffType.id + '">' + dayOffType.name + '</option>');
+					});	
+				} else {
+					alert(dayOffTypeSearchResponse.status_info.error);
+				}
+			},
+			error : function() {
+				alert("error!!!");
+			}
+		});
+		
+		//Department combobox
+		$.ajax({
+			url : "/department/search",
+			type : "post",
+			dataType :"json",
+			contentType : "application/json",
+			data : JSON.stringify({
+				"valid_flag": 1
+			}),
+			success : function (departmentSearchResponse){
+				if (departmentSearchResponse.status_info.status == 0) {
+					listDepartment = departmentSearchResponse.listDepartment;
+					$('#department').empty().append('<option value=""></option>');
+					$.each(listDepartment, function(index, department) {
+						$('#department').append('<option value="' + department.id + '">' + department.name + '</option>');
+					});	
+				} else {
+					alert(departmentSearchResponse.status_info.error);
+				}
+			},
+			error : function() {
+				alert("error!!!");
+			}
+		});
+		
+		//Team combobox
+		$.ajax({
+			url : "/team/search",
+			type : "post",
+			dataType :"json",
+			contentType : "application/json",
+			data : JSON.stringify({
+				"valid_flag": 1
+			}),
+			success : function (teamSearchResponse){
+				if (teamSearchResponse.status_info.status == 0) {
+					listTeam = teamSearchResponse.teams;
+					$('#team').empty().append('<option value=""></option>');
+					$.each(listTeam, function(index, team) {
+						$('#team').append('<option value="' + team.id + '">' + team.name + '</option>');
+					});	
+				} else {
+					alert(teamSearchResponse.status_info.error);
+				}
+			},
+			error : function() {
+				alert("error!!!");
+			}
+		});
+		
+		//select department event
+		$('#department').on('change', function() {
+			if ($(this).val() != '') {
+				var id = $(this).val();
+				var department = $.grep(listDepartment, function(department) {
+					return department.id == id;
+				})[0];
+				teams = department.listTeam;
+				$('#team').empty().append('<option value=""></option>');
+				$.each(teams, function(index, team) {
+					$('#team').append('<option value="' + team.id + '">' + team.name + '</option>');
+				});
+			} else {
+				$('#team').empty().append('<option value=""></option>');
+				$.each(listTeam, function(index, team) {
+					$('#team').append('<option value="' + team.id + '">' + team.name + '</option>');
+				});
+			}
+		})
+		
+		
+		
+		
+		
+		
+		
+		$("#testBtn").on('click', function() {
+			console.log("something");
+			$('#detailModal').modal('show');
+		});
+		
+		$('#offTable td').on('click', function() {
+			$('#detailModal').modal('show');
+		});
+	});	
+//]]>
+</script>
+
+<body>
+	<div class="container">
+		<form id="searchForm">
+			<div class="form-group row">
+				<div class="col-sm-2"></div>
+				<label class="col-sm-2 col-form-label">Form</label>
+				<div class="col-sm-6">
+					<input id="fromTime" name="fromTime" class="form-control" type="datetime-local"/>
+				</div>
+			</div>
+			
+			<div class="form-group row">
+				<div class="col-sm-2"></div>
+				<label class="col-sm-2 col-form-label">To</label>
+				<div class="col-sm-6">
+					<input id="toTime" name="toTime" class="form-control" type="datetime-local"/>
+				</div>
+			</div>
+			
+			<div class="form-group row">
+				<div class="col-sm-2"></div>
+				<label class="col-sm-2 col-form-label">Day Off Type</label>
+				<div class="col-sm-6">
+					<select id="dayOffType" name="dayOffType" class="form-control">
+						<option>T1</option>
+						<option>T2</option>
+					</select>
+				</div>
+			</div>
+			
+			<div class="form-group row">
+				<div class="col-sm-2"></div>
+				<label class="col-sm-2 col-form-label">Department</label>
+				<div class="col-sm-2">
+					<select id="department" name="department" class="form-control">
+						<option>T1</option>
+						<option>T2</option>
+					</select>
+				</div>
+				<div class="col-sm-1"></div>
+				<label class="col-sm-1 col-form-label">Team</label>
+				<div class="col-sm-2">
+					<select id="team" name="team" class="form-control">
+						<option>T1</option>
+						<option>T2</option>
+					</select>
+				</div>
+			</div>
+			
+			<div class="form-group row">
+				<div class="col-sm-2"></div>
+				<label class="col-sm-2 col-form-label">Employee</label>
+				<div class="col-sm-6">
+					<input id="employee" name="employee" type="text" class="form-control"></input>
+				</div>
+			</div>
+			
+			<div class="form-group row">
+				<div class="col-sm-2"></div>
+				<div class="col-sm-3"></div>
+				<div class="col-sm-2">
+					<button id="search" type="button" class="btn btn-primary btn-block">Search</button>
+				</div>
+				<div class="col-sm-2">
+					<button id="clear" type="button" class="btn btn-primary btn-block">Clear</button>
+				</div>
+			</div>
+		</form>
+		
+		<table id="offTable" class="table table-striped table-bordered table-hover table-condensed text-center" style="table-layout: fixed; word-wrap: break-word;">
+			<thead>
+				<tr>
+					<th class="col-md-1 text-center">ID</th>
+					<th class="col-md-3 text-center">Name</th>
+					<th class="col-md-2 text-center">Department</th>
+					<th class="col-md-2 text-center">Team</th>
+					<th class="col-md-2 text-center">Position</th>
+					<th class="col-md-1 text-center">Day Off with Paying</th>
+					<th class="col-md-1 text-center align-middle">Day Off without Paying</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>cell 2 </td>
+					<td>cell 1</td>
+					<td>cell 1</td>
+					<td>cell 1</td>
+					<td>cell 1</td>
+					<td>cell 1</td>
+					<td>cell 2</td>
+				</tr>
+				<tr>
+					<td>cell 1</td>
+					<td>cell 1</td>
+					<td>cell 1</td>
+					<td>cell 1</td>
+					<td>cell 1</td>
+					<td>cell 1</td>
+					<td>cell 2</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	
+	<div id="detailModal" class="modal fade bd-example-modal-lg">
+		<div class="modal-dialog modal-dialog-centered modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title" align="center">Details</h4>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<label class="col-sm-3 col-form-label">Employee</label>
+						<div class="col-sm-3">
+							<input id="detailEmployee" class="col-sm-3 form-control" type="text" value="thien" readonly="readonly"></input>
+						</div>
+						<label class="col-sm-3 col-form-label">Position</label>
+						<div class="col-sm-3">
+							<input id="detailPosition" class="col-sm-3 form-control" type="text" value="intern" readonly="readonly"></input>
+						</div>
+					</div>
+					<div class="row">
+						<label class="col-sm-3 col-form-label">Department</label>
+						<div class="col-sm-3">
+							<input id="detailDepartment" class="col-sm-3 form-control" type="text" value="Java" readonly="readonly"></input>
+						</div>
+						<label class="col-sm-3 col-form-label">Team</label>
+						<div class="col-sm-3">
+							<input id="detailTeam" class="col-sm-3 form-control" type="text" value="intern" readonly="readonly"></input>
+						</div>
+					</div>
+					<div class="row">
+						<label class="col-sm-3 col-form-label">Day Off With Paying</label>
+						<div class="col-sm-3">
+							<input id="detailDayOffWithPaying" class="col-sm-3 form-control" type="text" value="5" readonly="readonly"></input>
+						</div>
+						<label class="col-sm-3 col-form-label">Day Off Without Paying</label>
+						<div class="col-sm-3">
+							<input id="detailDayOffWithoutPaying" class="col-sm-3 form-control" type="text" value="3" readonly="readonly"></input>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6">
+							<table class="table table-striped table-bordered table-hover table-condensed text-center" style="table-layout: fixed; word-wrap: break-word;">
+								<caption>Day Off with Paying</caption>
+								<thead>
+									<tr>
+										<th class="col-md-6 text-center">From</th>
+										<th class="col-md-6 text-center">To</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>cell 2 </td>
+										<td>cell 1</td>
+									</tr>
+									<tr>
+										<td>cell 1</td>
+										<td>cell 2</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="col-md-6">
+							<table class="table table-striped table-bordered table-hover table-condensed text-center" style="table-layout: fixed; word-wrap: break-word;">
+								<caption>Day Off with Paying</caption>
+								<thead>
+									<tr>
+										<th class="col-md-6 text-center">From</th>
+										<th class="col-md-6 text-center">To</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>cell 2 </td>
+										<td>cell 1</td>
+									</tr>
+									<tr>
+										<td>cell 1</td>
+										<td>cell 2</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<button id="testBtn">Test</button>
+</body>
+</html>

@@ -22,7 +22,7 @@ public class DepartmentRepositoryImpl implements DepartmentRepositoryCustom {
 		if(departmentSearchRequest.getId() != 0) {
 			sqlQuery += " AND id = " + departmentSearchRequest.getId();
 		}
-		if(departmentSearchRequest.getName() != "") {
+		if(departmentSearchRequest.getName() != null && departmentSearchRequest.getName() != "") {
 			if(departmentSearchRequest.getNameMatchStatus() == 0) {
 				sqlQuery += " AND name like '%" + departmentSearchRequest.getName() + "%'";
 			}
