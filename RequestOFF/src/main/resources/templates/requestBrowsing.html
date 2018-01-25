@@ -17,11 +17,6 @@
 	];
 	
 	$(function(){
-// 		  $("#header").load("header.html"); 
-// 		  $("#footer").load("footer.html"); 
-	});
-	
-	$(function(){
 		loadTable(employeeArr);
 	
 	});
@@ -45,121 +40,136 @@
 </script>
 </head>
 <body class="content-body">
-<!-- 	<div id="header"></div> -->
 	<div th:replace="fragments/header"></div>
-	<h3 align="center">Request Browsing</h3>
 	
-	<p align="center">
-		<label> 
-			Employee: <input class="form-control" type="text" name="employee" id="employee" value="" /><br></br>
-		</label> 
-		<label> 
-			Team: <input type="text" name="team" id="team" value="" />
-		</label> 
-		<label style="font-weight: bold"> Request Status: 
-			<select name="status" id="status" value="">
-					<option value="">Approved</option>
-					<option value="">Denied</option>
-					<option value="">Waiting</option>
-					<option value="">Response</option>
-			</select>
-		</label>
+	
+	<div th:replace="menu"></div>
+	<div class="requestOffContentBody">
 		
-		<p style="font-weight: bold" align="center">
-				From: <input type="datetime-local" name="from" />
-				To: <input type="datetime-local" name="to" />
-		</p>
-	</p>
-	<div class="table-responsive"> 
-		<table class="table table-bordered table-striped table-hover" id="myTable">
-					<thead>
-						<tr>
-							<th name="select"><span>Select</span></th>
-							<th name="name"><span>Employee</span></th>
-							<th name="from"><span>From</span></th>
-							<th name="to"><span>To</span></th>
-							<th name="reason"><span>Reason</span></th>
-							<th name="approve"><span>Approve</span></th>
-							<th name="deny"><span>Deny</span></th>
-						</tr>
-					</thead>
-					<tbody align="center">
-					</tbody>
-		</table>
-	</div>
-	<p align="center">
-		<button type="button" class="btn btn-default" >Approve</button>
-		<button type="button" class="btn btn-default" >Deny</button>
-	</p>
-
-	<div class="modal fade" id="myModal" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Details</h4>
-				</div>
-				<div class="modal-body">
-					<label class="col-md-3 control-label">Employee</label>
-					<div class="col-md-9">
-						<p>Minh Hien</p>
-					</div>
-
-					<label class="col-md-3 control-label">Position</label>
-					<div class="col-md-9">
-						<p>Intern</p>
-					</div>
-
-					<label class="col-md-3 control-label">Team</label>
-					<div class="col-md-9">
-						<p>Intern</p>
-					</div>
-
-					<label class="col-md-3 control-label">Department</label>
-					<div class="col-md-9">
-						<p>Java</p>
-					</div>
-
-					<label class="col-md-3 control-label">From</label>
-					<div class="col-md-9">
-						<p>23/1/2018 10:10:SA</p>
-					</div>
-
-					<label class="col-md-3 control-label">Reason</label>
-					<div class="col-md-9">
-						<p>Ốm</p>
-					</div>
-
-					<label class="col-md-3 control-label">Day Off Type</label>
-					<div class="col-md-9">
-						<p>1</p>
-					</div>
-
-					<div class="form-group">
-						<label>Response Message</label>
-						<textarea id="subject" name="subject"
-							placeholder="Write message..."
-							style="height: 115px; width: 100%;"></textarea>
-					</div>
-					
-					<p align="center">
-						<button type="button">Approve</button>
-						<button type="button">Deny</button>
-						<button type="button">Send</button>
-						<button type="button">Cancel</button>
-					</p>
-
-					<label> Forward request to : <select name="status" id="status" value="">
-							<option value="">Employee1</option>
-							<option value="">Employee2</option>
-							<option value="">Employee3</option>
+		<div class="container-fluid">
+			<h3 align="center">Request Browsing</h3>
+			
+			<p align="center">
+				<!-- <label> 
+					Employee: <input class="form-control" type="text" name="employee" id="employee" value="" /><br></br>
+				</label> 
+				
+				<div class="form-group">
+					<label class="control-label col-sm-3">Employee: </label>
+						<div class="input-group col-sm-7">
+							<input class="form-control" type="datetime-local"></input>
+						</div>
+				</div> -->
+				<label> 
+					Team: <input type="text" name="team" id="team" value="" class="form-control"/>
+				</label> 
+				<label style="font-weight: bold"> Request Status: 
+					<select name="status" id="status" value="" class="form-control">
+							<option value="">Approved</option>
+							<option value="">Denied</option>
+							<option value="">Waiting</option>
+							<option value="">Response</option>
 					</select>
-					</label>
-					<button type="button">Forward</button>
+				</label>
+				
+				<p style="font-weight: bold" align="center">
+						From: <input type="datetime-local" name="from" class="form-control"/>
+						To: <input type="datetime-local" name="to" class="form-control"/>
+				</p>
+			</p>
+			<div class="table-responsive"> 
+				<table class="table table-bordered table-striped table-hover" id="myTable">
+							<thead>
+								<tr>
+									<th name="select"><span>Select</span></th>
+									<th name="name"><span>Employee</span></th>
+									<th name="from"><span>From</span></th>
+									<th name="to"><span>To</span></th>
+									<th name="reason"><span>Reason</span></th>
+									<th name="approve"><span>Approve</span></th>
+									<th name="deny"><span>Deny</span></th>
+								</tr>
+							</thead>
+							<tbody align="center">
+							</tbody>
+				</table>
+			</div>
+			<p align="center">
+				<button type="button" class="btn btn-default" >Approve</button>
+				<button type="button" class="btn btn-default" >Deny</button>
+			</p>
+		
+			<div class="modal fade" id="myModal" role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+							<h4 class="modal-title">Details</h4>
+						</div>
+						<div class="modal-body">
+							<label class="col-md-3 control-label">Employee</label>
+							<div class="col-md-9">
+								<p>Minh Hien</p>
+							</div>
+		
+							<label class="col-md-3 control-label">Position</label>
+							<div class="col-md-9">
+								<p>Intern</p>
+							</div>
+		
+							<label class="col-md-3 control-label">Team</label>
+							<div class="col-md-9">
+								<p>Intern</p>
+							</div>
+		
+							<label class="col-md-3 control-label">Department</label>
+							<div class="col-md-9">
+								<p>Java</p>
+							</div>
+		
+							<label class="col-md-3 control-label">From</label>
+							<div class="col-md-9">
+								<p>23/1/2018 10:10:SA</p>
+							</div>
+		
+							<label class="col-md-3 control-label">Reason</label>
+							<div class="col-md-9">
+								<p>Ốm</p>
+							</div>
+		
+							<label class="col-md-3 control-label">Day Off Type</label>
+							<div class="col-md-9">
+								<p>1</p>
+							</div>
+		
+							<div class="form-group">
+								<label>Response Message</label>
+								<textarea id="subject" name="subject"
+									placeholder="Write message..."
+									style="height: 115px; width: 100%;"></textarea>
+							</div>
+							
+							<p align="center">
+								<button type="button">Approve</button>
+								<button type="button">Deny</button>
+								<button type="button">Send</button>
+								<button type="button">Cancel</button>
+							</p>
+		
+							<label> Forward request to : <select name="status" id="status" value="">
+									<option value="">Employee1</option>
+									<option value="">Employee2</option>
+									<option value="">Employee3</option>
+							</select>
+							</label>
+							<button type="button">Forward</button>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 	<div th:replace="fragments/footer"></div>
+	
 </body>
 </html>

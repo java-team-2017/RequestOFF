@@ -3,24 +3,26 @@
 		$('[data-toggle="tooltip"]').tooltip();
 	});
 </script>
-<nav class="navbar navbar-default navbar-fixed-left" style="width: 13%; height: 100%; position: fixed; background-color: #93EDD7">
-	<div class="container-fluid">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle" data-toggle="collapse"
-				data-target="#navbarOfMe">
-				<span class="icon-bar"></span> <span class="icon-bar"></span> <span
-					class="icon-bar"></span>
-			</button>
+<div class="requestOffMenu">
+	<nav class="navbar navbar-default navbar-fixed-left" style="width: 13%; height: 100%; position: fixed; background-color: #ffffff">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse"
+					data-target="#navbarOfMe">
+					<span class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="collapse navbar-collapse" id="navbarOfMe">
+				<ul class="nav navbar-nav row">
+					<li><a class="col-ms-4 glyphicon glyphicon-user" href="#">
+							Account</a></li>
+					<li><a class="col-ms-4 glyphicon glyphicon-plus" href="#">
+							Add Request</a></li>
+					<li><a class="col-ms-4 glyphicon glyphicon-eye-open" href="#">
+							Request History</a></li>
+				</ul>
+			</div>
 		</div>
-		<div class="collapse navbar-collapse" id="navbarOfMe">
-			<ul class="nav navbar-nav row">
-				<li><a class="col-ms-4 glyphicon glyphicon-user" href="#">
-						Account</a></li>
-				<li><a class="col-ms-4 glyphicon glyphicon-plus" href="#">
-						Add Request</a></li>
-				<li><a class="col-ms-4 glyphicon glyphicon-eye-open" href="#">
-						Request History</a></li>
-			</ul>
-		</div>
-	</div>
-</nav>
+	</nav>
+</div>
