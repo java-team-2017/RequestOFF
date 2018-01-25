@@ -20,19 +20,21 @@
 			#requestHistoryForm {
 				margin-bottom: 50px;
 			}
-			#mainContent {
-				width: 87%;
-				height: auto;
-				position: absolute;
-				right: 0;
-				/*background: powderblue;*/
-			}
+/* 			#mainContent { */
+/* 				width: 87%; */
+/* 				height: auto; */
+/* 				position: absolute; */
+/* 				right: 0; */
+/* 				/*background: powderblue;*/ */
+/* 			} */
 		</style>
 	</head>
-	<body>
+	<body class="content-body">
 		<script>
 			/*<![CDATA[*/
 				$(function() {
+// 					$("#mainMenu").load("../menu.html");
+					
 					$('#requestHistoryTable tr').each(function() {
 						$(this).children('td:lt(5)').on('click', function() {
 							$('#requestDetailsModal').modal('show');
@@ -40,211 +42,199 @@
 					});
 					
 // 					$("#mainHeader").load("../header.html");
-					$("#mainMenu").load("../menu.html");
+					
+// 					$('#requestHistoryTable').DataTable();
 				});
 					
 			/*]]>*/
 		</script>
 		
-		<div>
-			<!-- <div class="row">
-				<div class="col-sm-3" id="mainHeader">
-				</div>
-			</div> -->
-			<div>
-				<div id="mainMenu">
-				</div>
-
-				<div id="mainContent">
-					<div class="container-fluid">
-						<!-- <div class="row"> -->
-							<h4 class="col-sm-offset-3">Bạn còn 15 ngày nghỉ phép</h4>
-						<!-- </div> -->
-						<!-- <div class="row"> -->
-							<form class="form-horizontal col-sm-6 col-sm-offset-3" id="requestHistoryForm">
-								<div class="form-group">
-									<label for="fromTime">From</label>
-									<input class="form-control" type="datetime-local"></input>
-								</div>
-		
-								<div class="form-group">
-									<label for="toTime">To</label>
-									<input class="form-control" type="datetime-local"></input>
-								</div>
-		
-								<div class="form-group">
-									<label for="requestType">Request Type</label>
-									<select class="form-control">
-										<option value="1">Saved</option>
-										<option value="2">Approved</option>
-										<option value="3">Denied</option>
-										<option value="4">Responded</option>
-										<option value="4">Waiting</option>
-									</select>
-								</div>
-		
-								<br/><br/>
-								<div align="center">
-							 		<button class="btn btn-primary customButton formButton">OK</button>
-							 		<button class="btn btn-primary customButton formButton">Clear</button>
-								</div>
-							</form>
-							
-						<!-- </div> -->
-						
-						<!-- <div class="row"> -->
-							<table class="table table-bordered table-striped table-hover" id="requestHistoryTable">
-								<thead>
-									<tr>
-										<th class="text-center">Employee</th>
-										<th class="text-center">From</th>
-										<th class="text-center">To</th>
-										<th class="text-center">Reason</th>
-										<th class="text-center">Edit</th>
-										<th class="text-center">Delete</th>
-									</tr>
-								</thead>
-		
-								<tbody>
-									<tr>
-										<td>Cao Hai Nhi</td>
-										<td>8h - 1/2/2017</td>
-										<td>11h - 1/2/2017</td>
-										<td>ban viec nha</td>
-										<td class="text-center"><button class="btn btn-primary customButton">Edit</button></td>
-										<td class="text-center"><button class="btn btn-danger customButton">Delete</button></td>
-									</tr>
-									<tr>
-										<td>Cao Hai Nhi</td>
-										<td>8h - 1/2/2017</td>
-										<td>11h - 1/2/2017</td>
-										<td>ban viec nha</td>
-										<td class="text-center"><button class="btn btn-primary customButton">Edit</button></td>
-										<td class="text-center"><button class="btn btn-danger customButton">Delete</button></td>
-									</tr>
-									<tr>
-										<td>Cao Hai Nhi</td>
-										<td>8h - 1/2/2017</td>
-										<td>11h - 1/2/2017</td>
-										<td>ban viec nha</td>
-										<td class="text-center"><button class="btn btn-primary customButton">Edit</button></td>
-										<td class="text-center"><button class="btn btn-danger customButton">Delete</button></td>
-									</tr>
-								</tbody>
-							</table>
-						<!-- </div> -->
-		
-							<div class="modal fade" id="requestDetailsModal" role="dialog">
-								<div class="modal-dialog">
-					
-									<!-- Modal content-->
-									<div class="modal-content">
-										<div class="modal-header">
-											<button type="button" class="close" data-dismiss="modal">&times;</button>
-											<h4 class="modal-title">Cao Hai Nhi</h4>
-										</div>
-										<div class="modal-body">
-											<form class="form-horizontal">
-												<div class="form-group">
-													<label class="control-label col-sm-3">Employee: </label>
-													<label class="control-label col-sm-7" style="text-align: left;">Cao Hai Nhi</label>
-												</div>
-												<div class="form-group">
-													<label class="control-label col-sm-3">Position: </label>
-													<div class="input-group col-sm-7">
-														<span class="input-group-btn">
-															<select class="form-control">
-																<option value="1">Intern</option>
-																<option value="2">Employee</option>
-																<option value="3">Leader</option>
-															</select>
-														</span>
-													</div>
-												</div>
-												<div class="form-group">
-													<label class="control-label col-sm-3">Team: </label>
-													<div class="input-group col-sm-7">
-														<span class="input-group-btn">
-															<select class="form-control">
-																<option value="1">Java</option>
-																<option value="2">PHP</option>
-																<option value="3">Ruby</option>
-															</select>
-														</span>
-													</div>
-												</div>
-												<div class="form-group">
-													<label class="control-label col-sm-3">Department: </label>
-													<div class="input-group col-sm-7">
-														<span class="input-group-btn">
-															<select class="form-control">
-																<option value="1">Department 1</option>
-																<option value="2">Department 2</option>
-																<option value="3">Department 3</option>
-															</select>
-														</span>
-													</div>
-												</div>
-												<div class="form-group">
-													<label class="control-label col-sm-3">From: </label>
-													<div class="input-group col-sm-7">
-														<input class="form-control" type="datetime-local"></input>
-													</div>
-												</div>
-												<div class="form-group">
-													<label class="control-label col-sm-3">To: </label>
-													<div class="input-group col-sm-7">
-														<input class="form-control" type="datetime-local"></input>
-													</div>
-												</div>
-												<div class="form-group">
-													<label class="control-label col-sm-3">Reason: </label>
-													<div class="input-group col-sm-7">
-														<span class="input-group-btn">
-															<textarea class="form-control"></textarea>
-														</span>
-													</div>
-												</div>
-												<div class="form-group">
-													<label class="control-label col-sm-3">Day off type: </label>
-													<div class="input-group col-sm-7">
-														<span class="input-group-btn">
-															<select class="form-control">
-																<option value="1">Nghỉ phép</option>
-																<option value="2">Kết hôn</option>
-																<option value="3">Nghỉ không lương</option>
-															</select>
-														</span>
-													</div>
-												</div>
-												<div class="form-group">
-													<label class="control-label col-sm-3">Response Message: </label>
-													<div class="input-group col-sm-7">
-														<span class="input-group-btn">
-															<textarea class="form-control"></textarea>
-														</span>
-													</div>
-												</div>
-											</form>
-										</div>
-										<div class="modal-footer">
-											<button type="button" class="btn btn-default" data-dismiss="modal">Save</button>
-											<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-										</div>
-									</div>
-		
-								</div>
+			<div th:replace="menu"></div>
+			<div th:replace="fragments/header"></div>
+			<div class="requestOffContentBody">
+				<div class="container-fluid">
+					<!-- <div class="row"> -->
+						<h4 class="col-sm-offset-3">Bạn còn 15 ngày nghỉ phép</h4>
+						<form class="form-horizontal col-sm-6 col-sm-offset-3" id="requestHistoryForm">
+							<div class="form-group">
+								<label for="fromTime">From</label>
+								<input class="form-control" type="datetime-local"></input>
 							</div>
 	
-					</div>
+							<div class="form-group">
+								<label for="toTime">To</label>
+								<input class="form-control" type="datetime-local"></input>
+							</div>
+	
+							<div class="form-group">
+								<label for="requestType">Request Type</label>
+								<select class="form-control">
+									<option value="1">Saved</option>
+									<option value="2">Approved</option>
+									<option value="3">Denied</option>
+									<option value="4">Responded</option>
+									<option value="4">Waiting</option>
+								</select>
+							</div>
+	
+							<br/><br/>
+							<div align="center">
+						 		<button class="btn btn-primary customButton formButton">OK</button>
+						 		<button class="btn btn-primary customButton formButton">Clear</button>
+							</div>
+						</form>
+						
+					<!-- </div> -->
+					
+					<!-- <div class="row"> -->
+						<table class="table table-bordered table-striped table-hover" id="requestHistoryTable">
+							<thead>
+								<tr>
+									<th class="text-center">Employee</th>
+									<th class="text-center">From</th>
+									<th class="text-center">To</th>
+									<th class="text-center">Reason</th>
+									<th class="text-center">Edit</th>
+									<th class="text-center">Delete</th>
+								</tr>
+							</thead>
+	
+							<tbody>
+								<tr>
+									<td>Cao Hai Nhi</td>
+									<td>8h - 1/2/2017</td>
+									<td>11h - 1/2/2017</td>
+									<td>ban viec nha</td>
+									<td class="text-center"><button class="btn btn-primary customButton">Edit</button></td>
+									<td class="text-center"><button class="btn btn-danger customButton">Delete</button></td>
+								</tr>
+								<tr>
+									<td>Cao Hai Nhi</td>
+									<td>8h - 1/2/2017</td>
+									<td>11h - 1/2/2017</td>
+									<td>ban viec nha</td>
+									<td class="text-center"><button class="btn btn-primary customButton">Edit</button></td>
+									<td class="text-center"><button class="btn btn-danger customButton">Delete</button></td>
+								</tr>
+								<tr>
+									<td>Cao Hai Nhi</td>
+									<td>8h - 1/2/2017</td>
+									<td>11h - 1/2/2017</td>
+									<td>ban viec nha</td>
+									<td class="text-center"><button class="btn btn-primary customButton">Edit</button></td>
+									<td class="text-center"><button class="btn btn-danger customButton">Delete</button></td>
+								</tr>
+							</tbody>
+						</table>
+					<!-- </div> -->
+	
+						<div class="modal fade" id="requestDetailsModal" role="dialog">
+							<div class="modal-dialog">
+				
+								<!-- Modal content-->
+								<div class="modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal">&times;</button>
+										<h4 class="modal-title">Cao Hai Nhi</h4>
+									</div>
+									<div class="modal-body">
+										<form class="form-horizontal">
+											<div class="form-group">
+												<label class="control-label col-sm-3">Employee: </label>
+												<label class="control-label col-sm-7" style="text-align: left;">Cao Hai Nhi</label>
+											</div>
+											<div class="form-group">
+												<label class="control-label col-sm-3">Position: </label>
+												<div class="input-group col-sm-7">
+													<span class="input-group-btn">
+														<select class="form-control">
+															<option value="1">Intern</option>
+															<option value="2">Employee</option>
+															<option value="3">Leader</option>
+														</select>
+													</span>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="control-label col-sm-3">Team: </label>
+												<div class="input-group col-sm-7">
+													<span class="input-group-btn">
+														<select class="form-control">
+															<option value="1">Java</option>
+															<option value="2">PHP</option>
+															<option value="3">Ruby</option>
+														</select>
+													</span>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="control-label col-sm-3">Department: </label>
+												<div class="input-group col-sm-7">
+													<span class="input-group-btn">
+														<select class="form-control">
+															<option value="1">Department 1</option>
+															<option value="2">Department 2</option>
+															<option value="3">Department 3</option>
+														</select>
+													</span>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="control-label col-sm-3">From: </label>
+												<div class="input-group col-sm-7">
+													<input class="form-control" type="datetime-local"></input>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="control-label col-sm-3">To: </label>
+												<div class="input-group col-sm-7">
+													<input class="form-control" type="datetime-local"></input>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="control-label col-sm-3">Reason: </label>
+												<div class="input-group col-sm-7">
+													<span class="input-group-btn">
+														<textarea class="form-control"></textarea>
+													</span>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="control-label col-sm-3">Day off type: </label>
+												<div class="input-group col-sm-7">
+													<span class="input-group-btn">
+														<select class="form-control">
+															<option value="1">Nghỉ phép</option>
+															<option value="2">Kết hôn</option>
+															<option value="3">Nghỉ không lương</option>
+														</select>
+													</span>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="control-label col-sm-3">Response Message: </label>
+												<div class="input-group col-sm-7">
+													<span class="input-group-btn">
+														<textarea class="form-control"></textarea>
+													</span>
+												</div>
+											</div>
+										</form>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-default" data-dismiss="modal">Save</button>
+										<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+									</div>
+								</div>
+	
+							</div>
+						</div>
 
 				</div>
 
-
 			</div>
-		</div>
 
-		
-		
+			<div th:replace="fragments/footer"></div>
+
 	</body>
 </html>

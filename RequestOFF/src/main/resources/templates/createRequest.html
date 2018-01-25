@@ -9,18 +9,6 @@
 		<script src="./bootstrap/js/bootstrap.min.js"></script>
 
 		<style type="text/css">
-		#mainMenu {
-				width: 15%;
-				height: 100%;
-				position: fixed;
-			}
-			
-			#mainContent {
-				width: 85%;
-				height: auto;
-				position: absolute;
-				right: 0;
-			}
 			
 			.formButton {
 				margin: 0px 10px;
@@ -36,12 +24,12 @@
 		</style>
 
 	</head>
-	<body>
+	<body  class="content-body">
 		<script>
 			/*<![CDATA[*/
 				$(function() {
 // 					$("#mainHeader").load("../header.html");
-					$("#mainMenu").load("../menu.html");
+// 					$("#mainMenu").load("../menu.html");
 				});
 					
 			/*]]>*/
@@ -49,11 +37,10 @@
 
 		<div>
 			
-			<div id="mainMenu">
-				
-			</div>
+			<div th:replace="menu"></div>
+			<div th:replace="fragments/header"></div>
 
-			<div id="mainContent">
+			<div class="requestOffContentBody">
 				<div class="container-fluid">
 					<div class="row">
 						<h4 class="col-sm-offset-3">Bạn còn 15 ngày nghỉ phép</h4>
@@ -95,6 +82,7 @@
 					</div>
 				</div>
 			</div>
+			<div th:replace="fragments/footer"></div>
 		</div>
 
 	</body>
