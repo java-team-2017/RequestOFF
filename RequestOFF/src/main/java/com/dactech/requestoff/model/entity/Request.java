@@ -12,6 +12,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class Request {
+	public static final long REQUEST_STATUS_SAVED = 1; 
+	public static final long REQUEST_STATUS_APPROVED = 2; 
+	public static final long REQUEST_STATUS_DENIED = 3; 
+	public static final long REQUEST_STATUS_RESPONDED = 4; 
+	public static final long REQUEST_STATUS_WAITING = 5; 
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
