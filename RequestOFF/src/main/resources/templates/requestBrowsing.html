@@ -1,20 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="ISO-8859-1"/>
 <title>Request Browsing</title>
-<!-- <link rel="stylesheet" type="text/css" href="requestBrowsing.css" /> -->
-<script src="jquery-3.2.1.js"></script>
-<script src="jquery.serializejson.js"></script>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<link rel="stylesheet"  type="text/css" href="./bootstrap/css/bootstrap.min.css" />
+	<script src="jquery-3.2.1.js"></script>
+	<script src="./bootstrap/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/requestBrowsing.css" />
 <script>
+/*<![CDATA[*/
 	var employeeArr = [
 		{'name': 'Minh Hien', 'from': '23/1/2018 10:10:SA', 'to': '23/1/2018 14:10:CH', 'reason': 'Ốm'},
 		{'name': 'Hai Nhi', 'from': '23/1/2018 10:10:SA', 'to': '23/1/2018 14:10:CH', 'reason': 'Ốm'},
 		{'name': 'Binh Thien', 'from': '23/1/2018 10:10:SA', 'to': '23/1/2018 14:10:CH', 'reason': 'Ốm'},
 	];
+	
+	$(function(){
+// 		  $("#header").load("header.html"); 
+// 		  $("#footer").load("footer.html"); 
+	});
 	
 	$(function(){
 		loadTable(employeeArr);
@@ -29,21 +34,24 @@
 					row += '<td data-toggle="modal" data-target="#myModal">' + object.from + '</td>';
 					row += '<td data-toggle="modal" data-target="#myModal">' + object.to + '</td>';
 					row += '<td data-toggle="modal" data-target="#myModal">' + object.reason + '</td>';
-					row += '<td><button type="button" >Approve</button></td>';
-					row += '<td><button type="button" >Deny</button></td>';
+					row += '<td><button type="button" class="btn btn-default">Approve</button></td>';
+					row += '<td><button type="button" class="btn btn-default">Deny</button></td>';
 					row += '</tr>'
 					html += row;
 		});
 		$("#myTable > tbody").empty().append(html);
 	}
+	/*]]>*/
 </script>
 </head>
-<body>
+<body class="content-body">
+<!-- 	<div id="header"></div> -->
+	<div th:replace="fragments/header"></div>
 	<h3 align="center">Request Browsing</h3>
 	
 	<p align="center">
 		<label> 
-			Employee: <input type="text" name="employee" id="employee" value="" /><br></br>
+			Employee: <input class="form-control" type="text" name="employee" id="employee" value="" /><br></br>
 		</label> 
 		<label> 
 			Team: <input type="text" name="team" id="team" value="" />
@@ -62,21 +70,23 @@
 				To: <input type="datetime-local" name="to" />
 		</p>
 	</p>
-	<table align="center" id="myTable" border="1">
-				<thead>
-					<tr>
-						<th name="select"><span>Select</span></th>
-						<th name="name"><span>Employee</span></th>
-						<th name="from"><span>From</span></th>
-						<th name="to"><span>To</span></th>
-						<th name="reason"><span>Reason</span></th>
-						<th name="approve"><span>Approve</span></th>
-						<th name="deny"><span>Deny</span></th>
-					</tr>
-				</thead>
-				<tbody>
-				</tbody>
-	</table>
+	<div class="table-responsive"> 
+		<table class="table table-bordered table-striped table-hover" id="myTable">
+					<thead>
+						<tr>
+							<th name="select"><span>Select</span></th>
+							<th name="name"><span>Employee</span></th>
+							<th name="from"><span>From</span></th>
+							<th name="to"><span>To</span></th>
+							<th name="reason"><span>Reason</span></th>
+							<th name="approve"><span>Approve</span></th>
+							<th name="deny"><span>Deny</span></th>
+						</tr>
+					</thead>
+					<tbody align="center">
+					</tbody>
+		</table>
+	</div>
 	<p align="center">
 		<button type="button" class="btn btn-default" >Approve</button>
 		<button type="button" class="btn btn-default" >Deny</button>
@@ -148,94 +158,8 @@
 					<button type="button">Forward</button>
 				</div>
 			</div>
-
 		</div>
 	</div>
-	<style type="text/css">
-/* button {
-	color: black;
-	background-color: 66CCFF;
-	border-width: 1px;
-	border-style: Groove;
-	font-size: 12px;
-	font-weight: bold;
-	height: 26px;
-	width: 80px;
-	border-radius: 7px;
-} */
-/* .not-active {
-   pointer-events: none;
-   cursor: default;
-   color:gray;
-   text-decoration:none
-}
-.active{
-	color:black;
-	text-decoration:none;
-}
-
-.active:hover{
-	color:red;
-} */
-
-button:hover {
-	color: Navy;
-	background-color: Silver;
-	cursor: pointer;
-}
-
-input {
-	border-radius: 10px;
-	height: 30px;
-	padding: 5px;
-}
-
-select {
-	border-radius: 10px;
-	font-size: 12px;
-	font-weight: bold;
-	height: 30px;
-	padding: 5px;
-	width: 200px;
-}
-
-select:hover {
-	color: Navy;
-	background-color: Silver;
-	cursor: pointer;
-}
-
-table {
-	background-color: FFCCCC;
-	width: 50%;
-}
-
-table tr:nth-child(even) {
-	background-color: #eee;
-}
-
-table tr:nth-child(odd) {
-	background-color: #fff;
-}
-
-table th {
-	background-color: black;
-	color: white;
-}
-
-th {
-	text-align: center;
-}
-tbody {
-	border-radius: 15px;
-	border: none solid #6297BC;
-	text-align: center;
-	height: 29px;
-	padding: 5px;
-}
-btn-group {
-	align: center;
-}
-</style>
+	<div th:replace="fragments/footer"></div>
 </body>
 </html>

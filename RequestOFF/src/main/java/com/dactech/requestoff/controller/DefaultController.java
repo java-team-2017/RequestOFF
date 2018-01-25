@@ -11,39 +11,45 @@ public class DefaultController {
 	public String index() {
 		return "/index";
 	}
-	
+
 	@GetMapping("/login")
 	public String login() {
 		return "/login";
 	}
-	
+
 	@GetMapping("/403")
 	public String error403() {
 		return "/error/403";
 	}
-	
-	@GetMapping("/layout")
+
+	@GetMapping("/header")
 	public String layout() {
-		return "/layout";
+		return "fragments/header";
 	}
-	
+
+	@GetMapping("/footer")
+	public String footer() {
+		return "fragments/footer";
+	}
+
 	@GetMapping("/requestBrowsing")
 	public String requestBrowsing() {
 		return "/requestBrowsing";
 	}
-	
+
 	@RequestMapping(value = "/statistic", method = RequestMethod.GET)
 	public String statistic() {
 		return "/statistic";
 	}
-	
+
 	@GetMapping("/requestHistory")
 	public String requestHistoryScreen() {
 		return "requestHistory";
 	}
-	
+
 	@GetMapping("/createRequest")
 	public String createRequestScreen() {
 		return "createRequest";
 	}
+
 }

@@ -1,0 +1,11 @@
+.navbar-text {
+	float: initial;
+	color: black;
+}
+.content-body {
+	padding: 120px 50px;
+}
+.glyphicon {
+	padding-right: 17px;
+	font-size: 20px;
+}

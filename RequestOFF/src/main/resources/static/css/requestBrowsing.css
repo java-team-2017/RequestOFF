@@ -1,0 +1,22 @@
+@charset "ISO-8859-1";
+
+input {
+	border-radius: 10px;
+	height: 30px;
+	padding: 5px;
+}
+
+select {
+	border-radius: 10px;
+	font-size: 12px;
+	font-weight: bold;
+	height: 30px;
+	padding: 5px;
+	width: 200px;
+}
+
+table th {
+	background-color: black;
+	color: white;
+	text-align: center;
+}
