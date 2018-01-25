@@ -23,6 +23,26 @@ public class EmployeeSearchRequest {
 	public EmployeeSearchRequest() {
 		super();
 	}
+	
+
+	public EmployeeSearchRequest(long id, String name, int nameMatchStatus, String gender, String birthday,
+			long positionId, String email, long phone, String startWorkingDate, String officalWorkingDate,
+			int validFlag) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.nameMatchStatus = nameMatchStatus;
+		this.gender = gender;
+		this.birthday = birthday;
+		this.positionId = positionId;
+		this.email = email;
+		this.phone = phone;
+		this.startWorkingDate = startWorkingDate;
+		this.officalWorkingDate = officalWorkingDate;
+		this.validFlag = validFlag;
+	}
+
+
 
 	@Override
 	public String toString() {
