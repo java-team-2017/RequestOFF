@@ -4,11 +4,24 @@
 		<meta charset="utf-8"/>
 		<title>Create Request</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<link rel="stylesheet"  type="text/css" href="./bootstrap/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="./bootstrap/css/bootstrap.min.css" />
 		<script src="jquery-3.2.1.js"></script>
 		<script src="./bootstrap/js/bootstrap.min.js"></script>
 
 		<style type="text/css">
+		#mainMenu {
+				width: 15%;
+				height: 100%;
+				position: fixed;
+			}
+			
+			#mainContent {
+				width: 85%;
+				height: auto;
+				position: absolute;
+				right: 0;
+			}
+			
 			.formButton {
 				margin: 0px 10px;
 				width: 80px;
@@ -24,45 +37,63 @@
 
 	</head>
 	<body>
+		<script>
+			/*<![CDATA[*/
+				$(function() {
+// 					$("#mainHeader").load("../header.html");
+					$("#mainMenu").load("../menu.html");
+				});
+					
+			/*]]>*/
+		</script>
 
-		<div class="container">
-			<div class="row">
-				<h4 class="col-sm-offset-3">Bạn còn 15 ngày nghỉ phép</h4>
-				<form id="createRequestForm" class="col-sm-6 col-sm-offset-3">
-					<div class="form-group">
-						<label>From: </label>
-						<input type="datetime-local" class="form-control"/>
+		<div>
+			
+			<div id="mainMenu">
+				
+			</div>
+
+			<div id="mainContent">
+				<div class="container-fluid">
+					<div class="row">
+						<h4 class="col-sm-offset-3">Bạn còn 15 ngày nghỉ phép</h4>
+						<form id="createRequestForm" class="col-sm-6 col-sm-offset-3">
+							<div class="form-group">
+								<label>From: </label>
+								<input type="datetime-local" class="form-control"/>
+							</div>
+							<div class="form-group">
+								<label>To: </label>
+								<input type="datetime-local" class="form-control"/>
+							</div>
+							<div class="form-group">
+								<label>Reason: </label>
+								<textarea class="form-control"></textarea>
+							</div>
+							<div class="form-group">
+								<label>Day off type: </label>
+								<select class="form-control">
+									<option>Nghỉ phép</option>
+									<option>Kết hôn</option>
+									<option>Nghỉ không lương</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label>Send to: </label>
+								<select class="form-control">
+									<option>Đỗ Phú Thiện</option>
+									<option>Nguyễn Chí Nhất</option>
+								</select>
+							</div>
+							<br/>
+							<div align="center">
+								<button type="submit" class="btn btn-primary formButton">Save</button>
+								<button class="btn btn-primary formButton">Send</button>
+								<button class="btn btn-primary formButton">Cancel</button>
+							</div>
+						</form>
 					</div>
-					<div class="form-group">
-						<label>To: </label>
-						<input type="datetime-local" class="form-control"/>
-					</div>
-					<div class="form-group">
-						<label>Reason: </label>
-						<textarea class="form-control"></textarea>
-					</div>
-					<div class="form-group">
-						<label>Day off type: </label>
-						<select class="form-control">
-							<option>Nghỉ phép</option>
-							<option>Kết hôn</option>
-							<option>Nghỉ không lương</option>
-						</select>
-					</div>
-					<div class="form-group">
-						<label>Send to: </label>
-						<select class="form-control">
-							<option>Đỗ Phú Thiện</option>
-							<option>Nguyễn Chí Nhất</option>
-						</select>
-					</div>
-					<br/>
-					<div align="center">
-						<button type="submit" class="btn btn-primary formButton">Save</button>
-						<button class="btn btn-primary formButton">Send</button>
-						<button class="btn btn-primary formButton">Cancel</button>
-					</div>
-				</form>
+				</div>
 			</div>
 		</div>
 

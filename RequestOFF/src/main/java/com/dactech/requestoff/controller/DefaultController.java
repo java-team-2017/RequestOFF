@@ -31,6 +31,11 @@ public class DefaultController {
 	public String footer() {
 		return "fragments/footer";
 	}
+	
+	@GetMapping("/menu")
+	public String showMenu() {
+		return "menu";
+	}
 
 	@GetMapping("/requestBrowsing")
 	public String requestBrowsing() {
