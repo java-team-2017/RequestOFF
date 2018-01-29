@@ -7,6 +7,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import com.dactech.requestoff.model.entity.Employee;
+import com.dactech.requestoff.model.entity.Team;
 import com.dactech.requestoff.model.request.EmployeeSearchRequest;
 import com.dactech.requestoff.repository.custom.EmployeeRepositoryCustom;
 
@@ -96,6 +97,37 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 			query = entityManager.createNativeQuery(sqlJoinQuery.toString(), Employee.class);
 		}
 		return query.getResultList();
+	}
+
+	@Override
+	public List<Employee> search(String name, long teamId, long departmentId) {
+		StringBuilder queryString = new StringBuilder(
+				"SELECT * " + "FROM employee e INNER JOIN team_employee te ON te.employee_id = e.id"
+						+ " INNER JOIN team t ON te.team_id = t.id ");
+		StringBuilder whereClause = new StringBuilder("");
+
+		if (name != null && name != "") {
+			whereClause.append(" AND e.name like '%" + name + "%'");
+		}
+
+		if (teamId != 0) {
+			whereClause.append(" AND t.id = '" + teamId + "'");
+		}
+
+		if (departmentId != 0) {
+			whereClause.append(" AND t.department_id = '" + departmentId + "'");
+		}
+		
+		whereClause.append(" AND e.valid_flag = '" + 1 + "'");
+
+		if (whereClause.length() > 0) {
+			whereClause.replace(0, 5, " WHERE ");
+			queryString.append(whereClause);
+		}
+
+		Query query = entityManager.createNativeQuery(queryString.toString(), Employee.class);
+		List<Employee> employees = query.getResultList();
+		return employees;
 	}
 
 }

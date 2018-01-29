@@ -6,6 +6,8 @@
 	<script src="javascript/jquery-3.2.1.js"></script>
 	<script src="javascript/bootstrap.min.js"></script>
 	<script src="javascript/jquery.serializejson.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/datatables.min.css"/>
+	<script type="text/javascript" src="javascript/datatables.min.js"></script>
 </head>
 
 <script type="text/javascript">
@@ -14,36 +16,10 @@
 		//=====================================================================
 		// # Initialize form
 		//=====================================================================
-		var listDayOffType;
 		var listDepartment;
 		var listTeam;
-
 		
-		//dayOffType combobox
-		$.ajax({
-			url : "/dayOffType/search",
-			type : "post",
-			dataType :"json",
-			contentType : "application/json",
-			data : JSON.stringify({
-				"payment_flag_id": -1,
-				"valid_flag_id": 1
-			}),
-			success : function (dayOffTypeSearchResponse){
-				if (dayOffTypeSearchResponse.status_info.status == 0) {
-					listDayOffType = dayOffTypeSearchResponse.listDayOffType;
-					$('#dayOffType').empty().append('<option value=""></option>');
-					$.each(listDayOffType, function(index, dayOffType) {
-						$('#dayOffType').append('<option value="' + dayOffType.id + '">' + dayOffType.name + '</option>');
-					});	
-				} else {
-					alert(dayOffTypeSearchResponse.status_info.error);
-				}
-			},
-			error : function() {
-				alert("error!!!");
-			}
-		});
+		var listStatistics;
 		
 		//Department combobox
 		$.ajax({
@@ -128,6 +104,65 @@
 				contentType : "application/json",
 				data : JSON.stringify(searchParam),
 				success : function (data){
+					listStatistics = data.listEmployeeStatistics;
+					console.log(listStatistics);
+					
+					$('#statisticsTable').DataTable({
+						destroy: true,
+						"searching": false,
+						data: listStatistics,
+						columns: [
+							{ data: 'employee.id' },
+							{ data: 'employee.name' },
+							{ data: 'employee.listTeam[0].name' },
+							{ data: 'employee.listTeam[0].department.name' },
+							{ data: 'employee.position.name' },
+							{ data: 'timeOffWithPaying' },
+							{ data: 'timeOffWithoutPaying' },
+						]
+					});
+					
+					$('#statisticsTable tr').on('click', function() {
+						var employeeId = $(this).find("td:first").html();
+						var statisticsObj = $.grep(listStatistics, function(statistics) {
+							return statistics.employee.id == employeeId;
+						})[0];
+						console.log(statisticsObj);
+						
+						$('#detailEmployee').val(statisticsObj.employee.name);
+						$('#detailPosition').val(statisticsObj.employee.position.name);
+						$('#detailDepartment').val(statisticsObj.employee.listTeam[0].department.name);
+						$('#detailTeam').val(statisticsObj.employee.listTeam[0].name);
+						$('#detailWithPaying').val(statisticsObj.timeOffWithPaying);
+						$('#detailWithoutPaying').val(statisticsObj.timeOffWithoutPaying);
+						
+						$('#withPayingTable').DataTable({
+							destroy: true,
+							"searching": false,
+							"info": false,
+							"lengthChange": false,
+							"paging": false,
+							data: statisticsObj.listRequestWithPaying,
+							columns: [
+								{ data: 'fromTime' },
+								{ data: 'toTime' },
+							]
+						});
+						$('#withoutPayingTable').DataTable({
+							destroy: true,
+							"searching": false,
+							"info": false,
+							"lengthChange": false,
+							"paging": false,
+							data: statisticsObj.listRequestWithoutPaying,
+							columns: [
+								{ data: 'fromTime' },
+								{ data: 'toTime' },
+							]
+						});
+						
+						$('#detailModal').modal('show');
+					});
 				},
 				error : function() {
 					alert("error!!!");
@@ -140,9 +175,14 @@
 			$('#detailModal').modal('show');
 		});
 		
-		$('#offTable td').on('click', function() {
-			$('#detailModal').modal('show');
+		$("#clearBtn").on('click', function() {
+			$('#searchForm input, #searchForm select').val('');
+			$('#team').empty().append('<option value=""></option>');
+			$.each(listTeam, function(index, team) {
+				$('#team').append('<option value="' + team.id + '">' + team.name + '</option>');
+			});
 		});
+		
 	});	
 //]]>
 </script>
@@ -158,7 +198,7 @@
 					<div class="col-sm-2"></div>
 					<label class="col-sm-2 col-form-label">Form</label>
 					<div class="col-sm-6">
-						<input id="fromTime" name="from_time" class="form-control" type="datetime-local" />
+						<input id="fromTime" name="from_time" class="form-control" type="datetime-local" value="2015-06-01T08:30"/>
 					</div>
 				</div>
 				
@@ -166,18 +206,7 @@
 					<div class="col-sm-2"></div>
 					<label class="col-sm-2 col-form-label">To</label>
 					<div class="col-sm-6">
-						<input id="toTime" name="to_time" class="form-control" type="datetime-local"/>
-					</div>
-				</div>
-				
-				<div class="form-group row">
-					<div class="col-sm-2"></div>
-					<label class="col-sm-2 col-form-label">Day Off Type</label>
-					<div class="col-sm-6">
-						<select id="dayOffType" name="day_off_type_id" class="form-control">
-							<option>T1</option>
-							<option>T2</option>
-						</select>
+						<input id="toTime" name="to_time" class="form-control" type="datetime-local" value="2020-06-01T08:30"/>
 					</div>
 				</div>
 				
@@ -220,7 +249,7 @@
 				</div>
 			</form>
 			
-			<table id="offTable" class="table table-striped table-bordered table-hover table-condensed text-center" style="table-layout: fixed; word-wrap: break-word;">
+			<table id="statisticsTable" class="table table-striped table-bordered table-hover table-condensed text-center" style="table-layout: fixed; word-wrap: break-word;">
 				<thead>
 					<tr>
 						<th class="col-md-1 text-center">ID</th>
@@ -248,36 +277,36 @@
 						<div class="row">
 							<label class="col-sm-3 col-form-label">Employee</label>
 							<div class="col-sm-3">
-								<input id="detailEmployee" class="col-sm-3 form-control" type="text" value="thien" readonly="readonly"></input>
+								<input id="detailEmployee" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
 							</div>
 							<label class="col-sm-3 col-form-label">Position</label>
 							<div class="col-sm-3">
-								<input id="detailPosition" class="col-sm-3 form-control" type="text" value="intern" readonly="readonly"></input>
+								<input id="detailPosition" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
 							</div>
 						</div>
 						<div class="row">
 							<label class="col-sm-3 col-form-label">Department</label>
 							<div class="col-sm-3">
-								<input id="detailDepartment" class="col-sm-3 form-control" type="text" value="Java" readonly="readonly"></input>
+								<input id="detailDepartment" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
 							</div>
 							<label class="col-sm-3 col-form-label">Team</label>
 							<div class="col-sm-3">
-								<input id="detailTeam" class="col-sm-3 form-control" type="text" value="intern" readonly="readonly"></input>
+								<input id="detailTeam" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
 							</div>
 						</div>
 						<div class="row">
-							<label class="col-sm-3 col-form-label">Day Off With Paying</label>
+							<label class="col-sm-3 col-form-label">Time Off With Paying (hours)</label>
 							<div class="col-sm-3">
-								<input id="detailDayOffWithPaying" class="col-sm-3 form-control" type="text" value="5" readonly="readonly"></input>
+								<input id="detailWithPaying" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
 							</div>
-							<label class="col-sm-3 col-form-label">Day Off Without Paying</label>
+							<label class="col-sm-3 col-form-label">Time Off Without Paying (hours)</label>
 							<div class="col-sm-3">
-								<input id="detailDayOffWithoutPaying" class="col-sm-3 form-control" type="text" value="3" readonly="readonly"></input>
+								<input id="detailWithoutPaying" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-md-6">
-								<table class="table table-striped table-bordered table-hover table-condensed text-center" style="table-layout: fixed; word-wrap: break-word;">
+								<table id="withPayingTable" class="table table-bordered table-hover" style="table-layout: fixed; width: 100%;">
 									<caption>Day Off with Paying</caption>
 									<thead>
 										<tr>
@@ -286,19 +315,11 @@
 										</tr>
 									</thead>
 									<tbody>
-										<tr>
-											<td>cell 2 </td>
-											<td>cell 1</td>
-										</tr>
-										<tr>
-											<td>cell 1</td>
-											<td>cell 2</td>
-										</tr>
 									</tbody>
 								</table>
 							</div>
 							<div class="col-md-6">
-								<table class="table table-striped table-bordered table-hover table-condensed text-center" style="table-layout: fixed; word-wrap: break-word;">
+								<table id="withoutPayingTable" class="table table-bordered table-hover" style="table-layout: fixed; width: 100%;">
 									<caption>Day Off with Paying</caption>
 									<thead>
 										<tr>
@@ -307,14 +328,6 @@
 										</tr>
 									</thead>
 									<tbody>
-										<tr>
-											<td>cell 2 </td>
-											<td>cell 1</td>
-										</tr>
-										<tr>
-											<td>cell 1</td>
-											<td>cell 2</td>
-										</tr>
 									</tbody>
 								</table>
 							</div>
