@@ -24,7 +24,7 @@ import com.dactech.requestoff.model.response.EmployeeRegistResponse;
 import com.dactech.requestoff.model.response.EmployeeSearchResponse;
 import com.dactech.requestoff.repository.EmployeeRepository;
 import com.dactech.requestoff.service.EmployeeService;
-import com.dactech.requestoff.util.DateProcessing;
+import com.dactech.requestoff.util.DateUtils;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -130,7 +130,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 				Date endTime = toTime.before(requestToTime) ? toTime : requestToTime;
 				
 				// calculate amount of off time in working time
-				long timeOff = DateProcessing.diffHours(startTime, endTime);
+				long timeOff = DateUtils.diffHours(startTime, endTime);
 				
 				if (request.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING) {
 					timeOffWithPaying += timeOff;

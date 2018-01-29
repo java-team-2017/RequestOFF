@@ -4,7 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public class DateProcessing {
+public class DateUtils {
 	// calculate diffWorkingHours between 2 time
 	// except weekend and the hour without working
 	// minute, second and millisecon are ignore
