@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<link rel="stylesheet"	type="text/css" href="css/bootstrap.min.css" />
 		<script src="javascript/jquery-3.2.1.js"></script>
+		<script src="javascript/jquery.serializejson.js"></script>
 		<script src="javascript/bootstrap.min.js"></script>
 
 		<style type="text/css">
@@ -27,9 +28,163 @@
 	<body  class="content-body">
 		<script>
 			/*<![CDATA[*/
+				var employeeId = "1";
+				var listRecipient = [];
+				
+				function getDayOffTypeId(DayOffTypeName) {
+					var id;
+					if(listDayOffType.listDayOffType.length > 0) {
+						$.each(listDayOffType.listDayOffType, function(i, element) {
+							if( DayOffTypeName.localeCompare(element.name) == 0 ) {
+								id = element.id;
+								return false;
+							}
+						});
+					}
+					return id;
+				}
+				
+				function getRecipientId(recipientName) {
+					var id;
+					if(listRecipient.length > 0) {
+						$.each(listRecipient, function(i, element) {
+							if( recipientName.localeCompare(element.name) == 0 ) {
+								id = element.id;
+								return false;
+							}
+						});
+					}
+					return id;
+				}
+				
+				function validate(formId) {
+					var ok = 1;
+					var listInput = $(formId).find(':input').not("button");
+					$.each(listInput, function() {
+						if($(this).val() == "") {
+							ok = 0;
+// 							$(this).parent().css( "background-color", "moccasin" );
+						}
+					});
+					if(ok == 0) {
+						alert("Please fill in all fields");
+					}
+					return ok;
+				}
+				
+				function update(status) {	//status = 1 -> save, status = 0 -> send
+					if(validate("#createRequestForm") == 1) {
+						requestRegistRequest = {
+							"id" : "",
+							"employee_id" : "",
+							"from_time" : "",
+							"to_time" : "",
+							"reason" : "",
+							"status" : "",
+							"response_message" : "",
+							"day_off_type_id" : "",
+							"recipient_id" : "",
+							"valid_flag" : "",
+							"update_date" : ""
+						}
+						var createRequestData = $('#createRequestForm').serializeJSON();
+						requestRegistRequest.employee_id = employeeId;
+						requestRegistRequest.from_time = createRequestData.from;
+						requestRegistRequest.to_time = createRequestData.to;
+						requestRegistRequest.reason = createRequestData.reason;
+						requestRegistRequest.status = (status == 1 ? 1 : 5);
+						requestRegistRequest.day_off_type_id = getDayOffTypeId(createRequestData.dayOffType);
+						requestRegistRequest.recipient_id = getRecipientId(createRequestData.recipient);;
+						requestRegistRequest.valid_flag = "1";
+						
+						$.ajax({
+							type : "POST",
+							contentType : "application/json",
+							url : "/request/regist",
+							dataType : 'json',
+							data : JSON.stringify(requestRegistRequest),
+							success : function(returnData) {
+							},
+							error : function(e) {
+								console.log("ERROR: ", e);
+							}
+						});
+					}
+				}
+				
 				$(function() {
-// 					$("#mainHeader").load("../header.html");
-// 					$("#mainMenu").load("../menu.html");
+					var allDayOffTypeRequest = {
+						"id" : "",
+						"name" : "",
+						"name_match_status" : "",
+						"payment_flag_id" : "2",
+						"valid_flag_id" : "2"
+					};
+
+					$.ajax({
+						type : "POST",
+						contentType : "application/json",
+						url : "/dayOffType/search",
+						dataType : 'json',
+						data : JSON.stringify(allDayOffTypeRequest),
+						success : function(returnData) {
+							listDayOffType = returnData;
+							var option = "";
+							$.each(returnData.listDayOffType, function(i, element){
+								var option = "<option value='" + element.name + "'>" + element.name + "</option>"; 
+								$("#id_dayOffType").append(option);
+							});
+						},
+						error : function(e) {
+							console.log("ERROR: ", e);
+						}
+					});
+					
+					var allRecipientRequest = {
+						"id" : ""
+					};
+					allRecipientRequest.id = employeeId;
+					
+					$.ajax({
+						type : "POST",
+						contentType : "application/json",
+						url : "/employee/details",
+						dataType : 'json',
+						data : JSON.stringify(allRecipientRequest),
+						success : function(returnData) {
+							var temp;
+							if(returnData.employee.position.name == "leader") {
+								listRecipient.push({ "id" : "", "name" : "" });
+								listRecipient[0].id = returnData.employee.team.department.manager.id;
+								listRecipient[0].name = returnData.employee.team.department.manager.name;
+							}
+							else {
+								listRecipient.push({ "id" : "", "name" : "" });
+								listRecipient[0].id = returnData.employee.listTeam[0].leader.id;
+								listRecipient[0].name = returnData.employee.listTeam[0].leader.name;
+								
+								listRecipient.push({ "id" : "", "name" : "" });
+								listRecipient[1].id = returnData.employee.listTeam[0].department.manager.id;
+								listRecipient[1].name = returnData.employee.listTeam[0].department.manager.name;
+							}
+							var option = "";
+							$.each(listRecipient, function(i, element){
+								var option = "<option value='" + element.name + "'>" + element.name + "</option>"; 
+								$("#id_recipient").append(option);
+							});
+						},
+						error : function(e) {
+							console.log("ERROR: ", e);
+						}
+					});
+					
+					$('#btnSave').on('click', function() {
+						update(1);
+					});
+					
+					$('#btnSend').on('click', function() {
+						update(0);
+					});
 				});
 					
 			/*]]>*/
@@ -41,48 +196,44 @@
 			<div th:replace="fragments/header"></div>
 
 			<div class="requestOffContentBody">
+				<h1 align="center">Create Request</h1>
 				<div class="container-fluid">
 					<div class="row">
 						<h4 class="col-sm-offset-3">Bạn còn 15 ngày nghỉ phép</h4>
 						<form id="createRequestForm" class="col-sm-6 col-sm-offset-3">
 							<div class="form-group">
 								<label>From: </label>
-								<input type="datetime-local" class="form-control"/>
+								<input type="datetime-local" class="form-control" name="from" id="id_from"/>
 							</div>
 							<div class="form-group">
 								<label>To: </label>
-								<input type="datetime-local" class="form-control"/>
+								<input type="datetime-local" class="form-control" name="to" id="id_to"/>
 							</div>
 							<div class="form-group">
 								<label>Reason: </label>
-								<textarea class="form-control"></textarea>
+								<textarea class="form-control" name="reason" id="id_reason"></textarea>
 							</div>
 							<div class="form-group">
 								<label>Day off type: </label>
-								<select class="form-control">
-									<option>Nghỉ phép</option>
-									<option>Kết hôn</option>
-									<option>Nghỉ không lương</option>
+								<select class="form-control" name="dayOffType" id="id_dayOffType">
 								</select>
 							</div>
 							<div class="form-group">
 								<label>Send to: </label>
-								<select class="form-control">
-									<option>Đỗ Phú Thiện</option>
-									<option>Nguyễn Chí Nhất</option>
+								<select class="form-control" name="recipient" id="id_recipient">
 								</select>
 							</div>
 							<br/>
 							<div align="center">
-								<button type="submit" class="btn btn-primary formButton">Save</button>
-								<button class="btn btn-primary formButton">Send</button>
-								<button class="btn btn-primary formButton">Cancel</button>
+								<button type="button" class="btn btn-primary formButton" id="btnSave">Save</button>
+								<button type="button" class="btn btn-primary formButton" id="btnSend">Send</button>
+								<button type="button" class="btn btn-primary formButton" id="btnCancel">Cancel</button>
 							</div>
 						</form>
 					</div>
 				</div>
 			</div>
-			<div th:replace="fragments/footer"></div>
+<!-- 			<div th:replace="fragments/footer"></div> -->
 		</div>
 
 	</body>

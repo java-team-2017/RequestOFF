@@ -39,8 +39,36 @@
 }
 
 .requestOffContentBody {
-	width: 87%;
+	width: 85%;
 	height: auto;
 	position: absolute;
 	right: 0;
+}
+
+.customButton {
+	width: 100px;
+}
+
+.formButton {
+	margin: 0px 20px;
+}
+
+#requestHistoryForm {
+	margin-bottom: 20px;
+}
+
+.idCell, .editCell, .deleteCell {
+	width: 5%;
+}
+
+.employeeCell {
+	width: 15%;
+}
+
+.fromCell, .toCell {
+	width: 15%;
+}
+
+.pleaseFillIn {
+	background-color: moccasin;
 }

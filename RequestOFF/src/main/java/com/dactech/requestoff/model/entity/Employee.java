@@ -57,7 +57,7 @@ public class Employee {
 	private Team team;
 
 	@ManyToMany(mappedBy = "listEmployee")
-	@JsonIgnoreProperties(value = { "leader", "listEmployee" })
+	@JsonIgnoreProperties(value = { "listEmployee" })
 	private List<Team> listTeam;
 
 	@ManyToMany(mappedBy = "listEmployee")

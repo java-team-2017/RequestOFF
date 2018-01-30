@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 	<head>
@@ -6,196 +5,487 @@
 		<title>Request History</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<link rel="stylesheet"	type="text/css" href="css/bootstrap.min.css" />
+		<link rel="stylesheet"	type="text/css" href="css/layoutStyle.css" />
+		<link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet" />
 		<script src="javascript/jquery-3.2.1.js"></script>
+		<script src="javascript/jquery.serializejson.js"></script>
 		<script src="javascript/bootstrap.min.js"></script>
-		
-		<style type="text/css">
-			.customButton {
-				width: 100px;
-			}
-
-			.formButton {
-				margin: 0px 20px;
-			}
-			#requestHistoryForm {
-				margin-bottom: 50px;
-			}
-/* 			#mainContent { */
-/* 				width: 87%; */
-/* 				height: auto; */
-/* 				position: absolute; */
-/* 				right: 0; */
-/* 				/*background: powderblue;*/ */
-/* 			} */
-		</style>
+		<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 	</head>
 	<body class="content-body">
 		<script>
 			/*<![CDATA[*/
-				$(function() {
-// 					$("#mainMenu").load("../menu.html");
+				var employeeId = "1";
+				var listDayOffType;
+				var listRecipient = [];
+				var getStatus = {
+					'1': 'saved',
+					'2': 'approved',
+					'3': 'denied',
+					'4': 'responded',
+					'5': 'waiting'
+				};
+				
+				function getDayOffTypeId(DayOffTypeName) {
+					var id;
+					if(listDayOffType.listDayOffType.length > 0) {
+						$.each(listDayOffType.listDayOffType, function(i, element) {
+							if( DayOffTypeName.localeCompare(element.name) == 0 ) {
+								id = element.id;
+								return false;
+							}
+						});
+					}
+					return id;
+				}
+				
+				function getRecipientNameOrId(recipient) {
+					var returnValue;
+					if(listRecipient.length > 0) {
+						$.each(listRecipient, function(i, element) {
+							if( recipient.localeCompare(element.name) == 0 ) {
+								returnValue = element.id;
+								return false;
+							}
+							else if( recipient.localeCompare(element.id) == 0 ) {
+								returnValue = element.name;
+								return false;
+							}
+						});
+					}
+					return returnValue;
+				}
+				
+				function validate(formId) {
+					var ok = 1;
+					var listInput = $(formId).find(':input').not("#modalResponseMessage");
+					$.each(listInput, function() {
+						if($(this).val() == "") {
+							ok = 0;
+// 							$(this).parent().css( "background-color", "red" );
+						}
+					});
+					if(ok == 0) {
+						alert("Please fill in all fields");
+					}
+					return ok;
+				}
+				
+				function search() {
+					var requestSearchRequest = {
+						"id" : "0",
+						"employee_id" : "0",
+						"from_time" : "",
+						"to_time" : "",
+						"reason" : "",
+						"status" : "0",
+						"response_message" : "",
+						"day_off_type_id" : "0",
+						"recipient_id" : "0",
+						"valid_flag" : "0"
+					};
+					requestSearchRequest.employee_id = employeeId;
+					var searchData = $('#requestHistoryForm').serializeJSON();
+
+					requestSearchRequest.from_time = searchData.fromTime;
+					requestSearchRequest.to_time = searchData.toTime;
+					requestSearchRequest.status = searchData.requestType;
+					requestSearchRequest.valid_flag = "1";
 					
-					$('#requestHistoryTable tr').each(function() {
-						$(this).children('td:lt(5)').on('click', function() {
+					$.ajax({
+						type : "POST",
+						contentType : "application/json",
+						url : "/request/search",
+						dataType : 'json',
+						data : JSON.stringify(requestSearchRequest),
+						success : function(returnData) {
+							$('#requestHistoryTable').DataTable( {
+								destroy: true,
+								searching: false,
+								data: returnData.requests,
+ 								columnDefs: [
+ 									{
+										"targets": [ 0 ],
+										"data": 'id'
+									},
+									{
+										"targets": [ 1 ],
+										"data": 'employee.name'
+									},
+									{
+										"targets": [ 2 ],
+										"data": 'fromTime'
+									},
+									{
+										"targets": [ 3 ],
+										"data": 'toTime'
+									},
+									{
+										"targets": [ 4 ],
+										"data": 'reason'
+									},
+									{
+										"targets": [ 5 ],
+										"className": "text-center",
+										"data": null,
+										"defaultContent": "<a href='#'><span class='glyphicon glyphicon-pencil'></span></a>"
+									},
+									{
+										"targets": [ 6 ],
+										"className": "text-center",
+										"data": null,
+										"defaultContent": "<a href='#' class='btnDelete'><span class='glyphicon glyphicon-remove'></span></a>"
+									}
+								]
+							});
+						},
+						error : function(e) {
+							console.log("ERROR: ", e);
+						}
+					});
+				}
+				
+				function update(status) {	//status = 1 -> save, status = 0 -> send
+					if(validate("#modalForm") == 1) {
+						requestRegistRequest = {
+							"id" : "",
+							"employee_id" : "",
+							"from_time" : "",
+							"to_time" : "",
+							"reason" : "",
+							"status" : "",
+							"response_message" : "",
+							"day_off_type_id" : "",
+							"recipient_id" : "",
+							"valid_flag" : "",
+							"update_date" : ""
+						}
+						var requestId = $("#modalRequestId").html();
+						var editRequestData = $('#modalForm').serializeJSON();
+						requestRegistRequest.id = requestId;
+						requestRegistRequest.employee_id = employeeId;
+						requestRegistRequest.from_time = editRequestData.from_modalForm;
+						requestRegistRequest.to_time = editRequestData.to_modalForm;
+						requestRegistRequest.reason = editRequestData.reason_modalForm;
+						requestRegistRequest.status = (status == 1 ? 1 : 5);
+						requestRegistRequest.response_message = editRequestData.responseMessage_modalForm;
+						requestRegistRequest.day_off_type_id = getDayOffTypeId(editRequestData.dayOffType_modalForm);
+						requestRegistRequest.recipient_id = getRecipientNameOrId(editRequestData.recipient_modalForm);
+						requestRegistRequest.valid_flag = "1";
+						requestRegistRequest.update_date = editRequestData.updateDate_modalForm;
+						
+						$.ajax({
+							type : "POST",
+							contentType : "application/json",
+							url : "/request/regist",
+							dataType : 'json',
+							data : JSON.stringify(requestRegistRequest),
+							success : function(returnData) {
+								search();
+							},
+							error : function(e) {
+								console.log("ERROR: ", e);
+							}
+						});
+					}
+				}
+			
+				$(function() {
+					var allDayOffTypeRequest = {
+						"id" : "",
+						"name" : "",
+						"name_match_status" : "",
+						"payment_flag_id" : "2",
+						"valid_flag_id" : "2"
+					};
+
+					$.ajax({
+						type : "POST",
+						contentType : "application/json",
+						url : "/dayOffType/search",
+						dataType : 'json',
+						data : JSON.stringify(allDayOffTypeRequest),
+						success : function(returnData) {
+							listDayOffType = returnData;
+							var option = "";
+							$.each(returnData.listDayOffType, function(i, element){
+								var option = "<option value='" + element.name + "'>" + element.name + "</option>"; 
+								$("#modalDayOffType").append(option);
+							});
+						},
+						error : function(e) {
+							console.log("ERROR: ", e);
+						}
+					});
+					
+					var allRecipientRequest = {
+						"id" : ""
+					};
+					allRecipientRequest.id = employeeId;
+					
+					$.ajax({
+						type : "POST",
+						contentType : "application/json",
+						url : "/employee/details",
+						dataType : 'json',
+						data : JSON.stringify(allRecipientRequest),
+						success : function(returnData) {
+							var temp;
+							if(returnData.employee.position.name == "leader") {
+								listRecipient.push({ "id" : "", "name" : "" });
+								listRecipient[0].id = returnData.employee.team.department.manager.id;
+								listRecipient[0].name = returnData.employee.team.department.manager.name;
+							}
+							else {
+								listRecipient.push({ "id" : "", "name" : "" });
+								listRecipient[0].id = returnData.employee.listTeam[0].leader.id;
+								listRecipient[0].name = returnData.employee.listTeam[0].leader.name;
+								
+								listRecipient.push({ "id" : "", "name" : "" });
+								listRecipient[1].id = returnData.employee.listTeam[0].department.manager.id;
+								listRecipient[1].name = returnData.employee.listTeam[0].department.manager.name;
+							}
+							var option = "";
+							$.each(listRecipient, function(i, element){
+								var option = "<option value='" + element.name + "'>" + element.name + "</option>"; 
+								$("#modalRecipient").append(option);
+							});
+						},
+						error : function(e) {
+							console.log("ERROR: ", e);
+						}
+					});
+					
+					var table = $('#requestHistoryTable').DataTable();
+					$('#requestHistoryTable tbody').on( 'click', 'td', function () {
+						//thien test
+// 						console.log("row data: ");
+// 						var table2 = $('#requestHistoryTable').DataTable();
+// 						console.log(table2.row(this).data());
+						
+						//thien test end
+						var index = $(this).index();
+						if(index <= 5) {
+							var requestDetails = {
+								"id" : "0"
+							};
+							
+							var row = $(this).closest("tr");	// Finds the closest row <tr> 
+							requestId = row.find("td:nth-child(1)").html();		//Find the 1st <td> element
+							requestDetails.id = requestId;
+							
+							$.ajax({
+								type : "POST",
+								contentType : "application/json",
+								url : "/request/details",
+								dataType : 'json',
+								data : JSON.stringify(requestDetails),
+								success : function(returnData) {
+									$("#modalRequestId").empty();
+									$("#modalRequestId").append(returnData.request.id);
+									$("#modalStatus").empty();
+									$("#modalStatus").append(getStatus[returnData.request.status]);
+									$("#modalTitle").empty();
+									$("#modalTitle").append(returnData.request.employee.name);
+									$("#modalName").empty();
+									$("#modalName").append(returnData.request.employee.name);
+									$("#modalPosition").empty();
+									$("#modalPosition").append(returnData.request.employee.position.name);
+									$("#modalTeam").empty();
+									$("#modalDepartment").empty();
+									if(returnData.request.employee.position.name == "leader") {
+										$("#modalTeam").append(returnData.request.employee.team.name);
+										$("#modalDepartment").append(returnData.request.employee.team.department.name);
+									}
+									else {
+										$("#modalTeam").append(returnData.request.employee.listTeam[0].name);
+										$("#modalDepartment").append(returnData.request.employee.listTeam[0].department.name);
+									}
+									var fromStr = returnData.request.fromTime;
+									fromStr = fromStr.replace(" ", "T");
+									$("#modalFrom").val(fromStr);
+									var toStr = returnData.request.toTime;
+									toStr = toStr.replace(" ", "T");
+									$("#modalTo").val(toStr);
+									$("#modalReason").val(returnData.request.reason);
+									$("#modalDayOffType").val(returnData.request.dayOffType.name);
+									$("#modalRecipient").val( getRecipientNameOrId(returnData.request.recipientId + "") );
+									$("#modalResponseMessage").empty();
+									$("#modalResponseMessage").val(returnData.request.responseMessage);
+									$("#modalUpdateDate").val(returnData.request.updateDate);
+									
+									if(returnData.request.status == "1" || returnData.request.status == "4") {
+										$("#modalForm :input").prop('disabled', false);
+										$("#btnSave_modal, #btnSend_modal").show();
+									}
+									else {
+										$("#modalForm :input").prop('disabled', true);
+										$("#btnSave_modal, #btnSend_modal").hide();
+									}
+								},
+								error : function(e) {
+									console.log("ERROR: ", e);
+								}
+							});
 							$('#requestDetailsModal').modal('show');
+						}
+					} );
+					
+					$('#btnOK').on('click', function() {
+						search();
+					});
+					
+					$('#btnClear').on('click', function() {
+						$("#requestHistoryForm input, #requestHistoryForm select").each(function(){
+							$(this).val("");
 						});
 					});
 					
-// 					$("#mainHeader").load("../header.html");
+					$("body").on("click", ".btnDelete", function() {
+						requestDeleteRequest = {
+							"id" : ""
+						};
+						var row = $(this).closest("tr");	// Finds the closest row <tr> 
+						requestDeleteRequest.id = row.find("td:nth-child(1)").html();		//Find the 1st <td> element
+						console.log(requestDeleteRequest);
+						
+						if (confirm('Are you sure you want to delete this request?')) {
+							$.ajax({
+								type : "POST",
+								contentType : "application/json",
+								url : "/request/delete",
+								dataType : 'json',
+								data : JSON.stringify(requestDeleteRequest),
+								success : function(returnData) {
+									search();
+								},
+								error : function(e) {
+									console.log("ERROR: ", e);
+								}
+							});
+						}
+					});
 					
-// 					$('#requestHistoryTable').DataTable();
+					$('#btnSave_modal').on('click', function() {
+						update(1);
+					});
+					
+					$('#btnSend_modal').on('click', function() {
+						update(0);
+					});
 				});
-					
+				
 			/*]]>*/
 		</script>
 		
 			<div th:replace="menu"></div>
 			<div th:replace="fragments/header"></div>
 			<div class="requestOffContentBody">
+				<h1 align="center">Request Off History</h1>
 				<div class="container-fluid">
-					<!-- <div class="row"> -->
 						<h4 class="col-sm-offset-3">Bạn còn 15 ngày nghỉ phép</h4>
 						<form class="form-horizontal col-sm-6 col-sm-offset-3" id="requestHistoryForm">
 							<div class="form-group">
 								<label for="fromTime">From</label>
-								<input class="form-control" type="datetime-local"></input>
+								<input class="form-control" type="datetime-local" name="fromTime" id="fromTimeId"></input>
 							</div>
 	
 							<div class="form-group">
 								<label for="toTime">To</label>
-								<input class="form-control" type="datetime-local"></input>
+								<input class="form-control" type="datetime-local" name="toTime" id="toTimeId"></input>
 							</div>
 	
 							<div class="form-group">
 								<label for="requestType">Request Type</label>
-								<select class="form-control">
+								<select class="form-control" name="requestType">
+									<option value="0"></option>
 									<option value="1">Saved</option>
 									<option value="2">Approved</option>
 									<option value="3">Denied</option>
 									<option value="4">Responded</option>
-									<option value="4">Waiting</option>
+									<option value="5">Waiting</option>
 								</select>
 							</div>
 	
-							<br/><br/>
+							<br/>
 							<div align="center">
-						 		<button class="btn btn-primary customButton formButton">OK</button>
-						 		<button class="btn btn-primary customButton formButton">Clear</button>
+						 		<button type="button" class="btn btn-primary customButton formButton" id="btnOK">OK</button>
+						 		<button type="button" class="btn btn-primary customButton formButton" id="btnClear">Clear</button>
 							</div>
 						</form>
 						
-					<!-- </div> -->
-					
-					<!-- <div class="row"> -->
-						<table class="table table-bordered table-striped table-hover" id="requestHistoryTable">
+						<table class="display table table-bordered" cellspacing="0" width="100%" id="requestHistoryTable">
 							<thead>
 								<tr>
-									<th class="text-center">Employee</th>
-									<th class="text-center">From</th>
-									<th class="text-center">To</th>
-									<th class="text-center">Reason</th>
-									<th class="text-center">Edit</th>
-									<th class="text-center">Delete</th>
+									<th class="text-center idCell">ID</th>
+									<th class="text-center employeeCell">Employee</th>
+									<th class="text-center fromCell">From</th>
+									<th class="text-center toCell">To</th>
+									<th class="text-center reasonCell">Reason</th>
+									<th class="text-center editCell">Edit</th>
+									<th class="text-center deleteCell">Delete</th>
 								</tr>
 							</thead>
 	
 							<tbody>
-								<tr>
-									<td>Cao Hai Nhi</td>
-									<td>8h - 1/2/2017</td>
-									<td>11h - 1/2/2017</td>
-									<td>ban viec nha</td>
-									<td class="text-center"><button class="btn btn-primary customButton">Edit</button></td>
-									<td class="text-center"><button class="btn btn-danger customButton">Delete</button></td>
-								</tr>
-								<tr>
-									<td>Cao Hai Nhi</td>
-									<td>8h - 1/2/2017</td>
-									<td>11h - 1/2/2017</td>
-									<td>ban viec nha</td>
-									<td class="text-center"><button class="btn btn-primary customButton">Edit</button></td>
-									<td class="text-center"><button class="btn btn-danger customButton">Delete</button></td>
-								</tr>
-								<tr>
-									<td>Cao Hai Nhi</td>
-									<td>8h - 1/2/2017</td>
-									<td>11h - 1/2/2017</td>
-									<td>ban viec nha</td>
-									<td class="text-center"><button class="btn btn-primary customButton">Edit</button></td>
-									<td class="text-center"><button class="btn btn-danger customButton">Delete</button></td>
-								</tr>
+
 							</tbody>
 						</table>
-					<!-- </div> -->
 	
 						<div class="modal fade" id="requestDetailsModal" role="dialog">
 							<div class="modal-dialog">
 				
-								<!-- Modal content-->
 								<div class="modal-content">
 									<div class="modal-header">
 										<button type="button" class="close" data-dismiss="modal">&times;</button>
-										<h4 class="modal-title">Cao Hai Nhi</h4>
+										<h4 class="modal-title" id="modalTitle"></h4>
 									</div>
 									<div class="modal-body">
-										<form class="form-horizontal">
+										<form class="form-horizontal" id="modalForm">
+											<div class="form-group">
+												<label class="control-label col-sm-3">Request ID: </label>
+												<label class="control-label" style="text-align: left;" id="modalRequestId"></label>
+											</div>
+											<div class="form-group">
+												<label class="control-label col-sm-3">Status: </label>
+												<label class="control-label" id="modalStatus"></label>
+											</div>
 											<div class="form-group">
 												<label class="control-label col-sm-3">Employee: </label>
-												<label class="control-label col-sm-7" style="text-align: left;">Cao Hai Nhi</label>
+												<label class="control-label" style="text-align: left;" id="modalName"></label>
 											</div>
 											<div class="form-group">
 												<label class="control-label col-sm-3">Position: </label>
-												<div class="input-group col-sm-7">
-													<span class="input-group-btn">
-														<select class="form-control">
-															<option value="1">Intern</option>
-															<option value="2">Employee</option>
-															<option value="3">Leader</option>
-														</select>
-													</span>
-												</div>
+												<label class="control-label" id="modalPosition"></label>
 											</div>
 											<div class="form-group">
 												<label class="control-label col-sm-3">Team: </label>
-												<div class="input-group col-sm-7">
-													<span class="input-group-btn">
-														<select class="form-control">
-															<option value="1">Java</option>
-															<option value="2">PHP</option>
-															<option value="3">Ruby</option>
-														</select>
-													</span>
-												</div>
+												<label class="control-label" id="modalTeam"></label>
 											</div>
 											<div class="form-group">
 												<label class="control-label col-sm-3">Department: </label>
-												<div class="input-group col-sm-7">
-													<span class="input-group-btn">
-														<select class="form-control">
-															<option value="1">Department 1</option>
-															<option value="2">Department 2</option>
-															<option value="3">Department 3</option>
-														</select>
-													</span>
-												</div>
+												<label class="control-label" id="modalDepartment"></label>
 											</div>
 											<div class="form-group">
 												<label class="control-label col-sm-3">From: </label>
 												<div class="input-group col-sm-7">
-													<input class="form-control" type="datetime-local"></input>
+													<input class="form-control" type="datetime-local" name="from_modalForm" id="modalFrom"></input>
 												</div>
+<!-- 												<div class="input-group col-sm-1"> -->
+<!-- 													<span class='glyphicon glyphicon-remove' id=""></span> -->
+<!-- 												</div> -->
 											</div>
 											<div class="form-group">
 												<label class="control-label col-sm-3">To: </label>
 												<div class="input-group col-sm-7">
-													<input class="form-control" type="datetime-local"></input>
+													<input class="form-control" type="datetime-local" name="to_modalForm" id="modalTo"></input>
 												</div>
 											</div>
 											<div class="form-group">
 												<label class="control-label col-sm-3">Reason: </label>
 												<div class="input-group col-sm-7">
 													<span class="input-group-btn">
-														<textarea class="form-control"></textarea>
+														<textarea class="form-control" name="reason_modalForm" id="modalReason"></textarea>
 													</span>
 												</div>
 											</div>
@@ -203,10 +493,16 @@
 												<label class="control-label col-sm-3">Day off type: </label>
 												<div class="input-group col-sm-7">
 													<span class="input-group-btn">
-														<select class="form-control">
-															<option value="1">Nghỉ phép</option>
-															<option value="2">Kết hôn</option>
-															<option value="3">Nghỉ không lương</option>
+														<select class="form-control" name="dayOffType_modalForm" id="modalDayOffType">
+														</select>
+													</span>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="control-label col-sm-3">Recipient: </label>
+												<div class="input-group col-sm-7">
+													<span class="input-group-btn">
+														<select class="form-control" name="recipient_modalForm" id="modalRecipient">
 														</select>
 													</span>
 												</div>
@@ -215,15 +511,17 @@
 												<label class="control-label col-sm-3">Response Message: </label>
 												<div class="input-group col-sm-7">
 													<span class="input-group-btn">
-														<textarea class="form-control"></textarea>
+														<textarea readonly="true" class="form-control" name="responseMessage_modalForm" id="modalResponseMessage"></textarea>
 													</span>
 												</div>
 											</div>
+											<input type="hidden" name="updateDate_modalForm" id="modalUpdateDate" />
 										</form>
 									</div>
 									<div class="modal-footer">
-										<button type="button" class="btn btn-default" data-dismiss="modal">Save</button>
-										<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+										<button type="button" class="btn btn-default" id="btnSave_modal">Save</button>
+										<button type="button" class="btn btn-default" id="btnSend_modal">Send</button>
+										<button type="button" class="btn btn-default" data-dismiss="modal" id="btnCancel_modal">Cancel</button>
 									</div>
 								</div>
 	
@@ -231,10 +529,9 @@
 						</div>
 
 				</div>
-
 			</div>
 
-			<div th:replace="fragments/footer"></div>
+<!-- 			<div th:replace="fragments/footer"></div> -->
 
 	</body>
 </html>

@@ -8,9 +8,11 @@ import org.springframework.stereotype.Service;
 import com.dactech.requestoff.model.entity.DayOffType;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.Request;
+import com.dactech.requestoff.model.request.RequestDeleteRequest;
 import com.dactech.requestoff.model.request.RequestDetailsRequest;
 import com.dactech.requestoff.model.request.RequestRegistRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
+import com.dactech.requestoff.model.response.RequestDeleteResponse;
 import com.dactech.requestoff.model.response.RequestDetailsResponse;
 import com.dactech.requestoff.model.response.RequestRegistResponse;
 import com.dactech.requestoff.model.response.RequestSearchResponse;
@@ -70,5 +72,18 @@ public class RequestServiceImpl implements RequestService{
 		Request request = requestRepository.findById(requestDetailsRequest.getId());
 		RequestDetailsResponse requestDetailsResponse = new RequestDetailsResponse(request);
 		return requestDetailsResponse;
+	}
+	
+	@Override
+	public RequestDeleteResponse delete(RequestDeleteRequest requestDeleteRequest) throws Exception {
+		RequestDeleteResponse requestDeleteResponse = new RequestDeleteResponse();
+		Request request = requestRepository.findById(requestDeleteRequest.getId());
+		if(request == null) {
+			throw new Exception("There is no request with id = " + requestDeleteRequest.getId());
+		}
+		request.setValidFlag(0);
+		requestRepository.save(request);
+		requestDeleteResponse.setId(request.getId());
+		return requestDeleteResponse;
 	}
 }
