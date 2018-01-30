@@ -19,8 +19,6 @@
 		var listDepartment;
 		var listTeam;
 		
-		var listStatistics;
-		
 		//Department combobox
 		$.ajax({
 			url : "/department/search",
@@ -97,82 +95,84 @@
 		//=====================================================================
 		$("#searchBtn").on('click', function() {
 			var searchParam = $('#searchForm').serializeJSON();
-			$.ajax({
-				url : "/employee/statistics",
-				type : "post",
-				dataType :"json",
-				contentType : "application/json",
-				data : JSON.stringify(searchParam),
-				success : function (data){
-					listStatistics = data.listEmployeeStatistics;
-					console.log(listStatistics);
-					
-					$('#statisticsTable').DataTable({
-						destroy: true,
-						"searching": false,
-						data: listStatistics,
-						columns: [
-							{ data: 'employee.id' },
-							{ data: 'employee.name' },
-							{ data: 'employee.listTeam[0].name' },
-							{ data: 'employee.listTeam[0].department.name' },
-							{ data: 'employee.position.name' },
-							{ data: 'timeOffWithPaying' },
-							{ data: 'timeOffWithoutPaying' },
-						]
-					});
-					
-					$('#statisticsTable tr').on('click', function() {
-						var employeeId = $(this).find("td:first").html();
-						var statisticsObj = $.grep(listStatistics, function(statistics) {
-							return statistics.employee.id == employeeId;
-						})[0];
-						console.log(statisticsObj);
-						
-						$('#detailEmployee').val(statisticsObj.employee.name);
-						$('#detailPosition').val(statisticsObj.employee.position.name);
-						$('#detailDepartment').val(statisticsObj.employee.listTeam[0].department.name);
-						$('#detailTeam').val(statisticsObj.employee.listTeam[0].name);
-						$('#detailWithPaying').val(statisticsObj.timeOffWithPaying);
-						$('#detailWithoutPaying').val(statisticsObj.timeOffWithoutPaying);
-						
-						$('#withPayingTable').DataTable({
-							destroy: true,
-							"searching": false,
-							"info": false,
-							"lengthChange": false,
-							"paging": false,
-							data: statisticsObj.listRequestWithPaying,
-							columns: [
-								{ data: 'fromTime' },
-								{ data: 'toTime' },
-							]
-						});
-						$('#withoutPayingTable').DataTable({
-							destroy: true,
-							"searching": false,
-							"info": false,
-							"lengthChange": false,
-							"paging": false,
-							data: statisticsObj.listRequestWithoutPaying,
-							columns: [
-								{ data: 'fromTime' },
-								{ data: 'toTime' },
-							]
-						});
-						
-						$('#detailModal').modal('show');
-					});
-				},
-				error : function() {
-					alert("error!!!");
+			if (searchParam.from_time != "" && searchParam.to_time != "") {
+				var fromTime = new Date(searchParam.from_time);
+				var toTime = new Date(searchParam.to_time);
+				if (toTime <= fromTime) {
+					alert ("time of To field must be after From field");
+					return;
 				}
+			}
+			
+			$('#statisticsTable').DataTable({
+				destroy: true,
+				processing: true,
+				serverSide: true,
+				searching: false,
+// 				pageLength: 2,
+				ajax: {
+					'url' : "/employee/statisticsPaging",
+					'type': "POST",
+					'data': function (data) {
+						$.each(searchParam, function (field, val) {
+							data[field] = val;
+						});
+ 						return data;
+					},
+					'dataSrc': 'listEmployeeStatistics'
+				},
+				columns: [
+					{ data: 'employee.id' },
+					{ data: 'employee.name' },
+					{ data: 'employee.listTeam[0].name' },
+					{ data: 'employee.listTeam[0].department.name' },
+					{ data: 'employee.position.name' },
+					{ data: 'timeOffWithPaying' },
+					{ data: 'timeOffWithoutPaying' },
+				]
 			});
 		});
 		
-		$("#testBtn").on('click', function() {
-			console.log("something");
+		$('#statisticsTable tbody').on('click', 'tr', function() {
+			var statisticsTable = $('#statisticsTable').DataTable();
+			var statisticsObj = statisticsTable.row(this).data();
+			
+			$('#detailEmployee').val(statisticsObj.employee.name);
+			$('#detailPosition').val(statisticsObj.employee.position.name);
+			$('#detailDepartment').val(statisticsObj.employee.listTeam[0].department.name);
+			$('#detailTeam').val(statisticsObj.employee.listTeam[0].name);
+			$('#detailWithPaying').val(statisticsObj.timeOffWithPaying);
+			$('#detailWithoutPaying').val(statisticsObj.timeOffWithoutPaying);
+			
+			$('#withPayingTable').DataTable({
+				destroy: true,
+				searching: false,
+				info: false,
+				lengthChange: false,
+				paging: false,
+				data: statisticsObj.listRequestWithPaying,
+				columns: [
+					{ data: 'fromTime' },
+					{ data: 'toTime' },
+				]
+			});
+			$('#withoutPayingTable').DataTable({
+				destroy: true,
+				searching: false,
+				info: false,
+				lengthChange: false,
+				paging: false,
+				data: statisticsObj.listRequestWithoutPaying,
+				columns: [
+					{ data: 'fromTime' },
+					{ data: 'toTime' },
+				]
+			});
+			
 			$('#detailModal').modal('show');
+		});
+
+		$("#testBtn").on('click', function() {
 		});
 		
 		$("#clearBtn").on('click', function() {
@@ -198,7 +198,7 @@
 					<div class="col-sm-2"></div>
 					<label class="col-sm-2 col-form-label">Form</label>
 					<div class="col-sm-6">
-						<input id="fromTime" name="from_time" class="form-control" type="datetime-local" value="2015-06-01T08:30"/>
+						<input id="fromTime" name="from_time" class="form-control" type="datetime-local" val=""/>
 					</div>
 				</div>
 				
@@ -206,7 +206,7 @@
 					<div class="col-sm-2"></div>
 					<label class="col-sm-2 col-form-label">To</label>
 					<div class="col-sm-6">
-						<input id="toTime" name="to_time" class="form-control" type="datetime-local" value="2020-06-01T08:30"/>
+						<input id="toTime" name="to_time" class="form-control" type="datetime-local"/>
 					</div>
 				</div>
 				
