@@ -12,7 +12,6 @@ import com.dactech.requestoff.model.response.EmployeeRegistResponse;
 import com.dactech.requestoff.model.response.EmployeeSearchResponse;
 
 public interface EmployeeService {
-	EmployeeOffStatisticsResponse employeeOffStatistics(EmployeeOffStatisticsRequest employeeOffStatisticsRequest) throws Exception;
 	EmployeeOffStatisticsPagingResponse employeeOffStatisticsPaging(EmployeeOffStatisticsPagingRequest request) throws Exception;
 	
 	EmployeeRegistResponse employeeRegist(EmployeeRegistRequest employeeRegistRequest) throws Exception;

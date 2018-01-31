@@ -124,8 +124,24 @@
 				columns: [
 					{ data: 'employee.id' },
 					{ data: 'employee.name' },
-					{ data: 'employee.listTeam[0].department.name' },
-					{ data: 'employee.listTeam[0].name' },
+					{
+						data: 'employee.listTeam[0].department.name',
+						render: function (data, type, row){
+							if(typeof(row.employee.listTeam[0]) == "undefined") {
+								data = row.employee.department.name;
+							}
+							return data;	
+						}
+					},
+					{
+						data: 'employee.listTeam[0].name',
+						render: function (data, type, row){
+							if(typeof(row.employee.listTeam[0]) == "undefined") {
+								data = "";
+							}
+							return data;	
+						}
+					},
 					{ data: 'employee.position.name' },
 					{ data: 'timeOffWithPaying' },
 					{ data: 'timeOffWithoutPaying' },
@@ -137,10 +153,18 @@
 			var statisticsTable = $('#statisticsTable').DataTable();
 			var statisticsObj = statisticsTable.row(this).data();
 			
+			
 			$('#detailEmployee').val(statisticsObj.employee.name);
 			$('#detailPosition').val(statisticsObj.employee.position.name);
-			$('#detailDepartment').val(statisticsObj.employee.listTeam[0].department.name);
-			$('#detailTeam').val(statisticsObj.employee.listTeam[0].name);
+			
+			if(typeof(statisticsObj.employee.listTeam[0]) == "undefined") {
+				$('#detailDepartment').val(statisticsObj.employee.department.name);
+				$('#detailTeam').val("");
+			} else {
+				$('#detailDepartment').val(statisticsObj.employee.listTeam[0].department.name);
+				$('#detailTeam').val(statisticsObj.employee.listTeam[0].name);
+			}
+			
 			$('#detailWithPaying').val(statisticsObj.timeOffWithPaying);
 			$('#detailWithoutPaying').val(statisticsObj.timeOffWithoutPaying);
 			
@@ -170,9 +194,6 @@
 			});
 			
 			$('#detailModal').modal('show');
-		});
-
-		$("#testBtn").on('click', function() {
 		});
 		
 		$("#clearBtn").on('click', function() {
@@ -336,7 +357,6 @@
 			</div>
 		</div>
 	</div>
-	<button id="testBtn">Test</button>
 	<div th:replace="fragments/footer"></div>
 </body>
 

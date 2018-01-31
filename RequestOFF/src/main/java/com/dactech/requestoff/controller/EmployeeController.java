@@ -70,26 +70,12 @@ public class EmployeeController {
 		return response;
 	}
 
-	@RequestMapping(value = "/employee/statistics", method = RequestMethod.POST)
-	EmployeeOffStatisticsResponse employeeStatistics(
-			@RequestBody EmployeeOffStatisticsRequest employeeOffStatisticsRequest) {
-		EmployeeOffStatisticsResponse response;
-		try {
-			response = employeeService.employeeOffStatistics(employeeOffStatisticsRequest);
-			response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
-		} catch (Exception e) {
-			response = new EmployeeOffStatisticsResponse();
-			response.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
-		}
-		return response;
-	}
-
 	@RequestMapping(value = "/employee/statisticsPaging", method = RequestMethod.POST)
 	EmployeeOffStatisticsPagingResponse employeeStatisticsPaging(HttpServletRequest httpRequest,
 			HttpServletResponse httpResponse, Model model) {
-		EmployeeOffStatisticsPagingRequest request = new EmployeeOffStatisticsPagingRequest(httpRequest);
 		EmployeeOffStatisticsPagingResponse response = new EmployeeOffStatisticsPagingResponse();
 		try {
+			EmployeeOffStatisticsPagingRequest request = new EmployeeOffStatisticsPagingRequest(httpRequest);
 			response = employeeService.employeeOffStatisticsPaging(request);
 		} catch (Exception e) {
 			response.setError(e.getMessage());

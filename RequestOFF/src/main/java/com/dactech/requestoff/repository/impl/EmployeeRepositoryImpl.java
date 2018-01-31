@@ -126,7 +126,22 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 		}
 
 		Query query = entityManager.createNativeQuery(queryString.toString(), Employee.class);
-		List<Employee> employees = query.getResultList();
+		List<Employee> employees = query.getResultList(); // list employees without manager
+		
+		
+		if (teamId == 0) { // team ID == 0, select manager
+			StringBuilder managerQueryString = new StringBuilder("SELECT * FROM employee e INNER JOIN department d ON e.id = d.manager_id ");
+			if( departmentId != 0) { // select 1 manager
+				managerQueryString.append("WHERE d.id = " + departmentId);
+			}
+			
+			query = entityManager.createNativeQuery(managerQueryString.toString(), Employee.class);
+			List<Employee> managers = query.getResultList(); // list employees without manager
+			if (managers != null && managers.size() > 0) {
+				employees.addAll(managers);
+			}
+		}
+		
 		return employees;
 	}
 
