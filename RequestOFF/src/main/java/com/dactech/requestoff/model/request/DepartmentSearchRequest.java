@@ -3,20 +3,20 @@ package com.dactech.requestoff.model.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DepartmentSearchRequest {
-	private long id;
+	private String id;
 	private String name;
 	@JsonProperty("name_match_status")
-	private int nameMatchStatus;
+	private String nameMatchStatus;
 	@JsonProperty("manager_id")
-	private long managerId;
+	private String managerId;
 	@JsonProperty("valid_flag")
-	private int validFlag;
+	private String validFlag;
 
 	public DepartmentSearchRequest() {
 		super();
 	}
 
-	public DepartmentSearchRequest(long id, String name, int nameMatchStatus, long managerId, int validFlag) {
+	public DepartmentSearchRequest(String id, String name, String nameMatchStatus, String managerId, String validFlag) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -25,11 +25,11 @@ public class DepartmentSearchRequest {
 		this.validFlag = validFlag;
 	}
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -41,27 +41,27 @@ public class DepartmentSearchRequest {
 		this.name = name;
 	}
 
-	public int getNameMatchStatus() {
+	public String getNameMatchStatus() {
 		return nameMatchStatus;
 	}
 
-	public void setNameMatchStatus(int nameMatchStatus) {
+	public void setNameMatchStatus(String nameMatchStatus) {
 		this.nameMatchStatus = nameMatchStatus;
 	}
 
-	public long getManagerId() {
+	public String getManagerId() {
 		return managerId;
 	}
 
-	public void setManagerId(long managerId) {
+	public void setManagerId(String managerId) {
 		this.managerId = managerId;
 	}
 
-	public int getValidFlag() {
+	public String getValidFlag() {
 		return validFlag;
 	}
 
-	public void setValidFlag(int validFlag) {
+	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
 	}
 
