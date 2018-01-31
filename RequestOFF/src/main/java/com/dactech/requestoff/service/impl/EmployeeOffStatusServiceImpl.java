@@ -18,6 +18,7 @@ import com.dactech.requestoff.repository.CompanyYearOffRepository;
 import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
 import com.dactech.requestoff.service.EmployeeOffStatusService;
+import com.dactech.requestoff.util.StringUtil;
 
 @Service
 public class EmployeeOffStatusServiceImpl implements EmployeeOffStatusService {
@@ -29,41 +30,62 @@ public class EmployeeOffStatusServiceImpl implements EmployeeOffStatusService {
 	CompanyYearOffRepository companyYearOffRepository;
 
 	@Override
-	public EmployeeOffStatusRegistResponse employeeOffStatusRegist(EmployeeOffStatusRegistRequest eOSRRequest) throws Exception {
-		EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(eOSRRequest.getYearId(),
-				eOSRRequest.getEmployeeId());
-		if (employeeOffStatus == null) {
-			employeeOffStatus = new EmployeeOffStatus();
-			CompanyYearOff companyYearOff = companyYearOffRepository.findById(eOSRRequest.getYearId());
-			Employee employee = employeeRepository.findById(eOSRRequest.getEmployeeId());
-			employeeOffStatus.setEmployee(employee);
-			employeeOffStatus.setCompanyYearOff(companyYearOff);
-		} else if (!employeeOffStatus.getUpdateDate().equals(eOSRRequest.getUpdateDate())) { // update case, check update date
-			throw new Exception("Someone updated EmployeeOffStatus at "
-					+ employeeOffStatus.getUpdateDate());
-		}
+	public EmployeeOffStatusRegistResponse employeeOffStatusRegist(EmployeeOffStatusRegistRequest eOSRRequest)
+			throws Exception {
+		long yearId = Long.parseLong(eOSRRequest.getYearId());
+		long employeeId = Long.parseLong(eOSRRequest.getEmployeeId());
 
-		employeeOffStatus.setRemainHours(eOSRRequest.getRemainHours());
-		employeeOffStatus.setTotalHours(eOSRRequest.getTotalHours());
-		employeeOffStatus.setValidFlag(eOSRRequest.getValidFlag());
+		EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(yearId, employeeId);
+		if (employeeOffStatus == null) { // create new
+			employeeOffStatus = new EmployeeOffStatus();
+
+			CompanyYearOff companyYearOff = companyYearOffRepository.findById(yearId);
+			employeeOffStatus.setCompanyYearOff(companyYearOff);
+
+			Employee employee = employeeRepository.findById(employeeId);
+			employeeOffStatus.setEmployee(employee);
+
+			employeeOffStatus.setRemainHours(Long.parseLong(eOSRRequest.getRemainHours()));
+			employeeOffStatus.setTotalHours(Long.parseLong(eOSRRequest.getTotalHours()));
+			employeeOffStatus.setValidFlag(Integer.parseInt(eOSRRequest.getValidFlag()));
+
+		} else { // update
+			if (!employeeOffStatus.getUpdateDate().equals(eOSRRequest.getUpdateDate())) {
+				throw new Exception("Someone updated EmployeeOffStatus with year id "
+						+ employeeOffStatus.getCompanyYearOff().getId() + " and employee id "
+						+ employeeOffStatus.getEmployee().getId() + " at " + employeeOffStatus.getUpdateDate());
+			}
+
+			if (StringUtil.isNotEmpty(eOSRRequest.getRemainHours())) {
+				employeeOffStatus.setRemainHours(Long.parseLong(eOSRRequest.getRemainHours()));
+			}
+			if (StringUtil.isNotEmpty(eOSRRequest.getTotalHours())) {
+				employeeOffStatus.setTotalHours(Long.parseLong(eOSRRequest.getTotalHours()));
+			}
+			if (StringUtil.isNotEmpty(eOSRRequest.getValidFlag())) {
+				employeeOffStatus.setValidFlag(Integer.parseInt(eOSRRequest.getValidFlag()));
+			}
+		}
 
 		employeeOffStatusRepository.save(employeeOffStatus);
 
 		return new EmployeeOffStatusRegistResponse(employeeOffStatus.getCompanyYearOff().getId(),
 				employeeOffStatus.getEmployee().getId());
 	}
-	
+
 	@Override
 	public EmployeeOffStatusDetailsResponse details(EmployeeOffStatusDetailsRequest employeeOffStatusDetailsRequest) {
-		EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(employeeOffStatusDetailsRequest.getYearId(), 
-																					employeeOffStatusDetailsRequest.getEmployeeId());
-		EmployeeOffStatusDetailsResponse employeeOffStatusDetailsResponse = new EmployeeOffStatusDetailsResponse(employeeOffStatus);
+		EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository
+				.findById(employeeOffStatusDetailsRequest.getYearId(), employeeOffStatusDetailsRequest.getEmployeeId());
+		EmployeeOffStatusDetailsResponse employeeOffStatusDetailsResponse = new EmployeeOffStatusDetailsResponse(
+				employeeOffStatus);
 		return employeeOffStatusDetailsResponse;
 	}
 
 	@Override
 	public EmployeeOffStatusSearchResponse search(EmployeeOffStatusSearchRequest employeeOffStatusSearchRequest) {
-		List<EmployeeOffStatus> listEmployeeOffStatus = employeeOffStatusRepository.search(employeeOffStatusSearchRequest);
+		List<EmployeeOffStatus> listEmployeeOffStatus = employeeOffStatusRepository
+				.search(employeeOffStatusSearchRequest);
 		EmployeeOffStatusSearchResponse response = new EmployeeOffStatusSearchResponse();
 		response.setListEmployeeOffStatus(listEmployeeOffStatus);
 		return response;

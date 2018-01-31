@@ -4,25 +4,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EmployeeOffStatusRegistRequest {
 	@JsonProperty("year_id")
-	private long yearId;
+	private String yearId;
 	@JsonProperty("employee_id")
-	private long employeeId;
+	private String employeeId;
 	@JsonProperty("remain_hours")
-	private long remainHours;
+	private String remainHours;
 	@JsonProperty("total_hours")
-	private long totalHours;
+	private String totalHours;
 	@JsonProperty("update_date")
 	private String updateDate;
 	@JsonProperty("valid_flag")
-	private int validFlag;
+	private String validFlag;
 
 	public EmployeeOffStatusRegistRequest() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public EmployeeOffStatusRegistRequest(long yearId, long employeeId, long remainHours, long totalHours,
-			String updateDate, int validFlag) {
+	public EmployeeOffStatusRegistRequest(String yearId, String employeeId, String remainHours, String totalHours,
+			String updateDate, String validFlag) {
 		super();
 		this.yearId = yearId;
 		this.employeeId = employeeId;
@@ -32,35 +32,35 @@ public class EmployeeOffStatusRegistRequest {
 		this.validFlag = validFlag;
 	}
 
-	public long getYearId() {
+	public String getYearId() {
 		return yearId;
 	}
 
-	public void setYearId(long yearId) {
+	public void setYearId(String yearId) {
 		this.yearId = yearId;
 	}
 
-	public long getEmployeeId() {
+	public String getEmployeeId() {
 		return employeeId;
 	}
 
-	public void setEmployeeId(long employeeId) {
+	public void setEmployeeId(String employeeId) {
 		this.employeeId = employeeId;
 	}
 
-	public long getRemainHours() {
+	public String getRemainHours() {
 		return remainHours;
 	}
 
-	public void setRemainHours(long remainHours) {
+	public void setRemainHours(String remainHours) {
 		this.remainHours = remainHours;
 	}
 
-	public long getTotalHours() {
+	public String getTotalHours() {
 		return totalHours;
 	}
 
-	public void setTotalHours(long totalHours) {
+	public void setTotalHours(String totalHours) {
 		this.totalHours = totalHours;
 	}
 
@@ -72,11 +72,11 @@ public class EmployeeOffStatusRegistRequest {
 		this.updateDate = updateDate;
 	}
 
-	public int getValidFlag() {
+	public String getValidFlag() {
 		return validFlag;
 	}
 
-	public void setValidFlag(int validFlag) {
+	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
 	}
 
