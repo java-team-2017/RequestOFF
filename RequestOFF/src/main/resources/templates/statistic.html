@@ -2,14 +2,8 @@
 <html>
 <head>
 	<title>Hr statistic screen</title>
-	<link rel="stylesheet"	type="text/css" href="css/bootstrap.min.css" />
-	<script src="javascript/jquery-3.2.1.js"></script>
-	<script src="javascript/bootstrap.min.js"></script>
-	<script src="javascript/jquery.serializejson.js"></script>
-	<link rel="stylesheet" type="text/css" href="css/datatables.min.css"/>
-	<script type="text/javascript" src="javascript/datatables.min.js"></script>
 </head>
-
+<div th:replace="fragments/header"></div>
 <script type="text/javascript">
 //<![CDATA[ 
 	$(function() {
@@ -99,7 +93,7 @@
 				var fromTime = new Date(searchParam.from_time);
 				var toTime = new Date(searchParam.to_time);
 				if (toTime <= fromTime) {
-					alert ("time of To field must be after From field");
+					alert (errors.DateError);
 					return;
 				}
 			}
@@ -209,7 +203,6 @@
 </script>
 
 <body class="content-body">
-	<div th:replace="fragments/header"></div>
 	<div th:replace="menu"></div>
 	<div class="requestOffContentBody">
 		<div class="container">
