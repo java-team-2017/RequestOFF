@@ -50,7 +50,7 @@ public class RequestServiceImpl implements RequestService{
 			request.setValidFlag(Integer.parseInt(requestRegistRequest.getValidFlag()));
 		}
 		else {	//update request
-			long id = Integer.parseInt(requestRegistRequest.getId());
+			long id = Long.parseLong(requestRegistRequest.getId());
 			request = requestRepository.findById(id);
 			if(request == null) {
 				throw new Exception("Can not find request with id = " + id);
