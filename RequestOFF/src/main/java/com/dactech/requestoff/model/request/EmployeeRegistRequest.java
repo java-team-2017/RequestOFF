@@ -3,15 +3,15 @@ package com.dactech.requestoff.model.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EmployeeRegistRequest {
-	private long id;
+	private String id;
 	private String name;
 	private String gender;
 	private String birthday;
 	@JsonProperty("position_id")
-	private long positionId;
+	private String positionId;
 	private String email;
 	private String password;
-	private long phone;
+	private String phone;
 	@JsonProperty("start_working_date")
 	private String startWorkingDate;
 	@JsonProperty("official_working_date")
@@ -19,16 +19,16 @@ public class EmployeeRegistRequest {
 	@JsonProperty("update_date")
 	private String updateDate;
 	@JsonProperty("valid_flag")
-	private int validFlag;
+	private String validFlag;
 
 	public EmployeeRegistRequest() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public EmployeeRegistRequest(long id, String name, String gender, String birthday, long positionId, String email,
-			String password, long phone, String startWorkingDate, String officialWorkingDate, String updateDate,
-			int validFlag) {
+	public EmployeeRegistRequest(String id, String name, String gender, String birthday, String positionId,
+			String email, String password, String phone, String startWorkingDate, String officialWorkingDate,
+			String updateDate, String validFlag) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -44,11 +44,11 @@ public class EmployeeRegistRequest {
 		this.validFlag = validFlag;
 	}
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -76,11 +76,11 @@ public class EmployeeRegistRequest {
 		this.birthday = birthday;
 	}
 
-	public long getPositionId() {
+	public String getPositionId() {
 		return positionId;
 	}
 
-	public void setPositionId(long positionId) {
+	public void setPositionId(String positionId) {
 		this.positionId = positionId;
 	}
 
@@ -100,11 +100,11 @@ public class EmployeeRegistRequest {
 		this.password = password;
 	}
 
-	public long getPhone() {
+	public String getPhone() {
 		return phone;
 	}
 
-	public void setPhone(long phone) {
+	public void setPhone(String phone) {
 		this.phone = phone;
 	}
 
@@ -132,11 +132,11 @@ public class EmployeeRegistRequest {
 		this.updateDate = updateDate;
 	}
 
-	public int getValidFlag() {
+	public String getValidFlag() {
 		return validFlag;
 	}
 
-	public void setValidFlag(int validFlag) {
+	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
 	}
 
