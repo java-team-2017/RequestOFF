@@ -3,22 +3,22 @@ package com.dactech.requestoff.model.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TeamSearchRequest {
-	private long id;
+	private String id;
 	private String name;
 	@JsonProperty("name_match_status")
-	private int nameMatchStatus;
+	private String nameMatchStatus;
 	@JsonProperty("leader_id")
-	private long leaderId;
+	private String leaderId;
 	@JsonProperty("department_id")
-	private long departmentId;
+	private String departmentId;
 	@JsonProperty("valid_flag")
-	private long validFlag;
+	private String validFlag;
 
 	public TeamSearchRequest() {
 	}
 
-	public TeamSearchRequest(long id, String name, int nameMatchStatus, long leaderId, long departmentId,
-			long validFlag) {
+	public TeamSearchRequest(String id, String name, String nameMatchStatus, String leaderId, String departmentId,
+			String validFlag) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -28,11 +28,11 @@ public class TeamSearchRequest {
 		this.validFlag = validFlag;
 	}
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -44,35 +44,35 @@ public class TeamSearchRequest {
 		this.name = name;
 	}
 
-	public int getNameMatchStatus() {
+	public String getNameMatchStatus() {
 		return nameMatchStatus;
 	}
 
-	public void setNameMatchStatus(int nameMatchStatus) {
+	public void setNameMatchStatus(String nameMatchStatus) {
 		this.nameMatchStatus = nameMatchStatus;
 	}
 
-	public long getLeaderId() {
+	public String getLeaderId() {
 		return leaderId;
 	}
 
-	public void setLeaderId(long leaderId) {
+	public void setLeaderId(String leaderId) {
 		this.leaderId = leaderId;
 	}
 
-	public long getDepartmentId() {
+	public String getDepartmentId() {
 		return departmentId;
 	}
 
-	public void setDepartmentId(long departmentId) {
+	public void setDepartmentId(String departmentId) {
 		this.departmentId = departmentId;
 	}
 
-	public long getValidFlag() {
+	public String getValidFlag() {
 		return validFlag;
 	}
 
-	public void setValidFlag(long validFlag) {
+	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
 	}
 

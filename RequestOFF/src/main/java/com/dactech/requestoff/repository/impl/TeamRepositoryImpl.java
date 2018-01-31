@@ -9,6 +9,7 @@ import javax.persistence.Query;
 import com.dactech.requestoff.model.entity.Team;
 import com.dactech.requestoff.model.request.TeamSearchRequest;
 import com.dactech.requestoff.repository.custom.TeamRepositoryCustom;
+import com.dactech.requestoff.util.StringUtil;
 
 public class TeamRepositoryImpl implements TeamRepositoryCustom {
 	@PersistenceContext
@@ -19,28 +20,30 @@ public class TeamRepositoryImpl implements TeamRepositoryCustom {
 		StringBuilder queryString = new StringBuilder("SELECT * FROM team ");
 		StringBuilder whereClause = new StringBuilder("");
 
-		if (teamSearchRequest.getId() != 0) {
+		if (StringUtil.isNotEmpty(teamSearchRequest.getId())) {
 			whereClause.append(" AND id = '" + teamSearchRequest.getId() + "'");
 		}
 
-		if (teamSearchRequest.getName() != null && teamSearchRequest.getName() != "") {
-			if (teamSearchRequest.getNameMatchStatus() != 1) {
-				whereClause.append(" AND name like '%" + teamSearchRequest.getName() + "%'");
-			} else {
+		if (StringUtil.isNotEmpty(teamSearchRequest.getName())) {
+			if (StringUtil.isNotEmpty(teamSearchRequest.getNameMatchStatus()) && teamSearchRequest.getNameMatchStatus().equals("1")) {
 				whereClause.append(" AND name = '" + teamSearchRequest.getName() + "'");
+			} else {
+				whereClause.append(" AND name like '%" + teamSearchRequest.getName() + "%'");
 			}
 		}
 
-		if (teamSearchRequest.getLeaderId() != 0) {
+		if (StringUtil.isNotEmpty(teamSearchRequest.getLeaderId())) {
 			whereClause.append(" AND leader_id = '" + teamSearchRequest.getLeaderId() + "'");
 		}
 
-		if (teamSearchRequest.getDepartmentId() != 0) {
+		if (StringUtil.isNotEmpty(teamSearchRequest.getDepartmentId())) {
 			whereClause.append(" AND department_id = '" + teamSearchRequest.getDepartmentId() + "'");
 		}
-
-		whereClause.append(" AND valid_flag = '" + teamSearchRequest.getValidFlag() + "'");
-
+		
+		if (StringUtil.isNotEmpty(teamSearchRequest.getValidFlag())) {
+			whereClause.append(" AND valid_flag = '" + teamSearchRequest.getValidFlag() + "'");
+		}
+		
 		if (whereClause.length() > 0) {
 			whereClause.replace(0, 5, " WHERE ");
 			queryString.append(whereClause);
