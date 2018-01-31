@@ -3,59 +3,14 @@
 	<head>
 		<meta charset="utf-8"/>
 		<title>Create Request</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<link rel="stylesheet"	type="text/css" href="css/bootstrap.min.css" />
-		<script src="javascript/jquery-3.2.1.js"></script>
-		<script src="javascript/jquery.serializejson.js"></script>
-		<script src="javascript/bootstrap.min.js"></script>
-
-		<style type="text/css">
-			
-			.formButton {
-				margin: 0px 10px;
-				width: 80px;
-			}
-
-			#createRequestForm {
-				/*background-color: powderblue;*/
-				padding: 30px 50px;
-				border: 1px solid grey;
-				border-radius: 15px;
-			}
-		</style>
-
 	</head>
+	<div th:replace="fragments/header"></div>
 	<body  class="content-body">
 		<script>
 			/*<![CDATA[*/
 				var employeeId = "1";
 				var listRecipient = [];
-				
-				function getDayOffTypeId(DayOffTypeName) {
-					var id;
-					if(listDayOffType.listDayOffType.length > 0) {
-						$.each(listDayOffType.listDayOffType, function(i, element) {
-							if( DayOffTypeName.localeCompare(element.name) == 0 ) {
-								id = element.id;
-								return false;
-							}
-						});
-					}
-					return id;
-				}
-				
-				function getRecipientId(recipientName) {
-					var id;
-					if(listRecipient.length > 0) {
-						$.each(listRecipient, function(i, element) {
-							if( recipientName.localeCompare(element.name) == 0 ) {
-								id = element.id;
-								return false;
-							}
-						});
-					}
-					return id;
-				}
+				var listDayOffType;
 				
 				function validate(formId) {
 					var ok = 1;
@@ -67,49 +22,9 @@
 						}
 					});
 					if(ok == 0) {
-						alert("Please fill in all fields");
+						alert(errors.incompleteFields);
 					}
 					return ok;
-				}
-				
-				function update(status) {	//status = 1 -> save, status = 0 -> send
-					if(validate("#createRequestForm") == 1) {
-						requestRegistRequest = {
-							"id" : "",
-							"employee_id" : "",
-							"from_time" : "",
-							"to_time" : "",
-							"reason" : "",
-							"status" : "",
-							"response_message" : "",
-							"day_off_type_id" : "",
-							"recipient_id" : "",
-							"valid_flag" : "",
-							"update_date" : ""
-						}
-						var createRequestData = $('#createRequestForm').serializeJSON();
-						requestRegistRequest.employee_id = employeeId;
-						requestRegistRequest.from_time = createRequestData.from;
-						requestRegistRequest.to_time = createRequestData.to;
-						requestRegistRequest.reason = createRequestData.reason;
-						requestRegistRequest.status = (status == 1 ? 1 : 5);
-						requestRegistRequest.day_off_type_id = getDayOffTypeId(createRequestData.dayOffType);
-						requestRegistRequest.recipient_id = getRecipientId(createRequestData.recipient);;
-						requestRegistRequest.valid_flag = "1";
-						
-						$.ajax({
-							type : "POST",
-							contentType : "application/json",
-							url : "/request/regist",
-							dataType : 'json',
-							data : JSON.stringify(requestRegistRequest),
-							success : function(returnData) {
-							},
-							error : function(e) {
-								console.log("ERROR: ", e);
-							}
-						});
-					}
 				}
 				
 				$(function() {
@@ -128,7 +43,7 @@
 						dataType : 'json',
 						data : JSON.stringify(allDayOffTypeRequest),
 						success : function(returnData) {
-							listDayOffType = returnData;
+							listDayOffType = returnData.listDayOffType;
 							var option = "";
 							$.each(returnData.listDayOffType, function(i, element){
 								var option = "<option value='" + element.name + "'>" + element.name + "</option>"; 
@@ -178,12 +93,49 @@
 						}
 					});
 					
-					$('#btnSave').on('click', function() {
-						update(1);
-					});
-					
-					$('#btnSend').on('click', function() {
-						update(0);
+					$('#btnSave, #btnSend').on('click', function() {
+						var status, alertStr;
+						if( $(this).attr('id') == 'btnSave' ) {
+							status = 1;
+							alertStr = "Your request has been saved";
+						}
+						else {
+							status = 5;
+							alertStr = "Your request has been sent";
+						}
+						var createRequestData = $('#createRequestForm').serializeJSON();
+						if(validate("#createRequestForm") == 1) {
+							requestRegistRequest = {
+								"id" : "0",
+								"employee_id" : employeeId,
+								"from_time" : createRequestData.from,
+								"to_time" : createRequestData.to,
+								"reason" : createRequestData.reason,
+								"status" : status,
+								"response_message" : "",
+								"day_off_type_id" : getDayOffTypeId(listDayOffType, createRequestData.dayOffType),
+								"recipient_id" : getRecipientNameOrId(listRecipient, createRequestData.recipient),
+								"valid_flag" : "1",
+								"update_date" : ""
+							}
+							
+							$.ajax({
+								type : "POST",
+								contentType : "application/json",
+								url : "/request/regist",
+								dataType : 'json',
+								data : JSON.stringify(requestRegistRequest),
+								success : function(returnData) {
+								},
+								error : function(e) {
+									console.log("ERROR: ", e);
+								}
+							});
+							
+							$("#createRequestForm :input").not("button, select").val("");
+							$("#createRequestForm select").prop('selectedIndex', 0);
+							alert(alertStr);
+						}
 					});
 				});
 					
@@ -225,9 +177,9 @@
 							</div>
 							<br/>
 							<div align="center">
-								<button type="button" class="btn btn-primary formButton" id="btnSave">Save</button>
-								<button type="button" class="btn btn-primary formButton" id="btnSend">Send</button>
-								<button type="button" class="btn btn-primary formButton" id="btnCancel">Cancel</button>
+								<button type="button" class="btn btn-primary createRequestFormButton" id="btnSave">Save</button>
+								<button type="button" class="btn btn-primary createRequestFormButton" id="btnSend">Send</button>
+								<button type="button" class="btn btn-primary createRequestFormButton" id="btnCancel">Cancel</button>
 							</div>
 						</form>
 					</div>

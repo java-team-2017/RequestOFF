@@ -3,15 +3,9 @@
 	<head>
 		<meta charset="utf-8"/>
 		<title>Request History</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<link rel="stylesheet"	type="text/css" href="css/bootstrap.min.css" />
-		<link rel="stylesheet"	type="text/css" href="css/layoutStyle.css" />
-		<link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet" />
-		<script src="javascript/jquery-3.2.1.js"></script>
-		<script src="javascript/jquery.serializejson.js"></script>
-		<script src="javascript/bootstrap.min.js"></script>
-		<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+		
 	</head>
+	<div th:replace="fragments/header"></div>
 	<body class="content-body">
 		<script>
 			/*<![CDATA[*/
@@ -26,36 +20,6 @@
 					'5': 'waiting'
 				};
 				
-				function getDayOffTypeId(DayOffTypeName) {
-					var id;
-					if(listDayOffType.listDayOffType.length > 0) {
-						$.each(listDayOffType.listDayOffType, function(i, element) {
-							if( DayOffTypeName.localeCompare(element.name) == 0 ) {
-								id = element.id;
-								return false;
-							}
-						});
-					}
-					return id;
-				}
-				
-				function getRecipientNameOrId(recipient) {
-					var returnValue;
-					if(listRecipient.length > 0) {
-						$.each(listRecipient, function(i, element) {
-							if( recipient.localeCompare(element.name) == 0 ) {
-								returnValue = element.id;
-								return false;
-							}
-							else if( recipient.localeCompare(element.id) == 0 ) {
-								returnValue = element.name;
-								return false;
-							}
-						});
-					}
-					return returnValue;
-				}
-				
 				function validate(formId) {
 					var ok = 1;
 					var listInput = $(formId).find(':input').not("#modalResponseMessage");
@@ -66,130 +30,86 @@
 						}
 					});
 					if(ok == 0) {
-						alert("Please fill in all fields");
+						alert(errors.incompleteFields);
 					}
 					return ok;
 				}
 				
 				function search() {
-					var requestSearchRequest = {
-						"id" : "0",
-						"employee_id" : "0",
-						"from_time" : "",
-						"to_time" : "",
-						"reason" : "",
-						"status" : "0",
-						"response_message" : "",
-						"day_off_type_id" : "0",
-						"recipient_id" : "0",
-						"valid_flag" : "0"
-					};
-					requestSearchRequest.employee_id = employeeId;
 					var searchData = $('#requestHistoryForm').serializeJSON();
-
-					requestSearchRequest.from_time = searchData.fromTime;
-					requestSearchRequest.to_time = searchData.toTime;
-					requestSearchRequest.status = searchData.requestType;
-					requestSearchRequest.valid_flag = "1";
+					var requestSearchRequest = {
+						"id" : "",
+						"employee_id" : employeeId,
+						"from_time" : searchData.fromTime,
+						"to_time" : searchData.toTime,
+						"reason" : "",
+						"status" : searchData.requestType,
+						"response_message" : "",
+						"day_off_type_id" : "",
+						"recipient_id" : "",
+						"valid_flag" : "1"
+					};
 					
-					$.ajax({
-						type : "POST",
-						contentType : "application/json",
-						url : "/request/search",
-						dataType : 'json',
-						data : JSON.stringify(requestSearchRequest),
-						success : function(returnData) {
-							$('#requestHistoryTable').DataTable( {
-								destroy: true,
-								searching: false,
-								data: returnData.requests,
- 								columnDefs: [
- 									{
-										"targets": [ 0 ],
-										"data": 'id'
-									},
-									{
-										"targets": [ 1 ],
-										"data": 'employee.name'
-									},
-									{
-										"targets": [ 2 ],
-										"data": 'fromTime'
-									},
-									{
-										"targets": [ 3 ],
-										"data": 'toTime'
-									},
-									{
-										"targets": [ 4 ],
-										"data": 'reason'
-									},
-									{
-										"targets": [ 5 ],
-										"className": "text-center",
-										"data": null,
-										"defaultContent": "<a href='#'><span class='glyphicon glyphicon-pencil'></span></a>"
-									},
-									{
-										"targets": [ 6 ],
-										"className": "text-center",
-										"data": null,
-										"defaultContent": "<a href='#' class='btnDelete'><span class='glyphicon glyphicon-remove'></span></a>"
-									}
-								]
-							});
-						},
-						error : function(e) {
-							console.log("ERROR: ", e);
-						}
-					});
-				}
-				
-				function update(status) {	//status = 1 -> save, status = 0 -> send
-					if(validate("#modalForm") == 1) {
-						requestRegistRequest = {
-							"id" : "",
-							"employee_id" : "",
-							"from_time" : "",
-							"to_time" : "",
-							"reason" : "",
-							"status" : "",
-							"response_message" : "",
-							"day_off_type_id" : "",
-							"recipient_id" : "",
-							"valid_flag" : "",
-							"update_date" : ""
-						}
-						var requestId = $("#modalRequestId").html();
-						var editRequestData = $('#modalForm').serializeJSON();
-						requestRegistRequest.id = requestId;
-						requestRegistRequest.employee_id = employeeId;
-						requestRegistRequest.from_time = editRequestData.from_modalForm;
-						requestRegistRequest.to_time = editRequestData.to_modalForm;
-						requestRegistRequest.reason = editRequestData.reason_modalForm;
-						requestRegistRequest.status = (status == 1 ? 1 : 5);
-						requestRegistRequest.response_message = editRequestData.responseMessage_modalForm;
-						requestRegistRequest.day_off_type_id = getDayOffTypeId(editRequestData.dayOffType_modalForm);
-						requestRegistRequest.recipient_id = getRecipientNameOrId(editRequestData.recipient_modalForm);
-						requestRegistRequest.valid_flag = "1";
-						requestRegistRequest.update_date = editRequestData.updateDate_modalForm;
-						
-						$.ajax({
+					$('#requestHistoryTable').DataTable({
+						ajax: {
 							type : "POST",
 							contentType : "application/json",
-							url : "/request/regist",
+							url : "/request/search",
 							dataType : 'json',
-							data : JSON.stringify(requestRegistRequest),
-							success : function(returnData) {
-								search();
+							data : function() {
+								return JSON.stringify(requestSearchRequest);
 							},
-							error : function(e) {
-								console.log("ERROR: ", e);
+							dataSrc: 'requests'
+						},
+						destroy: true,
+						searching: false,
+						columnDefs: [
+							{
+								"targets": [ 0 ],
+								"data": 'id'
+							},
+							{
+								"targets": [ 1 ],
+								"data": 'employee.name'
+							},
+							{
+								"targets": [ 2 ],
+								"data": 'fromTime'
+							},
+							{
+								"targets": [ 3 ],
+								"data": 'toTime'
+							},
+							{
+								"targets": [ 4 ],
+								"data": 'reason'
+							},
+							{
+								"targets": [ 5 ],
+								"className": "text-center",
+								"data": null,
+								"defaultContent": "<a href='#'><span class='glyphicon glyphicon-pencil'></span></a>"
+							},
+							{
+								"targets": [ 6 ],
+								"className": "text-center",
+								"data": null,
+								"defaultContent": "<a href='#' class='btnDelete'><span class='glyphicon glyphicon-remove'></span></a>"
 							}
-						});
+						]
+					});
+					
+					table = $('#requestHistoryTable').DataTable();
+					if(searchData.requestType == 0 || searchData.requestType == 2 || searchData.requestType == 3 
+							|| searchData.requestType == 5) { //0: all request, 2: approved, 3: denied, 5: waiting
+						table.column(5).visible(false);
+						table.column(6).visible(false);
+					}
+					if(searchData.requestType == 4) { //4: responded
+						table.column(6).visible(false);
 					}
 				}
-			
+				
 				$(function() {
 					var allDayOffTypeRequest = {
 						"id" : "",
@@ -206,7 +126,7 @@
 						dataType : 'json',
 						data : JSON.stringify(allDayOffTypeRequest),
 						success : function(returnData) {
-							listDayOffType = returnData;
+							listDayOffType = returnData.listDayOffType;
 							var option = "";
 							$.each(returnData.listDayOffType, function(i, element){
 								var option = "<option value='" + element.name + "'>" + element.name + "</option>"; 
@@ -256,77 +176,43 @@
 						}
 					});
 					
-					var table = $('#requestHistoryTable').DataTable();
-					$('#requestHistoryTable tbody').on( 'click', 'td', function () {
-						//thien test
-// 						console.log("row data: ");
-// 						var table2 = $('#requestHistoryTable').DataTable();
-// 						console.log(table2.row(this).data());
-						
-						//thien test end
+					$('#requestHistoryTable tbody').on('click', 'td', function() {
 						var index = $(this).index();
 						if(index <= 5) {
-							var requestDetails = {
-								"id" : "0"
-							};
-							
-							var row = $(this).closest("tr");	// Finds the closest row <tr> 
-							requestId = row.find("td:nth-child(1)").html();		//Find the 1st <td> element
-							requestDetails.id = requestId;
-							
-							$.ajax({
-								type : "POST",
-								contentType : "application/json",
-								url : "/request/details",
-								dataType : 'json',
-								data : JSON.stringify(requestDetails),
-								success : function(returnData) {
-									$("#modalRequestId").empty();
-									$("#modalRequestId").append(returnData.request.id);
-									$("#modalStatus").empty();
-									$("#modalStatus").append(getStatus[returnData.request.status]);
-									$("#modalTitle").empty();
-									$("#modalTitle").append(returnData.request.employee.name);
-									$("#modalName").empty();
-									$("#modalName").append(returnData.request.employee.name);
-									$("#modalPosition").empty();
-									$("#modalPosition").append(returnData.request.employee.position.name);
-									$("#modalTeam").empty();
-									$("#modalDepartment").empty();
-									if(returnData.request.employee.position.name == "leader") {
-										$("#modalTeam").append(returnData.request.employee.team.name);
-										$("#modalDepartment").append(returnData.request.employee.team.department.name);
-									}
-									else {
-										$("#modalTeam").append(returnData.request.employee.listTeam[0].name);
-										$("#modalDepartment").append(returnData.request.employee.listTeam[0].department.name);
-									}
-									var fromStr = returnData.request.fromTime;
-									fromStr = fromStr.replace(" ", "T");
-									$("#modalFrom").val(fromStr);
-									var toStr = returnData.request.toTime;
-									toStr = toStr.replace(" ", "T");
-									$("#modalTo").val(toStr);
-									$("#modalReason").val(returnData.request.reason);
-									$("#modalDayOffType").val(returnData.request.dayOffType.name);
-									$("#modalRecipient").val( getRecipientNameOrId(returnData.request.recipientId + "") );
-									$("#modalResponseMessage").empty();
-									$("#modalResponseMessage").val(returnData.request.responseMessage);
-									$("#modalUpdateDate").val(returnData.request.updateDate);
-									
-									if(returnData.request.status == "1" || returnData.request.status == "4") {
-										$("#modalForm :input").prop('disabled', false);
-										$("#btnSave_modal, #btnSend_modal").show();
-									}
-									else {
-										$("#modalForm :input").prop('disabled', true);
-										$("#btnSave_modal, #btnSend_modal").hide();
-									}
-								},
-								error : function(e) {
-									console.log("ERROR: ", e);
-								}
-							});
+							table = $('#requestHistoryTable').DataTable();
+							rowData = table.row(this).data();
+							$("#modalRequestId").empty().append(rowData.id);
+							$("#modalStatus").empty().append(getStatus[rowData.status]);
+							$("#modalTitle").empty().append(rowData.employee.name);
+							$("#modalName").empty().append(rowData.employee.name);
+							$("#modalPosition").empty().append(rowData.employee.position.name);
+							if(rowData.employee.position.name == "leader") {
+								$("#modalTeam").empty().append(rowData.employee.team.name);
+								$("#modalDepartment").empty().append(rowData.employee.team.department.name);
+							} else {
+								$("#modalTeam").empty().append(rowData.employee.listTeam[0].name);
+								$("#modalDepartment").empty().append(rowData.employee.listTeam[0].department.name);
+							}
+							var fromStr = rowData.fromTime;
+							fromStr = fromStr.replace(" ", "T");
+							$("#modalFrom").val(fromStr);
+							var toStr = rowData.toTime;
+							toStr = toStr.replace(" ", "T");
+							$("#modalTo").val(toStr);
+							$("#modalReason").val(rowData.reason);
+							$("#modalDayOffType").val(rowData.dayOffType.name);
+							$("#modalRecipient").val( getRecipientNameOrId(listRecipient, rowData.recipientId + "") );
+							$("#modalResponseMessage").empty();
+							$("#modalResponseMessage").val(rowData.responseMessage);
+							$("#modalUpdateDate").val(rowData.updateDate);
+						
+							if(rowData.status == "1" || rowData.status == "4") {
+								$("#modalForm :input").prop('disabled', false);
+								$("#btnSave_modal, #btnSend_modal").show();
+							} else {
+								$("#modalForm :input").prop('disabled', true);
+								$("#btnSave_modal, #btnSend_modal").hide();
+							}
 							$('#requestDetailsModal').modal('show');
 						}
 					} );
@@ -366,12 +252,47 @@
 						}
 					});
 					
-					$('#btnSave_modal').on('click', function() {
-						update(1);
-					});
-					
-					$('#btnSend_modal').on('click', function() {
-						update(0);
+					$('#btnSave_modal, #btnSend_modal').on('click', function() {
+						var status;
+						if( $(this).attr('id') == 'btnSave_modal' ) {
+							status = 1;
+						}
+						else {
+							status = 5;
+						}
+						
+						if(validate("#modalForm") == 1) {
+							var requestId = $("#modalRequestId").html();
+							var editRequestData = $('#modalForm').serializeJSON();
+							requestRegistRequest = {
+								"id" : requestId,
+								"employee_id" : employeeId,
+								"from_time" : editRequestData.from_modalForm,
+								"to_time" : editRequestData.to_modalForm,
+								"reason" : editRequestData.reason_modalForm,
+								"status" : status,
+								"response_message" : editRequestData.responseMessage_modalForm,
+								"day_off_type_id" : getDayOffTypeId(listDayOffType, editRequestData.dayOffType_modalForm),
+								"recipient_id" : getRecipientNameOrId(listRecipient, editRequestData.recipient_modalForm),
+								"valid_flag" : "1",
+								"update_date" : editRequestData.updateDate_modalForm
+							}
+							
+							$.ajax({
+								type : "POST",
+								contentType : "application/json",
+								url : "/request/regist",
+								dataType : 'json',
+								data : JSON.stringify(requestRegistRequest),
+								success : function(returnData) {
+									search();
+								},
+								error : function(e) {
+									console.log("ERROR: ", e);
+								}
+							});
+							$('#requestDetailsModal').modal('hide');
+						}
 					});
 				});
 				
@@ -389,12 +310,12 @@
 								<label for="fromTime">From</label>
 								<input class="form-control" type="datetime-local" name="fromTime" id="fromTimeId"></input>
 							</div>
-	
+
 							<div class="form-group">
 								<label for="toTime">To</label>
 								<input class="form-control" type="datetime-local" name="toTime" id="toTimeId"></input>
 							</div>
-	
+
 							<div class="form-group">
 								<label for="requestType">Request Type</label>
 								<select class="form-control" name="requestType">
@@ -406,11 +327,11 @@
 									<option value="5">Waiting</option>
 								</select>
 							</div>
-	
+
 							<br/>
 							<div align="center">
-						 		<button type="button" class="btn btn-primary customButton formButton" id="btnOK">OK</button>
-						 		<button type="button" class="btn btn-primary customButton formButton" id="btnClear">Clear</button>
+						 		<button type="button" class="btn btn-primary customButton requestHistoryFormButton" id="btnOK">OK</button>
+						 		<button type="button" class="btn btn-primary customButton requestHistoryFormButton" id="btnClear">Clear</button>
 							</div>
 						</form>
 						
@@ -426,15 +347,15 @@
 									<th class="text-center deleteCell">Delete</th>
 								</tr>
 							</thead>
-	
+							
 							<tbody>
 
 							</tbody>
 						</table>
-	
+						
 						<div class="modal fade" id="requestDetailsModal" role="dialog">
 							<div class="modal-dialog">
-				
+							
 								<div class="modal-content">
 									<div class="modal-header">
 										<button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -471,9 +392,6 @@
 												<div class="input-group col-sm-7">
 													<input class="form-control" type="datetime-local" name="from_modalForm" id="modalFrom"></input>
 												</div>
-<!-- 												<div class="input-group col-sm-1"> -->
-<!-- 													<span class='glyphicon glyphicon-remove' id=""></span> -->
-<!-- 												</div> -->
 											</div>
 											<div class="form-group">
 												<label class="control-label col-sm-3">To: </label>
@@ -530,7 +448,6 @@
 
 				</div>
 			</div>
-
 <!-- 			<div th:replace="fragments/footer"></div> -->
 
 	</body>

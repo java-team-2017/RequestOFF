@@ -18,6 +18,7 @@ import com.dactech.requestoff.model.response.RequestRegistResponse;
 import com.dactech.requestoff.model.response.RequestSearchResponse;
 import com.dactech.requestoff.repository.RequestRepository;
 import com.dactech.requestoff.service.RequestService;
+import com.dactech.requestoff.util.StringUtil;
 
 @Service
 public class RequestServiceImpl implements RequestService{
@@ -26,37 +27,74 @@ public class RequestServiceImpl implements RequestService{
 	
 	@Override
 	public RequestRegistResponse regist(RequestRegistRequest requestRegistRequest) throws Exception{
-		RequestRegistResponse requestRegistResponse = new RequestRegistResponse();
+		Request request;
 		
-		Request request = requestRepository.findById(requestRegistRequest.getId());
-		
-		if(request == null) {
+		if(StringUtil.isEmpty(requestRegistRequest.getId())) {	//create new request
 			request = new Request();
+			
+			Employee employee = new Employee();
+			employee.setId(Integer.parseInt(requestRegistRequest.getEmployeeId()));
+			request.setEmployee(employee);
+			
+			request.setFromTime(requestRegistRequest.getFromTime());
+			request.setToTime(requestRegistRequest.getToTime());
+			request.setReason(requestRegistRequest.getReason());
+			request.setStatus(Integer.parseInt(requestRegistRequest.getStatus()));
+			request.setResponseMessage(requestRegistRequest.getResponseMessage());
+			
+			DayOffType dayOffType = new DayOffType();
+			dayOffType.setId(Integer.parseInt(requestRegistRequest.getDayOffTypeId()));
+			request.setDayOffType(dayOffType);
+			
+			request.setRecipientId(Integer.parseInt(requestRegistRequest.getRecipientId()));
+			request.setValidFlag(Integer.parseInt(requestRegistRequest.getValidFlag()));
 		}
-		else {
-			if(requestRegistRequest.getUpdateDate().equals(request.getUpdateDate()) == false) {
+		else {	//update request
+			long id = Integer.parseInt(requestRegistRequest.getId());
+			request = requestRepository.findById(id);
+			if(request == null) {
+				throw new Exception("Can not find request with id = " + id);
+			}
+			else if(requestRegistRequest.getUpdateDate().equals(request.getUpdateDate()) == false) {
 				throw new Exception("Someone updated Request with id " + requestRegistRequest.getId() + " at " + request.getUpdateDate());
+			}
+			else {
+				if(StringUtil.isNotEmpty(requestRegistRequest.getEmployeeId())) {
+					Employee employee = new Employee();
+					employee.setId(Integer.parseInt(requestRegistRequest.getEmployeeId()));
+					request.setEmployee(employee);
+				}
+				if(StringUtil.isNotEmpty(requestRegistRequest.getFromTime())) {
+					request.setFromTime(requestRegistRequest.getFromTime());
+				}
+				if(StringUtil.isNotEmpty(requestRegistRequest.getToTime())) {
+					request.setToTime(requestRegistRequest.getToTime());
+				}
+				if(StringUtil.isNotEmpty(requestRegistRequest.getReason())) {
+					request.setReason(requestRegistRequest.getReason());
+				}
+				if(StringUtil.isNotEmpty(requestRegistRequest.getStatus())) {
+					request.setStatus(Integer.parseInt(requestRegistRequest.getStatus()));
+				}
+				if(StringUtil.isNotEmpty(requestRegistRequest.getResponseMessage())) {
+					request.setResponseMessage(requestRegistRequest.getResponseMessage());
+				}
+				if(StringUtil.isNotEmpty(requestRegistRequest.getDayOffTypeId())) {
+					DayOffType dayOffType = new DayOffType();
+					dayOffType.setId(Integer.parseInt(requestRegistRequest.getDayOffTypeId()));
+					request.setDayOffType(dayOffType);
+				}
+				if(StringUtil.isNotEmpty(requestRegistRequest.getRecipientId())) {
+					request.setRecipientId(Integer.parseInt(requestRegistRequest.getRecipientId()));
+				}
+				if(StringUtil.isNotEmpty(requestRegistRequest.getValidFlag())) {
+					request.setValidFlag(Integer.parseInt(requestRegistRequest.getValidFlag()));
+				}
 			}
 		}
 		
-		Employee employee = new Employee();
-		employee.setId(requestRegistRequest.getEmployeeId());
-		request.setEmployee(employee);
-		
-		request.setFromTime(requestRegistRequest.getFromTime());
-		request.setToTime(requestRegistRequest.getToTime());
-		request.setReason(requestRegistRequest.getReason());
-		request.setStatus(requestRegistRequest.getStatus());
-		request.setResponseMessage(requestRegistRequest.getResponseMessage());
-		
-		DayOffType dayOffType = new DayOffType();
-		dayOffType.setId(requestRegistRequest.getDayOffTypeId());
-		request.setDayOffType(dayOffType);
-		
-		request.setRecipientId(requestRegistRequest.getRecipientId());
-		request.setValidFlag(requestRegistRequest.getValidFlag());
-		
 		requestRepository.save(request);
+		RequestRegistResponse requestRegistResponse = new RequestRegistResponse();
 		requestRegistResponse.setId(request.getId());
 		return requestRegistResponse;
 	}

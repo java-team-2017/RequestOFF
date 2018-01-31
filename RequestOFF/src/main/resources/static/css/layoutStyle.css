@@ -45,16 +45,31 @@
 	right: 0;
 }
 
+#requestHistoryTable {
+	margin-top: 3px; /* make space between table and pagination */
+}
+
 .customButton {
 	width: 100px;
 }
 
-.formButton {
+.requestHistoryFormButton {
 	margin: 0px 20px;
 }
 
 #requestHistoryForm {
 	margin-bottom: 20px;
+}
+
+.createRequestFormButton {
+	margin: 0px 10px;
+	width: 80px;
+}
+
+#createRequestForm {
+	padding: 30px 50px;
+	border: 1px solid grey;
+	border-radius: 15px;
 }
 
 .idCell, .editCell, .deleteCell {

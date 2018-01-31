@@ -3,23 +3,23 @@ package com.dactech.requestoff.model.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RequestRegistRequest {
-	private long id;
+	private String id;
 	@JsonProperty("employee_id")
-	private long employeeId;
+	private String employeeId;
 	@JsonProperty("from_time")
 	private String fromTime;
 	@JsonProperty("to_time")
 	private String toTime;
 	private String reason;
-	private long status;
+	private String status;
 	@JsonProperty("response_message")
 	private String responseMessage;
 	@JsonProperty("day_off_type_id")
-	private long dayOffTypeId;
+	private String dayOffTypeId;
 	@JsonProperty("recipient_id")
-	private long recipientId;
+	private String recipientId;
 	@JsonProperty("valid_flag")
-	private int validFlag;
+	private String validFlag;
 	@JsonProperty("update_date")
 	private String updateDate;
 
@@ -27,8 +27,9 @@ public class RequestRegistRequest {
 		super();
 	}
 
-	public RequestRegistRequest(long id, long employeeId, String fromTime, String toTime, String reason, long status,
-			String responseMessage, long dayOffTypeId, long recipientId, int validFlag, String updateDate) {
+	public RequestRegistRequest(String id, String employeeId, String fromTime, String toTime, String reason,
+			String status, String responseMessage, String dayOffTypeId, String recipientId, String validFlag,
+			String updateDate) {
 		super();
 		this.id = id;
 		this.employeeId = employeeId;
@@ -43,19 +44,19 @@ public class RequestRegistRequest {
 		this.updateDate = updateDate;
 	}
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
-	public long getEmployeeId() {
+	public String getEmployeeId() {
 		return employeeId;
 	}
 
-	public void setEmployeeId(long employeeId) {
+	public void setEmployeeId(String employeeId) {
 		this.employeeId = employeeId;
 	}
 
@@ -83,11 +84,11 @@ public class RequestRegistRequest {
 		this.reason = reason;
 	}
 
-	public long getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(long status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 
@@ -99,27 +100,27 @@ public class RequestRegistRequest {
 		this.responseMessage = responseMessage;
 	}
 
-	public long getDayOffTypeId() {
+	public String getDayOffTypeId() {
 		return dayOffTypeId;
 	}
 
-	public void setDayOffTypeId(long dayOffTypeId) {
+	public void setDayOffTypeId(String dayOffTypeId) {
 		this.dayOffTypeId = dayOffTypeId;
 	}
 
-	public long getRecipientId() {
+	public String getRecipientId() {
 		return recipientId;
 	}
 
-	public void setRecipientId(long recipientId) {
+	public void setRecipientId(String recipientId) {
 		this.recipientId = recipientId;
 	}
 
-	public int getValidFlag() {
+	public String getValidFlag() {
 		return validFlag;
 	}
 
-	public void setValidFlag(int validFlag) {
+	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
 	}
 
