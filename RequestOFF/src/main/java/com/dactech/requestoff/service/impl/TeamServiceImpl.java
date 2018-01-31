@@ -16,6 +16,7 @@ import com.dactech.requestoff.model.response.TeamRegistResponse;
 import com.dactech.requestoff.model.response.TeamSearchResponse;
 import com.dactech.requestoff.repository.TeamRepository;
 import com.dactech.requestoff.service.TeamService;
+import com.dactech.requestoff.util.StringUtil;
 
 /**
  * @author Nguyen Binh Thien
@@ -28,26 +29,53 @@ public class TeamServiceImpl implements TeamService {
 
 	@Override
 	public TeamRegistResponse teamRegist(TeamRegistRequest teamRegistRequest) throws Exception {
-
-		Department department = new Department();
-		department.setId(teamRegistRequest.getDepartmentId());
-		Employee leader = new Employee();
-		leader.setId(teamRegistRequest.getLeaderId());
-
-		Team team = teamRepository.findById(teamRegistRequest.getId());
-
-		if (team == null) { // regist new Team
+		Team team;
+		if (StringUtil.isEmpty(teamRegistRequest.getId())) { // create new team
 			team = new Team();
-		} else if (!team.getUpdateDate().equals(teamRegistRequest.getUpdateDate())) { // update case, check update date
-			throw new Exception("Someone updated Team with id " + teamRegistRequest.getId() + " at "
-					+ team.getUpdateDate());
+			
+			team.setName(teamRegistRequest.getName());
+			
+			Employee leader = new Employee();
+			leader.setId(Long.parseLong(teamRegistRequest.getLeaderId()));
+			team.setLeader(leader);
+			
+			Department department = new Department();
+			department.setId(Long.parseLong(teamRegistRequest.getDepartmentId()));
+			team.setDepartment(department);
+			
+			team.setValidFlag(Integer.parseInt(teamRegistRequest.getValidFlag()));
+		} else { //update team
+			long teamId = Long.parseLong(teamRegistRequest.getId());
+			team = teamRepository.findById(teamId);
+			if (team == null) {
+				throw new Exception("cannot find the team with id : " + teamId);
+			}
+			if(!team.getUpdateDate().equals(teamRegistRequest.getUpdateDate())) {
+				throw new Exception("Someone updated Team with id " + teamRegistRequest.getId() + " at "
+						+ team.getUpdateDate());
+			}
+			
+			if (StringUtil.isNotEmpty(teamRegistRequest.getName())) {
+				team.setName(teamRegistRequest.getName());
+			}
+			
+			if (StringUtil.isNotEmpty(teamRegistRequest.getLeaderId())) {
+				Employee leader = new Employee();
+				leader.setId(Long.parseLong(teamRegistRequest.getLeaderId()));
+				team.setLeader(leader);
+			}
+			
+			if (StringUtil.isNotEmpty(teamRegistRequest.getDepartmentId())) {
+				Department department = new Department();
+				department.setId(Long.parseLong(teamRegistRequest.getDepartmentId()));
+				team.setDepartment(department);
+			}
+			
+			if (StringUtil.isNotEmpty(teamRegistRequest.getValidFlag())) {
+				team.setValidFlag(Integer.parseInt(teamRegistRequest.getValidFlag()));
+			}
 		}
-
-		team.setValidFlag(teamRegistRequest.getValidFlag());
-		team.setName(teamRegistRequest.getName());
-		team.setDepartment(department);
-		team.setLeader(leader);
-
+		
 		teamRepository.save(team);
 
 		return new TeamRegistResponse(team.getId());

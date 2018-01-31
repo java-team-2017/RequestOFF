@@ -3,21 +3,22 @@ package com.dactech.requestoff.model.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TeamRegistRequest {
-	private long id;
+	private String id;
 	private String name;
 	@JsonProperty("leader_id")
-	private long leaderId;
+	private String leaderId;
 	@JsonProperty("department_id")
-	private long departmentId;
+	private String departmentId;
 	@JsonProperty("update_date")
 	private String updateDate;
 	@JsonProperty("valid_flag")
-	private int validFlag;
+	private String validFlag;
 
 	public TeamRegistRequest() {
 	}
 
-	public TeamRegistRequest(long id, String name, long leaderId, long departmentId, String updateDate, int validFlag) {
+	public TeamRegistRequest(String id, String name, String leaderId, String departmentId, String updateDate,
+			String validFlag) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -27,11 +28,11 @@ public class TeamRegistRequest {
 		this.validFlag = validFlag;
 	}
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -43,19 +44,19 @@ public class TeamRegistRequest {
 		this.name = name;
 	}
 
-	public long getLeaderId() {
+	public String getLeaderId() {
 		return leaderId;
 	}
 
-	public void setLeaderId(long leaderId) {
+	public void setLeaderId(String leaderId) {
 		this.leaderId = leaderId;
 	}
 
-	public long getDepartmentId() {
+	public String getDepartmentId() {
 		return departmentId;
 	}
 
-	public void setDepartmentId(long departmentId) {
+	public void setDepartmentId(String departmentId) {
 		this.departmentId = departmentId;
 	}
 
@@ -67,12 +68,11 @@ public class TeamRegistRequest {
 		this.updateDate = updateDate;
 	}
 
-	public int getValidFlag() {
+	public String getValidFlag() {
 		return validFlag;
 	}
 
-	public void setValidFlag(int validFlag) {
+	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
 	}
-
 }
