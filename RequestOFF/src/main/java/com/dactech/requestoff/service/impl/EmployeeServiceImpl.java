@@ -1,9 +1,10 @@
 package com.dactech.requestoff.service.impl;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -230,7 +231,42 @@ public class EmployeeServiceImpl implements EmployeeService {
 		response.setRecordsTotal(lEStatistics.size());
 		int start = eospRequest.getStart();
 		int length = eospRequest.getLength();
-		int end = start + length <= lEStatistics.size() ? start + length : lEStatistics.size(); 
+		int end = start + length <= lEStatistics.size() ? start + length : lEStatistics.size();
+		
+		int sortedColIndex = eospRequest.getOrders().get(0).getColumn();
+		int dir = eospRequest.getOrders().get(0).getDir().equals("desc") ? -1 : 1;
+		String colData = eospRequest.getColumns().get(sortedColIndex).getData();
+		Collections.sort(lEStatistics, new Comparator<EmployeeOffStatisticsPagingResponse.EmployeeStatistics>() {
+			@Override
+			public int compare(EmployeeOffStatisticsPagingResponse.EmployeeStatistics o1, EmployeeOffStatisticsPagingResponse.EmployeeStatistics o2) {
+				int returnNumber;
+				if (colData.equals("employee.name")) {
+					String name1 = o1.getEmployee().getName();
+					String name2 = o2.getEmployee().getName();
+					returnNumber = dir * name1.compareToIgnoreCase(name2);
+				} else if (colData.equals("employee.listTeam[0].department.name")) {
+					String name1 = o1.getEmployee().getListTeam().get(0).getDepartment().getName();
+					String name2 =  o2.getEmployee().getListTeam().get(0).getDepartment().getName();
+					returnNumber = dir * name1.compareToIgnoreCase(name2);
+				} else if (colData.equals("employee.listTeam[0].name")) {
+					String name1 = o1.getEmployee().getListTeam().get(0).getName();
+					String name2 =  o2.getEmployee().getListTeam().get(0).getName();
+					returnNumber = dir * name1.compareToIgnoreCase(name2);
+				} else if (colData.equals("employee.position.name")) {
+					String name1 = o1.getEmployee().getPosition().getName();
+					String name2 = o2.getEmployee().getPosition().getName();
+					returnNumber = dir * name1.compareToIgnoreCase(name2);
+				} else if (colData.equals("timeOffWithPaying")) {
+					returnNumber = (int) (dir * (o1.getTimeOffWithPaying() - o2.getTimeOffWithPaying()));
+				} else if (colData.equals("timeOffWithoutPaying")) {
+					returnNumber = (int) (dir * (o1.getTimeOffWithoutPaying() - o2.getTimeOffWithoutPaying()));
+				} else { //sort by id is default
+					returnNumber = (int) (dir * (o1.getEmployee().getId() - o2.getEmployee().getId())); 
+				} 
+				return returnNumber;
+			}
+		});
+		
 		List<EmployeeOffStatisticsPagingResponse.EmployeeStatistics> truncatedList = lEStatistics.subList(start, end);
 		response.setListEmployeeStatistics(truncatedList);
 		return response;
