@@ -3,7 +3,7 @@ body {
     background-color: #f5f8fa;
 } 
 #header{
-	background-color: #3097D1 !important;
+	background-color: #006699 !important;
 	height: 60px;
 	padding: 5px;
 }
@@ -78,7 +78,7 @@ span.header-title {
 
 .form-signin .form-heading{
 	margin-bottom: 20px;
-	color: #1E90FF;
+	color: #006699;
 	font-weight: bold;
 }
 
