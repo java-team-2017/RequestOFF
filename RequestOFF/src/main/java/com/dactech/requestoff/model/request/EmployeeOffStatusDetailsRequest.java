@@ -4,33 +4,33 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EmployeeOffStatusDetailsRequest {
 	@JsonProperty("year_id")
-	private long yearId;
+	private String yearId;
 	@JsonProperty("employee_id")
-	private long employeeId;
+	private String employeeId;
 
 	public EmployeeOffStatusDetailsRequest() {
 		super();
 	}
 
-	public EmployeeOffStatusDetailsRequest(long yearId, long employeeId) {
+	public EmployeeOffStatusDetailsRequest(String yearId, String employeeId) {
 		super();
 		this.yearId = yearId;
 		this.employeeId = employeeId;
 	}
 
-	public long getYearId() {
+	public String getYearId() {
 		return yearId;
 	}
 
-	public void setYearId(long yearId) {
+	public void setYearId(String yearId) {
 		this.yearId = yearId;
 	}
 
-	public long getEmployeeId() {
+	public String getEmployeeId() {
 		return employeeId;
 	}
 
-	public void setEmployeeId(long employeeId) {
+	public void setEmployeeId(String employeeId) {
 		this.employeeId = employeeId;
 	}
 

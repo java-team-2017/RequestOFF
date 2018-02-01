@@ -76,7 +76,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 	
 	@Override
 	public DepartmentDetailsResponse details(DepartmentDetailsRequest departmentDetailsRequest) {
-		Department department = departmentRepository.findById(departmentDetailsRequest.getId());
+		Department department = departmentRepository.findById(Long.parseLong(departmentDetailsRequest.getId()));
 		DepartmentDetailsResponse departmentDetailsResponse = new DepartmentDetailsResponse(department);
 		return departmentDetailsResponse;
 	}

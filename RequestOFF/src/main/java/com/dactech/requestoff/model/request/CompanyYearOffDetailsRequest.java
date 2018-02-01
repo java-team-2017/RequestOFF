@@ -1,22 +1,22 @@
 package com.dactech.requestoff.model.request;
 
 public class CompanyYearOffDetailsRequest {
-	private long id;
+	private String id;
 
 	public CompanyYearOffDetailsRequest() {
 		super();
 	}
 
-	public CompanyYearOffDetailsRequest(long id) {
+	public CompanyYearOffDetailsRequest(String id) {
 		super();
 		this.id = id;
 	}
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

@@ -73,7 +73,7 @@ public class CompanyYearOffServiceImpl implements CompanyYearOffService{
 	
 	@Override
 	public CompanyYearOffDetailsResponse details(CompanyYearOffDetailsRequest companyYearOffDetailsRequest) {
-		CompanyYearOff companyYearOff = companyYearOffRepository.findById(companyYearOffDetailsRequest.getId());
+		CompanyYearOff companyYearOff = companyYearOffRepository.findById(Long.parseLong(companyYearOffDetailsRequest.getId()));
 		CompanyYearOffDetailsResponse companyYearOffDetailsResponse = new CompanyYearOffDetailsResponse(companyYearOff);
 		return companyYearOffDetailsResponse;
 	}
