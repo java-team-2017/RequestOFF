@@ -40,9 +40,13 @@ public class Employee {
 	private String updateDate;
 	private long updateOperator;
 
-	@OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
-	@JsonIgnoreProperties("employee")
+	@OneToMany(mappedBy = "employee")
+	@JsonIgnoreProperties(value = { "employee", "recipient" })
 	private List<Request> listRequest;
+
+	@OneToMany(mappedBy = "recipient")
+	@JsonIgnoreProperties(value = { "employee", "recipient" })
+	private List<Request> listReceivedRequest;
 
 	@OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
 	@JsonIgnoreProperties("employee")
@@ -67,35 +71,6 @@ public class Employee {
 	public Employee() {
 		super();
 		// TODO Auto-generated constructor stub
-	}
-
-	public Employee(long id, String name, String gender, String birthday, Position position, String email,
-			String password, long phone, String startWorkingDate, String officialWorkingDate, int validFlag,
-			String insertDate, long insertOperator, String updateDate, long updateOperator, List<Request> listRequest,
-			List<EmployeeOffStatus> listEmployeeOffStatus, Department department, Team team, List<Team> listTeam,
-			List<Role> listRole) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.gender = gender;
-		this.birthday = birthday;
-		this.position = position;
-		this.email = email;
-		this.password = password;
-		this.phone = phone;
-		this.startWorkingDate = startWorkingDate;
-		this.officialWorkingDate = officialWorkingDate;
-		this.validFlag = validFlag;
-		this.insertDate = insertDate;
-		this.insertOperator = insertOperator;
-		this.updateDate = updateDate;
-		this.updateOperator = updateOperator;
-		this.listRequest = listRequest;
-		this.listEmployeeOffStatus = listEmployeeOffStatus;
-		this.department = department;
-		this.team = team;
-		this.listTeam = listTeam;
-		this.listRole = listRole;
 	}
 
 	public long getId() {
@@ -226,6 +201,14 @@ public class Employee {
 		this.listRequest = listRequest;
 	}
 
+	public List<Request> getListReceivedRequest() {
+		return listReceivedRequest;
+	}
+
+	public void setListReceivedRequest(List<Request> listReceivedRequest) {
+		this.listReceivedRequest = listReceivedRequest;
+	}
+
 	public List<EmployeeOffStatus> getListEmployeeOffStatus() {
 		return listEmployeeOffStatus;
 	}
@@ -265,5 +248,37 @@ public class Employee {
 	public void setListRole(List<Role> listRole) {
 		this.listRole = listRole;
 	}
+
+	public Employee(long id, String name, String gender, String birthday, Position position, String email,
+			String password, long phone, String startWorkingDate, String officialWorkingDate, int validFlag,
+			String insertDate, long insertOperator, String updateDate, long updateOperator, List<Request> listRequest,
+			List<Request> listReceivedRequest, List<EmployeeOffStatus> listEmployeeOffStatus, Department department,
+			Team team, List<Team> listTeam, List<Role> listRole) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.gender = gender;
+		this.birthday = birthday;
+		this.position = position;
+		this.email = email;
+		this.password = password;
+		this.phone = phone;
+		this.startWorkingDate = startWorkingDate;
+		this.officialWorkingDate = officialWorkingDate;
+		this.validFlag = validFlag;
+		this.insertDate = insertDate;
+		this.insertOperator = insertOperator;
+		this.updateDate = updateDate;
+		this.updateOperator = updateOperator;
+		this.listRequest = listRequest;
+		this.listReceivedRequest = listReceivedRequest;
+		this.listEmployeeOffStatus = listEmployeeOffStatus;
+		this.department = department;
+		this.team = team;
+		this.listTeam = listTeam;
+		this.listRole = listRole;
+	}
+
+	
 
 }

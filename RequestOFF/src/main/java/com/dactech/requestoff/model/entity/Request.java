@@ -17,13 +17,13 @@ public class Request {
 	public static final long REQUEST_STATUS_DENIED = 3;
 	public static final long REQUEST_STATUS_RESPONDED = 4;
 	public static final long REQUEST_STATUS_WAITING = 5;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "employee_id")
-	@JsonIgnoreProperties("listRequest")
+	@JsonIgnoreProperties(value = { "listReceivedRequest", "listRequest" })
 	private Employee employee;
 	private String fromTime;
 	private String toTime;
@@ -34,7 +34,10 @@ public class Request {
 	@JoinColumn(name = "day_off_type_id")
 	@JsonIgnoreProperties("listRequest")
 	private DayOffType dayOffType;
-	private long recipientId;
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "recipient_id")
+	@JsonIgnoreProperties(value = { "listReceivedRequest", "listRequest" })
+	private Employee recipient;
 	private int validFlag;
 	private String insertDate;
 	private long insertOperator;
@@ -46,7 +49,7 @@ public class Request {
 	}
 
 	public Request(long id, Employee employee, String fromTime, String toTime, String reason, long status,
-			String responseMessage, DayOffType dayOffType, long recipientId, int validFlag, String insertDate,
+			String responseMessage, DayOffType dayOffType, Employee recipient, int validFlag, String insertDate,
 			long insertOperator, String updateDate, long updateOperator) {
 		super();
 		this.id = id;
@@ -57,7 +60,7 @@ public class Request {
 		this.status = status;
 		this.responseMessage = responseMessage;
 		this.dayOffType = dayOffType;
-		this.recipientId = recipientId;
+		this.recipient = recipient;
 		this.validFlag = validFlag;
 		this.insertDate = insertDate;
 		this.insertOperator = insertOperator;
@@ -129,12 +132,12 @@ public class Request {
 		this.dayOffType = dayOffType;
 	}
 
-	public long getRecipientId() {
-		return recipientId;
+	public Employee getRecipient() {
+		return recipient;
 	}
 
-	public void setRecipientId(long recipientId) {
-		this.recipientId = recipientId;
+	public void setRecipient(Employee recipient) {
+		this.recipient = recipient;
 	}
 
 	public int getValidFlag() {
@@ -175,6 +178,26 @@ public class Request {
 
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
+	}
+
+	public static long getRequestStatusSaved() {
+		return REQUEST_STATUS_SAVED;
+	}
+
+	public static long getRequestStatusApproved() {
+		return REQUEST_STATUS_APPROVED;
+	}
+
+	public static long getRequestStatusDenied() {
+		return REQUEST_STATUS_DENIED;
+	}
+
+	public static long getRequestStatusResponded() {
+		return REQUEST_STATUS_RESPONDED;
+	}
+
+	public static long getRequestStatusWaiting() {
+		return REQUEST_STATUS_WAITING;
 	}
 
 }
