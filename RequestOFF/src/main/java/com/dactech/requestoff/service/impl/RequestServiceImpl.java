@@ -107,7 +107,7 @@ public class RequestServiceImpl implements RequestService{
 
 	@Override
 	public RequestDetailsResponse details(RequestDetailsRequest requestDetailsRequest) {
-		Request request = requestRepository.findById(requestDetailsRequest.getId());
+		Request request = requestRepository.findById(Long.parseLong(requestDetailsRequest.getId()));
 		RequestDetailsResponse requestDetailsResponse = new RequestDetailsResponse(request);
 		return requestDetailsResponse;
 	}
