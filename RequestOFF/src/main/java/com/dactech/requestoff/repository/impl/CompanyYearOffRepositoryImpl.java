@@ -7,9 +7,9 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import com.dactech.requestoff.model.entity.CompanyYearOff;
-import com.dactech.requestoff.model.request.CompanyYearOffDetailsRequest;
 import com.dactech.requestoff.model.request.CompanyYearOffSearchRequest;
 import com.dactech.requestoff.repository.custom.CompanyYearOffRepositoryCustom;
+import com.dactech.requestoff.util.StringUtil;
 
 public class CompanyYearOffRepositoryImpl implements CompanyYearOffRepositoryCustom {
 	@PersistenceContext
@@ -19,16 +19,16 @@ public class CompanyYearOffRepositoryImpl implements CompanyYearOffRepositoryCus
 	@Override
 	public List<CompanyYearOff> search(CompanyYearOffSearchRequest companyYearOffSearchRequest) {
 		String sqlQuery = "SELECT * FROM company_year_off";
-		if(companyYearOffSearchRequest.getId() != 0) {
+		if(StringUtil.isNotEmpty(companyYearOffSearchRequest.getId())) {
 			sqlQuery += " AND id = " + companyYearOffSearchRequest.getId();
 		}
-		if(companyYearOffSearchRequest.getDayOffResetFlag() != -1) {
+		if(StringUtil.isNotEmpty(companyYearOffSearchRequest.getDayOffResetFlag())) {
 			sqlQuery += " AND day_off_reset_flag = " + companyYearOffSearchRequest.getDayOffResetFlag();
 		}
-		if(companyYearOffSearchRequest.getCurrentYearFlag() != -1) {
+		if(StringUtil.isNotEmpty(companyYearOffSearchRequest.getCurrentYearFlag())) {
 			sqlQuery += " AND current_year_flag = " + companyYearOffSearchRequest.getCurrentYearFlag();
 		}
-		if(companyYearOffSearchRequest.getValidFlag() != -1) {
+		if(StringUtil.isNotEmpty(companyYearOffSearchRequest.getValidFlag())) {
 			sqlQuery += " AND valid_flag = " + companyYearOffSearchRequest.getValidFlag();
 		}
 		
