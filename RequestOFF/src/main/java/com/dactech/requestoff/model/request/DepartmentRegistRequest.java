@@ -3,12 +3,12 @@ package com.dactech.requestoff.model.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DepartmentRegistRequest {
-	private long id;
+	private String id;
 	private String name;
 	@JsonProperty("manager_id")
-	private long managerId;
+	private String managerId;
 	@JsonProperty("valid_flag")
-	private int validFlag;
+	private String validFlag;
 	@JsonProperty("update_date")
 	private String updateDate;
 
@@ -16,7 +16,7 @@ public class DepartmentRegistRequest {
 		super();
 	}
 
-	public DepartmentRegistRequest(long id, String name, long managerId, int validFlag, String updateDate) {
+	public DepartmentRegistRequest(String id, String name, String managerId, String validFlag, String updateDate) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -25,11 +25,11 @@ public class DepartmentRegistRequest {
 		this.updateDate = updateDate;
 	}
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -41,19 +41,19 @@ public class DepartmentRegistRequest {
 		this.name = name;
 	}
 
-	public long getManagerId() {
+	public String getManagerId() {
 		return managerId;
 	}
 
-	public void setManagerId(long managerId) {
+	public void setManagerId(String managerId) {
 		this.managerId = managerId;
 	}
 
-	public int getValidFlag() {
+	public String getValidFlag() {
 		return validFlag;
 	}
 
-	public void setValidFlag(int validFlag) {
+	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
 	}
 

@@ -33,7 +33,7 @@ public class RequestServiceImpl implements RequestService{
 			request = new Request();
 			
 			Employee employee = new Employee();
-			employee.setId(Integer.parseInt(requestRegistRequest.getEmployeeId()));
+			employee.setId(Long.parseLong(requestRegistRequest.getEmployeeId()));
 			request.setEmployee(employee);
 			
 			request.setFromTime(requestRegistRequest.getFromTime());
@@ -43,10 +43,10 @@ public class RequestServiceImpl implements RequestService{
 			request.setResponseMessage(requestRegistRequest.getResponseMessage());
 			
 			DayOffType dayOffType = new DayOffType();
-			dayOffType.setId(Integer.parseInt(requestRegistRequest.getDayOffTypeId()));
+			dayOffType.setId(Long.parseLong(requestRegistRequest.getDayOffTypeId()));
 			request.setDayOffType(dayOffType);
 			
-			request.setRecipientId(Integer.parseInt(requestRegistRequest.getRecipientId()));
+			request.setRecipientId(Long.parseLong(requestRegistRequest.getRecipientId()));
 			request.setValidFlag(Integer.parseInt(requestRegistRequest.getValidFlag()));
 		}
 		else {	//update request
@@ -56,12 +56,12 @@ public class RequestServiceImpl implements RequestService{
 				throw new Exception("Can not find request with id = " + id);
 			}
 			else if(requestRegistRequest.getUpdateDate().equals(request.getUpdateDate()) == false) {
-				throw new Exception("Someone updated Request with id " + requestRegistRequest.getId() + " at " + request.getUpdateDate());
+				throw new Exception("Someone updated request with id " + requestRegistRequest.getId() + " at " + request.getUpdateDate());
 			}
 			else {
 				if(StringUtil.isNotEmpty(requestRegistRequest.getEmployeeId())) {
 					Employee employee = new Employee();
-					employee.setId(Integer.parseInt(requestRegistRequest.getEmployeeId()));
+					employee.setId(Long.parseLong(requestRegistRequest.getEmployeeId()));
 					request.setEmployee(employee);
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getFromTime())) {
@@ -81,11 +81,11 @@ public class RequestServiceImpl implements RequestService{
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getDayOffTypeId())) {
 					DayOffType dayOffType = new DayOffType();
-					dayOffType.setId(Integer.parseInt(requestRegistRequest.getDayOffTypeId()));
+					dayOffType.setId(Long.parseLong(requestRegistRequest.getDayOffTypeId()));
 					request.setDayOffType(dayOffType);
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getRecipientId())) {
-					request.setRecipientId(Integer.parseInt(requestRegistRequest.getRecipientId()));
+					request.setRecipientId(Long.parseLong(requestRegistRequest.getRecipientId()));
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getValidFlag())) {
 					request.setValidFlag(Integer.parseInt(requestRegistRequest.getValidFlag()));

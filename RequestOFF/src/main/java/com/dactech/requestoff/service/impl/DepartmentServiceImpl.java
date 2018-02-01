@@ -15,6 +15,7 @@ import com.dactech.requestoff.model.response.DepartmentRegistResponse;
 import com.dactech.requestoff.model.response.DepartmentSearchResponse;
 import com.dactech.requestoff.repository.DepartmentRepository;
 import com.dactech.requestoff.service.DepartmentService;
+import com.dactech.requestoff.util.StringUtil;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
@@ -22,30 +23,44 @@ public class DepartmentServiceImpl implements DepartmentService {
 	DepartmentRepository departmentRepository;
 	
 	public DepartmentRegistResponse registDepartment(DepartmentRegistRequest departmentRegistRequest) throws Exception {
-		DepartmentRegistResponse departmentRegistResponse = new DepartmentRegistResponse();
+		Department department;
 		
-		Department department = departmentRepository.findById(departmentRegistRequest.getId());
-		if(department == null) {
+		if(StringUtil.isEmpty(departmentRegistRequest.getId())) {	//create new department
 			department = new Department();
+			department.setName(departmentRegistRequest.getName());
+			
+			Employee manager = new Employee();
+			manager.setId(Long.parseLong(departmentRegistRequest.getManagerId()));
+			department.setManager(manager);
+			
+			department.setValidFlag(Integer.parseInt(departmentRegistRequest.getValidFlag()));
 		}
 		else {
-			if(departmentRegistRequest.getUpdateDate().equals( department.getUpdateDate() ) == false) {
-				throw new Exception("Someone updated Department with id " + departmentRegistRequest.getId() + " at " + department.getUpdateDate());
+			department = departmentRepository.findById(Long.parseLong(departmentRegistRequest.getId()));
+			if(department == null) {
+				throw new Exception("Can not find department with id = " + departmentRegistRequest.getId());
+			}
+			else if(departmentRegistRequest.getUpdateDate().equals(department.getUpdateDate()) == false) {
+				throw new Exception("Someone updated department with id " + departmentRegistRequest.getId() + " at " + department.getUpdateDate());
+			}
+			else {
+				if(StringUtil.isNotEmpty(departmentRegistRequest.getName())) {
+					department.setName(departmentRegistRequest.getName());
+				}
+				if(StringUtil.isNotEmpty(departmentRegistRequest.getManagerId())) {
+					Employee manager = new Employee();
+					manager.setId(Long.parseLong(departmentRegistRequest.getManagerId()));
+					department.setManager(manager);
+				}
+				if(StringUtil.isNotEmpty(departmentRegistRequest.getValidFlag())) {
+					department.setValidFlag(Integer.parseInt(departmentRegistRequest.getValidFlag()));
+				}
 			}
 		}
-		
-		department.setName(departmentRegistRequest.getName());
-		
-		Employee manager = new Employee();
-		manager.setId(departmentRegistRequest.getManagerId());
-		department.setManager(manager);
-		
-		department.setValidFlag(departmentRegistRequest.getValidFlag());
-		
 		departmentRepository.save(department);
 		
+		DepartmentRegistResponse departmentRegistResponse = new DepartmentRegistResponse();
 		departmentRegistResponse.setId(department.getId());
-		
 		return departmentRegistResponse;
 	}
 	

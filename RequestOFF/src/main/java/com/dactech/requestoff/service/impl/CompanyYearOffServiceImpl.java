@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.CompanyYearOff;
-import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.request.CompanyYearOffDetailsRequest;
 import com.dactech.requestoff.model.request.CompanyYearOffRegistRequest;
 import com.dactech.requestoff.model.request.CompanyYearOffSearchRequest;
