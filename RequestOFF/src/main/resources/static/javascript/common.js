@@ -51,3 +51,44 @@ function getRecipientNameOrId(recipientList, recipientNameOrId) {
 	});
 	return returnValue;
 }
+
+function renderDayOffTypeSelect(selectBoxId) {
+	$.ajax({
+		type : "POST",
+		contentType : "application/json",
+		url : "/dayOffType/search",
+		dataType : 'json',
+		data : JSON.stringify({"valid_flag_id" : "1"}),
+		success : function(returnData) {
+			listDayOffType = returnData.listDayOffType;
+			var option = "";
+			$.each(returnData.listDayOffType, function(i, element){
+				option += "<option value='" + element.name + "'>" + element.name + "</option>"; 
+			});
+			$("#" + selectBoxId).append(option);
+		},
+		error : function(e) {
+			console.log("ERROR: ", e);
+		}
+	});
+}
+
+function renderRemainHours(employeeId, containerId) {
+	var currentYear = (new Date()).getFullYear();
+	$.ajax({
+		type : "POST",
+		contentType : "application/json",
+		url : "/employeeOffStatus/details",
+		dataType : 'json',
+		data : JSON.stringify({
+			"year_id" : currentYear,
+			"employee_id" : employeeId
+		}),
+		success : function(returnData) {
+			$("#" + containerId).html(returnData.employee_off_status.remainHours);
+		},
+		error : function(e) {
+			console.log("ERROR: ", e);
+		}
+	});
+}

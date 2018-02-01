@@ -13,8 +13,6 @@ import com.dactech.requestoff.model.request.EmployeeOffStatusSearchRequest;
 import com.dactech.requestoff.model.response.EmployeeOffStatusDetailsResponse;
 import com.dactech.requestoff.model.response.EmployeeOffStatusRegistResponse;
 import com.dactech.requestoff.model.response.EmployeeOffStatusSearchResponse;
-import com.dactech.requestoff.model.response.TeamRegistResponse;
-import com.dactech.requestoff.model.response.TeamSearchResponse;
 import com.dactech.requestoff.service.EmployeeOffStatusService;
 
 @RestController

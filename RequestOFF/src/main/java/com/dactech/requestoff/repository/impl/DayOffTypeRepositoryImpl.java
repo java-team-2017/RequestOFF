@@ -7,7 +7,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import com.dactech.requestoff.model.entity.DayOffType;
-import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.request.DayOffTypeSearchRequest;
 import com.dactech.requestoff.repository.custom.DayOffTypeRepositoryCustom;
 import com.dactech.requestoff.util.StringUtil;

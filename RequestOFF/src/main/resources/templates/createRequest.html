@@ -7,151 +7,114 @@
 	<div th:replace="fragments/header"></div>
 	<body  class="content-body">
 		<script>
-			/*<![CDATA[*/
-				var employeeId = "1";
-				var listRecipient = [];
-				var listDayOffType;
+		/*<![CDATA[*/
+			$(function() {
+				renderRemainHours(employeeId, 'remainHours');
+				renderDayOffTypeSelect('id_dayOffType');
 				
-				function validate(formId) {
-					var ok = 1;
-					var listInput = $(formId).find(':input').not("button");
-					$.each(listInput, function() {
-						if($(this).val() == "") {
-							ok = 0;
-// 							$(this).parent().css( "background-color", "moccasin" );
-						}
-					});
-					if(ok == 0) {
-						alert(errors.incompleteFields);
-					}
-					return ok;
-				}
-				
-				$(function() {
-					var allDayOffTypeRequest = {
-						"id" : "",
-						"name" : "",
-						"name_match_status" : "",
-						"payment_flag_id" : "",
-						"valid_flag_id" : ""
-					};
-
-					$.ajax({
-						type : "POST",
-						contentType : "application/json",
-						url : "/dayOffType/search",
-						dataType : 'json',
-						data : JSON.stringify(allDayOffTypeRequest),
-						success : function(returnData) {
-							listDayOffType = returnData.listDayOffType;
-							var option = "";
-							$.each(returnData.listDayOffType, function(i, element){
-								var option = "<option value='" + element.name + "'>" + element.name + "</option>"; 
-								$("#id_dayOffType").append(option);
-							});
-						},
-						error : function(e) {
-							console.log("ERROR: ", e);
-						}
-					});
-					
-					var allRecipientRequest = {
-						"id" : ""
-					};
-					allRecipientRequest.id = employeeId;
-					
-					$.ajax({
-						type : "POST",
-						contentType : "application/json",
-						url : "/employee/details",
-						dataType : 'json',
-						data : JSON.stringify(allRecipientRequest),
-						success : function(returnData) {
-							var temp;
-							if(returnData.employee.position.name == "leader") {
-								listRecipient.push({ "id" : "", "name" : "" });
-								listRecipient[0].id = returnData.employee.team.department.manager.id;
-								listRecipient[0].name = returnData.employee.team.department.manager.name;
-							}
-							else {
-								listRecipient.push({ "id" : "", "name" : "" });
-								listRecipient[0].id = returnData.employee.listTeam[0].leader.id;
-								listRecipient[0].name = returnData.employee.listTeam[0].leader.name;
-								
-								listRecipient.push({ "id" : "", "name" : "" });
-								listRecipient[1].id = returnData.employee.listTeam[0].department.manager.id;
-								listRecipient[1].name = returnData.employee.listTeam[0].department.manager.name;
-							}
-							var option = "";
-							$.each(listRecipient, function(i, element){
-								var option = "<option value='" + element.name + "'>" + element.name + "</option>"; 
-								$("#id_recipient").append(option);
-							});
-						},
-						error : function(e) {
-							console.log("ERROR: ", e);
-						}
-					});
-					
-					$('#btnSave, #btnSend').on('click', function() {
-						var status, alertStr;
-						if( $(this).attr('id') == 'btnSave' ) {
-							status = 1;
-							alertStr = "Your request has been saved";
+				//recipient select box
+				$.ajax({
+					type : "POST",
+					contentType : "application/json",
+					url : "/employee/details",
+					dataType : 'json',
+					data : JSON.stringify({ "id" : employeeId }),
+					success : function(returnData) {
+						var temp;
+						if(returnData.employee.position.name == "leader") {
+							listRecipient.push(returnData.employee.team.department.manager);
 						}
 						else {
-							status = 5;
-							alertStr = "Your request has been sent";
+							listRecipient.push(returnData.employee.listTeam[0].leader);
+							listRecipient.push(returnData.employee.listTeam[0].department.manager);
 						}
-						var createRequestData = $('#createRequestForm').serializeJSON();
-						if(validate("#createRequestForm") == 1) {
-							requestRegistRequest = {
-								"id" : "",
-								"employee_id" : employeeId,
-								"from_time" : createRequestData.from,
-								"to_time" : createRequestData.to,
-								"reason" : createRequestData.reason,
-								"status" : status,
-								"response_message" : "",
-								"day_off_type_id" : getDayOffTypeId(listDayOffType, createRequestData.dayOffType),
-								"recipient_id" : getRecipientNameOrId(listRecipient, createRequestData.recipient),
-								"valid_flag" : "1",
-								"update_date" : ""
-							}
-							
-							$.ajax({
-								type : "POST",
-								contentType : "application/json",
-								url : "/request/regist",
-								dataType : 'json',
-								data : JSON.stringify(requestRegistRequest),
-								success : function(returnData) {
-								},
-								error : function(e) {
-									console.log("ERROR: ", e);
-								}
-							});
-							
-							$("#createRequestForm :input").not("button, select").val("");
-							$("#createRequestForm select").prop('selectedIndex', 0);
-							alert(alertStr);
-						}
-					});
+						var option = "";
+						$.each(listRecipient, function(i, element){
+							option += "<option value='" + element.name + "'>" + element.name + "</option>"; 
+						});
+						$("#id_recipient").append(option);
+					},
+					error : function(e) {
+						console.log("ERROR: ", e);
+					}
 				});
-					
-			/*]]>*/
+				
+				$('#btnSave, #btnSend').on('click', function() {
+					var status, alertStr;
+					if( $(this).attr('id') == 'btnSave' ) {
+						status = 1;
+						alertStr = "Your request has been saved";
+					}
+					else {
+						status = 5;
+						alertStr = "Your request has been sent";
+					}
+					var createRequestData = $('#createRequestForm').serializeJSON();
+					if(validate("#createRequestForm") == 1) {
+						requestRegistRequest = {
+							"id" : "",
+							"employee_id" : employeeId,
+							"from_time" : createRequestData.from,
+							"to_time" : createRequestData.to,
+							"reason" : createRequestData.reason,
+							"status" : status,
+							"response_message" : "",
+							"day_off_type_id" : getDayOffTypeId(listDayOffType, createRequestData.dayOffType),
+							"recipient_id" : getRecipientNameOrId(listRecipient, createRequestData.recipient),
+							"valid_flag" : "1",
+							"update_date" : ""
+						}
+						console.log(requestRegistRequest);
+						$.ajax({
+							type : "POST",
+							contentType : "application/json",
+							url : "/request/regist",
+							dataType : 'json',
+							data : JSON.stringify(requestRegistRequest),
+							success : function(returnData) {
+							},
+							error : function(e) {
+								console.log("ERROR: ", e);
+							}
+						});
+						
+						$("#createRequestForm :input").not("button, select").val("");
+						$("#createRequestForm select").prop('selectedIndex', 0);
+						alert(alertStr);
+					}
+				});
+			});
+		
+			var employeeId = "1";
+			var listRecipient = [];
+			var listDayOffType;
+			
+			function validate(formId) {
+				var ok = 1;
+				var listInput = $(formId).find(':input').not("button");
+				$.each(listInput, function() {
+					if($(this).val() == "") {
+						ok = 0;
+					}
+// 					if($("#id_to").val() )
+				});
+				if(ok == 0) {
+					alert(errors.incompleteFields);
+				}
+				return ok;
+			}
+				
+		/*]]>*/
 		</script>
 
 		<div>
-			
 			<div th:replace="menu"></div>
-			<div th:replace="fragments/header"></div>
 
 			<div class="requestOffContentBody">
 				<h1 align="center">Create Request</h1>
 				<div class="container-fluid">
 					<div class="row">
-						<h4 class="col-sm-offset-3">Bạn còn 15 ngày nghỉ phép</h4>
+						<h4 class="col-sm-offset-3">Bạn còn <span id="remainHours"></span> ngày nghỉ phép</h4>
 						<form id="createRequestForm" class="col-sm-6 col-sm-offset-3">
 							<div class="form-group">
 								<label>From: </label>
