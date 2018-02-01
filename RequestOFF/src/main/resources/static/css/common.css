@@ -1,1 +1,137 @@
-@CHARSET "ISO-8859-1";
+body {
+	margin: 0;
+    background-color: #f5f8fa;
+} 
+#header{
+	background-color: #3097D1 !important;
+	height: 60px;
+	padding: 5px;
+}
+
+#footer{
+	clear: both;
+	padding: 5px;
+	border-top: 1px solid rgba(0, 0, 0, 0.125);
+	font-size: 12px;
+}
+
+.nav-bar{
+	width:250px; 
+	float:left;
+	background-color: #fff;
+	/* border: 1px solid rgba(0, 0, 0, 0.125);
+	border-radius: 0.25rem; */
+	/* margin-right: 15px; */
+}
+
+.nav-bar > .nav-bar-item{
+	padding: 10px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.nav-bar > .active{
+	background-color: #87CEEB;
+}
+
+.nav-bar > a{
+	cursor: pointer;
+}
+
+.main-body{
+	width:auto; 
+	overflow: hidden;
+	min-height: 800px;
+	background-color: #fff;
+	border-left: 1px solid rgba(0, 0, 0, 0.125);
+	/* border-radius: 0.25rem; */
+	padding: 10px;
+	position: relative;
+}
+
+.header-left  {
+	color: white;
+	width: 200px;
+	float: left;
+}
+
+span.header-title {
+	font-size: 20px;
+	font-weight: bold;
+} 
+
+.header-right  {
+	float: right;
+	color: white;
+	padding: 10px;
+}
+
+.header-right  a {
+	color: white;
+	cursor: pointer;
+}
+
+.form-signin {
+    max-width: 330px;
+    padding: 15px;
+    margin: 0 auto;
+}
+
+.form-signin .form-heading{
+	margin-bottom: 20px;
+	color: #1E90FF;
+	font-weight: bold;
+}
+
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+    margin-bottom: 10px;
+}
+
+.form-signin .checkbox {
+    font-weight: normal;
+}
+
+.form-signin .form-control {
+    position: relative;
+    height: auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.form-signin .form-control:focus {
+    z-index: 2;
+}
+
+.form-signin input {
+    margin-top: 10px;
+}
+
+.form-signin button {
+    margin-top: 10px;
+}
+
+.has-error {
+    color: red
+}
+
+.loading-progress {
+  visibility: hidden;
+  background-color: rgba(255,255,255,0.7);
+  position: absolute;
+  z-index: +100 !important;
+  width: 100%;
+  height:100%;
+}
+
+.loading-progress img {
+  position: relative;
+  top:50%;
+  left:50%;
+}
+
+.center-align{
+	text-align: center;
+}

@@ -1,10 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8"/>
-		<title>Create Request</title>
+		<title>Header</title>
+		<link rel="stylesheet" type="text/css" href="css/layoutStyle.css" />
+		<link rel="stylesheet" type="text/css" href="css/common.css" />
+		<link rel="stylesheet"	type="text/css" href="css/bootstrap.min.css" />
+		<link rel="stylesheet"	type="text/css" href="css/notify.css" />
+		<link rel="stylesheet" type="text/css" href="css/datatables.min.css"/>
+		<script src="javascript/jquery-3.2.1.js"></script>
+		<script src="javascript/bootstrap.min.js"></script>
+		<script src="javascript/jquery.serializejson.js"></script>
+		<script src="javascript/common.js"></script>
+		<script src="javascript/notify.js"></script>
+		<script type="text/javascript" src="javascript/datatables.min.js"></script>
+		<script type="text/javascript" src="javascript/bootstrap-confirmation.min.js"></script>
 	</head>
-	<div th:replace="fragments/header"></div>
 	<body  class="content-body">
 		<script>
 		/*<![CDATA[*/
@@ -108,47 +118,46 @@
 		</script>
 
 		<div>
+			<div th:replace="fragments/header"></div>
 			<div th:replace="menu"></div>
 
 			<div class="requestOffContentBody">
-				<h1 align="center">Create Request</h1>
-				<div class="container-fluid">
-					<div class="row">
-						<h4 class="col-sm-offset-3">Bạn còn <span id="remainHours"></span> ngày nghỉ phép</h4>
-						<form id="createRequestForm" class="col-sm-6 col-sm-offset-3">
-							<div class="form-group">
-								<label>From: </label>
-								<input type="datetime-local" class="form-control" name="from" id="id_from"/>
-							</div>
-							<div class="form-group">
-								<label>To: </label>
-								<input type="datetime-local" class="form-control" name="to" id="id_to"/>
-							</div>
-							<div class="form-group">
-								<label>Reason: </label>
-								<textarea class="form-control" name="reason" id="id_reason"></textarea>
-							</div>
-							<div class="form-group">
-								<label>Day off type: </label>
-								<select class="form-control" name="dayOffType" id="id_dayOffType">
-								</select>
-							</div>
-							<div class="form-group">
-								<label>Send to: </label>
-								<select class="form-control" name="recipient" id="id_recipient">
-								</select>
-							</div>
-							<br/>
-							<div align="center">
-								<button type="button" class="btn btn-primary createRequestFormButton" id="btnSave">Save</button>
-								<button type="button" class="btn btn-primary createRequestFormButton" id="btnSend">Send</button>
-								<button type="button" class="btn btn-primary createRequestFormButton" id="btnCancel">Cancel</button>
-							</div>
-						</form>
-					</div>
+				<h2>Create Request</h2>
+				<div>
+					<h4>Bạn còn <span id="remainHours"></span> ngày nghỉ phép</h4>
+					<form id="createRequestForm" class="form-input">
+						<div class="form-group">
+							<label>From: </label>
+							<input type="datetime-local" class="form-control" name="from" id="id_from"/>
+						</div>
+						<div class="form-group">
+							<label>To: </label>
+							<input type="datetime-local" class="form-control" name="to" id="id_to"/>
+						</div>
+						<div class="form-group">
+							<label>Reason: </label>
+							<textarea class="form-control" name="reason" id="id_reason"></textarea>
+						</div>
+						<div class="form-group">
+							<label>Day off type: </label>
+							<select class="form-control" name="dayOffType" id="id_dayOffType">
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Send to: </label>
+							<select class="form-control" name="recipient" id="id_recipient">
+							</select>
+						</div>
+						<br/>
+						<div>
+							<button type="button" class="btn btn-primary createRequestFormButton" id="btnSave">Save</button>
+							<button type="button" class="btn btn-primary createRequestFormButton" id="btnSend">Send</button>
+							<button type="button" class="btn btn-primary createRequestFormButton" id="btnCancel">Cancel</button>
+						</div>
+					</form>
 				</div>
 			</div>
-<!-- 			<div th:replace="fragments/footer"></div> -->
+			<div th:replace="fragments/footer"></div>
 		</div>
 
 	</body>
