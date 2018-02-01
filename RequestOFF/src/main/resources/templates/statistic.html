@@ -30,11 +30,11 @@
 						$('#department').append('<option value="' + department.id + '">' + department.name + '</option>');
 					});	
 				} else {
-					alert(departmentSearchResponse.status_info.error);
+					$.notify(notification['APIResponseError'](departmentSearchResponse.status_info.error));
 				}
 			},
 			error : function() {
-				alert("error!!!");
+				$.notify(notification['APIResponseError']("connection error"));
 			}
 		});
 		
@@ -55,11 +55,11 @@
 						$('#team').append('<option value="' + team.id + '">' + team.name + '</option>');
 					});	
 				} else {
-					alert(teamSearchResponse.status_info.error);
+					$.notify(notification['APIResponseError'](teamSearchResponse.status_info.error));
 				}
 			},
 			error : function() {
-				alert("error!!!");
+				$.notify(notification['APIResponseError']("connection error"));
 			}
 		});
 		
@@ -93,7 +93,7 @@
 				var fromTime = new Date(searchParam.from_time);
 				var toTime = new Date(searchParam.to_time);
 				if (toTime <= fromTime) {
-					alert (errors.DateError);
+					$.notify(notification['DateError']);
 					return;
 				}
 			}

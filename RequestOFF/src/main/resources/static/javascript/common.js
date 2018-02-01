@@ -3,6 +3,29 @@ var errors = {
 	'incompleteFields': 'Please fill in all fields'
 }
 
+// usage example: $.notify(notification['DateError']);
+//				  $.notify(notification['APIResponseError'](errMsg));
+var notification = {
+	'DateError': {
+		message: 'time of To field must be after From field',
+		status: 'error', // 'default', 'info', 'error', 'warning', 'success'
+		timeout: 3000, // ms
+		pos: 'top-center' // 'top-center','top-right', 'bottom-right', 'bottom-center', 'bottom-left'
+	},'incompleteFields': {
+		message: 'Please fill in all fields',
+		status: 'error',
+		timeout: 3000,
+		pos: 'top-center'
+	},'APIResponseError': function (errMsg) {
+		return {
+			message: '<h5 align = "center">API response error</h5>' + errMsg,
+			status: 'error',
+			timeout: 3000,
+			pos: 'top-center'
+		}
+	}
+}
+
 function getDayOffTypeId(dayOffTypeList, dayOffTypeName) {
 	var id;
 	$.each(dayOffTypeList, function(i, element) {
