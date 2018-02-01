@@ -10,6 +10,7 @@ import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.Team;
 import com.dactech.requestoff.model.request.EmployeeSearchRequest;
 import com.dactech.requestoff.repository.custom.EmployeeRepositoryCustom;
+import com.dactech.requestoff.util.StringUtil;
 
 public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 	@PersistenceContext
@@ -100,25 +101,25 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 	}
 
 	@Override
-	public List<Employee> search(String name, long teamId, long departmentId) {
+	public List<Employee> search(String name, String teamId, String departmentId) {
 		StringBuilder queryString = new StringBuilder(
 				"SELECT * " + "FROM employee e INNER JOIN team_employee te ON te.employee_id = e.id"
 						+ " INNER JOIN team t ON te.team_id = t.id ");
 		StringBuilder whereClause = new StringBuilder("");
 
-		if (name != null && name != "") {
+		if (StringUtil.isNotEmpty(name)) {
 			whereClause.append(" AND e.name like '%" + name + "%'");
 		}
 
-		if (teamId != 0) {
+		if (StringUtil.isNotEmpty(teamId)) {
 			whereClause.append(" AND t.id = '" + teamId + "'");
 		}
 
-		if (departmentId != 0) {
+		if (StringUtil.isNotEmpty(departmentId)) {
 			whereClause.append(" AND t.department_id = '" + departmentId + "'");
 		}
-		
-		whereClause.append(" AND e.valid_flag = '" + 1 + "'");
+
+		whereClause.append(" AND e.valid_flag = '1' AND te.valid_flag = '1' AND t.valid_flag = '1' ");
 
 		if (whereClause.length() > 0) {
 			whereClause.replace(0, 5, " WHERE ");
@@ -127,21 +128,25 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 
 		Query query = entityManager.createNativeQuery(queryString.toString(), Employee.class);
 		List<Employee> employees = query.getResultList(); // list employees without manager
-		
-		
-		if (teamId == 0) { // team ID == 0, select manager
-			StringBuilder managerQueryString = new StringBuilder("SELECT * FROM employee e INNER JOIN department d ON e.id = d.manager_id ");
-			if( departmentId != 0) { // select 1 manager
-				managerQueryString.append("WHERE d.id = " + departmentId);
+
+		if (StringUtil.isEmpty(teamId)) { // if team ID is empty== 0, select manager
+			StringBuilder managerQueryString = new StringBuilder(
+					"SELECT * FROM employee e INNER JOIN department d ON e.id = d.manager_id "
+							+ "WHERE e.valid_flag = '1' AND d.valid_flag = '1' ");
+			if (StringUtil.isNotEmpty(departmentId)) { // select 1 manager
+				managerQueryString.append("AND d.id = " + departmentId + " ");
 			}
-			
+			if (StringUtil.isNotEmpty(name)) {
+				managerQueryString.append(" AND e.name like '%" + name + "%'");
+			}
+
 			query = entityManager.createNativeQuery(managerQueryString.toString(), Employee.class);
 			List<Employee> managers = query.getResultList(); // list employees without manager
 			if (managers != null && managers.size() > 0) {
 				employees.addAll(managers);
 			}
 		}
-		
+
 		return employees;
 	}
 

@@ -20,8 +20,8 @@ public class EmployeeOffStatisticsPagingRequest {
 
 	private String fromTime;
 	private String toTime;
-	private long departmentId;
-	private long teamId;
+	private String departmentId;
+	private String teamId;
 	private String employee;
 
 	public EmployeeOffStatisticsPagingRequest() {
@@ -50,25 +50,18 @@ public class EmployeeOffStatisticsPagingRequest {
 			orders.add(order);
 		}
 		this.setOrders(orders);
-		
+
 		this.setFromTime(request.getParameter("from_time"));
 		this.setToTime(request.getParameter("to_time"));
-		if (request.getParameter("department_id") != null && !request.getParameter("department_id").equals("")) {
-			this.setDepartmentId(Long.parseLong(request.getParameter("department_id")));
-		} else {
-			this.setDepartmentId(0);
-		}
-		if (request.getParameter("team_id") != null && !request.getParameter("team_id").equals("")) {
-			this.setTeamId(Long.parseLong(request.getParameter("team_id")));
-		} else {
-			this.setTeamId(0);
-		}
-		
+		this.setDepartmentId(request.getParameter("department_id"));
+		this.setTeamId(request.getParameter("team_id"));
+
 		this.setEmployee(request.getParameter("employee"));
 	}
 
 	public EmployeeOffStatisticsPagingRequest(String draw, int start, int length, String searchValue,
-			boolean searchRegex, List<PagingColumn> columns, List<PagingOrder> orders) {
+			boolean searchRegex, List<PagingColumn> columns, List<PagingOrder> orders, String fromTime, String toTime,
+			String departmentId, String teamId, String employee) {
 		super();
 		this.draw = draw;
 		this.start = start;
@@ -77,6 +70,11 @@ public class EmployeeOffStatisticsPagingRequest {
 		this.searchRegex = searchRegex;
 		this.columns = columns;
 		this.orders = orders;
+		this.fromTime = fromTime;
+		this.toTime = toTime;
+		this.departmentId = departmentId;
+		this.teamId = teamId;
+		this.employee = employee;
 	}
 
 	public String getDraw() {
@@ -151,19 +149,19 @@ public class EmployeeOffStatisticsPagingRequest {
 		this.toTime = toTime;
 	}
 
-	public long getDepartmentId() {
+	public String getDepartmentId() {
 		return departmentId;
 	}
 
-	public void setDepartmentId(long departmentId) {
+	public void setDepartmentId(String departmentId) {
 		this.departmentId = departmentId;
 	}
 
-	public long getTeamId() {
+	public String getTeamId() {
 		return teamId;
 	}
 
-	public void setTeamId(long teamId) {
+	public void setTeamId(String teamId) {
 		this.teamId = teamId;
 	}
 

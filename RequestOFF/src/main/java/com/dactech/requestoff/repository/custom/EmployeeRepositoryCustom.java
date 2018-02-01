@@ -7,6 +7,6 @@ import com.dactech.requestoff.model.request.EmployeeSearchRequest;
 
 public interface EmployeeRepositoryCustom {
 	public List<Employee> search(EmployeeSearchRequest employeeSearchRequest);
-	public List<Employee> search(String name, long teamId, long departmentId);
+	public List<Employee> search(String name, String teamId, String departmentId);
 	
 }
