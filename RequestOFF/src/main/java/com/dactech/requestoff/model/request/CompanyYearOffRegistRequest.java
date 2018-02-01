@@ -3,13 +3,13 @@ package com.dactech.requestoff.model.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CompanyYearOffRegistRequest {
-	private long id;
+	private String id;
 	@JsonProperty("day_off_reset_flag")
-	private int dayOffResetFlag;
+	private String dayOffResetFlag;
 	@JsonProperty("current_year_flag")
-	private int currentYearFlag;
+	private String currentYearFlag;
 	@JsonProperty("valid_flag")
-	private int validFlag;
+	private String validFlag;
 	@JsonProperty("update_date")
 	private String updateDate;
 
@@ -17,7 +17,7 @@ public class CompanyYearOffRegistRequest {
 		super();
 	}
 
-	public CompanyYearOffRegistRequest(long id, int dayOffResetFlag, int currentYearFlag, int validFlag,
+	public CompanyYearOffRegistRequest(String id, String dayOffResetFlag, String currentYearFlag, String validFlag,
 			String updateDate) {
 		super();
 		this.id = id;
@@ -27,35 +27,35 @@ public class CompanyYearOffRegistRequest {
 		this.updateDate = updateDate;
 	}
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
-	public int getDayOffResetFlag() {
+	public String getDayOffResetFlag() {
 		return dayOffResetFlag;
 	}
 
-	public void setDayOffResetFlag(int dayOffResetFlag) {
+	public void setDayOffResetFlag(String dayOffResetFlag) {
 		this.dayOffResetFlag = dayOffResetFlag;
 	}
 
-	public int getCurrentYearFlag() {
+	public String getCurrentYearFlag() {
 		return currentYearFlag;
 	}
 
-	public void setCurrentYearFlag(int currentYearFlag) {
+	public void setCurrentYearFlag(String currentYearFlag) {
 		this.currentYearFlag = currentYearFlag;
 	}
 
-	public int getValidFlag() {
+	public String getValidFlag() {
 		return validFlag;
 	}
 
-	public void setValidFlag(int validFlag) {
+	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
 	}
 
