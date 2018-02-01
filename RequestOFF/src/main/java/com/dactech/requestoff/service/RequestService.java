@@ -1,10 +1,8 @@
 package com.dactech.requestoff.service;
 
-import com.dactech.requestoff.model.request.RequestDeleteRequest;
 import com.dactech.requestoff.model.request.RequestDetailsRequest;
 import com.dactech.requestoff.model.request.RequestRegistRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
-import com.dactech.requestoff.model.response.RequestDeleteResponse;
 import com.dactech.requestoff.model.response.RequestDetailsResponse;
 import com.dactech.requestoff.model.response.RequestRegistResponse;
 import com.dactech.requestoff.model.response.RequestSearchResponse;
@@ -16,5 +14,4 @@ public interface RequestService {
 	
 	public RequestDetailsResponse details(RequestDetailsRequest requestDetailsRequest);
 	
-	public RequestDeleteResponse delete(RequestDeleteRequest requestDeleteRequest) throws Exception;
 }

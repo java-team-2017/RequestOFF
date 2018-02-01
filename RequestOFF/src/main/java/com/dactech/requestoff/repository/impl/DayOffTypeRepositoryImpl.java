@@ -7,8 +7,10 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import com.dactech.requestoff.model.entity.DayOffType;
+import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.request.DayOffTypeSearchRequest;
 import com.dactech.requestoff.repository.custom.DayOffTypeRepositoryCustom;
+import com.dactech.requestoff.util.StringUtil;
 
 public class DayOffTypeRepositoryImpl implements DayOffTypeRepositoryCustom {
 	@PersistenceContext
@@ -17,39 +19,34 @@ public class DayOffTypeRepositoryImpl implements DayOffTypeRepositoryCustom {
 	@SuppressWarnings({ "unchecked" })
 	@Override
 	public List<DayOffType> search(DayOffTypeSearchRequest dayOffTypeSearchRequest) {
-		boolean whereClause = true;
-		StringBuilder sqlQuery = new StringBuilder("SELECT * FROM day_off_type ");
-
-		if (dayOffTypeSearchRequest.getId() != 0) {
-			sqlQuery.append(" WHERE id = '" + dayOffTypeSearchRequest.getId() + "'");
-			whereClause = false;
+		String sqlQuery = "SELECT * FROM day_off_type";
+		if(StringUtil.isNotEmpty(dayOffTypeSearchRequest.getId())) {
+			sqlQuery += " AND id = " + dayOffTypeSearchRequest.getId();
 		}
-
-		if (dayOffTypeSearchRequest.getName() != null && dayOffTypeSearchRequest.getName() != "") {
-			if (dayOffTypeSearchRequest.getNameMatchStatus() != 1) {
-				String sqlString = whereClause ? " WHERE " : " AND ";
-				sqlQuery.append(sqlString + "name like '%" + dayOffTypeSearchRequest.getName() + "%'");
-				whereClause = false;
-			} else {
-				String sqlString = whereClause ? " WHERE " : " AND ";
-				sqlQuery.append(sqlString + "name = '" + dayOffTypeSearchRequest.getName() + "'");
-				whereClause = false;
+		if(StringUtil.isNotEmpty(dayOffTypeSearchRequest.getName())) {
+			if(StringUtil.isNotEmpty(dayOffTypeSearchRequest.getNameMatchStatus()) 
+					&& dayOffTypeSearchRequest.getNameMatchStatus().equals("1")) {
+				sqlQuery += " AND name = '" + dayOffTypeSearchRequest.getName() + "'";
+			}
+			else {
+				sqlQuery += " AND name like '%" + dayOffTypeSearchRequest.getName() + "%'";
 			}
 		}
-
-		if (dayOffTypeSearchRequest.getPaymentFlag() == 0 || dayOffTypeSearchRequest.getPaymentFlag() == 1) {
-			String sqlString = whereClause ? " WHERE " : " AND ";
-			sqlQuery.append(sqlString + " payment_flag = '" + dayOffTypeSearchRequest.getPaymentFlag() + "'");
-			whereClause = false;
+		if(StringUtil.isNotEmpty(dayOffTypeSearchRequest.getPaymentFlag())) {
+			sqlQuery += " AND payment_flag = " + dayOffTypeSearchRequest.getPaymentFlag();
 		}
-
-		if (dayOffTypeSearchRequest.getValidFlag() == 0 || dayOffTypeSearchRequest.getValidFlag() == 1) {
-			String sqlString = whereClause ? " WHERE " : " AND ";
-			sqlQuery.append(sqlString + "valid_flag = '" + dayOffTypeSearchRequest.getValidFlag() + "'");
+		if(StringUtil.isNotEmpty(dayOffTypeSearchRequest.getValidFlag())) {
+			sqlQuery += " AND valid_flag = " + dayOffTypeSearchRequest.getValidFlag();
 		}
-
-		Query query = entityManager.createNativeQuery(sqlQuery.toString(), DayOffType.class);
-		return query.getResultList();
+		
+		if(sqlQuery.indexOf("AND") >= 0) {
+			sqlQuery = sqlQuery.replaceFirst("AND", "WHERE");
+		}
+		
+		Query query = entityManager.createNativeQuery(sqlQuery, DayOffType.class);
+		
+		List<DayOffType> listDayOffType = query.getResultList();
+		return listDayOffType;
 	}
 
 }

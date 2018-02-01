@@ -7,11 +7,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dactech.requestoff.model.common.StatusInfo;
-import com.dactech.requestoff.model.request.RequestDeleteRequest;
 import com.dactech.requestoff.model.request.RequestDetailsRequest;
 import com.dactech.requestoff.model.request.RequestRegistRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
-import com.dactech.requestoff.model.response.RequestDeleteResponse;
 import com.dactech.requestoff.model.response.RequestDetailsResponse;
 import com.dactech.requestoff.model.response.RequestRegistResponse;
 import com.dactech.requestoff.model.response.RequestSearchResponse;
@@ -62,17 +60,4 @@ public class RequestController {
 		return requestDetailsResponse;
 	}
 	
-	@RequestMapping(value = "/request/delete", method = RequestMethod.POST)
-	public RequestDeleteResponse delete(@RequestBody RequestDeleteRequest requestDeleteRequest) {
-		RequestDeleteResponse requestDeleteResponse = new RequestDeleteResponse();
-		StatusInfo statusInfo = null;
-		try {
-			requestDeleteResponse = requestService.delete(requestDeleteRequest);
-			statusInfo = new StatusInfo(StatusInfo.SUCCESS, null);
-		} catch (Exception e) {
-			statusInfo = new StatusInfo(StatusInfo.ERROR, e.getMessage());
-		}
-		requestDeleteResponse.setStatusInfo(statusInfo);
-		return requestDeleteResponse;
-	}
 }

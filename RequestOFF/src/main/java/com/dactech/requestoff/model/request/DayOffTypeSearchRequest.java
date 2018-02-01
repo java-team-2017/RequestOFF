@@ -3,20 +3,21 @@ package com.dactech.requestoff.model.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DayOffTypeSearchRequest {
-	private long id;
+	private String id;
 	private String name;
 	@JsonProperty("name_match_status")
-	private int nameMatchStatus;
+	private String nameMatchStatus;
 	@JsonProperty("payment_flag_id")
-	private int paymentFlag;
+	private String paymentFlag;
 	@JsonProperty("valid_flag_id")
-	private int validFlag;
+	private String validFlag;
 
 	public DayOffTypeSearchRequest() {
 		super();
 	}
 
-	public DayOffTypeSearchRequest(long id, String name, int nameMatchStatus, int paymentFlag, int validFlag) {
+	public DayOffTypeSearchRequest(String id, String name, String nameMatchStatus, String paymentFlag,
+			String validFlag) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -25,11 +26,11 @@ public class DayOffTypeSearchRequest {
 		this.validFlag = validFlag;
 	}
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -41,27 +42,27 @@ public class DayOffTypeSearchRequest {
 		this.name = name;
 	}
 
-	public int getNameMatchStatus() {
+	public String getNameMatchStatus() {
 		return nameMatchStatus;
 	}
 
-	public void setNameMatchStatus(int nameMatchStatus) {
+	public void setNameMatchStatus(String nameMatchStatus) {
 		this.nameMatchStatus = nameMatchStatus;
 	}
 
-	public int getPaymentFlag() {
+	public String getPaymentFlag() {
 		return paymentFlag;
 	}
 
-	public void setPaymentFlag(int paymentFlag) {
+	public void setPaymentFlag(String paymentFlag) {
 		this.paymentFlag = paymentFlag;
 	}
 
-	public int getValidFlag() {
+	public String getValidFlag() {
 		return validFlag;
 	}
 
-	public void setValidFlag(int validFlag) {
+	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
 	}
 
