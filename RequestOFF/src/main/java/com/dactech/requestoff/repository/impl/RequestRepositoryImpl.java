@@ -10,6 +10,7 @@ import com.dactech.requestoff.model.entity.Request;
 import com.dactech.requestoff.model.request.RequestDetailsRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
 import com.dactech.requestoff.repository.custom.RequestRepositoryCustom;
+import com.dactech.requestoff.util.StringUtil;
 
 public class RequestRepositoryImpl implements RequestRepositoryCustom {
 	@PersistenceContext
@@ -20,43 +21,43 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		StringBuilder queryString = new StringBuilder("SELECT * FROM request ");
 		StringBuilder whereClause = new StringBuilder("");
 
-		if (requestSearchRequest.getId() != 0) {
+		if (StringUtil.isNotEmpty(requestSearchRequest.getId())) {
 			whereClause.append(" AND id = '" + requestSearchRequest.getId() + "'");
 		}
 
-		if (requestSearchRequest.getEmployeeId() != 0) {
+		if (StringUtil.isNotEmpty(requestSearchRequest.getEmployeeId())) {
 			whereClause.append(" AND employee_id = '" + requestSearchRequest.getEmployeeId() + "'");
 		}
 
-		if (requestSearchRequest.getReason() != null && requestSearchRequest.getReason() != "") {
+		if (StringUtil.isNotEmpty(requestSearchRequest.getReason())) {
 			whereClause.append(" AND reason like '%" + requestSearchRequest.getReason() + "%'");
 		}
 
-		if (requestSearchRequest.getStatus() != 0) {
+		if (StringUtil.isNotEmpty(requestSearchRequest.getStatus())) {
 			whereClause.append(" AND status = '" + requestSearchRequest.getStatus() + "'");
 		}
 
-		if (requestSearchRequest.getResponseMessage() != null && requestSearchRequest.getResponseMessage() != "") {
+		if (StringUtil.isNotEmpty(requestSearchRequest.getResponseMessage())) {
 			whereClause.append(" AND response_message like '%" + requestSearchRequest.getResponseMessage() + "%'");
 		}
 
-		if (requestSearchRequest.getDayOffTypeId() != 0) {
+		if (StringUtil.isNotEmpty(requestSearchRequest.getDayOffTypeId())) {
 			whereClause.append(" AND day_off_type_id = '" + requestSearchRequest.getDayOffTypeId() + "'");
 		}
 
-		if (requestSearchRequest.getRecipientId() != 0) {
+		if (StringUtil.isNotEmpty(requestSearchRequest.getRecipientId())) {
 			whereClause.append(" AND recipient_id = '" + requestSearchRequest.getRecipientId() + "'");
 		}
 
-		if (requestSearchRequest.getFromTime() != null && requestSearchRequest.getFromTime() != "") {
+		if (StringUtil.isNotEmpty(requestSearchRequest.getFromTime())) {
 			whereClause.append(" AND to_time >= '" + requestSearchRequest.getFromTime() + "'");
 		}
 
-		if (requestSearchRequest.getToTime() != null && requestSearchRequest.getToTime() != "") {
+		if (StringUtil.isNotEmpty(requestSearchRequest.getToTime())) {
 			whereClause.append(" AND from_time <= '" + requestSearchRequest.getToTime() + "'");
 		}
 
-		if (requestSearchRequest.getValidFlag() != 0) {
+		if (StringUtil.isNotEmpty(requestSearchRequest.getValidFlag())) {
 			whereClause.append(" AND valid_flag = '" + requestSearchRequest.getValidFlag() + "'");
 		}
 

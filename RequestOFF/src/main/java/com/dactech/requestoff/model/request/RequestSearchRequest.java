@@ -3,30 +3,30 @@ package com.dactech.requestoff.model.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RequestSearchRequest {
-	private long id;
+	private String id;
 	@JsonProperty("employee_id")
-	private long employeeId;
+	private String employeeId;
 	@JsonProperty("from_time")
 	private String fromTime;
 	@JsonProperty("to_time")
 	private String toTime;
 	private String reason;
-	private long status;
+	private String status;
 	@JsonProperty("response_message")
 	private String responseMessage;
 	@JsonProperty("day_off_type_id")
-	private long dayOffTypeId;
+	private String dayOffTypeId;
 	@JsonProperty("recipient_id")
-	private long recipientId;
+	private String recipientId;
 	@JsonProperty("valid_flag")
-	private long validFlag;
+	private String validFlag;
 
 	public RequestSearchRequest() {
 		super();
 	}
 
-	public RequestSearchRequest(long id, long employeeId, String fromTime, String toTime, String reason, long status,
-			String responseMessage, long dayOffTypeId, long recipientId, long validFlag) {
+	public RequestSearchRequest(String id, String employeeId, String fromTime, String toTime, String reason,
+			String status, String responseMessage, String dayOffTypeId, String recipientId, String validFlag) {
 		super();
 		this.id = id;
 		this.employeeId = employeeId;
@@ -40,19 +40,19 @@ public class RequestSearchRequest {
 		this.validFlag = validFlag;
 	}
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
-	public long getEmployeeId() {
+	public String getEmployeeId() {
 		return employeeId;
 	}
 
-	public void setEmployeeId(long employeeId) {
+	public void setEmployeeId(String employeeId) {
 		this.employeeId = employeeId;
 	}
 
@@ -80,11 +80,11 @@ public class RequestSearchRequest {
 		this.reason = reason;
 	}
 
-	public long getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(long status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 
@@ -96,27 +96,27 @@ public class RequestSearchRequest {
 		this.responseMessage = responseMessage;
 	}
 
-	public long getDayOffTypeId() {
+	public String getDayOffTypeId() {
 		return dayOffTypeId;
 	}
 
-	public void setDayOffTypeId(long dayOffTypeId) {
+	public void setDayOffTypeId(String dayOffTypeId) {
 		this.dayOffTypeId = dayOffTypeId;
 	}
 
-	public long getRecipientId() {
+	public String getRecipientId() {
 		return recipientId;
 	}
 
-	public void setRecipientId(long recipientId) {
+	public void setRecipientId(String recipientId) {
 		this.recipientId = recipientId;
 	}
 
-	public long getValidFlag() {
+	public String getValidFlag() {
 		return validFlag;
 	}
 
-	public void setValidFlag(long validFlag) {
+	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
 	}
 
