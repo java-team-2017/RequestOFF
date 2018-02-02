@@ -139,8 +139,7 @@ span.header-title {
 
 #navbarMenu {
 	border-radius: none;
-	background-color: #fff;
-	border-right: 1px solid rgba(0, 0, 0, 0.125);	
+	background-color: #fff;	
 }
 
 #navbarOfMe {
@@ -159,8 +158,20 @@ span.header-title {
 .requestOffContentBody{
 	padding-left: 20px;
 	padding-right: 10px;
+	border-left: 1px solid rgba(0, 0, 0, 0.125);
+	min-height: 800px;
 }
 
 .form-input{
 	width: 600px;
+}
+
+.requestOffMenu{
+	width: 15%;
+	float: left;
+}
+
+footer {
+	padding: 10px;
+	border-top: 1px solid rgba(0, 0, 0, 0.125);
 }
