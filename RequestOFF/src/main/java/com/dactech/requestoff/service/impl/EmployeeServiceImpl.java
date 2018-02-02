@@ -259,4 +259,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 		response.setListEmployeeStatistics(truncatedList);
 		return response;
 	}
+
+	@Override
+	public Employee findByEmail(String email) {
+		return employeeRepository.findByEmail(email);
+	}
 }

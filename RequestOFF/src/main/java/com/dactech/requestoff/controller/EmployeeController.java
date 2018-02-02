@@ -11,17 +11,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dactech.requestoff.model.common.StatusInfo;
+import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.request.EmployeeDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatisticsPagingRequest;
-import com.dactech.requestoff.model.request.EmployeeOffStatisticsRequest;
 import com.dactech.requestoff.model.request.EmployeeRegistRequest;
 import com.dactech.requestoff.model.request.EmployeeSearchRequest;
+import com.dactech.requestoff.model.request.GetUserRequest;
 import com.dactech.requestoff.model.response.EmployeeDetailsResponse;
 import com.dactech.requestoff.model.response.EmployeeOffStatisticsPagingResponse;
-import com.dactech.requestoff.model.response.EmployeeOffStatisticsResponse;
 import com.dactech.requestoff.model.response.EmployeeRegistResponse;
 import com.dactech.requestoff.model.response.EmployeeSearchResponse;
+import com.dactech.requestoff.model.response.GetUserResponse;
 import com.dactech.requestoff.service.EmployeeService;
+import com.dactech.requestoff.util.AuthenticationUtil;
 
 @RestController
 public class EmployeeController {
@@ -83,4 +85,20 @@ public class EmployeeController {
 		return response;
 	}
 
+	@RequestMapping(value = "/employee/getUser", method = RequestMethod.POST)
+	GetUserResponse getUser(@RequestBody GetUserRequest getUserRequest) {
+		GetUserResponse response = new GetUserResponse();
+		try {
+			String email = AuthenticationUtil.getCurrentUserEmail();
+			Employee user = employeeService.findByEmail(email);
+			if (user == null) {
+				throw new Exception("Anonymous user");
+			}
+			response.setUser(user);
+			response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
+		} catch (Exception e) {
+			response.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
+		}
+		return response;
+	}
 }

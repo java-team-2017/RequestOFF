@@ -1,5 +1,6 @@
 package com.dactech.requestoff.service;
 
+import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.request.EmployeeDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatisticsPagingRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatisticsRequest;
@@ -19,4 +20,6 @@ public interface EmployeeService {
 	EmployeeSearchResponse employeeSearch(EmployeeSearchRequest employeeSearchRequest);
 
 	EmployeeDetailsResponse employeeDetails(EmployeeDetailsRequest employeeDetailsRequest);
+	
+	public Employee findByEmail(String email);
 }
