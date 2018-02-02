@@ -1,0 +1,31 @@
+#requestHistoryTable {
+	margin-top: 3px; /* make space between table and pagination */
+}
+
+.customButton {
+	width: 100px;
+}
+
+.requestHistoryFormButton {
+	margin: 0px 20px;
+}
+
+#requestHistoryForm {
+	margin-bottom: 20px;
+}
+
+.idCell, .editCell, .deleteCell {
+	width: 5%;
+}
+
+.employeeCell {
+	width: 15%;
+}
+
+.fromCell, .toCell {
+	width: 15%;
+}
+
+.pleaseFillIn {
+	background-color: moccasin;
+}

@@ -85,7 +85,13 @@ function renderRemainHours(employeeId, containerId) {
 			"employee_id" : employeeId
 		}),
 		success : function(returnData) {
-			$("#" + containerId).html(returnData.employee_off_status.remainHours);
+			var remainHours = parseInt(returnData.employee_off_status.remainHours)
+			if(remainHours < 2) {
+				$("#" + containerId).html(returnData.employee_off_status.remainHours + " hour");
+			}
+			else {
+				$("#" + containerId).html(returnData.employee_off_status.remainHours + " hours");
+			}
 		},
 		error : function(e) {
 			console.log("ERROR: ", e);
