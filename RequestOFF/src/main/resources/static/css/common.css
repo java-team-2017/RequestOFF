@@ -135,3 +135,31 @@ span.header-title {
 .center-align{
 	text-align: center;
 }
+
+
+#navbarMenu {
+	border-radius: none;
+	background-color: #fff;
+	border-right: 1px solid rgba(0, 0, 0, 0.125);	
+}
+
+#navbarOfMe {
+	padding: 0;
+}
+
+#navbarOfMe > ul > li {
+	width: 100%;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+#navbarOfMe > ul > li > a{
+	line-height: 15px;
+}
+
+.requestOffContentBody{
+	padding-left: 20px;
+}
+
+.form-input{
+	width: 600px;
+}
