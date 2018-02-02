@@ -123,17 +123,24 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public EmployeeOffStatisticsPagingResponse employeeOffStatisticsPaging(
 			EmployeeOffStatisticsPagingRequest eospRequest) throws Exception {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-		String requestFromTimeStr = eospRequest.getFromTime().equals("") ? "2000-01-01T01:00"
+		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy HH");
+		
+		String requestFromTimeStr = eospRequest.getFromTime().equals("") ? "01/01/2000 08"
 				: eospRequest.getFromTime();
-		Date requestFromTime = formatter.parse(requestFromTimeStr);
+		Date requestFromTime = formatter.parse(requestFromTimeStr + " 08");
+		
 		Date requestToTime;
 		if (eospRequest.getToTime().equals("")) {
-			requestToTime = Calendar.getInstance().getTime();
+			Calendar cal = Calendar.getInstance();
+			cal.set(Calendar.HOUR_OF_DAY, 17);
+			requestToTime = cal.getTime();
 		} else {
-			requestToTime = formatter.parse(eospRequest.getToTime());
+			requestToTime = formatter.parse(eospRequest.getToTime() + " 17");
 		}
-
+		
+		System.out.println(requestFromTime);
+		System.out.println(requestToTime);
+		
 		// get list employee from database with name, team and department
 		List<Employee> listEmployee = employeeRepository.search(eospRequest.getEmployee(), eospRequest.getTeamId(),
 				eospRequest.getDepartmentId());
@@ -248,6 +255,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 					returnNumber = (int) (dir * (o1.getTimeOffWithPaying() - o2.getTimeOffWithPaying()));
 				} else if (colData.equals("timeOffWithoutPaying")) {
 					returnNumber = (int) (dir * (o1.getTimeOffWithoutPaying() - o2.getTimeOffWithoutPaying()));
+				} else if (colData.equals("employee.listEmployeeOffStatus[0].remainHours")) {
+					long remainHours1 = o1.getEmployee().getListEmployeeOffStatus().get(0).getRemainHours();
+					long remainHours2 = o2.getEmployee().getListEmployeeOffStatus().get(0).getRemainHours();
+					returnNumber = (int) (dir * (remainHours1 - remainHours2));
 				} else { // sort by id is default
 					returnNumber = (int) (dir * (o1.getEmployee().getId() - o2.getEmployee().getId()));
 				}

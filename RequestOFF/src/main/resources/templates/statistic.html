@@ -4,9 +4,11 @@
 		<title>Header</title>
 		<link rel="stylesheet" type="text/css" href="css/layoutStyle.css" />
 		<link rel="stylesheet" type="text/css" href="css/common.css" />
+		<link rel="stylesheet" type="text/css" href="css/createRequestStyle.css" />
 		<link rel="stylesheet"	type="text/css" href="css/bootstrap.min.css" />
 		<link rel="stylesheet"	type="text/css" href="css/notify.css" />
 		<link rel="stylesheet" type="text/css" href="css/datatables.min.css"/>
+		<link rel="stylesheet" type="text/css" href="css/bootstrap-datepicker.min.css"/>
 		<script src="javascript/jquery-3.2.1.js"></script>
 		<script src="javascript/bootstrap.min.js"></script>
 		<script src="javascript/jquery.serializejson.js"></script>
@@ -14,9 +16,10 @@
 		<script src="javascript/notify.js"></script>
 		<script type="text/javascript" src="javascript/datatables.min.js"></script>
 		<script type="text/javascript" src="javascript/bootstrap-confirmation.min.js"></script>
+		<script type="text/javascript" src="javascript/bootstrap-datepicker.min.js"></script>
 	</head>
 
-<script type="text/javascript">
+<script th:inline="javascript">
 //<![CDATA[ 
 	$(function() {
 		//=====================================================================
@@ -27,7 +30,7 @@
 		
 		//Department combobox
 		$.ajax({
-			url : "/department/search",
+			url : /*[[@{/department/search}]]*/,
 			type : "post",
 			dataType :"json",
 			contentType : "application/json",
@@ -52,7 +55,7 @@
 		
 		//Team combobox
 		$.ajax({
-			url : "/team/search",
+			url : /*[[@{/team/search}]]*/,
 			type : "post",
 			dataType :"json",
 			contentType : "application/json",
@@ -104,7 +107,7 @@
 			if (searchParam.from_time != "" && searchParam.to_time != "") {
 				var fromTime = new Date(searchParam.from_time);
 				var toTime = new Date(searchParam.to_time);
-				if (toTime <= fromTime) {
+				if (toTime < fromTime) {
 					$.notify(notification['DateError']);
 					return;
 				}
@@ -117,7 +120,7 @@
 				searching: false,
 // 				pageLength: 2,
 				ajax: {
-					'url' : "/employee/statisticsPaging",
+					'url' : /*[[@{/employee/statisticsPaging}]]*/,
 					'type': "POST",
 					'data': function (data) {
 						$.each(searchParam, function (field, val) {
@@ -136,7 +139,7 @@
 							if(typeof(row.employee.listTeam[0]) == "undefined") {
 								data = row.employee.department.name;
 							}
-							return data;	
+							return data;
 						}
 					},
 					{
@@ -145,12 +148,24 @@
 							if(typeof(row.employee.listTeam[0]) == "undefined") {
 								data = "";
 							}
-							return data;	
+							return data;
 						}
 					},
 					{ data: 'employee.position.name' },
 					{ data: 'timeOffWithPaying' },
 					{ data: 'timeOffWithoutPaying' },
+					{
+						data: 'employee.listEmployeeOffStatus[0].remainHours',
+						render: function (data, type, row){
+							if (type == 'display' || type == 'filter') { // for display and search
+								if (data == "") data = 0;
+								return Math.round(data/8) + " days (" + data + " h)";
+							} else { // for sort and type detection
+								if (data == "") return 0;
+								return data;
+							}
+						}
+					}
 				]
 			});
 		});
@@ -158,7 +173,8 @@
 		$('#statisticsTable tbody').on('click', 'tr', function() {
 			var statisticsTable = $('#statisticsTable').DataTable();
 			var statisticsObj = statisticsTable.row(this).data();
-			
+			console.log("row data:");
+			console.log(statisticsObj);
 			
 			$('#detailEmployee').val(statisticsObj.employee.name);
 			$('#detailPosition').val(statisticsObj.employee.position.name);
@@ -173,6 +189,9 @@
 			
 			$('#detailWithPaying').val(statisticsObj.timeOffWithPaying);
 			$('#detailWithoutPaying').val(statisticsObj.timeOffWithoutPaying);
+			var remainHours = statisticsObj.employee.listEmployeeOffStatus[0].remainHours;
+			$('#detailRemainDay').val(Math.round(remainHours/8) + " day (" + remainHours + " h)");
+			
 			
 			$('#withPayingTable').DataTable({
 				destroy: true,
@@ -180,12 +199,15 @@
 				info: false,
 				lengthChange: false,
 				paging: false,
+// 				scrollY: '200px',
+// 				"scrollCollapse": true,
 				data: statisticsObj.listRequestWithPaying,
 				columns: [
 					{ data: 'fromTime' },
 					{ data: 'toTime' },
 				]
 			});
+			
 			$('#withoutPayingTable').DataTable({
 				destroy: true,
 				searching: false,
@@ -210,7 +232,34 @@
 			});
 		});
 		
-	});	
+		$("#editRemainHours").on('click', function() {
+			$("#okRemainHours").show();
+			$("#cancelRemainHours").show();
+			$("#editRemainHours").hide();
+			$('#detailRemainDay').attr('readOnly', false);
+			$('#detailRemainDay').attr('placeholder', $('#detailRemainDay').val());
+			$('#detailRemainDay').val("");
+			alert("undone function");
+		});
+		
+		$("#okRemainHours").on('click', function() {
+			$("#okRemainHours").hide();
+			$("#cancelRemainHours").hide();
+			$("#editRemainHours").show();
+			$('#detailRemainDay').attr('readOnly', true);
+			alert("undone function");
+		});
+		
+		$("#cancelRemainHours").on('click', function() {
+			$("#okRemainHours").hide();
+			$("#cancelRemainHours").hide();
+			$("#editRemainHours").show();
+			$('#detailRemainDay').attr('readOnly', true);
+			$('#detailRemainDay').val($('#detailRemainDay').attr('placeholder'));
+			alert("undone function");
+		});
+		
+	});
 //]]>
 </script>
 
@@ -220,15 +269,29 @@
 	<div class="requestOffContentBody">
 		<div>
 			<h2>Request Off Statistics</h2>
+			<div id="alertMessage" class="alert" style="display:none;">
+			</div>
 			<form id="searchForm" class="form-input">
 				<div class="form-group">
 					<label>From</label>
-					<input id="fromTime" name="from_time" class="form-control" type="datetime-local" val=""/>
+<!-- 					<input id="fromTime" name="from_time" class="form-control" type="datetime-local" val=""/> -->
+					<div class="input-group date datepicker" data-provide="datepicker">
+						<input id="fromTime" name="from_time" type="text" class="form-control" />
+						<div class="input-group-addon">
+							<span class="glyphicon glyphicon-th"></span>
+						</div>
+					</div>
 				</div>
 				
 				<div class="form-group">
 					<label>To</label>
-					<input id="toTime" name="to_time" class="form-control" type="datetime-local"/>
+<!-- 					<input id="toTime" name="to_time" class="form-control" type="datetime-local"/> -->
+					<div class="input-group date datepicker" data-provide="datepicker">
+						<input id="toTime" name="to_time" type="text" class="form-control" />
+						<div class="input-group-addon">
+							<span class="glyphicon glyphicon-th"></span>
+						</div>
+					</div>
 				</div>
 				
 				<div class="form-group">
@@ -253,15 +316,24 @@
 			</form>
 			
 			<table id="statisticsTable" class="table table-striped table-bordered table-hover table-condensed text-center" style="word-wrap: break-word; margin-top: 4em;">
+				<col width="3%"/>
+  				<col width="15%"/>
+  				<col width="10%"/>
+  				<col width="10%"/>
+  				<col width="10%"/>
+  				<col width="20%"/>
+  				<col width="20%"/>
+  				<col width="12%"/>
 				<thead>
 					<tr>
-						<th class="col-md-1 text-center">ID</th>
-						<th class="col-md-3 text-center">Name</th>
-						<th class="col-md-2 text-center">Department</th>
-						<th class="col-md-2 text-center">Team</th>
-						<th class="col-md-2 text-center">Position</th>
-						<th class="col-md-1 text-center">Day Off with Paying</th>
-						<th class="col-md-1 text-center align-middle">Day Off without Paying</th>
+						<th class="text-center">ID</th>
+						<th class="text-center">Name</th>
+						<th class="text-center">Department</th>
+						<th class="text-center">Team</th>
+						<th class="text-center">Position</th>
+						<th class="text-center">Time Off with Paying</th>
+						<th class="text-center align-middle">Time Off without Paying</th>
+						<th class="text-center align-middle">Remain Days</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -298,18 +370,29 @@
 							</div>
 						</div>
 						<div class="row">
-							<label class="col-sm-3 col-form-label">Time Off With Paying (hours)</label>
+							<label class="col-sm-3 col-form-label">Time Off With Paying</label>
 							<div class="col-sm-3">
 								<input id="detailWithPaying" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
 							</div>
-							<label class="col-sm-3 col-form-label">Time Off Without Paying (hours)</label>
+							<label class="col-sm-3 col-form-label">Time Off Without Paying</label>
 							<div class="col-sm-3">
 								<input id="detailWithoutPaying" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
 							</div>
 						</div>
 						<div class="row">
+							<label class="col-sm-3 col-form-label">Remain Off Days</label>
+							<div class="col-sm-3">
+								<input id="detailRemainDay" class="form-control" type="text" readonly="readonly"></input>
+							</div>
+							<div class="col-sm-6">
+								<button type="button" id="editRemainHours" class="btn btn-primary">Edit Remain Hours</button>
+								<button type="button" id="okRemainHours" class="btn btn-primary" style="display:none;">OK</button>
+								<button type="button" id="cancelRemainHours" class="btn btn-primary" style="display:none;">Cancel</button>
+							</div>
+						</div>
+						<div class="row">
 							<div class="col-md-6">
-								<table id="withPayingTable" class="table table-bordered table-hover" style="table-layout: fixed; width: 100%;">
+								<table id="withPayingTable" class="table table-bordered table-hover" style="width: 100%;">
 									<caption>Day Off with Paying</caption>
 									<thead>
 										<tr>
@@ -322,8 +405,8 @@
 								</table>
 							</div>
 							<div class="col-md-6">
-								<table id="withoutPayingTable" class="table table-bordered table-hover" style="table-layout: fixed; width: 100%;">
-									<caption>Day Off with Paying</caption>
+								<table id="withoutPayingTable" class="table table-bordered table-hover" style="width: 100%;">
+									<caption>Day Off without Paying</caption>
 									<thead>
 										<tr>
 											<th class="col-md-6 text-center">From</th>
