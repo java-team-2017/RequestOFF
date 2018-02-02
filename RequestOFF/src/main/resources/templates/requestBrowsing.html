@@ -6,6 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="css/common.css" />
 	<link rel="stylesheet"	type="text/css" href="css/bootstrap.min.css" />
 	<link rel="stylesheet"	type="text/css" href="css/notify.css" />
+	<link rel="stylesheet" type="text/css" href="css/bootstrap-datepicker.min.css"/>
 	<link rel="stylesheet" type="text/css" href="css/datatables.min.css"/>
 	<script src="javascript/jquery-3.2.1.js"></script>
 	<script src="javascript/bootstrap.min.js"></script>
@@ -14,106 +15,36 @@
 	<script src="javascript/notify.js"></script>
 	<script type="text/javascript" src="javascript/datatables.min.js"></script>
 	<script type="text/javascript" src="javascript/bootstrap-confirmation.min.js"></script>
+	<script type="text/javascript" src="javascript/bootstrap-datepicker.min.js"></script>
 </head>
 <body class="content-body">
-
-	<script>
+	<script th:inline="javascript">
 	/*<![CDATA[*/
-		var user;
-		
-		$.ajax({
-			type : "post",
-			contentType : "application/json",
-			url : "/employee/getUser",
-			data : JSON.stringify({}),
-			dataType : 'json',
-			success : function(data) {
-				user = data.user;
-				console.log("user : ");
-				console.log(user);
-			},
-				error : function() {
-					alert("Error");
-				}
-		});
-	
-		function updateRequest(requestObj) {
-			$.ajax({
-				type : "POST",
-				contentType : "application/json",
-				url : "/request/regist",
-				dataType : 'json',
-				data : JSON.stringify(requestObj),
-				success : function(resultData) {
-					search();
-				},
-				error : function() {
-					console.log("Error");
-				}
-			});
-		}
-		
-		function search(){
-			var requestData = $('#requestForm').serializeJSON();
-	// 			console.log(requestData);
+		var employeeLoginId;
+		$(function() {
+			var objReturnRequestDetails;
+			var listRequest;
+			var requestStatus = {
+				'1' : 'Saved',
+				'2' : 'Approved',
+				'3' : 'Denied',
+				'4' : 'Responded',
+				'5' : 'Waiting'
+			};
+			
 			$.ajax({
 				type : "post",
 				contentType : "application/json",
-				url : "/request/search",
-				data : JSON.stringify(requestData),
+				url : /*[[@{/employee/getUser}]]*/,
+				data : JSON.stringify({}),
 				dataType : 'json',
 				success : function(data) {
-					listRequest = data.requests;
-				$('#requestTable').DataTable( {
-						destroy: true,
-						searching: false,
-						data: listRequest,
-						columns: [
-							{ data: 'id' },
-							{ data: 'employee.name' },
-							{ data: 'fromTime' },
-							{ data: 'toTime' },
-							{ data: 'reason' },
-							{
-								render: function () {
-									return '<input type="checkbox" class="editor-active" >';
-								},
-							},{
-								render: function () {
-									return '<a href="#" class="btnApprove"><span class="glyphicon glyphicon-ok"></span></a>';
-								},
-							},{
-								render: function () {
-									return '<a href="#" class="btnDeny"><span class="glyphicon glyphicon-remove"></span></a>';
-								},
-							}
-						]
-					});
-					if(requestData.status != 5){
-						var table = $('#requestTable').DataTable();
-						table.column(5).visible(false);
-						table.column(6).visible(false);
-						table.column(7).visible(false);
-					}
+					employeeLoginId = data.user.id;
 				},
-					error : function() {
-						alert("Error");
-					}
+				error : function() {
+					alert("Error");
+				}
 			});
-			
-		}
-		
-		$(function() {
-			var objReturnRequestDetails;
-	// 		objRequestDetails.id = $(this).closest('tr').find('td:first').text();
-			var listRequest;
-			var requestStatus = {
-				'1' : 'saved',
-				'2' : 'approved',
-				'3' : 'denied',
-				'4' : 'response',
-				'5' : 'waiting'
-			};
 			
 			$('#btnSearch').on('click', function(){
 				search();
@@ -134,30 +65,29 @@
 					$('#toTimeDetails').val(rowData.toTime);
 					$('#reasonDetails').val(rowData.reason);
 					$('#statusDetails').val(requestStatus[rowData.status]);
+					$('#statusDetailsId').val(rowData.status);
 					$('#dayOffTypeDetails').val(rowData.dayOffType.name);
 					$('#responseMessage').val(rowData.responseMessage);
 					
-	// 				console.log(rowData);
 					var listForward = []; 
-					if (rowData.recipient.position.name == 'leader') {
+					
+					if (rowData.recipient.position.id == 2) {
 						listForward.push(rowData.recipient.team.department.manager);
-					} else if (rowData.recipient.position.name == 'project manager'){
+					} else if (rowData.recipient.position.id == 3){
 						$.each(rowData.recipient.department.listTeam, function (index, team) {
 							listForward.push(team.leader);
 						})
-					} else {
-						console.log("recipient is a employee");
 					}
 					$('#forward').empty();
 					$.each(listForward, function(index, recipient) {
 						$('#forward').append('<option value = "' + recipient.id + '">' + recipient.name + '</option>');
 					});
 					
-		 			if($('#statusDetails').val() == 'approved' || $('#statusDetails').val() == 'denied'){
+					if($('#statusDetailsId').val() != 5){
 						$('#btnApproveModal').prop('disabled', true);
 						$('#btnDenyModal').prop('disabled', true);
 						$('#btnSendModal').prop('disabled', true);
-					} else if($('#statusDetails').val() == 'waiting'){
+					} else {
 						$('#btnApproveModal').prop('disabled', false);
 						$('#btnDenyModal').prop('disabled', false);
 						$('#btnSendModal').prop('disabled', false);
@@ -174,21 +104,13 @@
 				}
 	// 			console.log($(this).attr('id'));
 	// 			console.log(requestObj);
-				if(requestObj == 2 || requestObj == 3){
-					 $('#chk').attr('disabled', true);
-				}
-				$('#requestTable input[type="checkbox"]').each(function(){
-					if ($(this).is(":checked")) {
+				$('#requestTable input[type="checkbox"]:checked').each(function(){
 						var table = $('#requestTable').DataTable();
 						var rowData = table.row($(this).parent()).data();
 						
 						requestObj.id = rowData.id;
 						requestObj.update_date = rowData.updateDate;
-	// 					console.log("row");
-	// 					console.log(rowData);
-	// 					console.log(requestObj);
 						updateRequest(requestObj);
-					}
 				});
 			});
 			
@@ -216,8 +138,7 @@
 	// 			if($('#statusDetails').val(data.request.status) == 2 ){
 	// 				$('#btnApproveModal').attr('disabled','disabled');
 	// 			}
-				var element = document.getElementById("forward");
-				var selectedValue = element.options[element.selectedIndex].value;
+				var selectedValue = $("#forward").val();
 				if ($(this).attr('id') == 'btnApproveModal') {
 					requestObj.status = 2;
 				} else if ($(this).attr('id') == 'btnDenyModal') {
@@ -225,16 +146,82 @@
 				} else if ($(this).attr('id') == 'btnSendModal') {
 					requestObj.status = 5;
 				} else if ($(this).attr('id') == 'btnForward') {
-					if(objReturnRequestDetails.recipient.position.name == 'project manager'){
-						requestObj.recipient_id = selectedValue;
-					} else if(objReturnRequestDetails.recipient.position.name == 'leader'){
-						requestObj.recipient_id = selectedValue;
-					}
+					requestObj.recipient_id = selectedValue;
 				}
 				requestObj.response_message = $('#responseMessage').val();
 				updateRequest(requestObj);
 			});
 		});
+		
+		function updateRequest(requestObj) {
+			$.ajax({
+				type : "POST",
+				contentType : "application/json",
+				url : /*[[@{/request/regist}]]*/,
+				dataType : 'json',
+				data : JSON.stringify(requestObj),
+				success : function(resultData) {
+					search();
+				},
+				error : function() {
+					console.log("Error");
+				}
+			});
+		}
+		
+		function search(){
+			var requestData = $('#requestForm').serializeJSON();
+// 				console.log(requestData);
+			$('#requestTable').DataTable( {
+				ajax: {
+					type: "POST",
+					contentType: "application/json",
+					url : /*[[@{/request/search}]]*/,
+					dataType : 'json',
+					data: function () {
+						return JSON.stringify({"recipient_id": employeeLoginId});
+// 						console.log(requestData);
+					},
+					dataSrc: 'requests'
+				},
+				destroy: true,
+				searching: false,
+				//data: listRequest,
+				columns: [
+					{
+						render: function () {
+							return '<input type="checkbox" class="editor-active" >';
+						},
+					},
+					{ data: 'id' },
+					{ data: 'employee.name' },
+					{ data: 'fromTime' },
+					{ data: 'toTime' },
+					{ data: 'reason' },
+					{
+						render: function () {
+							return '<a href="#" class="btnApprove"><span class="glyphicon glyphicon-ok"></span></a>';
+						},
+					},{
+						render: function () {
+							return '<a href="#" class="btnDeny"><span class="glyphicon glyphicon-remove"></span></a>';
+						},
+					}
+				]
+			});
+			
+			
+			
+// 			console.log("status: ");
+// 			console.log(requestData.status);
+// 			if(requestData.status != 5){
+// // 				var table = $('#requestTable').DataTable();
+// 				$("input[type='checkbox']").prop("disabled", true);
+// // 				table.column(5).prop("disabled", true);
+// // 				table.column(6).prop("disabled", true);
+// // 				table.column(7).prop("disabled", true);
+// 			}
+		}
 	/*]]>*/
 	</script>
 		<div th:replace="fragments/header"></div>
@@ -255,37 +242,47 @@
 								<option value=""></option>
 								<option value="2">Approved</option>
 								<option value="3">Denied</option>
-								<option value="4">Response</option>
+								<option value="4">Responded</option>
 								<option value="5">Waiting</option>
 							</select>
 						</div>
 						
 						<div class="form-group">
-							<label class="control-label">From: </label>
-							<input class="form-control" type="date" name="from_time" id="from" value=""></input>
+								<label class="control-label">From: </label>
+							<div class="input-group date" data-provide="datepicker">
+								<input type="text" class="form-control" name="from_time" id="from" value=""/>
+								<div class="input-group-addon">
+									<span class="glyphicon glyphicon-calendar"></span>
+								</div>
+							</div>
 						</div>
 						
 						<div class="form-group">
-							<label class="control-label">To: </label>
-							<input class="form-control" type="date" name="to_time" id="to" value=""></input>
+								<label class="control-label">To: </label>
+							<div class="input-group date" data-provide="datepicker">
+								<input type="text" class="form-control" name="to_time" id="to" value=""/>
+								<div class="input-group-addon">
+									<span class="glyphicon glyphicon-calendar"></span>
+								</div>
+							</div>
 						</div>
-					
-					<p>
-						<button id="btnSearch" type="button" class="btn btn-primary" style="width:76px;">Search</button>&nbsp;&nbsp;
-						<button type="reset" class="btn btn-primary" style="width:76px;">Clear</button>
-					</p>
+						
+						<p>
+							<button id="btnSearch" type="button" class="btn btn-primary" style="width:76px;">Search</button>&nbsp;&nbsp;
+							<button type="reset" class="btn btn-primary" style="width:76px;">Clear</button>
+						</p>
 				</form>
 					
 				<div class="table-responsive" style="margin-top:3em;"> 
 					<table class="table table-bordered table-striped table-hover" id="requestTable">
 						<thead>
 							<tr>
+								<th class="text-center" name="select"><span>Select</span></th>
 								<th class="text-center" name="id" id="id"><span>ID</span></th>
 								<th class="text-center" name="name"><span>Employee</span></th>
 								<th class="text-center" name="from"><span>From</span></th>
 								<th class="text-center" name="to"><span>To</span></th>
 								<th class="text-center" name="reason"><span>Reason</span></th>
-								<th class="text-center" name="select"><span>Select</span></th>
 								<th class="text-center" name="approve"><span>Approve</span></th>
 								<th class="text-center" name="deny"><span>Deny</span></th>
 							</tr>
@@ -297,10 +294,8 @@
 					</table>
 				</div>
 				
-				<p align="center">
-					<button type="button" class="btn btn-primary" id="btnApprove" >Approve</button>&nbsp;&nbsp;
-					<button type="button" class="btn btn-primary" style="width:76px;" id="btnDeny">Deny</button>
-				</p>
+				<button type="button" class="btn btn-primary" id="btnApprove" >Approve</button>&nbsp;&nbsp;
+				<button type="button" class="btn btn-primary" style="width:76px;" id="btnDeny">Deny</button>
 				
 				<div class="modal fade" id="modalDetails" role="dialog">
 					<div class="modal-dialog">
@@ -383,6 +378,8 @@
 									<button type="button" class="btn btn-default btn-sm" id="btnForward">
 										<span class="glyphicon glyphicon-share-alt"></span>Forward
 									</button>
+									
+									<input type="hidden" id="statusDetailsId"></input>
 								</form>
 							</div>
 						</div>
