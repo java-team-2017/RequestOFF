@@ -19,17 +19,23 @@
 		<script type="text/javascript" src="javascript/bootstrap-datepicker.min.js"></script>
 	</head>
 	<body class="content-body">
-		<script>
+		<script th:inline="javascript">
 		/*<![CDATA[*/
-			var user;
+			var employee;
+			var employeeId;
+			
+			//get current user
 			$.ajax({
 				type : "POST",
 				contentType : "application/json",
-				url : "/employee/getUser",
+				url : /*[[@{/employee/getUser}]]*/,
 				dataType : 'json',
 				data : JSON.stringify({}),
 				success : function(returnData) {
-					user = returnData.user;
+					employee = returnData.user;
+					console.log(employee);
+					employeeId = employee.id;
+					console.log()
 				},
 				error : function(e) {
 					$.notify(notification['APIResponseError'](e));
@@ -37,8 +43,6 @@
 			});
 			
 			$(function() {
-				var user;
-				var employeeId;
 				var listDayOffType;
 				var listRecipient = [];
 				var getStatus = {
@@ -49,39 +53,15 @@
 					'5': 'waiting'
 				};
 				
-				
-				
-				renderRemainHours(employeeId, 'remainHours');
+				renderRemainHours(employee, 'remainHours');
 				renderDayOffTypeSelect('modalDayOffType');
 				
 				//recipient select box
-				$.ajax({
-					type : "POST",
-					contentType : "application/json",
-					url : "/employee/details",
-					dataType : 'json',
-					data : JSON.stringify({ "id" : employeeId }),
-					success : function(returnData) {
-						console.log("employee:");
-						console.log(employeeId);
-						var temp;
-						if(returnData.employee.position.name == "leader") {
-							listRecipient.push(returnData.employee.team.department.manager);
-						}
-						else {
-							listRecipient.push(returnData.employee.listTeam[0].leader);
-							listRecipient.push(returnData.employee.listTeam[0].department.manager);
-						}
-						var option = "";
-						$.each(listRecipient, function(i, element){
-							option += "<option value='" + element.name + "'>" + element.name + "</option>"; 
-						});
-						$("#modalRecipient").append(option);
-					},
-					error : function(e) {
-						$.notify(notification['APIResponseError'](e));
-					}
-				});
+				listRecipient = getListRecipient(employee);
+				renderRecipientSelect(listRecipient, 'modalRecipient');
+				
+				var requestSearchRequest = getRequestSearchRequest();
+				search(requestSearchRequest);
 				
 				$('#requestHistoryTable tbody').on('click', 'td', function() {
 					var index = $(this).index();
@@ -125,7 +105,9 @@
 				} );
 				
 				$('#btnOK').on('click', function() {
-					search();
+					var requestSearchRequest = getRequestSearchRequest();
+					console.log(requestSearchRequest);
+					search(requestSearchRequest);
 				});
 				
 				$('#btnClear').on('click', function() {
@@ -164,7 +146,7 @@
 						$.ajax({
 							type : "POST",
 							contentType : "application/json",
-							url : "/request/regist",
+							url : /*[[@{/request/regist}]]*/,
 							dataType : 'json',
 							data : JSON.stringify({
 								"id" : id,
@@ -172,7 +154,8 @@
 								"update_date" : updateDate
 							}),
 							success : function(returnData) {
-								search();
+								var requestSearchRequest = getRequestSearchRequest();
+								search(requestSearchRequest);
 							},
 							error : function(e) {
 								$.notify(notification['APIResponseError'](e));
@@ -210,11 +193,12 @@
 						$.ajax({
 							type : "POST",
 							contentType : "application/json",
-							url : "/request/regist",
+							url : /*[[@{/request/regist}]]*/,
 							dataType : 'json',
 							data : JSON.stringify(requestRegistRequest),
 							success : function(returnData) {
-								search();
+								var requestSearchRequest = getRequestSearchRequest();
+								search(requestSearchRequest);
 							},
 							error : function(e) {
 								$.notify(notification['APIResponseError'](e));
@@ -239,13 +223,30 @@
 				return ok;
 			}
 			
-			function search() {
+			function getRequestSearchRequest() {
 				var searchData = $('#requestHistoryForm').serializeJSON();
+				var from = searchData.fromTime;
+				var date = new Date();
+				if(from != "") {
+					from = from.substr(6, 4) + "-" + from.substr(0, 2) + "-" + from.substr(3, 2);
+				}
+				else {
+					from = date.getFullYear() + "-01-01";
+				}
+				
+				var to = searchData.toTime;
+				if(to != "") {
+					to = to.substr(6, 4) + "-" + to.substr(0, 2) + "-" + to.substr(3, 2);
+				}
+				else {
+					to = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+				}
+				
 				var requestSearchRequest = {
 					"id" : "",
 					"employee_id" : employeeId,
-					"from_time" : searchData.fromTime,
-					"to_time" : searchData.toTime,
+					"from_time" : from,
+					"to_time" : to,
 					"reason" : "",
 					"status" : searchData.requestType,
 					"response_message" : "",
@@ -253,12 +254,15 @@
 					"recipient_id" : "",
 					"valid_flag" : "1"
 				};
-				
+				return requestSearchRequest;
+			}
+			
+			function search(requestSearchRequest) {
 				$('#requestHistoryTable').DataTable({
 					ajax: {
 						type : "POST",
 						contentType : "application/json",
-						url : "/request/search",
+						url : /*[[@{/request/search}]]*/,
 						dataType : 'json',
 						data : function() {
 							return JSON.stringify(requestSearchRequest);
@@ -304,12 +308,21 @@
 				});
 				
 				var table = $('#requestHistoryTable').DataTable();
-				if(searchData.requestType == 0 || searchData.requestType == 2 || searchData.requestType == 3 
-						|| searchData.requestType == 5) { //0: all request, 2: approved, 3: denied, 5: waiting
+// 				if(searchData.requestType == 0 || searchData.requestType == 2 || searchData.requestType == 3 
+// 						|| searchData.requestType == 5) { //0: all request, 2: approved, 3: denied, 5: waiting
+// 					table.column(5).visible(false);
+// 					table.column(6).visible(false);
+// 				}
+// 				if(searchData.requestType == 4) { //4: responded
+// 					table.column(6).visible(false);
+// 				}
+				var requestStatus = requestSearchRequest.status;
+				if(requestStatus == 0 || requestStatus == 2 || requestStatus == 3 
+						|| requestStatus == 5) { //0: all request, 2: approved, 3: denied, 5: waiting
 					table.column(5).visible(false);
 					table.column(6).visible(false);
 				}
-				if(searchData.requestType == 4) { //4: responded
+				if(requestStatus == 4) { //4: responded
 					table.column(6).visible(false);
 				}
 			}
@@ -329,7 +342,7 @@
 						<div class="form-group">
 							<label for="fromTime">From</label>
 							<div class="input-group date datepicker" data-provide="datepicker">
-								<input type="text" class="form-control" />
+								<input type="text" class="form-control" name="fromTime" id="fromTimeId" />
 								<div class="input-group-addon">
 									<span class="glyphicon glyphicon-th"></span>
 								</div>
@@ -339,7 +352,7 @@
 						<div class="form-group">
 							<label for="toTime">To</label>
 							<div class="input-group date datepicker" data-provide="datepicker">
-								<input type="text" class="form-control" />
+								<input type="text" class="form-control" name="toTime" id="toTimeId" />
 								<div class="input-group-addon">
 									<span class="glyphicon glyphicon-th"></span>
 								</div>

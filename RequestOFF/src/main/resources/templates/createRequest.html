@@ -19,39 +19,46 @@
 		<script type="text/javascript" src="javascript/bootstrap-datepicker.min.js"></script>
 	</head>
 	<body class="content-body">
-		<script>
+		<script th:inline="javascript">
 		/*<![CDATA[*/
+			var employee;
+			var employeeId;
+			
+			//get current user
+			$.ajax({
+				type : "POST",
+				contentType : "application/json",
+				url : /*[[@{/employee/getUser}]]*/,
+				dataType : 'json',
+				data : JSON.stringify({}),
+				success : function(returnData) {
+					employee = returnData.user;
+					console.log(employee);
+					employeeId = employee.id;
+					console.log()
+				},
+				error : function(e) {
+					$.notify(notification['APIResponseError'](e));
+				}
+			});
+			
 			$(function() {
-				$('.datepicker').datepicker();
-				renderRemainHours(employeeId, 'remainHours');
+				var listDayOffType;
+				var listRecipient = [];
+				var getStatus = {
+					'1': 'saved',
+					'2': 'approved',
+					'3': 'denied',
+					'4': 'responded',
+					'5': 'waiting'
+				};
+				
+				renderRemainHours(employee, 'remainHours');
 				renderDayOffTypeSelect('id_dayOffType');
 				
 				//recipient select box
-				$.ajax({
-					type : "POST",
-					contentType : "application/json",
-					url : "/employee/details",
-					dataType : 'json',
-					data : JSON.stringify({ "id" : employeeId }),
-					success : function(returnData) {
-						var temp;
-						if(returnData.employee.position.name == "leader") {
-							listRecipient.push(returnData.employee.team.department.manager);
-						}
-						else {
-							listRecipient.push(returnData.employee.listTeam[0].leader);
-							listRecipient.push(returnData.employee.listTeam[0].department.manager);
-						}
-						var option = "";
-						$.each(listRecipient, function(i, element){
-							option += "<option value='" + element.name + "'>" + element.name + "</option>"; 
-						});
-						$("#id_recipient").append(option);
-					},
-					error : function(e) {
-						console.log("ERROR: ", e);
-					}
-				});
+				listRecipient = getListRecipient(employee);
+				renderRecipientSelect(listRecipient, 'id_recipient');
 				
 				$('#btnSave, #btnSend').on('click', function() {
 					var status, alertStr;
@@ -65,7 +72,15 @@
 					}
 					var createRequestData = $('#createRequestForm').serializeJSON();
 					if(validate("#createRequestForm") == 1) {
-						requestRegistRequest = {
+						var fromDate = createRequestData.from;
+						fromDate = fromDate.substr(6, 4) + "-" + fromDate.substr(0, 2) + "-" + fromDate.substr(3, 2);
+						var toDate = createRequestData.to;
+						toDate = toDate.substr(6, 4) + "-" + toDate.substr(0, 2) + "-" + toDate.substr(3, 2);
+						var 
+						
+						console.log(from);
+						console.log(to);
+						var requestRegistRequest = {
 							"id" : "",
 							"employee_id" : employeeId,
 							"from_time" : createRequestData.from,
@@ -79,9 +94,9 @@
 							"update_date" : ""
 						}
 						console.log(requestRegistRequest);
-						var fromStr = requestRegistRequest.from;
-						fromStr = fromStr.replace("T", " ");
-						console.log(Date.parse(requestRegistRequest.from));
+// 						var fromStr = requestRegistRequest.from;
+// 						fromStr = fromStr.replace("T", " ");
+// 						console.log(Date.parse(requestRegistRequest.from));
 						$.ajax({
 							type : "POST",
 							contentType : "application/json",
@@ -101,10 +116,6 @@
 					}
 				});
 			});
-		
-			var employeeId = "1";
-			var listRecipient = [];
-			var listDayOffType;
 			
 			function validate(formId) {
 				var ok = 1;
@@ -142,7 +153,7 @@
 							<div class="row">
 								<div class="col-sm-6">
 									<div class="input-group date datepicker" data-provide="datepicker">
-										<input type="text" class="form-control" />
+										<input type="text" class="form-control" name="from"/>
 										<div class="input-group-addon">
 											<span class="glyphicon glyphicon-th"></span>
 										</div>
@@ -185,7 +196,7 @@
 							<div class="row">
 								<div class="col-sm-6">
 									<div class="input-group date datepicker" data-provide="datepicker">
-										<input type="text" class="form-control" />
+										<input type="text" class="form-control" name="to"/>
 										<div class="input-group-addon">
 											<span class="glyphicon glyphicon-th"></span>
 										</div>
@@ -245,7 +256,7 @@
 					</form>
 				</div>
 			</div>
-			<div th:replace="fragments/footer"></div>
+<!-- 			<div th:replace="fragments/footer"></div> -->
 		</div>
 
 	</body>

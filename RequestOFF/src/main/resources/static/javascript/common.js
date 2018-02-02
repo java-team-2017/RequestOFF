@@ -73,28 +73,41 @@ function renderDayOffTypeSelect(selectBoxId) {
 	});
 }
 
-function renderRemainHours(employeeId, containerId) {
+function renderRemainHours(employee, containerId) {
 	var currentYear = (new Date()).getFullYear();
-	$.ajax({
-		type : "POST",
-		contentType : "application/json",
-		url : "/employeeOffStatus/details",
-		dataType : 'json',
-		data : JSON.stringify({
-			"year_id" : currentYear,
-			"employee_id" : employeeId
-		}),
-		success : function(returnData) {
-			var remainHours = parseInt(returnData.employee_off_status.remainHours)
-			if(remainHours < 2) {
-				$("#" + containerId).html(returnData.employee_off_status.remainHours + " hour");
-			}
-			else {
-				$("#" + containerId).html(returnData.employee_off_status.remainHours + " hours");
-			}
-		},
-		error : function(e) {
-			console.log("ERROR: ", e);
+	listEmployeeOffStatus = employee.listEmployeeOffStatus;
+	var remainHours;
+	$.each(listEmployeeOffStatus, function(i, element) {
+		if(element.companyYearOff.id == currentYear) {
+			remainHours = element.remainHours;
+			return false;	//return false to break the loop
 		}
 	});
+	remainHours = parseInt(remainHours);
+	if(remainHours < 2) {
+		$("#" + containerId).html(remainHours + " hour");
+	}
+	else {
+		$("#" + containerId).html(remainHours + " hours");
+	}
+}
+
+function getListRecipient(employee) {
+	var listRecipient = [];
+	if(employee.position.name == "leader") {
+		listRecipient.push(employee.team.department.manager);
+	}
+	else {
+		listRecipient.push(employee.listTeam[0].leader);
+		listRecipient.push(employee.listTeam[0].department.manager);
+	}
+	return listRecipient;
+}
+
+function renderRecipientSelect(listRecipient, selectBoxId) {
+	var option = "";
+	$.each(listRecipient, function(i, element) {
+		option += "<option value='" + element.name + "'>" + element.name + "</option>"; 
+	});
+	$("#" + selectBoxId).append(option);
 }

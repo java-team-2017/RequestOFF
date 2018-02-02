@@ -104,6 +104,12 @@ public class RequestServiceImpl implements RequestService{
 
 	@Override
 	public RequestSearchResponse requestSearch(RequestSearchRequest requestSearchRequest) {
+		if (StringUtil.isNotEmpty(requestSearchRequest.getFromTime())) {
+			requestSearchRequest.setFromTime(requestSearchRequest.getFromTime() + " 00:00:00");
+		}
+		if (StringUtil.isNotEmpty(requestSearchRequest.getToTime())) {
+			requestSearchRequest.setToTime(requestSearchRequest.getToTime() + " 23:59:59");
+		}
 		List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
 		return new RequestSearchResponse(requests);
 	}
