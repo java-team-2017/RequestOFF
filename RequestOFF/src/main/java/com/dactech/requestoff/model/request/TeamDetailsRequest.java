@@ -1,20 +1,20 @@
 package com.dactech.requestoff.model.request;
 
 public class TeamDetailsRequest {
-	private long id;
+	private String id;
 
 	public TeamDetailsRequest() {
 	}
 
-	public TeamDetailsRequest(long id) {
+	public TeamDetailsRequest(String id) {
 		this.id = id;
 	}
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

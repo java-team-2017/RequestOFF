@@ -89,7 +89,7 @@ public class TeamServiceImpl implements TeamService {
 
 	@Override
 	public TeamDetailsResponse teamDetails(TeamDetailsRequest teamDetailsRequest) {
-		Team team = teamRepository.findById(teamDetailsRequest.getId());
+		Team team = teamRepository.findById(Long.parseLong(teamDetailsRequest.getId()));
 		TeamDetailsResponse response = new TeamDetailsResponse(team);
 		return response;
 	}

@@ -14,6 +14,7 @@ import com.dactech.requestoff.model.response.DayOffTypeRegistResponse;
 import com.dactech.requestoff.model.response.DayOffTypeSearchResponse;
 import com.dactech.requestoff.repository.DayOffTypeRepository;
 import com.dactech.requestoff.service.DayOffTypeService;
+import com.dactech.requestoff.util.StringUtil;
 
 @Service
 public class DayOffTypeServiceImpl implements DayOffTypeService {
@@ -22,23 +23,39 @@ public class DayOffTypeServiceImpl implements DayOffTypeService {
 	DayOffTypeRepository dayOffTypeRepository;
 
 	@Override
-	public DayOffTypeRegistResponse registDayOffType(DayOffTypeRegistRequest dayOffTypeRegistRequest) throws Exception {
+	public DayOffTypeRegistResponse registDayOffType(DayOffTypeRegistRequest request) throws Exception {
 		DayOffType dayOffType;
-		dayOffType = dayOffTypeRepository.findById(dayOffTypeRegistRequest.getId());
-
-		if (dayOffType == null) {
+		if (StringUtil.isEmpty(request.getId())) { // create new DayOffTypeRegistRequest
 			dayOffType = new DayOffType();
-			dayOffType.setId(dayOffTypeRegistRequest.getId());
-		} else if (!dayOffType.getUpdateDate().equals(dayOffTypeRegistRequest.getUpdateDate())) {
-			throw new Exception("Someone updated day_off_type with id " + dayOffTypeRegistRequest.getId() + " at "
-					+ dayOffType.getUpdateDate());
 
+			dayOffType.setName(request.getNameDayOffType());
+			dayOffType.setPaymentFlag(Integer.parseInt(request.getPaymentFlag()));
+			dayOffType.setValidFlag(Integer.parseInt(request.getValidFlag()));
+		} else { // update
+			long dayOffTypeId = Long.parseLong(request.getId());
+			dayOffType = dayOffTypeRepository.findById(dayOffTypeId);
+			if (dayOffType == null) {
+				throw new Exception("cannot find the dayOffType with id : " + dayOffTypeId);
+			}
+
+			if (!dayOffType.getUpdateDate().equals(request.getUpdateDate())) {
+				throw new Exception("Someone updated dayOffType with id " + dayOffType.getId() + " at "
+						+ dayOffType.getUpdateDate());
+			}
+
+			if (StringUtil.isNotEmpty(request.getNameDayOffType())) {
+				dayOffType.setName(request.getNameDayOffType());
+			}
+
+			if (StringUtil.isNotEmpty(request.getPaymentFlag())) {
+				dayOffType.setPaymentFlag(Integer.parseInt(request.getPaymentFlag()));
+			}
+			
+			if (StringUtil.isNotEmpty(request.getValidFlag())) {
+				dayOffType.setValidFlag(Integer.parseInt(request.getValidFlag()));
+			}
 		}
-
-		dayOffType.setName(dayOffTypeRegistRequest.getNameDayOffType());
-		dayOffType.setPaymentFlag(dayOffTypeRegistRequest.getPaymentFlag());
-		dayOffType.setValidFlag(dayOffTypeRegistRequest.getValidFlag());
-
+		
 		dayOffTypeRepository.save(dayOffType);
 		return new DayOffTypeRegistResponse(dayOffType.getId());
 	}
@@ -53,7 +70,7 @@ public class DayOffTypeServiceImpl implements DayOffTypeService {
 
 	@Override
 	public DayOffTypeDetailsResponse detailsDayOffType(DayOffTypeDetailsRequest dayOffTypeDetailsRequest) {
-		DayOffType dayOffType = dayOffTypeRepository.findById(dayOffTypeDetailsRequest.getId());
+		DayOffType dayOffType = dayOffTypeRepository.findById(Long.parseLong(dayOffTypeDetailsRequest.getId()));
 		DayOffTypeDetailsResponse response = new DayOffTypeDetailsResponse(dayOffType);
 		return response;
 	}

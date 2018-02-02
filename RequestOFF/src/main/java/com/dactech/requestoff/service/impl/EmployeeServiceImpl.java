@@ -115,7 +115,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public EmployeeDetailsResponse employeeDetails(EmployeeDetailsRequest employeeDetailsRequest) {
-		Employee employee = employeeRepository.findById(employeeDetailsRequest.getId());
+		Employee employee = employeeRepository.findById(Long.parseLong(employeeDetailsRequest.getId()));
 		EmployeeDetailsResponse response = new EmployeeDetailsResponse(employee);
 		return response;
 	}

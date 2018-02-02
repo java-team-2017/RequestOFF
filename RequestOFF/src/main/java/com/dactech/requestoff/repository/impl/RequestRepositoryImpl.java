@@ -7,7 +7,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import com.dactech.requestoff.model.entity.Request;
-import com.dactech.requestoff.model.request.RequestDetailsRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
 import com.dactech.requestoff.repository.custom.RequestRepositoryCustom;
 import com.dactech.requestoff.util.StringUtil;
@@ -20,6 +19,12 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 	public List<Request> searchRequest(RequestSearchRequest requestSearchRequest) {
 		StringBuilder queryString = new StringBuilder("SELECT * FROM request ");
 		StringBuilder whereClause = new StringBuilder("");
+		StringBuilder sqlJoinQuery = new StringBuilder("");
+		
+		if (requestSearchRequest.getNameOfEmployee() != null && requestSearchRequest.getNameOfEmployee() != "") {
+			sqlJoinQuery.append(" INNER JOIN employee ON request.employee_id = employee.id WHERE name like '%"
+					+ requestSearchRequest.getNameOfEmployee() + "%'");
+		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getId())) {
 			whereClause.append(" AND id = '" + requestSearchRequest.getId() + "'");
@@ -64,8 +69,11 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		if (whereClause.length() > 0) {
 			whereClause.replace(0, 5, " WHERE ");
 			queryString.append(whereClause);
+		} else if (sqlJoinQuery.indexOf("JOIN") != -1) {
+			queryString.append(sqlJoinQuery);
 		}
 		Query query = entityManager.createNativeQuery(queryString.toString(), Request.class);
+		@SuppressWarnings("unchecked")
 		List<Request> requests = query.getResultList();
 		return requests;
 	}

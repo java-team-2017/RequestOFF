@@ -3,32 +3,29 @@ package com.dactech.requestoff.model.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EmployeeSearchRequest {
-	private long id;
+	private String id;
 	private String name;
 	@JsonProperty("name_match_status")
-	private int nameMatchStatus;
+	private String nameMatchStatus;
 	private String gender;
 	private String birthday;
 	@JsonProperty("position_id")
-	private long positionId;
+	private String positionId;
 	private String email;
-	private long phone;
+	private String phone;
 	@JsonProperty("start_working_date")
 	private String startWorkingDate;
 	@JsonProperty("offical_working_date")
 	private String officalWorkingDate;
 	@JsonProperty("valid_flag")
-	private int validFlag;
+	private String validFlag;
 
 	public EmployeeSearchRequest() {
-		super();
 	}
-	
 
-	public EmployeeSearchRequest(long id, String name, int nameMatchStatus, String gender, String birthday,
-			long positionId, String email, long phone, String startWorkingDate, String officalWorkingDate,
-			int validFlag) {
-		super();
+	public EmployeeSearchRequest(String id, String name, String nameMatchStatus, String gender, String birthday,
+			String positionId, String email, String phone, String startWorkingDate, String officalWorkingDate,
+			String validFlag) {
 		this.id = id;
 		this.name = name;
 		this.nameMatchStatus = nameMatchStatus;
@@ -42,21 +39,11 @@ public class EmployeeSearchRequest {
 		this.validFlag = validFlag;
 	}
 
-
-
-	@Override
-	public String toString() {
-		return "EmployeeSearchRequest [id=" + id + ", name=" + name + ", nameMatchStatus=" + nameMatchStatus
-				+ ", gender=" + gender + ", birthday=" + birthday + ", positionId=" + positionId + ", email=" + email
-				+ ", phone=" + phone + ", startWorkingDate=" + startWorkingDate + ", officalWorkingDate="
-				+ officalWorkingDate + ", validFlag=" + validFlag + "]";
-	}
-
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -68,11 +55,11 @@ public class EmployeeSearchRequest {
 		this.name = name;
 	}
 
-	public int getNameMatchStatus() {
+	public String getNameMatchStatus() {
 		return nameMatchStatus;
 	}
 
-	public void setNameMatchStatus(int nameMatchStatus) {
+	public void setNameMatchStatus(String nameMatchStatus) {
 		this.nameMatchStatus = nameMatchStatus;
 	}
 
@@ -92,11 +79,11 @@ public class EmployeeSearchRequest {
 		this.birthday = birthday;
 	}
 
-	public long getPositionId() {
+	public String getPositionId() {
 		return positionId;
 	}
 
-	public void setPositionId(long positionId) {
+	public void setPositionId(String positionId) {
 		this.positionId = positionId;
 	}
 
@@ -108,11 +95,11 @@ public class EmployeeSearchRequest {
 		this.email = email;
 	}
 
-	public long getPhone() {
+	public String getPhone() {
 		return phone;
 	}
 
-	public void setPhone(long phone) {
+	public void setPhone(String phone) {
 		this.phone = phone;
 	}
 
@@ -132,11 +119,11 @@ public class EmployeeSearchRequest {
 		this.officalWorkingDate = officalWorkingDate;
 	}
 
-	public int getValidFlag() {
+	public String getValidFlag() {
 		return validFlag;
 	}
 
-	public void setValidFlag(int validFlag) {
+	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
 	}
 

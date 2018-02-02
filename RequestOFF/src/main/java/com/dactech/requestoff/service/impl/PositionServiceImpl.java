@@ -14,6 +14,7 @@ import com.dactech.requestoff.model.response.PositionRegistResponse;
 import com.dactech.requestoff.model.response.PositionSearchResponse;
 import com.dactech.requestoff.repository.PositionRepository;
 import com.dactech.requestoff.service.PositionService;
+import com.dactech.requestoff.util.StringUtil;
 
 @Service
 public class PositionServiceImpl implements PositionService {
@@ -22,20 +23,35 @@ public class PositionServiceImpl implements PositionService {
 	PositionRepository positionRepository;
 
 	@Override
-	public PositionRegistResponse registPosition(PositionRegistRequest positionRegistRequest) throws Exception {
+	public PositionRegistResponse registPosition(PositionRegistRequest request) throws Exception {
 		Position position;
-		position = positionRepository.findById(positionRegistRequest.getId());
-
-		if (position == null) {
+		if (StringUtil.isEmpty(request.getId())) { // create new PositionRegistResponse
 			position = new Position();
-			position.setId(positionRegistRequest.getId());
-		} else if (!position.getUpdateDate().equals(positionRegistRequest.getUpdateDate())) {
-			throw new Exception("Someone updated position with id " + positionRegistRequest.getId() + " at "
-					+ position.getUpdateDate());
+			
+			position.setName(request.getName());
+			position.setValidFlag(Integer.parseInt(request.getValidFlag()));
+			
+		} else {
+			long positionId = Long.parseLong(request.getId());
+			position = positionRepository.findById(positionId);
+			if (position == null) {
+				throw new Exception("cannot find the position with id : " + positionId);
+			}
+			
+			if (!position.getUpdateDate().equals(request.getUpdateDate())) {
+				throw new Exception("Someone updated position with id " + position.getId() + " at "
+						+ position.getUpdateDate());
+			}
+
+			if (StringUtil.isNotEmpty(request.getName())) {
+				position.setName(request.getName());
+			}
+			
+			if (StringUtil.isNotEmpty(request.getValidFlag())) {
+				position.setValidFlag(Integer.parseInt(request.getValidFlag()));
+			}
 
 		}
-		position.setName(positionRegistRequest.getName());
-		position.setValidFlag(positionRegistRequest.getValidFlag());
 
 		positionRepository.save(position);
 		return new PositionRegistResponse(position.getId());
@@ -52,7 +68,7 @@ public class PositionServiceImpl implements PositionService {
 
 	@Override
 	public PositionDetailsResponse detailsPosition(PositionDetailsRequest positionDetailsRequest) {
-		Position position = positionRepository.findById(positionDetailsRequest.getId());
+		Position position = positionRepository.findById(Long.parseLong(positionDetailsRequest.getId()));
 		PositionDetailsResponse response = new PositionDetailsResponse(position);
 		return response;
 	}

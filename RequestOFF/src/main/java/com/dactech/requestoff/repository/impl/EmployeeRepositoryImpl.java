@@ -7,7 +7,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import com.dactech.requestoff.model.entity.Employee;
-import com.dactech.requestoff.model.entity.Team;
 import com.dactech.requestoff.model.request.EmployeeSearchRequest;
 import com.dactech.requestoff.repository.custom.EmployeeRepositoryCustom;
 import com.dactech.requestoff.util.StringUtil;
@@ -25,13 +24,13 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 				"SELECT * FROM employee INNER JOIN team_employee ON employee.id = team_employee.employee_id INNER JOIN team ON team_employee.team_id = team.id ");
 		StringBuilder sqlQuery = new StringBuilder("SELECT * FROM employee ");
 
-		if (employeeSearchRequest.getId() != 0) {
-			sqlJoinQuery.append(" WHERE employee.id = '" + employeeSearchRequest.getId() + "'");
+		if (StringUtil.isNotEmpty(employeeSearchRequest.getId())) {
+			sqlQuery.append(" WHERE employee.id = '" + employeeSearchRequest.getId() + "'");
 			whereClause = false;
 		}
 
-		if (employeeSearchRequest.getName() != null && employeeSearchRequest.getName() != "") {
-			if (employeeSearchRequest.getNameMatchStatus() != 1) {
+		if (StringUtil.isNotEmpty(employeeSearchRequest.getName())) {
+			if (StringUtil.isNotEmpty(employeeSearchRequest.getNameMatchStatus())) {
 				String sqlString = whereClause ? " WHERE " : " AND ";
 				sqlQuery.append(sqlString + "name like '%" + employeeSearchRequest.getName() + "%'");
 				whereClause = false;
@@ -42,51 +41,50 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 			}
 		}
 
-		if (employeeSearchRequest.getGender() != null && employeeSearchRequest.getGender() != "") {
+		if (StringUtil.isNotEmpty(employeeSearchRequest.getGender())) {
 			String sqlString = whereClause ? " WHERE " : " AND ";
-			sqlQuery.append(sqlString + "gender = " + employeeSearchRequest.getGender() + "'");
+			sqlQuery.append(sqlString + "gender = '" + employeeSearchRequest.getGender() + "'");
 			whereClause = false;
 		}
 
-		if (employeeSearchRequest.getBirthday() != null && employeeSearchRequest.getBirthday() != "") {
+		if (StringUtil.isNotEmpty(employeeSearchRequest.getBirthday())) {
 			String sqlString = whereClause ? " WHERE " : " AND ";
-			sqlQuery.append(sqlString + "birthday = " + employeeSearchRequest.getBirthday() + "'");
+			sqlQuery.append(sqlString + "birthday = '" + employeeSearchRequest.getBirthday() + "'");
 			whereClause = false;
 		}
 
-		if (employeeSearchRequest.getPositionId() != 0) {
+		if (StringUtil.isNotEmpty(employeeSearchRequest.getPositionId())) {
 			String sqlString = whereClause ? " WHERE " : " AND ";
 			sqlQuery.append(sqlString + "position_id = '" + employeeSearchRequest.getPositionId() + "'");
 			whereClause = false;
 		}
 
-		if (employeeSearchRequest.getEmail() != null && employeeSearchRequest.getEmail() != "") {
+		if (StringUtil.isNotEmpty(employeeSearchRequest.getEmail())) {
 			String sqlString = whereClause ? " WHERE " : " AND ";
 			sqlQuery.append(sqlString + "email = '" + employeeSearchRequest.getEmail() + "'");
 			whereClause = false;
 		}
 
-		if (employeeSearchRequest.getPhone() != 0) {
+		if (StringUtil.isNotEmpty(employeeSearchRequest.getPhone())) {
 			String sqlString = whereClause ? " WHERE " : " AND ";
 			sqlQuery.append(sqlString + "phone = '" + employeeSearchRequest.getPhone() + "'");
 			whereClause = false;
 		}
 
-		if (employeeSearchRequest.getStartWorkingDate() != null && employeeSearchRequest.getStartWorkingDate() != "") {
+		if (StringUtil.isNotEmpty(employeeSearchRequest.getStartWorkingDate())) {
 			String sqlString = whereClause ? " WHERE " : " AND ";
 			sqlQuery.append(sqlString + "start_working_date = '" + employeeSearchRequest.getStartWorkingDate() + "'");
 			whereClause = false;
 		}
 
-		if (employeeSearchRequest.getOfficalWorkingDate() != null
-				& employeeSearchRequest.getOfficalWorkingDate() != "") {
+		if (StringUtil.isNotEmpty(employeeSearchRequest.getOfficalWorkingDate())) {
 			String sqlString = whereClause ? " WHERE " : " AND ";
 			sqlQuery.append(
 					sqlString + "offical_working_date = '" + employeeSearchRequest.getOfficalWorkingDate() + "'");
 			whereClause = false;
 		}
 
-		if (employeeSearchRequest.getValidFlag() == 0 || employeeSearchRequest.getValidFlag() == 1) {
+		if (StringUtil.isNotEmpty(employeeSearchRequest.getValidFlag())) {
 			String sqlString = whereClause ? " WHERE " : " AND ";
 			sqlQuery.append(sqlString + "valid_flag = '" + employeeSearchRequest.getValidFlag() + "'");
 			whereClause = false;
@@ -100,6 +98,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 		return query.getResultList();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Employee> search(String name, String teamId, String departmentId) {
 		StringBuilder queryString = new StringBuilder(

@@ -7,9 +7,9 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import com.dactech.requestoff.model.entity.EmployeeOffStatus;
-import com.dactech.requestoff.model.request.EmployeeOffStatusDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatusSearchRequest;
 import com.dactech.requestoff.repository.custom.EmployeeOffStatusRepositoryCustom;
+import com.dactech.requestoff.util.StringUtil;
 
 public class EmployeeOffStatusRepositoryImpl implements EmployeeOffStatusRepositoryCustom {
 	@PersistenceContext
@@ -20,30 +20,30 @@ public class EmployeeOffStatusRepositoryImpl implements EmployeeOffStatusReposit
 	public List<EmployeeOffStatus> search(EmployeeOffStatusSearchRequest employeeOffStatusSearchRequest) {
 		boolean whereClause = true;
 		StringBuilder sqlQuery = new StringBuilder("SELECT * FROM employee_off_status ");
-		if (employeeOffStatusSearchRequest.getYearId() != 0) {
+		if (StringUtil.isNotEmpty(employeeOffStatusSearchRequest.getYearId())) {
 			sqlQuery.append(" WHERE year_id = '" + employeeOffStatusSearchRequest.getYearId() + "'");
 			whereClause = false;
 		}
-
-		if (employeeOffStatusSearchRequest.getEmployeeId() != 0) {
+		
+		if (StringUtil.isNotEmpty(employeeOffStatusSearchRequest.getEmployeeId())) {
 			String sqlString = whereClause ? " WHERE " : " AND ";
 			sqlQuery.append(sqlString + " employee_id = '" + employeeOffStatusSearchRequest.getEmployeeId() + "'");
 			whereClause = false;
 		}
 
-		if (employeeOffStatusSearchRequest.getRemainHours() >= 0) {
+		if (StringUtil.isNotEmpty(employeeOffStatusSearchRequest.getRemainHours())) {
 			String sqlString = whereClause ? " WHERE " : " AND ";
 			sqlQuery.append(sqlString + " remain_hours = '" + employeeOffStatusSearchRequest.getRemainHours() + "'");
 			whereClause = false;
 		}
 
-		if (employeeOffStatusSearchRequest.getTotalHours() > 0) {
+		if (StringUtil.isNotEmpty(employeeOffStatusSearchRequest.getTotalHours())) {
 			String sqlString = whereClause ? " WHERE " : " AND ";
 			sqlQuery.append(sqlString + " total_hours = '" + employeeOffStatusSearchRequest.getTotalHours() + "'");
 			whereClause = false;
 		}
 
-		if (employeeOffStatusSearchRequest.getValidFlag() == 0 || employeeOffStatusSearchRequest.getValidFlag() == 1) {
+		if (StringUtil.isNotEmpty(employeeOffStatusSearchRequest.getValidFlag())) {
 			String sqlString = whereClause ? " WHERE " : " AND ";
 			sqlQuery.append(sqlString + " valid_flag = '" + employeeOffStatusSearchRequest.getValidFlag() + "'");
 			whereClause = false;

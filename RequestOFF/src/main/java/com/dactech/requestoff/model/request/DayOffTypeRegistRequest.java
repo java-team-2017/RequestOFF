@@ -4,21 +4,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DayOffTypeRegistRequest {
 
-	private int id;
+	private String id;
 	@JsonProperty("name")
 	private String nameDayOffType;
 	@JsonProperty("payment_flag")
-	private int paymentFlag;
+	private String paymentFlag;
 	@JsonProperty("valid_flag")
-	private int validFlag;
+	private String validFlag;
 	@JsonProperty("update_date")
 	private String updateDate;
 
 	public DayOffTypeRegistRequest() {
-		super();
 	}
 
-	public DayOffTypeRegistRequest(int id, String nameDayOffType, int paymentFlag, int validFlag, String updateDate) {
+	public DayOffTypeRegistRequest(String id, String nameDayOffType, String paymentFlag, String validFlag,
+			String updateDate) {
 		this.id = id;
 		this.nameDayOffType = nameDayOffType;
 		this.paymentFlag = paymentFlag;
@@ -26,11 +26,11 @@ public class DayOffTypeRegistRequest {
 		this.updateDate = updateDate;
 	}
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -42,19 +42,19 @@ public class DayOffTypeRegistRequest {
 		this.nameDayOffType = nameDayOffType;
 	}
 
-	public int getPaymentFlag() {
+	public String getPaymentFlag() {
 		return paymentFlag;
 	}
 
-	public void setPaymentFlag(int paymentFlag) {
+	public void setPaymentFlag(String paymentFlag) {
 		this.paymentFlag = paymentFlag;
 	}
 
-	public int getValidFlag() {
+	public String getValidFlag() {
 		return validFlag;
 	}
 
-	public void setValidFlag(int validFlag) {
+	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
 	}
 

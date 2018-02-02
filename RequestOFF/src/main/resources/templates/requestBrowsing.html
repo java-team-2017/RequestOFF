@@ -1,193 +1,395 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Request Browsing</title>
-<meta charset="utf-8"/>
-	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>Request Browsing</title>
+	<link rel="stylesheet" type="text/css" href="css/layoutStyle.css" />
+	<link rel="stylesheet" type="text/css" href="css/common.css" />
 	<link rel="stylesheet"	type="text/css" href="css/bootstrap.min.css" />
+	<link rel="stylesheet"	type="text/css" href="css/notify.css" />
+	<link rel="stylesheet" type="text/css" href="css/datatables.min.css"/>
 	<script src="javascript/jquery-3.2.1.js"></script>
 	<script src="javascript/bootstrap.min.js"></script>
-<script>
-/*<![CDATA[*/
-	var employeeArr = [
-		{'name': 'Minh Hien', 'from': '23/1/2018 10:10:SA', 'to': '23/1/2018 14:10:CH', 'reason': 'Ốm'},
-		{'name': 'Hai Nhi', 'from': '23/1/2018 10:10:SA', 'to': '23/1/2018 14:10:CH', 'reason': 'Ốm'},
-		{'name': 'Binh Thien', 'from': '23/1/2018 10:10:SA', 'to': '23/1/2018 14:10:CH', 'reason': 'Ốm'},
-	];
-	
-	$(function(){
-		loadTable(employeeArr);
-	
-	});
-	function loadTable(employees){	
-		var html = '';	
-		$.each(employees, function(index, object) {
-					var row = '<tr>'
-					row += '<td><input type="checkbox" name="record" /></td>';
-					row += '<td data-toggle="modal" data-target="#myModal">' + object.name + '</td>';
-					row += '<td data-toggle="modal" data-target="#myModal">' + object.from + '</td>';
-					row += '<td data-toggle="modal" data-target="#myModal">' + object.to + '</td>';
-					row += '<td data-toggle="modal" data-target="#myModal">' + object.reason + '</td>';
-					row += '<td><a href="#"><span class="glyphicon glyphicon-ok"></span></a></td>';
-					row += '<td><a href="#"><span class="glyphicon glyphicon-remove"></span></a></td>';
-					row += '</tr>'
-					html += row;
-					
-		});
-		$("#myTable > tbody").empty().append(html);
-	}
-	/*]]>*/
-</script>
+	<script src="javascript/jquery.serializejson.js"></script>
+	<script src="javascript/common.js"></script>
+	<script src="javascript/notify.js"></script>
+	<script type="text/javascript" src="javascript/datatables.min.js"></script>
+	<script type="text/javascript" src="javascript/bootstrap-confirmation.min.js"></script>
 </head>
 <body class="content-body">
-	<div th:replace="fragments/header"></div>
-	<div  class="row">
-	<div th:replace="menu"></div>
-	
-	<div class="requestOffContentBody">
+
+	<script>
+	/*<![CDATA[*/
+		var user;
 		
-		<div class="container-fluid">
-			<h3 align="center">Request Browsing</h3>
+		$.ajax({
+			type : "post",
+			contentType : "application/json",
+			url : "/employee/getUser",
+			data : JSON.stringify({}),
+			dataType : 'json',
+			success : function(data) {
+				user = data.user;
+				console.log("user : ");
+				console.log(user);
+			},
+				error : function() {
+					alert("Error");
+				}
+		});
+	
+		function updateRequest(requestObj) {
+			$.ajax({
+				type : "POST",
+				contentType : "application/json",
+				url : "/request/regist",
+				dataType : 'json',
+				data : JSON.stringify(requestObj),
+				success : function(resultData) {
+					search();
+				},
+				error : function() {
+					console.log("Error");
+				}
+			});
+		}
+		
+		function search(){
+			var requestData = $('#requestForm').serializeJSON();
+	// 			console.log(requestData);
+			$.ajax({
+				type : "post",
+				contentType : "application/json",
+				url : "/request/search",
+				data : JSON.stringify(requestData),
+				dataType : 'json',
+				success : function(data) {
+					listRequest = data.requests;
+				$('#requestTable').DataTable( {
+						destroy: true,
+						searching: false,
+						data: listRequest,
+						columns: [
+							{ data: 'id' },
+							{ data: 'employee.name' },
+							{ data: 'fromTime' },
+							{ data: 'toTime' },
+							{ data: 'reason' },
+							{
+								render: function () {
+									return '<input type="checkbox" class="editor-active" >';
+								},
+							},{
+								render: function () {
+									return '<a href="#" class="btnApprove"><span class="glyphicon glyphicon-ok"></span></a>';
+								},
+							},{
+								render: function () {
+									return '<a href="#" class="btnDeny"><span class="glyphicon glyphicon-remove"></span></a>';
+								},
+							}
+						]
+					});
+					if(requestData.status != 5){
+						var table = $('#requestTable').DataTable();
+						table.column(5).visible(false);
+						table.column(6).visible(false);
+						table.column(7).visible(false);
+					}
+				},
+					error : function() {
+						alert("Error");
+					}
+			});
 			
-				<div class="form-group">
-					<label class="control-label col-sm-3">Employee: </label>
-						<div class="input-group col-sm-7">
-							<input class="form-control" type="text" name="employee" id="employee" value=""></input>
-						</div>
-				</div>
-				
-				<div class="form-group">
-					<label class="control-label col-sm-3">Team: </label>
-						<div class="input-group col-sm-7">
-							<input class="form-control" type="text" name="team" id="team" value=""></input>
-						</div>
-				</div>
-				
-				<div class="form-group">
-					<label class="control-label col-sm-3">Request Status: </label>
-						<div class="input-group col-sm-7">
-							<select name="status" id="status" value="" class="form-control">
-								<option value="">----Choose----</option>
-								<option value="">Approved</option>
-								<option value="">Denied</option>
-								<option value="">Waiting</option>
-								<option value="">Response</option>
-							</select>
-						</div>
-				</div>
-				
-				<div class="form-group">
-					<label class="control-label col-sm-3">From: </label>
-						<div class="input-group col-sm-7">
-							<input class="form-control" type="datetime-local" name="from" id="from" value=""></input>
-						</div>
-				</div>
-				
-				<div class="form-group">
-					<label class="control-label col-sm-3">To: </label>
-						<div class="input-group col-sm-7">
-							<input class="form-control" type="datetime-local" name="to" id="to" value=""></input>
-						</div>
-				</div>
-				
-				<div class="table-responsive"> 
-					<table class="table table-bordered table-striped table-hover" id="myTable">
-								<thead>
-									<tr>
-										<th class="text-center" name="select"><span>Select</span></th>
-										<th class="text-center" name="name"><span>Employee</span></th>
-										<th class="text-center" name="from"><span>From</span></th>
-										<th class="text-center" name="to"><span>To</span></th>
-										<th class="text-center" name="reason"><span>Reason</span></th>
-										<th class="text-center" name="approve"><span>Approve</span></th>
-										<th class="text-center" name="deny"><span>Deny</span></th>
-									</tr>
-								</thead>
-								<tbody class="text-center">
-								</tbody>
-					</table>
-				</div>
+		}
+		
+		$(function() {
+			var objReturnRequestDetails;
+	// 		objRequestDetails.id = $(this).closest('tr').find('td:first').text();
+			var listRequest;
+			var requestStatus = {
+				'1' : 'saved',
+				'2' : 'approved',
+				'3' : 'denied',
+				'4' : 'response',
+				'5' : 'waiting'
+			};
 			
-			<p align="center">
-				<button type="button" class="btn btn-default" style="width:76px;">Approve</button>
-				<button type="button" class="btn btn-default" style="width:76px;">Deny</button>
-			</p>
-			<div class="modal fade" id="myModal" role="dialog">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal">&times;</button>
-							<h4 class="modal-title">Details</h4>
+			$('#btnSearch').on('click', function(){
+				search();
+			});
+			
+			$('#requestTable').on('click', 'td', function () {
+				var childTag = $(this).children();
+				if(childTag.length == 0){
+					var table = $('#requestTable').DataTable();
+					var rowData = table.row(this).data();
+					objReturnRequestDetails = rowData;
+					$('#recipientDetails').val(rowData.recipient.name);
+					$('#nameDetails').val(rowData.employee.name);
+					$('#positionDetails').val(rowData.employee.position.name);
+					$('#teamDetails').val(rowData.employee.listTeam[0].name);
+					$('#departmentDetails').val(rowData.employee.listTeam[0].department.name);
+					$('#fromTimeDetails').val(rowData.fromTime);
+					$('#toTimeDetails').val(rowData.toTime);
+					$('#reasonDetails').val(rowData.reason);
+					$('#statusDetails').val(requestStatus[rowData.status]);
+					$('#dayOffTypeDetails').val(rowData.dayOffType.name);
+					$('#responseMessage').val(rowData.responseMessage);
+					
+	// 				console.log(rowData);
+					var listForward = []; 
+					if (rowData.recipient.position.name == 'leader') {
+						listForward.push(rowData.recipient.team.department.manager);
+					} else if (rowData.recipient.position.name == 'project manager'){
+						$.each(rowData.recipient.department.listTeam, function (index, team) {
+							listForward.push(team.leader);
+						})
+					} else {
+						console.log("recipient is a employee");
+					}
+					$('#forward').empty();
+					$.each(listForward, function(index, recipient) {
+						$('#forward').append('<option value = "' + recipient.id + '">' + recipient.name + '</option>');
+					});
+					
+		 			if($('#statusDetails').val() == 'approved' || $('#statusDetails').val() == 'denied'){
+						$('#btnApproveModal').prop('disabled', true);
+						$('#btnDenyModal').prop('disabled', true);
+						$('#btnSendModal').prop('disabled', true);
+					} else if($('#statusDetails').val() == 'waiting'){
+						$('#btnApproveModal').prop('disabled', false);
+						$('#btnDenyModal').prop('disabled', false);
+						$('#btnSendModal').prop('disabled', false);
+					}
+					
+					$('#modalDetails').modal('show');
+				}
+			});
+			
+			$("#btnApprove, #btnDeny").on('click', function() {
+				var status = $(this).attr('id') == 'btnApprove' ? 2 : 3;
+				var requestObj = {
+					"status" : status
+				}
+	// 			console.log($(this).attr('id'));
+	// 			console.log(requestObj);
+				if(requestObj == 2 || requestObj == 3){
+					 $('#chk').attr('disabled', true);
+				}
+				$('#requestTable input[type="checkbox"]').each(function(){
+					if ($(this).is(":checked")) {
+						var table = $('#requestTable').DataTable();
+						var rowData = table.row($(this).parent()).data();
+						
+						requestObj.id = rowData.id;
+						requestObj.update_date = rowData.updateDate;
+	// 					console.log("row");
+	// 					console.log(rowData);
+	// 					console.log(requestObj);
+						updateRequest(requestObj);
+					}
+				});
+			});
+			
+			$('#requestTable').on('click', '.btnApprove, .btnDeny', function () {
+				var table = $('#requestTable').DataTable();
+				var rowData = table.row($(this).parent()).data();
+				var requestObj = {
+					"id" : rowData.id ,
+					"update_date": rowData.updateDate
+					}
+	// 			console.log(rowData);
+				if ($(this).hasClass('btnApprove')) {
+					requestObj.status = 2;
+				} else {
+					requestObj.status = 3;
+				}
+				updateRequest(requestObj);
+			});
+			
+			$("#btnApproveModal, #btnDenyModal, #btnSendModal, #btnForward").on('click', function(){
+				var requestObj = {
+					"id" : objReturnRequestDetails.id ,
+					"update_date": objReturnRequestDetails.updateDate
+				}
+	// 			if($('#statusDetails').val(data.request.status) == 2 ){
+	// 				$('#btnApproveModal').attr('disabled','disabled');
+	// 			}
+				var element = document.getElementById("forward");
+				var selectedValue = element.options[element.selectedIndex].value;
+				if ($(this).attr('id') == 'btnApproveModal') {
+					requestObj.status = 2;
+				} else if ($(this).attr('id') == 'btnDenyModal') {
+					requestObj.status = 3;
+				} else if ($(this).attr('id') == 'btnSendModal') {
+					requestObj.status = 5;
+				} else if ($(this).attr('id') == 'btnForward') {
+					if(objReturnRequestDetails.recipient.position.name == 'project manager'){
+						requestObj.recipient_id = selectedValue;
+					} else if(objReturnRequestDetails.recipient.position.name == 'leader'){
+						requestObj.recipient_id = selectedValue;
+					}
+				}
+				requestObj.response_message = $('#responseMessage').val();
+				updateRequest(requestObj);
+			});
+		});
+	/*]]>*/
+	</script>
+		<div th:replace="fragments/header"></div>
+		<div th:replace="menu"></div>
+	
+		<div class="requestOffContentBody">			
+			<div>
+				<h2>Request Browsing</h2>
+					<form id="requestForm" class="form-input">
+						<div class="form-group">
+							<label class="control-label">Employee: </label>
+							<input class="form-control" type="text" name="name" id="employee" value=""></input>
 						</div>
 						
-						<div class="modal-body">
-							<label class="col-md-3 control-label">Employee</label>
-							<div class="col-md-9">
-								<p>Minh Hien</p>
-							</div>
-		
-							<label class="col-md-3 control-label">Position</label>
-							<div class="col-md-9">
-								<p>Intern</p>
-							</div>
-		
-							<label class="col-md-3 control-label">Team</label>
-							<div class="col-md-9">
-								<p>Intern</p>
-							</div>
-		
-							<label class="col-md-3 control-label">Department</label>
-							<div class="col-md-9">
-								<p>Java</p>
-							</div>
-		
-							<label class="col-md-3 control-label">From</label>
-							<div class="col-md-9">
-								<p>23/1/2018 10:10:SA</p>
-							</div>
-		
-							<label class="col-md-3 control-label">Reason</label>
-							<div class="col-md-9">
-								<p>Ốm</p>
-							</div>
-		
-							<label class="col-md-3 control-label">Day Off Type</label>
-							<div class="col-md-9">
-								<p>1</p>
-							</div>
-		
-							<div class="form-group">
-								<label>Response Message</label>
-								<textarea id="subject" name="subject"
-									placeholder="Write message..."
-									style="height: 115px; width: 100%;"></textarea>
+						<div class="form-group">
+							<label class="control-label">Request Status: </label>
+							<select name="status" id="status" value="" class="form-control">
+								<option value=""></option>
+								<option value="2">Approved</option>
+								<option value="3">Denied</option>
+								<option value="4">Response</option>
+								<option value="5">Waiting</option>
+							</select>
+						</div>
+						
+						<div class="form-group">
+							<label class="control-label">From: </label>
+							<input class="form-control" type="date" name="from_time" id="from" value=""></input>
+						</div>
+						
+						<div class="form-group">
+							<label class="control-label">To: </label>
+							<input class="form-control" type="date" name="to_time" id="to" value=""></input>
+						</div>
+					
+					<p>
+						<button id="btnSearch" type="button" class="btn btn-primary" style="width:76px;">Search</button>&nbsp;&nbsp;
+						<button type="reset" class="btn btn-primary" style="width:76px;">Clear</button>
+					</p>
+				</form>
+					
+				<div class="table-responsive" style="margin-top:3em;"> 
+					<table class="table table-bordered table-striped table-hover" id="requestTable">
+						<thead>
+							<tr>
+								<th class="text-center" name="id" id="id"><span>ID</span></th>
+								<th class="text-center" name="name"><span>Employee</span></th>
+								<th class="text-center" name="from"><span>From</span></th>
+								<th class="text-center" name="to"><span>To</span></th>
+								<th class="text-center" name="reason"><span>Reason</span></th>
+								<th class="text-center" name="select"><span>Select</span></th>
+								<th class="text-center" name="approve"><span>Approve</span></th>
+								<th class="text-center" name="deny"><span>Deny</span></th>
+							</tr>
+						</thead>
+						<tbody class="text-center">
+						<tr>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+				
+				<p align="center">
+					<button type="button" class="btn btn-primary" id="btnApprove" >Approve</button>&nbsp;&nbsp;
+					<button type="button" class="btn btn-primary" style="width:76px;" id="btnDeny">Deny</button>
+				</p>
+				
+				<div class="modal fade" id="modalDetails" role="dialog">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">�</button>
+								<h4 class="modal-title">Details</h4>
 							</div>
 							
-							<p align="center">
-								<button type="button" class="btn btn-default" style="width:76px;">Approve</button>
-								<button type="button" class="btn btn-default" style="width:76px;">Deny</button>
-								<button type="button" class="btn btn-default" style="width:76px;">Send</button>
-								<button type="button" class="btn btn-default" style="width:76px;">Cancel</button>
-							</p>
-		
-							<label> Forward request to : <select name="status" id="status" value="">
-									<option value=""></option>
-									<option value="1">Employee1</option>
-									<option value="2">Employee2</option>
-									<option value="3">Employee3</option>
-							</select>
-							</label>
-							<button type="button" class="btn btn-default btn-sm">
-								<span class="glyphicon glyphicon-share-alt"></span>Forward
-							</button>
+							<div class="modal-body">
+								<form class="form-horizontal" id="formModal">
+									<label class="col-md-3 control-label">Employee:</label>
+									<div class="col-md-9">
+										<input id="nameDetails" class="form-control" readonly="readonly"></input>
+									</div>
+				
+									<label class="col-md-3 control-label">Position:</label>
+									<div class="col-md-9">
+										<input id="positionDetails" class="form-control" readonly="readonly"></input>
+									</div>
+				
+									<label class="col-md-3 control-label">Team:</label>
+									<div class="col-md-9">
+										<input id="teamDetails" class="form-control" readonly="readonly"></input>
+									</div>
+				
+									<label class="col-md-3 control-label">Department:</label>
+									<div class="col-md-9">
+										<input id="departmentDetails" class="form-control" readonly="readonly"></input>
+									</div>
+				
+									<label class="col-md-3 control-label">Recipient:</label>
+									<div class="col-md-9">
+										<input id="recipientDetails" class="form-control" readonly="readonly"></input>
+									</div>
+									
+									<label class="col-md-3 control-label">From:</label>
+									<div class="col-md-9">
+										<input id="fromTimeDetails" class="form-control" readonly="readonly"></input>
+									</div>
+									
+									<label class="col-md-3 control-label">To:</label>
+									<div class="col-md-9">
+										<input id="toTimeDetails" class="form-control" readonly="readonly"></input>
+									</div>
+				
+									<label class="col-md-3 control-label">Reason:</label>
+									<div class="col-md-9">
+										<input id="reasonDetails" class="form-control" readonly="readonly"></input>
+									</div>
+									
+									<label class="col-md-3 control-label">Status:</label>
+									<div class="col-md-9">
+										<input id="statusDetails" class="form-control" readonly="readonly"></input>
+									</div>
+				
+									<label class="col-md-3 control-label">Day Off Type:</label>
+									<div class="col-md-9">
+										<input id="dayOffTypeDetails" class="form-control" readonly="readonly"></input>
+									</div>
+				
+									<div class="form-group">
+										<label>Response Message:</label>
+										<textarea id="responseMessage" name="responseMessage"
+											placeholder="Write message..."
+											style="height: 115px; width: 100%;">
+										</textarea>
+									</div>
+									
+									<p align="center">
+										<button type="button" class="btn btn-default" style="width:76px;" id="btnApproveModal">Approve</button>
+										<button type="button" class="btn btn-default" style="width:76px;" id="btnDenyModal">Deny</button>
+										<button type="button" class="btn btn-default" style="width:76px;" id="btnSendModal">Send</button>
+										<button type="button" class="btn btn-default" style="width:76px;" data-dismiss="modal">Cancel</button>
+									</p>
+				
+									<label> Forward request to : <select name="forward" id="forward" value=""></select>
+									</label>
+									
+									<button type="button" class="btn btn-default btn-sm" id="btnForward">
+										<span class="glyphicon glyphicon-share-alt"></span>Forward
+									</button>
+								</form>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	</div>
 	<div th:replace="fragments/footer"></div>
-	
 </body>
 </html>

@@ -20,14 +20,16 @@ public class RequestSearchRequest {
 	private String recipientId;
 	@JsonProperty("valid_flag")
 	private String validFlag;
+	@JsonProperty("name")
+	private String nameOfEmployee;
 
 	public RequestSearchRequest() {
 		super();
 	}
 
 	public RequestSearchRequest(String id, String employeeId, String fromTime, String toTime, String reason,
-			String status, String responseMessage, String dayOffTypeId, String recipientId, String validFlag) {
-		super();
+			String status, String responseMessage, String dayOffTypeId, String recipientId, String validFlag,
+			String nameOfEmployee) {
 		this.id = id;
 		this.employeeId = employeeId;
 		this.fromTime = fromTime;
@@ -38,6 +40,7 @@ public class RequestSearchRequest {
 		this.dayOffTypeId = dayOffTypeId;
 		this.recipientId = recipientId;
 		this.validFlag = validFlag;
+		this.nameOfEmployee = nameOfEmployee;
 	}
 
 	public String getId() {
@@ -118,6 +121,14 @@ public class RequestSearchRequest {
 
 	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
+	}
+
+	public String getNameOfEmployee() {
+		return nameOfEmployee;
+	}
+
+	public void setNameOfEmployee(String nameOfEmployee) {
+		this.nameOfEmployee = nameOfEmployee;
 	}
 
 }

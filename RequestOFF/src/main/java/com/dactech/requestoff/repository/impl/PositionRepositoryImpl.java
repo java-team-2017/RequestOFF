@@ -9,6 +9,7 @@ import javax.persistence.Query;
 import com.dactech.requestoff.model.entity.Position;
 import com.dactech.requestoff.model.request.PositionSearchRequest;
 import com.dactech.requestoff.repository.custom.PositionRepositoryCustom;
+import com.dactech.requestoff.util.StringUtil;
 
 public class PositionRepositoryImpl implements PositionRepositoryCustom {
 	@PersistenceContext
@@ -20,13 +21,13 @@ public class PositionRepositoryImpl implements PositionRepositoryCustom {
 		boolean whereClause = true;
 		StringBuilder sqlQuery = new StringBuilder("SELECT * FROM position ");
 
-		if (positionSearchRequest.getId() != 0) {
+		if (StringUtil.isNotEmpty(positionSearchRequest.getId())) {
 			sqlQuery.append(" WHERE id = '" + positionSearchRequest.getId() + "'");
 			whereClause = false;
 		}
 
-		if (positionSearchRequest.getName() != null && positionSearchRequest.getName() != "") {
-			if (positionSearchRequest.getNameMatchStatus() != 1) {
+		if (StringUtil.isNotEmpty(positionSearchRequest.getName())) {
+			if (StringUtil.isNotEmpty(positionSearchRequest.getNameMatchStatus())) {
 				String sqlString = whereClause ? " WHERE " : " AND ";
 				sqlQuery.append(sqlString + " name like '%" + positionSearchRequest.getName() + "%'");
 				whereClause = false;
@@ -38,7 +39,7 @@ public class PositionRepositoryImpl implements PositionRepositoryCustom {
 
 		}
 
-		if (positionSearchRequest.getValidFlag() == 0 || positionSearchRequest.getValidFlag() == 1) {
+		if (StringUtil.isNotEmpty(positionSearchRequest.getValidFlag())) {
 			String sqlString = whereClause ? " WHERE " : " AND ";
 			sqlQuery.append(sqlString + " valid_flag = '" + positionSearchRequest.getValidFlag() + "'");
 			whereClause = false;

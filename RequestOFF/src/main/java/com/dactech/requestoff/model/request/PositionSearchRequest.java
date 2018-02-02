@@ -4,30 +4,28 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PositionSearchRequest {
-	private long id;
+	private String id;
 	private String name;
 	@JsonProperty("name_match_status")
-	private int nameMatchStatus;
+	private String nameMatchStatus;
 	@JsonIgnoreProperties("valid_flag")
-	private int validFlag;
+	private String validFlag;
 
 	public PositionSearchRequest() {
-		super();
 	}
 
-	public PositionSearchRequest(long id, String name, int nameMatchStatus, int validFlag) {
-		super();
+	public PositionSearchRequest(String id, String name, String nameMatchStatus, String validFlag) {
 		this.id = id;
 		this.name = name;
 		this.nameMatchStatus = nameMatchStatus;
 		this.validFlag = validFlag;
 	}
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -39,19 +37,19 @@ public class PositionSearchRequest {
 		this.name = name;
 	}
 
-	public int getNameMatchStatus() {
+	public String getNameMatchStatus() {
 		return nameMatchStatus;
 	}
 
-	public void setNameMatchStatus(int nameMatchStatus) {
+	public void setNameMatchStatus(String nameMatchStatus) {
 		this.nameMatchStatus = nameMatchStatus;
 	}
 
-	public int getValidFlag() {
+	public String getValidFlag() {
 		return validFlag;
 	}
 
-	public void setValidFlag(int validFlag) {
+	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
 	}
 

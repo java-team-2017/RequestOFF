@@ -1,21 +1,20 @@
 package com.dactech.requestoff.model.request;
 
 public class PositionDetailsRequest {
-	private long id;
+	private String id;
 
 	public PositionDetailsRequest() {
-		super();
 	}
 
-	public PositionDetailsRequest(long id) {
+	public PositionDetailsRequest(String id) {
 		this.id = id;
 	}
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
