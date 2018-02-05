@@ -41,8 +41,8 @@
 				success : function(data) {
 					employeeLoginId = data.user.id;
 				},
-				error : function() {
-					alert("Error");
+				error : function(e) {
+					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 				}
 			});
 			
@@ -105,12 +105,12 @@
 	// 			console.log($(this).attr('id'));
 	// 			console.log(requestObj);
 				$('#requestTable input[type="checkbox"]:checked').each(function(){
-						var table = $('#requestTable').DataTable();
-						var rowData = table.row($(this).parent()).data();
-						
-						requestObj.id = rowData.id;
-						requestObj.update_date = rowData.updateDate;
-						updateRequest(requestObj);
+					var table = $('#requestTable').DataTable();
+					var rowData = table.row($(this).parent()).data();
+					
+					requestObj.id = rowData.id;
+					requestObj.update_date = rowData.updateDate;
+					updateRequest(requestObj);
 				});
 			});
 			
@@ -151,7 +151,13 @@
 				requestObj.response_message = $('#responseMessage').val();
 				updateRequest(requestObj);
 			});
+			
+// 			$('#employee').prop('disabled', true);
+			$(document).ready(function(){
+				$('[data-toggle="tooltip"]').tooltip();   
+			});
 		});
+		
 		
 		function updateRequest(requestObj) {
 			$.ajax({
@@ -161,17 +167,27 @@
 				dataType : 'json',
 				data : JSON.stringify(requestObj),
 				success : function(resultData) {
-					search();
+					$('#modalDetails').modal('hide');
+					var loadTable = $('#requestTable').DataTable();
+					loadTable.ajax.reload();
 				},
-				error : function() {
-					console.log("Error");
+				error : function(e) {
+					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 				}
 			});
 		}
 		
 		function search(){
 			var requestData = $('#requestForm').serializeJSON();
-// 				console.log(requestData);
+			var requestSearch = {
+				"from_time" : requestData.from_time,
+				"to_time" : requestData.to_time,
+				"status" : requestData.status,
+				"recipient_id" : employeeLoginId,
+				"name": requestData.name
+			};
+// 			console.log(requestData);
+// 			console.log(requestSearch);
 			$('#requestTable').DataTable( {
 				ajax: {
 					type: "POST",
@@ -179,7 +195,7 @@
 					url : /*[[@{/request/search}]]*/,
 					dataType : 'json',
 					data: function () {
-						return JSON.stringify({"recipient_id": employeeLoginId});
+						return JSON.stringify(requestSearch);
 // 						console.log(requestData);
 					},
 					dataSrc: 'requests'
@@ -189,8 +205,13 @@
 				//data: listRequest,
 				columns: [
 					{
-						render: function () {
-							return '<input type="checkbox" class="editor-active" >';
+						data: 'status',
+						render: function (data, type, row) {
+							if(row.status != 5){
+								return '<input type="checkbox" class="editor-active" disabled="disabled">';
+							} else {
+								return '<input type="checkbox" class="editor-active">';
+							}
 						},
 					},
 					{ data: 'id' },
@@ -199,28 +220,20 @@
 					{ data: 'toTime' },
 					{ data: 'reason' },
 					{
-						render: function () {
-							return '<a href="#" class="btnApprove"><span class="glyphicon glyphicon-ok"></span></a>';
-						},
-					},{
-						render: function () {
-							return '<a href="#" class="btnDeny"><span class="glyphicon glyphicon-remove"></span></a>';
+						data: 'status',
+						render: function (data, type, row) {
+							if(row.status == 2){
+								return '<p id="requestStatus">Approved</p>';
+							} else if(row.status == 3){
+								return '<p id="requestStatus">Denied</p>';
+							}
+							else if(row.status == 5) {
+								return '<a href="#" data-toggle="tooltip" title="Approve" class="btnApprove"><span class="glyphicon glyphicon-ok">&nbsp;&nbsp;<a href="#" data-toggle="tooltip" title="Deny" class="btnDeny"><span class="glyphicon glyphicon-remove"></span></a></a>';
+							}
 						},
 					}
 				]
 			});
-			
-			
-			
-// 			console.log("status: ");
-// 			console.log(requestData.status);
-// 			if(requestData.status != 5){
-// // 				var table = $('#requestTable').DataTable();
-// 				$("input[type='checkbox']").prop("disabled", true);
-// // 				table.column(5).prop("disabled", true);
-// // 				table.column(6).prop("disabled", true);
-// // 				table.column(7).prop("disabled", true);
-// 			}
 		}
 	/*]]>*/
 	</script>
@@ -230,6 +243,7 @@
 		<div class="requestOffContentBody">			
 			<div>
 				<h2>Request Browsing</h2>
+				<div id="alertMessage" class="alert" style="display:none;"></div>
 					<form id="requestForm" class="form-input">
 						<div class="form-group">
 							<label class="control-label">Employee: </label>
@@ -283,8 +297,7 @@
 								<th class="text-center" name="from"><span>From</span></th>
 								<th class="text-center" name="to"><span>To</span></th>
 								<th class="text-center" name="reason"><span>Reason</span></th>
-								<th class="text-center" name="approve"><span>Approve</span></th>
-								<th class="text-center" name="deny"><span>Deny</span></th>
+								<th class="text-center" name="approve"><span>Status</span></th>
 							</tr>
 						</thead>
 						<tbody class="text-center">

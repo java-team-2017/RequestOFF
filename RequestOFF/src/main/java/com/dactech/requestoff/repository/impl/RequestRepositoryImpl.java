@@ -17,41 +17,39 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 
 	@Override
 	public List<Request> searchRequest(RequestSearchRequest requestSearchRequest) {
-		StringBuilder queryString = new StringBuilder("SELECT * FROM request ");
+		StringBuilder queryString = new StringBuilder("SELECT * FROM request INNER JOIN employee ON request.employee_id = employee.id ");
 		StringBuilder whereClause = new StringBuilder("");
-		StringBuilder sqlJoinQuery = new StringBuilder("");
 		
-		if (requestSearchRequest.getNameOfEmployee() != null && requestSearchRequest.getNameOfEmployee() != "") {
-			sqlJoinQuery.append(" INNER JOIN employee ON request.employee_id = employee.id WHERE name like '%"
-					+ requestSearchRequest.getNameOfEmployee() + "%'");
+		if (StringUtil.isNotEmpty(requestSearchRequest.getNameOfEmployee())) {
+			whereClause.append(" AND name like '%" + requestSearchRequest.getNameOfEmployee() + "%'");
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getId())) {
-			whereClause.append(" AND id = '" + requestSearchRequest.getId() + "'");
+			whereClause.append(" AND request.id = '" + requestSearchRequest.getId() + "'");
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getEmployeeId())) {
-			whereClause.append(" AND employee_id = '" + requestSearchRequest.getEmployeeId() + "'");
+			whereClause.append(" AND request.employee_id = '" + requestSearchRequest.getEmployeeId() + "'");
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getReason())) {
-			whereClause.append(" AND reason like '%" + requestSearchRequest.getReason() + "%'");
+			whereClause.append(" AND request.reason like '%" + requestSearchRequest.getReason() + "%'");
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getStatus())) {
-			whereClause.append(" AND status = '" + requestSearchRequest.getStatus() + "'");
+			whereClause.append(" AND request.status = '" + requestSearchRequest.getStatus() + "'");
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getResponseMessage())) {
-			whereClause.append(" AND response_message like '%" + requestSearchRequest.getResponseMessage() + "%'");
+			whereClause.append(" AND request.response_message like '%" + requestSearchRequest.getResponseMessage() + "%'");
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getDayOffTypeId())) {
-			whereClause.append(" AND day_off_type_id = '" + requestSearchRequest.getDayOffTypeId() + "'");
+			whereClause.append(" AND request.day_off_type_id = '" + requestSearchRequest.getDayOffTypeId() + "'");
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getRecipientId())) {
-			whereClause.append(" AND recipient_id = '" + requestSearchRequest.getRecipientId() + "'");
+			whereClause.append(" AND request.recipient_id = '" + requestSearchRequest.getRecipientId() + "'");
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getFromTime())) {
@@ -69,9 +67,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		if (whereClause.length() > 0) {
 			whereClause.replace(0, 5, " WHERE ");
 			queryString.append(whereClause);
-		} else if (sqlJoinQuery.indexOf("JOIN") != -1) {
-			queryString.append(sqlJoinQuery);
-		}
+		} 
 		Query query = entityManager.createNativeQuery(queryString.toString(), Request.class);
 		@SuppressWarnings("unchecked")
 		List<Request> requests = query.getResultList();
