@@ -1,5 +1,7 @@
 package com.dactech.requestoff.service;
 
+import java.util.List;
+
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.request.EmployeeDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatisticsPagingRequest;
@@ -18,6 +20,8 @@ public interface EmployeeService {
 	EmployeeSearchResponse employeeSearch(EmployeeSearchRequest employeeSearchRequest);
 
 	EmployeeDetailsResponse employeeDetails(EmployeeDetailsRequest employeeDetailsRequest);
+	
+	public List<Employee> search(String name, String teamId, String departmentId);
 	
 	public Employee findByEmail(String email);
 }
