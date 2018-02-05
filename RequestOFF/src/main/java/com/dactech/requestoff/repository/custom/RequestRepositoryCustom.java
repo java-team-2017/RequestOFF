@@ -3,7 +3,6 @@ package com.dactech.requestoff.repository.custom;
 import java.util.List;
 
 import com.dactech.requestoff.model.entity.Request;
-import com.dactech.requestoff.model.request.RequestDetailsRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
 
 public interface RequestRepositoryCustom {

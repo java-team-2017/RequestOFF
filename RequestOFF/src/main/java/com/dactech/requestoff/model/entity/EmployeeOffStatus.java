@@ -122,6 +122,7 @@ public class EmployeeOffStatus {
 		this.updateOperator = updateOperator;
 	}
 
+	@SuppressWarnings("serial")
 	public static class EmployeeOffStatusId implements Serializable {
 		private long companyYearOff;
 		private long employee;

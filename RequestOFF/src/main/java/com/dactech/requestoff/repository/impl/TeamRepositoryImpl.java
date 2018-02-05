@@ -15,6 +15,7 @@ public class TeamRepositoryImpl implements TeamRepositoryCustom {
 	@PersistenceContext
 	EntityManager entityManager;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Team> searchTeam(TeamSearchRequest teamSearchRequest) {
 		StringBuilder queryString = new StringBuilder("SELECT * FROM team ");

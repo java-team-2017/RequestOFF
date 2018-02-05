@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.dactech.requestoff.model.common.PagingColumn;
 import com.dactech.requestoff.model.common.PagingOrder;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EmployeeOffStatisticsPagingRequest {
 	private String draw;
