@@ -1,6 +1,9 @@
 var errors = {
 	'DateError': 'time of To field must be after From field',
-	'incompleteFields': 'Please fill in all fields'
+	'incompleteFields': 'Please fill in all fields',
+	'APIResponseError': function (errMsg) {
+		return errMsg;
+	}
 }
 
 // usage example: $.notify(notification['DateError']);
@@ -110,4 +113,63 @@ function renderRecipientSelect(listRecipient, selectBoxId) {
 		option += "<option value='" + element.name + "'>" + element.name + "</option>"; 
 	});
 	$("#" + selectBoxId).append(option);
+}
+
+function renderDepartmentSelect(selectBoxId, dataHandler) {
+	$.ajax({
+//		url: /*[[@{/department/search}]]*/,
+		url: "/department/search",
+		type: "post",
+		dataType:"json",
+		contentType: "application/json",
+		data: JSON.stringify({
+			"valid_flag": 1
+		}),
+		success: function (departmentSearchResponse){
+			if (departmentSearchResponse.status_info.status == 0) {
+				listDepartment = departmentSearchResponse.listDepartment;
+				$('#' + selectBoxId).empty().append('<option value=""></option>');
+				$.each(listDepartment, function(index, department) {
+					$('#' + selectBoxId).append('<option value="' + department.id + '">' + department.name + '</option>');
+				});
+				if (typeof(dataHandler) == 'function') {
+					dataHandler(listDepartment);
+				}
+			} else {
+				$.notify(notification['APIResponseError'](departmentSearchResponse.status_info.error));
+			}
+		},
+		error: function(e) {
+			console.log(e);
+		}
+	});
+}
+
+function renderTeamSelect(selectBoxId, dataHandler) {
+	teamSelect = $('#' + selectBoxId);
+	$.ajax({
+//		url : /*[[@{/team/search}]]*/,
+		url: "/team/search",
+		type: "post",
+		dataType:"json",
+		contentType: "application/json",
+		data: JSON.stringify({
+			"valid_flag": 1
+		}),
+		success: function (teamSearchResponse){
+			if (teamSearchResponse.status_info.status == 0) {
+				listTeam = teamSearchResponse.teams;
+				teamSelect.empty().append('<option value=""></option>');
+				$.each(listTeam, function(index, team) {
+					teamSelect.append('<option value="' + team.id + '">' + team.name + '</option>');
+				});
+				dataHandler(listTeam);
+			} else {
+				console.log(notification['APIResponseError'](teamSearchResponse.status_info.error))
+			}
+		},
+		error: function() {
+			console.log("error");
+		}
+	});
 }

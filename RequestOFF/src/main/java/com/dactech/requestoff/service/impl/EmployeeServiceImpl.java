@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.DayOffType;
 import com.dactech.requestoff.model.entity.Employee;
+import com.dactech.requestoff.model.entity.EmployeeOffStatus;
 import com.dactech.requestoff.model.entity.Position;
 import com.dactech.requestoff.model.entity.Request;
 import com.dactech.requestoff.model.request.EmployeeDetailsRequest;
@@ -255,9 +256,21 @@ public class EmployeeServiceImpl implements EmployeeService {
 					returnNumber = (int) (dir * (o1.getTimeOffWithPaying() - o2.getTimeOffWithPaying()));
 				} else if (colData.equals("timeOffWithoutPaying")) {
 					returnNumber = (int) (dir * (o1.getTimeOffWithoutPaying() - o2.getTimeOffWithoutPaying()));
-				} else if (colData.equals("employee.listEmployeeOffStatus[0].remainHours")) {
-					long remainHours1 = o1.getEmployee().getListEmployeeOffStatus().get(0).getRemainHours();
-					long remainHours2 = o2.getEmployee().getListEmployeeOffStatus().get(0).getRemainHours();
+				} else if (colData.equals("employee.listEmployeeOffStatus")) {
+					long remainHours1 = -1, remainHours2 = -1;
+					for (EmployeeOffStatus e : o1.getEmployee().getListEmployeeOffStatus()) {
+						if (e.getValidFlag() == 1) {
+							remainHours1 = e.getRemainHours();
+							break;
+						}
+					}
+					
+					for (EmployeeOffStatus e : o2.getEmployee().getListEmployeeOffStatus()) {
+						if (e.getValidFlag() == 1) {
+							remainHours2 = e.getRemainHours();
+							break;
+						}
+					}
 					returnNumber = (int) (dir * (remainHours1 - remainHours2));
 				} else { // sort by id is default
 					returnNumber = (int) (dir * (o1.getEmployee().getId() - o2.getEmployee().getId()));
