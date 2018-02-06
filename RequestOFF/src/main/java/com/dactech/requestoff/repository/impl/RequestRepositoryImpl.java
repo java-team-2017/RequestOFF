@@ -61,7 +61,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getValidFlag())) {
-			whereClause.append(" AND valid_flag = '" + requestSearchRequest.getValidFlag() + "'");
+			whereClause.append(" AND request.valid_flag = '" + requestSearchRequest.getValidFlag() + "'");
 		}
 
 		if (whereClause.length() > 0) {

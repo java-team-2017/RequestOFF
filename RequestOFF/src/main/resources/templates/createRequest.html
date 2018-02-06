@@ -23,6 +23,7 @@
 		/*<![CDATA[*/
 			var employee;
 			var employeeId;
+			var listDayOffType;
 			
 			//get current user
 			$.ajax({
@@ -35,15 +36,32 @@
 					employee = returnData.user;
 					console.log(employee);
 					employeeId = employee.id;
-					console.log()
 				},
 				error : function(e) {
-					$.notify(notification['APIResponseError'](e));
+					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+				}
+			});
+			
+			$.ajax({
+				type : "POST",
+				contentType : "application/json",
+				url : "/dayOffType/search",
+				dataType : 'json',
+				data : JSON.stringify({"valid_flag_id" : "1"}),
+				success : function(returnData) {
+					listDayOffType = returnData.listDayOffType;
+					var option = "";
+					$.each(returnData.listDayOffType, function(i, element){
+						option += "<option value='" + element.name + "'>" + element.name + "</option>"; 
+					});
+					$("#id_dayOffType").append(option);
+				},
+				error : function(e) {
+					console.log("ERROR: ", e);
 				}
 			});
 			
 			$(function() {
-				var listDayOffType;
 				var listRecipient = [];
 				var getStatus = {
 					'1': 'saved',
@@ -54,36 +72,68 @@
 				};
 				
 				renderRemainHours(employee, 'remainHours');
-				renderDayOffTypeSelect('id_dayOffType');
 				
 				//recipient select box
 				listRecipient = getListRecipient(employee);
 				renderRecipientSelect(listRecipient, 'id_recipient');
 				
+				$('.datepicker').on('changeDate', function(ev){
+					$(this).datepicker('hide');
+				});
+				
 				$('#btnSave, #btnSend').on('click', function() {
-					var status, alertStr;
-					if( $(this).attr('id') == 'btnSave' ) {
-						status = 1;
-						alertStr = "Your request has been saved";
+					//validate
+					var complete = 1, valid = 1;
+					var listInput = $('#createRequestForm').find(':input').not("button");
+					$.each(listInput, function() {
+						if($(this).val() == "") {
+							complete = 0;
+						}
+					});
+					
+					var createRequestData = $('#createRequestForm').serializeJSON();
+					var fromDate = createRequestData.from;
+					fromDate = fromDate.substr(6, 4) + "-" + fromDate.substr(0, 2) + "-" + fromDate.substr(3, 2);
+					var fromTime = createRequestData.hourFrom + ":" + createRequestData.minuteFrom + ":00.0";
+					var from = fromDate + " " + fromTime;
+					var toDate = createRequestData.to;
+					toDate = toDate.substr(6, 4) + "-" + toDate.substr(0, 2) + "-" + toDate.substr(3, 2);
+					var toTime = createRequestData.hourTo + ":" + createRequestData.minuteTo + ":00.0";
+					var to = toDate + " " + toTime;
+					if(from.localeCompare(to) >= 0) {
+						valid = 0;
+					}
+					//end validate
+					
+					if(complete == 0) {
+						$('#alertMessage').html(errors['incompleteFields']).attr('class', 'alert alert-danger').show();
+					}
+					else if(valid == 0) {
+						$('#alertMessage').html(errors['DateError']).attr('class', 'alert alert-danger').show();
 					}
 					else {
-						status = 5;
-						alertStr = "Your request has been sent";
-					}
-					var createRequestData = $('#createRequestForm').serializeJSON();
-					if(validate("#createRequestForm") == 1) {
+						var status, alertStr;
+						if( $(this).attr('id') == 'btnSave' ) {
+							status = 1;
+							alertStr = "Your request has been saved";
+						}
+						else {
+							status = 5;
+							alertStr = "Your request has been sent";
+						}
+						
 						var fromDate = createRequestData.from;
 						fromDate = fromDate.substr(6, 4) + "-" + fromDate.substr(0, 2) + "-" + fromDate.substr(3, 2);
+						var fromTime = createRequestData.hourFrom + ":" + createRequestData.minuteFrom + ":00.0";
 						var toDate = createRequestData.to;
 						toDate = toDate.substr(6, 4) + "-" + toDate.substr(0, 2) + "-" + toDate.substr(3, 2);
+						var toTime = createRequestData.hourTo + ":" + createRequestData.minuteTo + ":00.0";
 						
-						console.log(from);
-						console.log(to);
 						var requestRegistRequest = {
 							"id" : "",
 							"employee_id" : employeeId,
-							"from_time" : createRequestData.from,
-							"to_time" : createRequestData.to,
+							"from_time" : fromDate + " " + fromTime,
+							"to_time" : toDate + " " + toTime,
 							"reason" : createRequestData.reason,
 							"status" : status,
 							"response_message" : "",
@@ -93,9 +143,6 @@
 							"update_date" : ""
 						}
 						console.log(requestRegistRequest);
-// 						var fromStr = requestRegistRequest.from;
-// 						fromStr = fromStr.replace("T", " ");
-// 						console.log(Date.parse(requestRegistRequest.from));
 						$.ajax({
 							type : "POST",
 							contentType : "application/json",
@@ -111,25 +158,12 @@
 						
 						$("#createRequestForm :input").not("button, select").val("");
 						$("#createRequestForm select").prop('selectedIndex', 0);
-						alert(alertStr);
+// 						$('#alertMessage').attr('class', 'alert fade in alert-success').show();
+// 						$('#alertMessage > span').html(alertStr);
+						$('#alertMessage').html(alertStr).attr('class', 'alert alert-success').show();
 					}
 				});
 			});
-			
-			function validate(formId) {
-				var ok = 1;
-				var listInput = $(formId).find(':input').not("button");
-				$.each(listInput, function() {
-					if($(this).val() == "") {
-						ok = 0;
-					}
-// 					if($("#id_to").val() )
-				});
-				if(ok == 0) {
-					alert(errors.incompleteFields);
-				}
-				return ok;
-			}
 				
 		/*]]>*/
 		</script>
@@ -141,12 +175,14 @@
 			<div class="requestOffContentBody">
 				<h2>Create Request</h2>
 				<div>
+					<div id="alertMessage" class="alert" style="display:none;"></div>
+<!-- 					<div id="alertMessage" class="alert close" data-dismiss="alert" style="display:none;"></div> -->
+<!-- 					<div id="alertMessage" style="display:none;"> -->
+<!-- 						<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> -->
+<!-- 						<span></span> -->
+<!-- 					</div> -->
 					<h4>You have <span id="remainHours"></span> of off time with payment left</h4>
 					<form id="createRequestForm" class="form-input">
-<!-- 						<div class="form-group"> -->
-<!-- 							<label>From: </label> -->
-<!-- 							<input type="datetime-local" class="form-control" name="from" id="id_from"/> -->
-<!-- 						</div> -->
 						<div class="form-group">
 							<label>From: </label>
 							<div class="row">
@@ -203,7 +239,7 @@
 								</div>
 								<div class="col-sm-6 form-inline" style="text-align: right;">
 									<label>Hours: </label>
-									<select class="form-control" name="hourFrom" style="width:100px;">
+									<select class="form-control" name="hourTo" style="width:100px;">
 										<option value="8">8</option>
 										<option value="9">9</option>
 										<option value="10">10</option>
@@ -215,7 +251,7 @@
 										<option value="16">16</option>
 										<option value="17">17</option>
 									</select>&nbsp;:&nbsp;
-									<select class="form-control" name="minuteFrom" style="width:100px;">
+									<select class="form-control" name="minuteTo" style="width:100px;">
 										<option value="0">00</option>
 										<option value="5">05</option>
 										<option value="10">10</option>

@@ -23,6 +23,14 @@
 		/*<![CDATA[*/
 			var employee;
 			var employeeId;
+			var listDayOffType;
+			var getStatus = {
+				'1': 'saved',
+				'2': 'approved',
+				'3': 'denied',
+				'4': 'responded',
+				'5': 'waiting'
+			};
 			
 			//get current user
 			$.ajax({
@@ -38,23 +46,33 @@
 					console.log()
 				},
 				error : function(e) {
-					$.notify(notification['APIResponseError'](e));
+					$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+				}
+			});
+			
+			$.ajax({
+				type : "POST",
+				contentType : "application/json",
+				url : "/dayOffType/search",
+				dataType : 'json',
+				data : JSON.stringify({"valid_flag_id" : "1"}),
+				success : function(returnData) {
+					listDayOffType = returnData.listDayOffType;
+					var option = "";
+					$.each(returnData.listDayOffType, function(i, element){
+						option += "<option value='" + element.name + "'>" + element.name + "</option>"; 
+					});
+					$("#modalDayOffType").append(option);
+				},
+				error : function(e) {
+					console.log("ERROR: ", e);
 				}
 			});
 			
 			$(function() {
-				var listDayOffType;
 				var listRecipient = [];
-				var getStatus = {
-					'1': 'saved',
-					'2': 'approved',
-					'3': 'denied',
-					'4': 'responded',
-					'5': 'waiting'
-				};
 				
 				renderRemainHours(employee, 'remainHours');
-				renderDayOffTypeSelect('modalDayOffType');
 				
 				//recipient select box
 				listRecipient = getListRecipient(employee);
@@ -62,6 +80,10 @@
 				
 				var requestSearchRequest = getRequestSearchRequest();
 				search(requestSearchRequest);
+				
+				$('.datepicker').on('changeDate', function(ev){
+					$(this).datepicker('hide');
+				});
 				
 				$('#requestHistoryTable tbody').on('click', 'td', function() {
 					var index = $(this).index();
@@ -80,12 +102,20 @@
 							$("#modalTeam").empty().append(rowData.employee.listTeam[0].name);
 							$("#modalDepartment").empty().append(rowData.employee.listTeam[0].department.name);
 						}
-						var fromStr = rowData.fromTime;
-						fromStr = fromStr.replace(" ", "T");
-						$("#modalFrom").val(fromStr);
-						var toStr = rowData.toTime;
-						toStr = toStr.replace(" ", "T");
-						$("#modalTo").val(toStr);
+						
+						var fromStr = rowData.fromTime.split(" ");
+						fromDateStr = fromStr[0].split("-");
+						$("#modalFrom").val(fromDateStr[1] + "/" + fromDateStr[2] + "/" + fromDateStr[0]);
+						fromStr = fromStr[1].split(":");
+						$("#modalHourFrom").val(fromStr[0]);
+						$("#modalMinuteFrom").val(fromStr[1]);
+						var toStr = rowData.toTime.split(" ");
+						toDateStr = toStr[0].split("-");
+						$("#modalTo").val(toDateStr[1] + "/" + toDateStr[2] + "/" + toDateStr[0]);
+						toStr = toStr[1].split(":");
+						$("#modalHourTo").val(toStr[0]);
+						$("#modalMinuteTo").val(toStr[1]);
+						
 						$("#modalReason").val(rowData.reason);
 						$("#modalDayOffType").val(rowData.dayOffType.name);
 						$("#modalRecipient").val(rowData.recipient.name);
@@ -100,6 +130,7 @@
 							$("#modalForm :input").prop('disabled', true);
 							$("#btnSave_modal, #btnSend_modal").hide();
 						}
+						$('#alertMessage_edit').hide();
 						$('#requestDetailsModal').modal('show');
 					}
 				} );
@@ -115,25 +146,6 @@
 						$(this).val("");
 					});
 				});
-				
-// 					$('#testBtn').confirmation({
-// 						placement: 'right',
-// 						title: 'Are you sure?',
-// 						btnOkClass: 'btn btn-sm btn-danger',
-// 						btnOkLabel: 'OK',
-// 						btnOkIcon: 'glyphicon glyphicon-ok',
-// 						btnCancelClass: 'btn btn-sm btn-default',
-// 						btnCancelLabel: 'Cancel',
-// 						btnCancelIcon: 'glyphicon glyphicon-remove',
-// 						onShow: function(event, element) {},
-// 						onHide: function(event, element) {},
-// 						onConfirm: function(event, element) {
-							
-// 						},
-// 						onCancel: function(event, element) {
-							
-// 						}
-// 					});
 				
 				$("body").on("click", ".btnDelete", function() {
 					if (confirm('Are you sure you want to delete this request?')) {
@@ -158,29 +170,65 @@
 								search(requestSearchRequest);
 							},
 							error : function(e) {
-								$.notify(notification['APIResponseError'](e));
+								$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 							}
 						});
 					}
 				});
 				
 				$('#btnSave_modal, #btnSend_modal').on('click', function() {
-					var status;
-					if( $(this).attr('id') == 'btnSave_modal' ) {
-						status = 1;
+					//validate
+					var editRequestData = $('#modalForm').serializeJSON();
+					
+					var complete = 1, valid = 1;
+					var listInput = $("#modalForm").find(':input').not("#modalResponseMessage");
+					$.each(listInput, function() {
+						if($(this).val() == "") {
+							complete = 0;
+						}
+					});
+					
+					var fromDate = editRequestData.from_modalForm;
+					fromDate = fromDate.substr(6, 4) + "-" + fromDate.substr(0, 2) + "-" + fromDate.substr(3, 2);
+					var fromTime = editRequestData.hourFrom_modalForm + ":" + editRequestData.minuteFrom_modalForm + ":00.0";
+					var from = fromDate + " " + fromTime;
+					var toDate = editRequestData.to_modalForm;
+					toDate = toDate.substr(6, 4) + "-" + toDate.substr(0, 2) + "-" + toDate.substr(3, 2);
+					var toTime = editRequestData.hourTo_modalForm + ":" + editRequestData.minuteTo_modalForm + ":00.0";
+					var to = toDate + " " + toTime;
+					console.log(from + "---" + to);
+					if(from.localeCompare(to) >= 0) {
+						valid = 0;
+					}
+					//end validate
+					
+					if(complete == 0) {
+						$('#alertMessage_edit').html(errors['incompleteFields']).attr('class', 'alert alert-danger').show();
+					}
+					else if(valid == 0) {
+						$('#alertMessage_edit').html(errors['DateError']).attr('class', 'alert alert-danger').show();
 					}
 					else {
-						status = 5;
-					}
-					
-					if(validate("#modalForm") == 1) {
+						var status;
+						if( $(this).attr('id') == 'btnSave_modal' ) {
+							status = 1;
+						}
+						else {
+							status = 5;
+						}
 						var requestId = $("#modalRequestId").html();
 						var editRequestData = $('#modalForm').serializeJSON();
+						var fromDate = editRequestData.from_modalForm;
+						fromDate = fromDate.substr(6, 4) + "-" + fromDate.substr(0, 2) + "-" + fromDate.substr(3, 2);
+						var fromTime = editRequestData.hourFrom_modalForm + ":" + editRequestData.minuteFrom_modalForm + ":00.0";
+						var toDate = editRequestData.to_modalForm;
+						toDate = toDate.substr(6, 4) + "-" + toDate.substr(0, 2) + "-" + toDate.substr(3, 2);
+						var toTime = editRequestData.hourTo_modalForm + ":" + editRequestData.minuteTo_modalForm + ":00.0";
 						requestRegistRequest = {
 							"id" : requestId,
 							"employee_id" : employeeId,
-							"from_time" : editRequestData.from_modalForm,
-							"to_time" : editRequestData.to_modalForm,
+							"from_time" : fromDate + " " + fromTime,
+							"to_time" : toDate + " " + toTime,
 							"reason" : editRequestData.reason_modalForm,
 							"status" : status,
 							"response_message" : editRequestData.responseMessage_modalForm,
@@ -189,6 +237,7 @@
 							"valid_flag" : "1",
 							"update_date" : editRequestData.updateDate_modalForm
 						}
+						console.log(requestRegistRequest);
 						
 						$.ajax({
 							type : "POST",
@@ -201,7 +250,7 @@
 								search(requestSearchRequest);
 							},
 							error : function(e) {
-								$.notify(notification['APIResponseError'](e));
+								$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 							}
 						});
 						$('#requestDetailsModal').modal('hide');
@@ -209,32 +258,23 @@
 				});
 			});
 		
-			function validate(formId) {
-				var ok = 1;
-				var listInput = $(formId).find(':input').not("#modalResponseMessage");
-				$.each(listInput, function() {
-					if($(this).val() == "") {
-						ok = 0;
-					}
-				});
-				if(ok == 0) {
-					$.notify(notification['incompleteFields']);
-				}
-				return ok;
-			}
-			
 			function getRequestSearchRequest() {
 				var searchData = $('#requestHistoryForm').serializeJSON();
 				var from = searchData.fromTime;
+				var to = searchData.toTime;
 				var date = new Date();
 				if(from != "") {
 					from = from.substr(6, 4) + "-" + from.substr(0, 2) + "-" + from.substr(3, 2);
 				}
 				else {
-					from = date.getFullYear() + "-01-01";
+					if(to == ""){
+						from = date.getFullYear() + "-01-01";
+					}
+					else {
+						from = "2000-01-01";
+					}
 				}
 				
-				var to = searchData.toTime;
 				if(to != "") {
 					to = to.substr(6, 4) + "-" + to.substr(0, 2) + "-" + to.substr(3, 2);
 				}
@@ -258,72 +298,77 @@
 			}
 			
 			function search(requestSearchRequest) {
-				$('#requestHistoryTable').DataTable({
-					ajax: {
-						type : "POST",
-						contentType : "application/json",
-						url : /*[[@{/request/search}]]*/,
-						dataType : 'json',
-						data : function() {
-							return JSON.stringify(requestSearchRequest);
+				if(requestSearchRequest.from_time.localeCompare(requestSearchRequest.to_time) > 0) {
+					$('#alertMessage_search').html(errors['DateError']).attr('class', 'alert alert-danger').show();
+				}
+				else {
+					$('#alertMessage_search').hide();
+					$('#requestHistoryTable').DataTable({
+						ajax: {
+							type : "POST",
+							contentType : "application/json",
+							url : /*[[@{/request/search}]]*/,
+							dataType : 'json',
+							data : function() {
+								return JSON.stringify(requestSearchRequest);
+							},
+							dataSrc: 'requests'
 						},
-						dataSrc: 'requests'
-					},
-					destroy: true,
-					searching: false,
-					columnDefs: [
-						{
-							"targets": [ 0 ],
-							"data": 'id'
-						},
-						{
-							"targets": [ 1 ],
-							"data": 'employee.name'
-						},
-						{
-							"targets": [ 2 ],
-							"data": 'fromTime'
-						},
-						{
-							"targets": [ 3 ],
-							"data": 'toTime'
-						},
-						{
-							"targets": [ 4 ],
-							"data": 'reason'
-						},
-						{
-							"targets": [ 5 ],
-							"className": "text-center",
-							"data": null,
-							"defaultContent": "<a href='#'><span class='glyphicon glyphicon-pencil'></span></a>"
-						},
-						{
-							"targets": [ 6 ],
-							"className": "text-center",
-							"data": null,
-							"defaultContent": "<a href='#' class='btnDelete'><span class='glyphicon glyphicon-remove'></span></a>"
-						}
-					]
-				});
+						destroy: true,
+						searching: false,
+						columnDefs: [
+							{
+								"targets": [ 0 ],
+								"data": 'id'
+							},
+							{
+								"targets": [ 1 ],
+								"data": 'insertDate'
+							},
+							{
+								"targets": [ 2 ],
+								"data": 'fromTime'
+							},
+							{
+								"targets": [ 3 ],
+								"data": 'toTime'
+							},
+							{
+								"targets": [ 4 ],
+								"data": 'reason'
+							},
+							{
+								"targets": [ 5 ],
+								"data": 'status',
+								"render": function(data, type, full, meta) {
+									return getStatus[data];
+								}
+							},
+							{
+								"targets": [ 6 ],
+								"className": "text-center",
+								"data": null,
+								"defaultContent": "<a href='#'><span class='glyphicon glyphicon-pencil'></span></a>"
+							},
+							{
+								"targets": [ 7 ],
+								"className": "text-center",
+								"data": null,
+								"defaultContent": "<a href='#' class='btnDelete'><span class='glyphicon glyphicon-remove'></span></a>"
+							}
+						]
+					});
+				}
 				
 				var table = $('#requestHistoryTable').DataTable();
-// 				if(searchData.requestType == 0 || searchData.requestType == 2 || searchData.requestType == 3 
-// 						|| searchData.requestType == 5) { //0: all request, 2: approved, 3: denied, 5: waiting
-// 					table.column(5).visible(false);
-// 					table.column(6).visible(false);
-// 				}
-// 				if(searchData.requestType == 4) { //4: responded
-// 					table.column(6).visible(false);
-// 				}
 				var requestStatus = requestSearchRequest.status;
 				if(requestStatus == 0 || requestStatus == 2 || requestStatus == 3 
 						|| requestStatus == 5) { //0: all request, 2: approved, 3: denied, 5: waiting
-					table.column(5).visible(false);
 					table.column(6).visible(false);
+					table.column(7).visible(false);
 				}
 				if(requestStatus == 4) { //4: responded
-					table.column(6).visible(false);
+					table.column(7).visible(false);
 				}
 			}
 			
@@ -337,6 +382,7 @@
 			<div class="requestOffContentBody">
 				<h2>Request Off History</h2>
 				<div>
+					<div id="alertMessage_search" class="alert" style="display:none;"></div>
 					<h4>You have <span id="remainHours"></span> of off time with payment left</h4>
 					<form class="form-input" id="requestHistoryForm">
 						<div class="form-group">
@@ -382,10 +428,11 @@
 						<thead>
 							<tr>
 								<th class="text-center idCell">ID</th>
-								<th class="text-center employeeCell">Employee</th>
+								<th class="text-center timeOfCreationCell">Time of creation</th>
 								<th class="text-center fromCell">From</th>
 								<th class="text-center toCell">To</th>
 								<th class="text-center reasonCell">Reason</th>
+								<th class="text-center statusCell">Status</th>
 								<th class="text-center editCell">Edit</th>
 								<th class="text-center deleteCell">Delete</th>
 							</tr>
@@ -397,83 +444,146 @@
 					</table>
 					
 					<div class="modal fade" id="requestDetailsModal" role="dialog">
-						<div class="modal-dialog">
-						
+						<div class="modal-dialog modal-dialog-centered">
+							
 							<div class="modal-content">
 								<div class="modal-header">
 									<button type="button" class="close" data-dismiss="modal">&times;</button>
 									<h4 class="modal-title" id="modalTitle"></h4>
 								</div>
 								<div class="modal-body">
-									<form class="form-horizontal" id="modalForm">
-										<div class="form-group">
+									<div id="alertMessage_edit" class="alert" style="display:none;"></div>
+									<form id="modalForm">
+										<div class="form-group row">
 											<label class="control-label col-sm-3">Request ID: </label>
-											<label class="control-label" style="text-align: left;" id="modalRequestId"></label>
+											<label class="control-label col-sm-9" style="text-align: left;" id="modalRequestId"></label>
 										</div>
-										<div class="form-group">
+										<div class="form-group row">
 											<label class="control-label col-sm-3">Status: </label>
-											<label class="control-label" id="modalStatus"></label>
+											<label class="control-label col-sm-9" id="modalStatus"></label>
 										</div>
-										<div class="form-group">
+										<div class="form-group row">
 											<label class="control-label col-sm-3">Employee: </label>
-											<label class="control-label" style="text-align: left;" id="modalName"></label>
+											<label class="control-label col-sm-9" style="text-align: left;" id="modalName"></label>
 										</div>
-										<div class="form-group">
+										<div class="form-group row">
 											<label class="control-label col-sm-3">Position: </label>
-											<label class="control-label" id="modalPosition"></label>
+											<label class="control-label col-sm-9" id="modalPosition"></label>
 										</div>
-										<div class="form-group">
+										<div class="form-group row">
 											<label class="control-label col-sm-3">Team: </label>
-											<label class="control-label" id="modalTeam"></label>
+											<label class="control-label col-sm-9" id="modalTeam"></label>
 										</div>
-										<div class="form-group">
+										<div class="form-group row">
 											<label class="control-label col-sm-3">Department: </label>
-											<label class="control-label" id="modalDepartment"></label>
+											<label class="control-label col-sm-9" id="modalDepartment"></label>
 										</div>
-										<div class="form-group">
+										<div class="form-group row">
 											<label class="control-label col-sm-3">From: </label>
-											<div class="input-group col-sm-7">
-												<input class="form-control" type="datetime-local" name="from_modalForm" id="modalFrom"></input>
+											<div class="col-sm-5" style="padding-left:0px;">
+												<div class="input-group date datepicker" data-provide="datepicker">
+													<input type="text" class="form-control" name="from_modalForm" id="modalFrom"/>
+													<div class="input-group-addon">
+														<span class="glyphicon glyphicon-th"></span>
+													</div>
+												</div>
+											</div>
+											<div class="col-sm-2">
+												<select class="form-control" name="hourFrom_modalForm" id="modalHourFrom">
+													<option value="08">8</option>
+													<option value="09">9</option>
+													<option value="10">10</option>
+													<option value="11">11</option>
+													<option value="12">12</option>
+													<option value="13">13</option>
+													<option value="14">14</option>
+													<option value="15">15</option>
+													<option value="16">16</option>
+													<option value="17">17</option>
+												</select>
+											</div>
+											<div class="col-sm-2">
+												<select class="form-control" name="minuteFrom_modalForm" id="modalMinuteFrom">
+													<option value="00">00</option>
+													<option value="05">05</option>
+													<option value="10">10</option>
+													<option value="15">15</option>
+													<option value="20">20</option>
+													<option value="25">25</option>
+													<option value="30">30</option>
+													<option value="35">35</option>
+													<option value="40">40</option>
+													<option value="45">45</option>
+													<option value="50">50</option>
+													<option value="55">55</option>
+												</select>
 											</div>
 										</div>
-										<div class="form-group">
+										<div class="form-group row">
 											<label class="control-label col-sm-3">To: </label>
-											<div class="input-group col-sm-7">
-												<input class="form-control" type="datetime-local" name="to_modalForm" id="modalTo"></input>
+											<div class="col-sm-5" style="padding-left:0px;">
+												<div class="input-group date datepicker" data-provide="datepicker">
+													<input type="text" class="form-control" name="to_modalForm" id="modalTo"/>
+													<div class="input-group-addon">
+														<span class="glyphicon glyphicon-th"></span>
+													</div>
+												</div>
+											</div>
+											<div class="col-sm-2">
+												<select class="form-control" name="hourTo_modalForm" id="modalHourTo">
+													<option value="08">8</option>
+													<option value="09">9</option>
+													<option value="10">10</option>
+													<option value="11">11</option>
+													<option value="12">12</option>
+													<option value="13">13</option>
+													<option value="14">14</option>
+													<option value="15">15</option>
+													<option value="16">16</option>
+													<option value="17">17</option>
+												</select>
+											</div>
+											<div class="col-sm-2">
+												<select class="form-control" name="minuteTo_modalForm" id="modalMinuteTo">
+													<option value="00">00</option>
+													<option value="05">05</option>
+													<option value="10">10</option>
+													<option value="15">15</option>
+													<option value="20">20</option>
+													<option value="25">25</option>
+													<option value="30">30</option>
+													<option value="35">35</option>
+													<option value="40">40</option>
+													<option value="45">45</option>
+													<option value="50">50</option>
+													<option value="55">55</option>
+												</select>
 											</div>
 										</div>
-										<div class="form-group">
+										<div class="form-group row">
 											<label class="control-label col-sm-3">Reason: </label>
-											<div class="input-group col-sm-7">
-												<span class="input-group-btn">
-													<textarea class="form-control" name="reason_modalForm" id="modalReason"></textarea>
-												</span>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<textarea class="form-control col-sm-9" name="reason_modalForm" id="modalReason"></textarea>
 											</div>
 										</div>
-										<div class="form-group">
+										<div class="form-group row">
 											<label class="control-label col-sm-3">Day off type: </label>
-											<div class="input-group col-sm-7">
-												<span class="input-group-btn">
-													<select class="form-control" name="dayOffType_modalForm" id="modalDayOffType">
-													</select>
-												</span>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<select class="form-control" name="dayOffType_modalForm" id="modalDayOffType">
+												</select>
 											</div>
 										</div>
-										<div class="form-group">
+										<div class="form-group row">
 											<label class="control-label col-sm-3">Recipient: </label>
-											<div class="input-group col-sm-7">
-												<span class="input-group-btn">
-													<select class="form-control" name="recipient_modalForm" id="modalRecipient">
-													</select>
-												</span>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<select class="form-control" name="recipient_modalForm" id="modalRecipient">
+												</select>
 											</div>
 										</div>
-										<div class="form-group">
+										<div class="form-group row">
 											<label class="control-label col-sm-3">Response Message: </label>
-											<div class="input-group col-sm-7">
-												<span class="input-group-btn">
-													<textarea readonly="true" class="form-control" name="responseMessage_modalForm" id="modalResponseMessage"></textarea>
-												</span>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<textarea readonly="true" class="form-control" name="responseMessage_modalForm" id="modalResponseMessage"></textarea>
 											</div>
 										</div>
 										<input type="hidden" name="updateDate_modalForm" id="modalUpdateDate" />

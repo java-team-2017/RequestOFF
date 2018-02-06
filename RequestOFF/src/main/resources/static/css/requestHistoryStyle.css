@@ -18,11 +18,15 @@
 	width: 5%;
 }
 
+.statusCell {
+	width: 6%;
+}
+
 .employeeCell {
 	width: 15%;
 }
 
-.fromCell, .toCell {
+.fromCell, .toCell, .timeOfCreationCell {
 	width: 15%;
 }
 

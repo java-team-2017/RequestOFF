@@ -29,6 +29,11 @@ var notification = {
 	}
 }
 
+//function notify(containerId, message) {
+//	$('#' + containerId).attr('class', 'alert fade in alert-success').show();
+//	$('#' + containerId + ' > span').html(message);
+//}
+
 function getDayOffTypeId(dayOffTypeList, dayOffTypeName) {
 	var id;
 	$.each(dayOffTypeList, function(i, element) {
@@ -53,27 +58,6 @@ function getRecipientNameOrId(recipientList, recipientNameOrId) {
 		}
 	});
 	return returnValue;
-}
-
-function renderDayOffTypeSelect(selectBoxId) {
-	$.ajax({
-		type : "POST",
-		contentType : "application/json",
-		url : "/dayOffType/search",
-		dataType : 'json',
-		data : JSON.stringify({"valid_flag_id" : "1"}),
-		success : function(returnData) {
-			listDayOffType = returnData.listDayOffType;
-			var option = "";
-			$.each(returnData.listDayOffType, function(i, element){
-				option += "<option value='" + element.name + "'>" + element.name + "</option>"; 
-			});
-			$("#" + selectBoxId).append(option);
-		},
-		error : function(e) {
-			console.log("ERROR: ", e);
-		}
-	});
 }
 
 function renderRemainHours(employee, containerId) {
