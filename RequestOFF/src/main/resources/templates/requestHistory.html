@@ -24,6 +24,7 @@
 			var employee;
 			var employeeId;
 			var listDayOffType;
+			var table;
 			var getStatus = {
 				'1': 'saved',
 				'2': 'approved',
@@ -43,7 +44,6 @@
 					employee = returnData.user;
 					console.log(employee);
 					employeeId = employee.id;
-					console.log()
 				},
 				error : function(e) {
 					$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
@@ -65,14 +65,16 @@
 					$("#modalDayOffType").append(option);
 				},
 				error : function(e) {
-					console.log("ERROR: ", e);
+					$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 				}
 			});
 			
 			$(function() {
 				var listRecipient = [];
+				var remainHours, offHours;
+				var oldFrom, oldTo;
 				
-				renderRemainHours(employee, 'remainHours');
+				remainHours = renderRemainHours(employee, 'remainHours');
 				
 				//recipient select box
 				listRecipient = getListRecipient(employee);
@@ -87,8 +89,8 @@
 				
 				$('#requestHistoryTable tbody').on('click', 'td', function() {
 					var index = $(this).index();
-					if(index <= 5) {
-						var table = $('#requestHistoryTable').DataTable();
+					if(index <= 6) {
+						table = $('#requestHistoryTable').DataTable();
 						rowData = table.row(this).data();
 						$("#modalRequestId").empty().append(rowData.id);
 						$("#modalStatus").empty().append(getStatus[rowData.status]);
@@ -98,23 +100,30 @@
 						if(rowData.employee.position.name == "leader") {
 							$("#modalTeam").empty().append(rowData.employee.team.name);
 							$("#modalDepartment").empty().append(rowData.employee.team.department.name);
-						} else {
+						}
+						else if(rowData.employee.position.name == "employee") {
 							$("#modalTeam").empty().append(rowData.employee.listTeam[0].name);
 							$("#modalDepartment").empty().append(rowData.employee.listTeam[0].department.name);
 						}
+						else {
+							$("#modalTeam").hide();
+							$("#modalDepartment").empty().append(rowData.employee.department.name);
+						}
 						
+						oldFrom = rowData.fromTime;
+						oldTo = rowData.toTime;
 						var fromStr = rowData.fromTime.split(" ");
-						fromDateStr = fromStr[0].split("-");
+						var fromDateStr = fromStr[0].split("-");
 						$("#modalFrom").val(fromDateStr[1] + "/" + fromDateStr[2] + "/" + fromDateStr[0]);
-						fromStr = fromStr[1].split(":");
-						$("#modalHourFrom").val(fromStr[0]);
-						$("#modalMinuteFrom").val(fromStr[1]);
+						var fromTimeStr = fromStr[1].split(":");
+						$("#modalHourFrom").val(fromTimeStr[0]);
+						$("#modalMinuteFrom").val(fromTimeStr[1]);
 						var toStr = rowData.toTime.split(" ");
-						toDateStr = toStr[0].split("-");
+						var toDateStr = toStr[0].split("-");
 						$("#modalTo").val(toDateStr[1] + "/" + toDateStr[2] + "/" + toDateStr[0]);
-						toStr = toStr[1].split(":");
-						$("#modalHourTo").val(toStr[0]);
-						$("#modalMinuteTo").val(toStr[1]);
+						var toTimeStr = toStr[1].split(":");
+						$("#modalHourTo").val(toTimeStr[0]);
+						$("#modalMinuteTo").val(toTimeStr[1]);
 						
 						$("#modalReason").val(rowData.reason);
 						$("#modalDayOffType").val(rowData.dayOffType.name);
@@ -151,10 +160,12 @@
 					if (confirm('Are you sure you want to delete this request?')) {
 						var row = $(this).closest("tr");	// Finds the closest row <tr> 
 						var id = row.find("td:nth-child(1)").html();		//Find the 1st <td> element
-						var table = $('#requestHistoryTable').DataTable();
 						rowData = table.row($(this).parent()).data();
 						var updateDate = rowData.updateDate;
+						var from = rowData.fromTime;
+						var to = rowData.toTime;
 						
+						//update request
 						$.ajax({
 							type : "POST",
 							contentType : "application/json",
@@ -166,21 +177,89 @@
 								"update_date" : updateDate
 							}),
 							success : function(returnData) {
-								var requestSearchRequest = getRequestSearchRequest();
-								search(requestSearchRequest);
+// 								var requestSearchRequest = getRequestSearchRequest();
+// 								search(requestSearchRequest);
+// 								table = $('#requestHistoryTable').DataTable();
+								table.ajax.reload();
 							},
 							error : function(e) {
 								$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 							}
 						});
+						
+						//calculate hours
+						$.ajax({
+							type : "POST",
+							contentType : "application/json",
+							url : "/request/calculateHours",
+							dataType : 'json',
+							data : JSON.stringify({
+								"from_time" : from,
+								"to_time" : to
+							}),
+							success : function(returnData) {
+								remainHours = parseInt(remainHours) + parseInt(returnData.hours);
+								$("#remainHours").html(remainHours + ((parseInt(remainHours) >= 2) ? " hours" : " hour"));
+								
+								$.ajax({
+									type : "POST",
+									contentType : "application/json",
+									url : "/employeeOffStatus/details",
+									dataType : 'json',
+									data : JSON.stringify({
+										"year_id" : (new Date()).getFullYear(),
+										"employee_id" : employeeId
+									}),
+									success : function(returnData) {
+										//update employee off status
+										var offStatusRegistRequest = {
+											"year_id" : (new Date()).getFullYear(),
+											"employee_id" : employeeId,
+											"remain_hours" : remainHours,
+											"total_hours" : "",
+											"update_date" : returnData.employee_off_status.updateDate,
+											"valid_flag" : ""
+										};
+										console.log(offStatusRegistRequest);
+										$.ajax({
+											type : "POST",
+											contentType : "application/json",
+											url : "/employeeOffStatus/regist",
+											dataType : 'json',
+											data : JSON.stringify(offStatusRegistRequest),
+											success : function(returnData) {
+											},
+											error : function(e) {
+												$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
+											}
+										});
+									},
+									error : function(e) {
+										$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
+									}
+								});
+							},
+							error : function(e) {
+								$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
+							}
+						});
+						
 					}
 				});
 				
 				$('#btnSave_modal, #btnSend_modal').on('click', function() {
-					//validate
+					var status;
+					if( $(this).attr('id') == 'btnSave_modal' ) {
+						status = 1;
+					}
+					else {
+						status = 5;
+					}
+					
 					var editRequestData = $('#modalForm').serializeJSON();
 					
-					var complete = 1, valid = 1;
+					//validate
+					var complete = 1, valid = 1, roundHours = 1;
 					var listInput = $("#modalForm").find(':input').not("#modalResponseMessage");
 					$.each(listInput, function() {
 						if($(this).val() == "") {
@@ -196,7 +275,9 @@
 					toDate = toDate.substr(6, 4) + "-" + toDate.substr(0, 2) + "-" + toDate.substr(3, 2);
 					var toTime = editRequestData.hourTo_modalForm + ":" + editRequestData.minuteTo_modalForm + ":00.0";
 					var to = toDate + " " + toTime;
-					console.log(from + "---" + to);
+					if(editRequestData.minuteFrom_modalForm.localeCompare(editRequestData.minuteTo_modalForm) != 0) {
+						roundHours = 0;
+					}
 					if(from.localeCompare(to) >= 0) {
 						valid = 0;
 					}
@@ -205,55 +286,128 @@
 					if(complete == 0) {
 						$('#alertMessage_edit').html(errors['incompleteFields']).attr('class', 'alert alert-danger').show();
 					}
+					else if(roundHours == 0) {
+						$('#alertMessage_edit').html(errors['roundHour']).attr('class', 'alert alert-danger').show();
+					}
 					else if(valid == 0) {
 						$('#alertMessage_edit').html(errors['DateError']).attr('class', 'alert alert-danger').show();
 					}
 					else {
-						var status;
-						if( $(this).attr('id') == 'btnSave_modal' ) {
-							status = 1;
-						}
-						else {
-							status = 5;
-						}
-						var requestId = $("#modalRequestId").html();
-						var editRequestData = $('#modalForm').serializeJSON();
-						var fromDate = editRequestData.from_modalForm;
-						fromDate = fromDate.substr(6, 4) + "-" + fromDate.substr(0, 2) + "-" + fromDate.substr(3, 2);
-						var fromTime = editRequestData.hourFrom_modalForm + ":" + editRequestData.minuteFrom_modalForm + ":00.0";
-						var toDate = editRequestData.to_modalForm;
-						toDate = toDate.substr(6, 4) + "-" + toDate.substr(0, 2) + "-" + toDate.substr(3, 2);
-						var toTime = editRequestData.hourTo_modalForm + ":" + editRequestData.minuteTo_modalForm + ":00.0";
-						requestRegistRequest = {
-							"id" : requestId,
-							"employee_id" : employeeId,
-							"from_time" : fromDate + " " + fromTime,
-							"to_time" : toDate + " " + toTime,
-							"reason" : editRequestData.reason_modalForm,
-							"status" : status,
-							"response_message" : editRequestData.responseMessage_modalForm,
-							"day_off_type_id" : getDayOffTypeId(listDayOffType, editRequestData.dayOffType_modalForm),
-							"recipient_id" : getRecipientNameOrId(listRecipient, editRequestData.recipient_modalForm),
-							"valid_flag" : "1",
-							"update_date" : editRequestData.updateDate_modalForm
-						}
-						console.log(requestRegistRequest);
-						
+						//calculate hours of off time
 						$.ajax({
 							type : "POST",
 							contentType : "application/json",
-							url : /*[[@{/request/regist}]]*/,
+							url : "/request/calculateHours",
 							dataType : 'json',
-							data : JSON.stringify(requestRegistRequest),
+							data : JSON.stringify({
+								"from_time" : oldFrom,
+								"to_time" : oldTo
+							}),
 							success : function(returnData) {
-								var requestSearchRequest = getRequestSearchRequest();
-								search(requestSearchRequest);
+								remainHours = parseInt(remainHours) + parseInt(returnData.hours);
+								$.ajax({
+									type : "POST",
+									contentType : "application/json",
+									url : "/request/calculateHours",
+									dataType : 'json',
+									data : JSON.stringify({
+										"from_time" : from,
+										"to_time" : to
+									}),
+									success : function(returnData) {
+										offHours = returnData.hours;
+										if(parseInt(offHours) == 0) {
+											$('#alertMessage_edit').html(errors['weekend']).attr('class', 'alert alert-danger').show();
+										}
+										else if(remainHours < offHours) {
+											$('#alertMessage_edit').html(errors['exceedTime']).attr('class', 'alert alert-danger').show();
+										}
+										else {
+											remainHours = parseInt(remainHours) - parseInt(offHours);
+											
+											//update request
+											var requestId = $("#modalRequestId").html();
+											var requestRegistRequest = {
+												"id" : requestId,
+												"employee_id" : employeeId,
+												"from_time" : from,
+												"to_time" : to,
+												"reason" : editRequestData.reason_modalForm,
+												"status" : status,
+												"response_message" : editRequestData.responseMessage_modalForm,
+												"day_off_type_id" : getDayOffTypeId(listDayOffType, editRequestData.dayOffType_modalForm),
+												"recipient_id" : getRecipientNameOrId(listRecipient, editRequestData.recipient_modalForm),
+												"valid_flag" : "1",
+												"update_date" : editRequestData.updateDate_modalForm
+											};
+											console.log(requestRegistRequest);
+											$.ajax({
+												type : "POST",
+												contentType : "application/json",
+												url : /*[[@{/request/regist}]]*/,
+												dataType : 'json',
+												data : JSON.stringify(requestRegistRequest),
+												success : function(returnData) {
+// 													table = $('#requestHistoryTable').DataTable();
+													table.ajax.reload();
+												},
+												error : function(e) {
+													$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+												}
+											});
+											
+											//get employee off status update date
+											$.ajax({
+												type : "POST",
+												contentType : "application/json",
+												url : "/employeeOffStatus/details",
+												dataType : 'json',
+												data : JSON.stringify({
+													"year_id" : (new Date()).getFullYear(),
+													"employee_id" : employeeId
+												}),
+												success : function(returnData) {
+													//update employee off status
+													var offStatusRegistRequest = {
+														"year_id" : (new Date()).getFullYear(),
+														"employee_id" : employeeId,
+														"remain_hours" : remainHours,
+														"total_hours" : "",
+														"update_date" : returnData.employee_off_status.updateDate,
+														"valid_flag" : ""
+													};
+													console.log(offStatusRegistRequest);
+													$.ajax({
+														type : "POST",
+														contentType : "application/json",
+														url : "/employeeOffStatus/regist",
+														dataType : 'json',
+														data : JSON.stringify(offStatusRegistRequest),
+														success : function(returnData) {
+														},
+														error : function(e) {
+															$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
+														}
+													});
+													
+													$("#remainHours").html(remainHours + ((parseInt(remainHours) >= 2) ? " hours" : " hour"));
+													$('#requestDetailsModal').modal('hide');
+												},
+												error : function(e) {
+													$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
+												}
+											});
+										}
+									},
+									error : function(e) {
+										$('#alertMessage_edit').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
+									}
+								});
 							},
 							error : function(e) {
-								$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+								$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
 							}
 						});
-						$('#requestDetailsModal').modal('hide');
 					}
 				});
 			});
@@ -316,6 +470,7 @@
 						},
 						destroy: true,
 						searching: false,
+						order: [[ 1, "desc" ]],
 						columnDefs: [
 							{
 								"targets": [ 0 ],
@@ -360,7 +515,7 @@
 					});
 				}
 				
-				var table = $('#requestHistoryTable').DataTable();
+				table = $('#requestHistoryTable').DataTable();
 				var requestStatus = requestSearchRequest.status;
 				if(requestStatus == 0 || requestStatus == 2 || requestStatus == 3 
 						|| requestStatus == 5) { //0: all request, 2: approved, 3: denied, 5: waiting
@@ -383,7 +538,7 @@
 				<h2>Request Off History</h2>
 				<div>
 					<div id="alertMessage_search" class="alert" style="display:none;"></div>
-					<h4>You have <span id="remainHours"></span> of off time with payment left</h4>
+					<h4>You have <span id="remainHours" style="font-weight: bold;"></span> of off time with payment left</h4>
 					<form class="form-input" id="requestHistoryForm">
 						<div class="form-group">
 							<label for="fromTime">From</label>
@@ -479,7 +634,7 @@
 											<label class="control-label col-sm-9" id="modalDepartment"></label>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">From: </label>
+											<label class="control-label col-sm-3">From * </label>
 											<div class="col-sm-5" style="padding-left:0px;">
 												<div class="input-group date datepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="from_modalForm" id="modalFrom"/>
@@ -520,7 +675,7 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">To: </label>
+											<label class="control-label col-sm-3">To * </label>
 											<div class="col-sm-5" style="padding-left:0px;">
 												<div class="input-group date datepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="to_modalForm" id="modalTo"/>
@@ -561,27 +716,27 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Reason: </label>
+											<label class="control-label col-sm-3">Reason * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<textarea class="form-control col-sm-9" name="reason_modalForm" id="modalReason"></textarea>
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Day off type: </label>
+											<label class="control-label col-sm-3">Day off type * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<select class="form-control" name="dayOffType_modalForm" id="modalDayOffType">
 												</select>
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Recipient: </label>
+											<label class="control-label col-sm-3">Recipient * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<select class="form-control" name="recipient_modalForm" id="modalRecipient">
 												</select>
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Response Message: </label>
+											<label class="control-label col-sm-3">Response Message </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<textarea readonly="true" class="form-control" name="responseMessage_modalForm" id="modalResponseMessage"></textarea>
 											</div>
@@ -599,7 +754,7 @@
 					</div>
 				</div>
 			</div>
-<!-- 			<div th:replace="fragments/footer"></div> -->
+			<div th:replace="fragments/footer"></div>
 		</div>
 
 	</body>

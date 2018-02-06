@@ -1,6 +1,9 @@
 var errors = {
 	'DateError': 'time of To field must be after From field',
-	'incompleteFields': 'Please fill in all fields',
+	'incompleteFields': 'Please fill in all required fields',
+	'exceedTime': 'Hours of off time exceed remain hours',
+	'roundHour': 'Your hours of off time must be round',
+	'weekend': 'Your choosen hours are belong to weekends',
 	'APIResponseError': function (errMsg) {
 		return errMsg;
 	}
@@ -26,7 +29,13 @@ var notification = {
 			timeout: 3000,
 			pos: 'top-center'
 		}
+	},'exceedTime': {
+		message: 'Hours of off time exceed remain hours',
+		status: 'error',
+		timeout: 3000,
+		pos: 'top-center'
 	}
+	
 }
 
 //function notify(containerId, message) {
@@ -77,6 +86,7 @@ function renderRemainHours(employee, containerId) {
 	else {
 		$("#" + containerId).html(remainHours + " hours");
 	}
+	return remainHours;
 }
 
 function getListRecipient(employee) {
@@ -84,9 +94,12 @@ function getListRecipient(employee) {
 	if(employee.position.name == "leader") {
 		listRecipient.push(employee.team.department.manager);
 	}
-	else {
+	else if(employee.position.name == "employee") {
 		listRecipient.push(employee.listTeam[0].leader);
 		listRecipient.push(employee.listTeam[0].department.manager);
+	}
+	else {
+		listRecipient.push(employee);
 	}
 	return listRecipient;
 }
