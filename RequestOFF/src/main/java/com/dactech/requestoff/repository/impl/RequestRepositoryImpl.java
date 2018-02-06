@@ -29,27 +29,27 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getEmployeeId())) {
-			whereClause.append(" AND request.employee_id = '" + requestSearchRequest.getEmployeeId() + "'");
+			whereClause.append(" AND employee_id = '" + requestSearchRequest.getEmployeeId() + "'");
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getReason())) {
-			whereClause.append(" AND request.reason like '%" + requestSearchRequest.getReason() + "%'");
+			whereClause.append(" AND reason like '%" + requestSearchRequest.getReason() + "%'");
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getStatus())) {
-			whereClause.append(" AND request.status = '" + requestSearchRequest.getStatus() + "'");
+			whereClause.append(" AND status = '" + requestSearchRequest.getStatus() + "'");
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getResponseMessage())) {
-			whereClause.append(" AND request.response_message like '%" + requestSearchRequest.getResponseMessage() + "%'");
+			whereClause.append(" AND response_message like '%" + requestSearchRequest.getResponseMessage() + "%'");
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getDayOffTypeId())) {
-			whereClause.append(" AND request.day_off_type_id = '" + requestSearchRequest.getDayOffTypeId() + "'");
+			whereClause.append(" AND day_off_type_id = '" + requestSearchRequest.getDayOffTypeId() + "'");
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getRecipientId())) {
-			whereClause.append(" AND request.recipient_id = '" + requestSearchRequest.getRecipientId() + "'");
+			whereClause.append(" AND recipient_id = '" + requestSearchRequest.getRecipientId() + "'");
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getFromTime())) {
