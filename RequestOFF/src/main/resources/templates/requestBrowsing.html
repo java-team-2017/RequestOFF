@@ -2,6 +2,8 @@
 <html>
 <head>
 	<title>Request Browsing</title>
+	<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="javascript/confirmDialog.jquery.min.js"></script>
 	<div th:replace="library"></div>
 </head>
 
@@ -38,8 +40,8 @@
 			});
 			
 			$('#requestTable').on('click', 'td', function () {
-				var childTag = $(this).children();
-				if(childTag.length == 0){
+				var position = $(this).index();
+				if(position != 0 && position != 6){
 					var table = $('#requestTable').DataTable();
 					var rowData = table.row(this).data();
 					objReturnRequestDetails = rowData;
@@ -139,8 +141,38 @@
 			$(document).ready(function(){
 				$('[data-toggle="tooltip"]').tooltip();   
 			});
+			
+			$('#employee').typeahead({
+				name: 'suggest-employee',
+				limit: 100,
+				hint: false,
+				remote: {
+					rateLimitWait: 1000,
+					url: '/employee/search',
+					replace: function (url, uriEncodedQuery){
+						return url + "#" + uriEncodedQuery;
+					},
+					beforeSend: function (jqXhr, settings) {
+						jqXhr.setRequestHeader('Content-Type','application/json');
+						settings.type = 'POST';
+						settings.hasContent = true;
+						settings.data = JSON.stringify({"name": $('#employee').val(), "name_match_status": "0"});
+					},
+					filter: function (data) {
+						var result = data.employees;
+						var sourceArr = [];
+						$.each(result, function(index, object) {
+							sourceArr.push(object.name);
+						});
+						return sourceArr;
+					}
+				}
+			}).bind('typeahead:selected', function(obj, selected, name) {
+				$(this).typeahead('setQuery', $("<div/>").html(selected.value).text());
+				return false;
+			});
+			
 		});
-		
 		
 		function updateRequest(requestObj) {
 			if(confirm('Are you sure?')){
@@ -231,7 +263,7 @@
 			<form id="requestForm" class="form-input">
 				<div class="form-group">
 					<label class="control-label">Employee: </label>
-					<input class="form-control" type="text" name="name" id="employee" value=""></input>
+					<input class="form-control" type="text" name="name" id="employee" placeholder="Input name" value=""></input>
 				</div>
 						
 				<div class="form-group">

@@ -49,7 +49,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getRecipientId())) {
-			whereClause.append(" AND recipient_id = '" + requestSearchRequest.getRecipientId() + "'");
+			whereClause.append(" AND recipient_id = '" + requestSearchRequest.getRecipientId() + "' AND status != 1");
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getFromTime())) {
