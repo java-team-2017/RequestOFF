@@ -1,7 +1,5 @@
 package com.dactech.requestoff.controller;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -10,7 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dactech.requestoff.model.common.StatusInfo;
@@ -103,11 +100,5 @@ public class EmployeeController {
 			response.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
 		}
 		return response;
-	}
-	
-	@RequestMapping(value = "/employee/employeeNameTypeahead", method = RequestMethod.POST)
-	List<Employee> employeeNameTypeahead(@RequestParam String name, @RequestParam String departmentId, @RequestParam String teamId) {
-		List<Employee> employees = employeeService.search(name, teamId, departmentId);
-		return employees;
 	}
 }

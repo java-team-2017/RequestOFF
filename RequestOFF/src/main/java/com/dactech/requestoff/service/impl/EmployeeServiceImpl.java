@@ -288,9 +288,4 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public Employee findByEmail(String email) {
 		return employeeRepository.findByEmail(email);
 	}
-
-	@Override
-	public List<Employee> search(String name, String teamId, String departmentId) {
-		return employeeRepository.search(name, teamId, departmentId);
-	}
 }
