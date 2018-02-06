@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dactech.requestoff.model.common.StatusInfo;
+import com.dactech.requestoff.model.request.RequestCalculateHoursRequest;
 import com.dactech.requestoff.model.request.RequestDetailsRequest;
 import com.dactech.requestoff.model.request.RequestRegistRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
+import com.dactech.requestoff.model.response.RequestCalculateHoursResponse;
 import com.dactech.requestoff.model.response.RequestDetailsResponse;
 import com.dactech.requestoff.model.response.RequestRegistResponse;
 import com.dactech.requestoff.model.response.RequestSearchResponse;
@@ -58,6 +60,22 @@ public class RequestController {
 		}
 		
 		return requestDetailsResponse;
+	}
+	
+	@RequestMapping(value = "/request/calculateHours", method = RequestMethod.POST)
+	public RequestCalculateHoursResponse calculateHours(@RequestBody RequestCalculateHoursRequest requestCalculateHoursRequest) {
+		System.out.println(requestCalculateHoursRequest.getFromTime() + "---" + requestCalculateHoursRequest.getToTime());
+		RequestCalculateHoursResponse requestCalculateHoursResponse = new RequestCalculateHoursResponse();
+		try {
+			requestCalculateHoursResponse = requestService.calculateHours(requestCalculateHoursRequest);
+			requestCalculateHoursResponse.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
+		}
+		catch(Exception e) {
+			requestCalculateHoursResponse.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
+			System.out.println(e.getMessage() + "-----");
+			e.printStackTrace();
+		}
+		return requestCalculateHoursResponse;
 	}
 	
 }

@@ -1,5 +1,7 @@
 package com.dactech.requestoff.service.impl;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,15 +10,18 @@ import org.springframework.stereotype.Service;
 import com.dactech.requestoff.model.entity.DayOffType;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.Request;
+import com.dactech.requestoff.model.request.RequestCalculateHoursRequest;
 import com.dactech.requestoff.model.request.RequestDetailsRequest;
 import com.dactech.requestoff.model.request.RequestRegistRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
+import com.dactech.requestoff.model.response.RequestCalculateHoursResponse;
 import com.dactech.requestoff.model.response.RequestDetailsResponse;
 import com.dactech.requestoff.model.response.RequestRegistResponse;
 import com.dactech.requestoff.model.response.RequestSearchResponse;
 import com.dactech.requestoff.repository.RequestRepository;
 import com.dactech.requestoff.service.RequestService;
 import com.dactech.requestoff.util.StringUtil;
+import com.dactech.requestoff.util.DateUtils;
 
 @Service
 public class RequestServiceImpl implements RequestService{
@@ -119,6 +124,17 @@ public class RequestServiceImpl implements RequestService{
 		Request request = requestRepository.findById(Long.parseLong(requestDetailsRequest.getId()));
 		RequestDetailsResponse requestDetailsResponse = new RequestDetailsResponse(request);
 		return requestDetailsResponse;
+	}
+	
+	@Override
+	public RequestCalculateHoursResponse calculateHours(RequestCalculateHoursRequest calculateHoursRequest) throws Exception {
+//		System.out.println(calculateHoursRequest.getFromTime());
+//		System.out.println(calculateHoursRequest.getToTime());
+		Date fromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(calculateHoursRequest.getFromTime());
+		Date toTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(calculateHoursRequest.getToTime());
+		int hours = DateUtils.diffHours(fromTime, toTime);
+		RequestCalculateHoursResponse calculateHoursResponse = new RequestCalculateHoursResponse(hours + "");
+		return calculateHoursResponse;
 	}
 	
 }
