@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Header</title>
+		<title>Statistics</title>
 		<link rel="stylesheet" type="text/css" href="css/layoutStyle.css" />
 		<link rel="stylesheet" type="text/css" href="css/common.css" />
 		<link rel="stylesheet" type="text/css" href="css/createRequestStyle.css" />
 		<link rel="stylesheet"	type="text/css" href="css/bootstrap.min.css" />
 		<link rel="stylesheet" type="text/css" href="css/datatables.min.css"/>
 		<link rel="stylesheet" type="text/css" href="css/bootstrap-datepicker.min.css"/>
+		<link rel="stylesheet" type="text/css" href="css/typeahead.js-bootstrap.css"/>
 		<script src="javascript/jquery-3.2.1.js"></script>
 		<script src="javascript/bootstrap.min.js"></script>
 		<script src="javascript/jquery.serializejson.js"></script>
@@ -15,6 +16,7 @@
 		<script type="text/javascript" src="javascript/datatables.min.js"></script>
 		<script type="text/javascript" src="javascript/bootstrap-confirmation.min.js"></script>
 		<script type="text/javascript" src="javascript/bootstrap-datepicker.min.js"></script>
+		<script type="text/javascript" src="javascript/typeahead.min.js"></script>
 	</head>
 
 <script th:inline="javascript">
@@ -43,6 +45,37 @@
 		
 		//Team combobox
 		renderTeamSelect("team", teamDataHandler);
+		
+		//Employee text field type ahead
+		$('#employee').typeahead({
+			name: 'suggest-employee',
+			limit: 100,
+			hint: false,
+			remote: {
+				rateLimitWait: 1000,
+				url: '/employee/search',
+				replace: function (url, uriEncodedQuery){
+					return url + "#" + uriEncodedQuery;
+				},
+				beforeSend: function (jqXhr, settings) {
+					jqXhr.setRequestHeader('Content-Type','application/json');
+					settings.type = 'POST';
+					settings.hasContent = true;
+					settings.data = JSON.stringify({"name": $('#employee').val(), "name_match_status": "0"});
+				},
+				filter: function (data) {
+					var result = data.employees;
+					var sourceArr = [];
+					$.each(result, function(index, object) {
+						sourceArr.push(object.name);
+					});
+					return sourceArr;
+				}
+			}
+		}).bind('typeahead:selected', function(obj, selected, name) {
+			$(this).typeahead('setQuery', $("<div/>").html(selected.value).text());
+			return false;
+		});
 		
 		//select department event
 		$('#department').on('change', function() {

@@ -74,7 +74,8 @@
 				var remainHours, offHours;
 				var oldFrom, oldTo;
 				
-				remainHours = renderRemainHours(employee, 'remainHours');
+				remainHours = getRemainHours(employee);
+				renderRemainHours(remainHours, 'remainHours');
 				
 				//recipient select box
 				listRecipient = getListRecipient(employee);
@@ -144,10 +145,26 @@
 					}
 				} );
 				
-				$('#btnOK').on('click', function() {
+				$('#btnSearch').on('click', function() {
 					var requestSearchRequest = getRequestSearchRequest();
 					console.log(requestSearchRequest);
 					search(requestSearchRequest);
+				});
+				
+				//prevent select box from opening when pressing enter after selecting
+				$("#requestHistoryForm select").keydown(function(e){
+					if(e.keyCode == 13) {
+						this.blur();
+					}
+				});
+				
+				//search when pressing enter
+				$(document).keypress(function(e) {
+					if(e.which == 13) {
+						var requestSearchRequest = getRequestSearchRequest();
+						console.log(requestSearchRequest);
+						search(requestSearchRequest);
+					}
 				});
 				
 				$('#btnClear').on('click', function() {
@@ -177,9 +194,6 @@
 								"update_date" : updateDate
 							}),
 							success : function(returnData) {
-// 								var requestSearchRequest = getRequestSearchRequest();
-// 								search(requestSearchRequest);
-// 								table = $('#requestHistoryTable').DataTable();
 								table.ajax.reload();
 							},
 							error : function(e) {
@@ -199,7 +213,7 @@
 							}),
 							success : function(returnData) {
 								remainHours = parseInt(remainHours) + parseInt(returnData.hours);
-								$("#remainHours").html(remainHours + ((parseInt(remainHours) >= 2) ? " hours" : " hour"));
+								renderRemainHours(remainHours, 'remainHours');
 								
 								$.ajax({
 									type : "POST",
@@ -348,7 +362,6 @@
 												dataType : 'json',
 												data : JSON.stringify(requestRegistRequest),
 												success : function(returnData) {
-// 													table = $('#requestHistoryTable').DataTable();
 													table.ajax.reload();
 												},
 												error : function(e) {
@@ -390,7 +403,7 @@
 														}
 													});
 													
-													$("#remainHours").html(remainHours + ((parseInt(remainHours) >= 2) ? " hours" : " hour"));
+													renderRemainHours(remainHours, 'remainHours');
 													$('#requestDetailsModal').modal('hide');
 												},
 												error : function(e) {
@@ -433,7 +446,9 @@
 					to = to.substr(6, 4) + "-" + to.substr(0, 2) + "-" + to.substr(3, 2);
 				}
 				else {
-					to = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+// 					to = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+					to = (date.getFullYear() + 1) + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+// 					to = "";
 				}
 				
 				var requestSearchRequest = {
@@ -574,7 +589,7 @@
 	
 						<br/>
 						<div>
-							<button type="button" class="btn btn-primary" id="btnOK">OK</button>&nbsp;&nbsp;
+							<button type="button" class="btn btn-primary" id="btnSearch">Search</button>&nbsp;&nbsp;
 							<button type="button" class="btn btn-primary" id="btnClear">Clear</button>
 						</div>
 					</form>
