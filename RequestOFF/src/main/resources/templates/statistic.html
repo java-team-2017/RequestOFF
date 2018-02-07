@@ -105,7 +105,7 @@
 		//=====================================================================
 		// # Button even handler
 		//=====================================================================
-		$("#searchBtn").on('click', function() {
+		function search() {
 			var searchParam = $('#searchForm').serializeJSON();
 			if (searchParam.from_time != "" && searchParam.to_time != "") {
 				var fromTime = new Date(searchParam.from_time);
@@ -183,6 +183,23 @@
 					}
 				]
 			});
+		}
+		$("#searchBtn").on('click', function() {
+			search();
+		});
+		
+		//prevent select box from opening when pressing enter after selecting
+		$("#searchForm select").keydown(function(e){
+			if(e.keyCode == 13) {
+				this.blur();
+			}
+		});
+		
+		//search when pressing enter
+		$(document).keypress(function(e) {
+			if(e.which == 13) {
+				search();
+			}
 		});
 		
 		$('#statisticsTable tbody').on('click', 'td', function() {
