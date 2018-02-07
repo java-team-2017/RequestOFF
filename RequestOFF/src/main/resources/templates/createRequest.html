@@ -45,7 +45,7 @@
 			$.ajax({
 				type : "POST",
 				contentType : "application/json",
-				url : "/dayOffType/search",
+				url : /*[[@{/dayOffType/search}]]*/,
 				dataType : 'json',
 				data : JSON.stringify({"valid_flag_id" : "1"}),
 				success : function(returnData) {
@@ -140,7 +140,7 @@
 						$.ajax({
 							type : "POST",
 							contentType : "application/json",
-							url : "/request/calculateHours",
+							url : /*[[@{/request/calculateHours}]]*/,
 							dataType : 'json',
 							data : JSON.stringify({
 								"from_time" : from,
@@ -175,7 +175,7 @@
 									$.ajax({
 										type : "POST",
 										contentType : "application/json",
-										url : "/request/regist",
+										url : /*[[@{/request/regist}]]*/,
 										dataType : 'json',
 										data : JSON.stringify(requestRegistRequest),
 										success : function(returnData) {
@@ -189,7 +189,7 @@
 									$.ajax({
 										type : "POST",
 										contentType : "application/json",
-										url : "/employeeOffStatus/details",
+										url : /*[[@{/employeeOffStatus/details}]]*/,
 										dataType : 'json',
 										data : JSON.stringify({
 											"year_id" : (new Date()).getFullYear(),
@@ -209,7 +209,7 @@
 		 									$.ajax({
 		 										type : "POST",
 		 										contentType : "application/json",
-		 										url : "/employeeOffStatus/regist",
+		 										url : /*[[@{/employeeOffStatus/regist}]]*/,
 		 										dataType : 'json',
 		 										data : JSON.stringify(offStatusRegistRequest),
 		 										success : function(returnData) {

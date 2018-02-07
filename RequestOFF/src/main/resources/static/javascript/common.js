@@ -69,26 +69,6 @@ function getRecipientNameOrId(recipientList, recipientNameOrId) {
 	return returnValue;
 }
 
-//function renderRemainHours(employee, containerId) {
-//	var currentYear = (new Date()).getFullYear();
-//	listEmployeeOffStatus = employee.listEmployeeOffStatus;
-//	var remainHours;
-//	$.each(listEmployeeOffStatus, function(i, element) {
-//		if(element.companyYearOff.id == currentYear) {
-//			remainHours = element.remainHours;
-//			return false;	//return false to break the loop
-//		}
-//	});
-//	remainHours = parseInt(remainHours);
-//	if(remainHours < 2) {
-//		$("#" + containerId).html(remainHours + " hour");
-//	}
-//	else {
-//		$("#" + containerId).html(remainHours + " hours");
-//	}
-//	return remainHours;
-//}
-
 function getRemainHours(employee) {
 	var currentYear = (new Date()).getFullYear();
 	listEmployeeOffStatus = employee.listEmployeeOffStatus;
