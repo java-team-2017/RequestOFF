@@ -2,8 +2,6 @@
 <html>
 <head>
 	<title>Request Browsing</title>
-	<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
-	<script type="text/javascript" src="javascript/confirmDialog.jquery.min.js"></script>
 	<div th:replace="library"></div>
 </head>
 
@@ -35,8 +33,24 @@
 				}
 			});
 			
+			$('.datepicker').on('changeDate', function(ev){
+				$(this).datepicker('hide');
+			});
+			
 			$('#btnSearch').on('click', function(){
 				search();
+			});
+			
+			$("#requestForm select").keydown(function(e){
+				if(e.keyCode == 13) {
+					this.blur();
+				}
+			});
+			
+			$(document).keypress(function(e) {
+				if(e.which == 13) {
+					search();
+				}
 			});
 			
 			$('#requestTable').on('click', 'td', function () {
@@ -57,6 +71,8 @@
 					$('#statusDetailsId').val(rowData.status);
 					$('#dayOffTypeDetails').val(rowData.dayOffType.name);
 					$('#responseMessage').val(rowData.responseMessage);
+					$('#remainHours').val(rowData.employee.listEmployeeOffStatus[0].remainHours);
+					$('#employeeIdDetails').val(rowData.employee.id);
 					
 					var listForward = []; 
 					
@@ -123,7 +139,6 @@
 					"id" : objReturnRequestDetails.id ,
 					"update_date": objReturnRequestDetails.updateDate
 				}
-				
 				var selectedValue = $("#forward").val();
 				if ($(this).attr('id') == 'btnApproveModal') {
 					requestObj.status = 2;
@@ -138,8 +153,134 @@
 				updateRequest(requestObj);
 			});
 			
+			
+			$("#btnDeny").on('click', function(){
+				$('#requestTable input[type="checkbox"]:checked').each(function(){
+					var table = $('#requestTable').DataTable();
+					var rowData = table.row($(this).parent()).data();
+					var remainHours = getRemainHours(rowData.employee);
+					console.log(remainHours);
+					var requestObj = {
+						"from_time" : rowData.fromTime ,
+						"to_time": rowData.toTime
+					}
+					if ($(this).attr('id') == 'btnDeny') {
+						requestObj.status = 3;
+					}
+					
+					$.ajax({
+						type : "POST",
+						contentType : "application/json",
+						url : /*[[@{/request/calculateHours}]]*/,
+						dataType : 'json',
+						data : JSON.stringify(requestObj),
+						success : function(resultData) {
+							console.log(resultData);
+							remainHours = parseInt(remainHours) + parseInt(resultData.hours);
+							$.ajax({
+								type : "POST",
+								contentType : "application/json",
+								url : "/employeeOffStatus/details",
+								dataType : 'json',
+								data : JSON.stringify({
+									"year_id" : (new Date()).getFullYear(),
+									"employee_id" : rowData.employee.id
+								}),
+								success : function(resultData) {
+									var employeeOffStatusRequest = {
+										"year_id" : (new Date()).getFullYear(),
+										"employee_id" : rowData.employee.id,
+										"remain_hours" : remainHours,
+										"update_date" : resultData.employee_off_status.updateDate
+									};
+									console.log(employeeOffStatusRequest);
+									$.ajax({
+										type : "POST",
+										contentType : "application/json",
+										url : "/employeeOffStatus/regist",
+										dataType : 'json',
+										data : JSON.stringify(employeeOffStatusRequest),
+										success : function(returnData) {
+										},
+										error : function(e) {
+											$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
+										}
+									});
+								},
+								error : function(e) {
+									$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
+								}
+									});
+						},
+						error : function(e) {
+							$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+						}
+					});
+				});
+			});
+			
+			$("#btnDenyModal").on('click', function(){
+				var remainHours = $('#remainHours').val();
+				var employeeId = $('#employeeIdDetails').val();
+				var requestObj = {
+					"from_time" : objReturnRequestDetails.fromTime ,
+					"to_time": objReturnRequestDetails.toTime
+				}
+				if ($(this).attr('id') == 'btnDenyModal') {
+					requestObj.status = 3;
+				} 
+				
+				$.ajax({
+					type : "POST",
+					contentType : "application/json",
+					url : /*[[@{/request/calculateHours}]]*/,
+					dataType : 'json',
+					data : JSON.stringify(requestObj),
+					success : function(resultData) {
+						remainHours = parseInt(remainHours) + parseInt(resultData.hours);
+						updateRemainHours(employeeId, remainHours);
+					},
+					error : function(e) {
+						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+					}
+					
+				});
+			});
+			
+			$('#requestTable').on('click', '.btnDeny', function () {
+				var table = $('#requestTable').DataTable();
+				var rowData = table.row($(this).parent()).data();
+				var remainHours = getRemainHours(rowData.employee);
+				var employeeId = rowData.employee.id;
+				var requestObj = {
+					"from_time" : rowData.fromTime ,
+					"to_time": rowData.toTime
+				}
+				if ($(this).hasClass('btnDeny')) {
+					requestObj.status = 3;
+				}
+				
+				$.ajax({
+					type : "POST",
+					contentType : "application/json",
+					url : /*[[@{/request/calculateHours}]]*/,
+					dataType : 'json',
+					data : JSON.stringify(requestObj),
+					success : function(resultData) {
+						remainHours = parseInt(remainHours) + parseInt(resultData.hours);
+						updateRemainHours(employeeId, remainHours);
+					},
+					error : function(e) {
+						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+					}
+				});
+				
+				
+				
+			});
+			
 			$(document).ready(function(){
-				$('[data-toggle="tooltip"]').tooltip();   
+				$('[data-toggle="tooltip"]').tooltip();
 			});
 			
 			$('#employee').typeahead({
@@ -173,6 +314,43 @@
 			});
 			
 		});
+		
+		function updateRemainHours(employeeId, remainHours){
+			$.ajax({
+				type : "POST",
+				contentType : "application/json",
+				url : /*[[@{/employeeOffStatus/details}]]*/,
+				dataType : 'json',
+				data : JSON.stringify({
+					"year_id" : (new Date()).getFullYear(),
+					"employee_id" : employeeId
+				}),
+				success : function(resultData) {
+					var employeeOffStatusRequest = {
+						"year_id" : (new Date()).getFullYear(),
+						"employee_id" : employeeId,
+						"remain_hours" : remainHours,
+						"update_date" : resultData.employee_off_status.updateDate
+					};
+					console.log(employeeOffStatusRequest);
+					$.ajax({
+						type : "POST",
+						contentType : "application/json",
+						url : /*[[@{/employeeOffStatus/regist}]]*/,
+						dataType : 'json',
+						data : JSON.stringify(employeeOffStatusRequest),
+						success : function(returnData) {
+						},
+						error : function(e) {
+							$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
+						}
+					});
+				},
+				error : function(e) {
+					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
+				}
+			});
+		}
 		
 		function updateRequest(requestObj) {
 			if(confirm('Are you sure?')){
@@ -279,7 +457,7 @@
 						
 				<div class="form-group">
 						<label class="control-label">From: </label>
-					<div class="input-group date" data-provide="datepicker">
+					<div class="input-group date datepicker" data-provide="datepicker">
 						<input type="text" class="form-control" name="from_time" id="from" value=""/>
 						<div class="input-group-addon">
 							<span class="glyphicon glyphicon-calendar"></span>
@@ -289,7 +467,7 @@
 						
 				<div class="form-group">
 						<label class="control-label">To: </label>
-					<div class="input-group date" data-provide="datepicker">
+					<div class="input-group date datepicker" data-provide="datepicker">
 						<input type="text" class="form-control" name="to_time" id="to" value=""/>
 						<div class="input-group-addon">
 							<span class="glyphicon glyphicon-calendar"></span>
@@ -298,7 +476,7 @@
 				</div>
 						
 				<p>
-					<button id="btnSearch" type="button" class="btn btn-primary" style="width:76px;">Search</button>&nbsp;&nbsp;
+					<button id="btnSearch" type="button" class="btn btn-primary" value="Search" style="width:76px;">Search</button>&nbsp;&nbsp;
 					<button type="reset" class="btn btn-primary" style="width:76px;">Clear</button>
 				</p>
 			</form>
@@ -407,6 +585,8 @@
 								</button>
 								
 								<input type="hidden" id="statusDetailsId"></input>
+								<input type="hidden" id="remainHours"></input>
+								<input type="hidden" id="employeeIdDetails"></input>
 							</form>
 						</div>
 					</div>
