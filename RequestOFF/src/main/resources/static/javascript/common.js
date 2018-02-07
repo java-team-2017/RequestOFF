@@ -1,3 +1,4 @@
+var webRootPath = '/';
 var errors = {
 	'DateError': 'time of To field must be after From field',
 	'incompleteFields': 'Please fill in all required fields',
@@ -116,8 +117,7 @@ function renderRecipientSelect(listRecipient, selectBoxId) {
 
 function renderDepartmentSelect(selectBoxId, dataHandler) {
 	$.ajax({
-//		url: /*[[@{/department/search}]]*/,
-		url: "/department/search",
+		url: webRootPath + "department/search",
 		type: "post",
 		dataType:"json",
 		contentType: "application/json",
@@ -147,8 +147,7 @@ function renderDepartmentSelect(selectBoxId, dataHandler) {
 function renderTeamSelect(selectBoxId, dataHandler) {
 	teamSelect = $('#' + selectBoxId);
 	$.ajax({
-//		url : /*[[@{/team/search}]]*/,
-		url: "/team/search",
+		url: webRootPath + "team/search",
 		type: "post",
 		dataType:"json",
 		contentType: "application/json",
