@@ -33,53 +33,55 @@
 				'5': 'waiting'
 			};
 			
-			//get current user
-			$.ajax({
-				type : "POST",
-				contentType : "application/json",
-				url : /*[[@{/employee/getUser}]]*/,
-				dataType : 'json',
-				data : JSON.stringify({}),
-				success : function(returnData) {
-					employee = returnData.user;
-					console.log(employee);
-					employeeId = employee.id;
-				},
-				error : function(e) {
-					$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-				}
-			});
-			
-			$.ajax({
-				type : "POST",
-				contentType : "application/json",
-				url : /*[[@{/dayOffType/search}]]*/,
-				dataType : 'json',
-				data : JSON.stringify({"valid_flag_id" : "1"}),
-				success : function(returnData) {
-					listDayOffType = returnData.listDayOffType;
-					var option = "";
-					$.each(returnData.listDayOffType, function(i, element){
-						option += "<option value='" + element.name + "'>" + element.name + "</option>"; 
-					});
-					$("#modalDayOffType").append(option);
-				},
-				error : function(e) {
-					$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-				}
-			});
-			
 			$(function() {
 				var listRecipient = [];
 				var remainHours, offHours;
 				var oldFrom, oldTo;
 				
-				remainHours = getRemainHours(employee);
-				renderRemainHours(remainHours, 'remainHours');
+				//get current user
+				$.ajax({
+					type : "POST",
+					contentType : "application/json",
+					url : /*[[@{/employee/getUser}]]*/,
+					dataType : 'json',
+					data : JSON.stringify({}),
+					success : function(returnData) {
+						employee = returnData.user;
+						console.log(employee);
+						employeeId = employee.id;
+						
+						remainHours = getRemainHours(employee);
+						renderRemainHours(remainHours, 'remainHours');
+						
+						//recipient select box
+						listRecipient = getListRecipient(employee);
+						renderRecipientSelect(listRecipient, 'modalRecipient');
+					},
+					error : function(e) {
+						$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+					}
+				});
 				
-				//recipient select box
-				listRecipient = getListRecipient(employee);
-				renderRecipientSelect(listRecipient, 'modalRecipient');
+				$.ajax({
+					type : "POST",
+					contentType : "application/json",
+					url : /*[[@{/dayOffType/search}]]*/,
+					dataType : 'json',
+					data : JSON.stringify({"valid_flag_id" : "1"}),
+					success : function(returnData) {
+						listDayOffType = returnData.listDayOffType;
+						var option = "";
+						$.each(returnData.listDayOffType, function(i, element){
+							option += "<option value='" + element.name + "'>" + element.name + "</option>"; 
+						});
+						$("#modalDayOffType").append(option);
+					},
+					error : function(e) {
+						$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+					}
+				});
+				
+				
 				
 				var requestSearchRequest = getRequestSearchRequest();
 				search(requestSearchRequest);
