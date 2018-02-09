@@ -1,14 +1,9 @@
 package com.dactech.requestoff.model.entity;
 
-import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class Position {
@@ -21,15 +16,12 @@ public class Position {
 	private long insertOperator;
 	private String updateDate;
 	private long updateOperator;
-	@OneToMany(mappedBy = "position")
-	@JsonIgnoreProperties("position")
-	private List<Employee> listEmployee;
 
 	public Position() {
 	}
 
 	public Position(long id, String name, int validFlag, String insertDate, long insertOperator, String updateDate,
-			long updateOperator, List<Employee> listEmployee) {
+			long updateOperator) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -38,7 +30,6 @@ public class Position {
 		this.insertOperator = insertOperator;
 		this.updateDate = updateDate;
 		this.updateOperator = updateOperator;
-		this.listEmployee = listEmployee;
 	}
 
 	public long getId() {
@@ -95,14 +86,6 @@ public class Position {
 
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
-	}
-
-	public List<Employee> getListEmployee() {
-		return listEmployee;
-	}
-
-	public void setListEmployee(List<Employee> listEmployee) {
-		this.listEmployee = listEmployee;
 	}
 
 }

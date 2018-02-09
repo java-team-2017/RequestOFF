@@ -34,10 +34,7 @@ public class TeamServiceImpl implements TeamService {
 			team = new Team();
 			
 			team.setName(teamRegistRequest.getName());
-			
-			Employee leader = new Employee();
-			leader.setId(Long.parseLong(teamRegistRequest.getLeaderId()));
-			team.setLeader(leader);
+			team.setLeaderId(Long.parseLong(teamRegistRequest.getLeaderId()));
 			
 			Department department = new Department();
 			department.setId(Long.parseLong(teamRegistRequest.getDepartmentId()));
@@ -60,9 +57,7 @@ public class TeamServiceImpl implements TeamService {
 			}
 			
 			if (StringUtil.isNotEmpty(teamRegistRequest.getLeaderId())) {
-				Employee leader = new Employee();
-				leader.setId(Long.parseLong(teamRegistRequest.getLeaderId()));
-				team.setLeader(leader);
+				team.setLeaderId(Long.parseLong(teamRegistRequest.getLeaderId()));
 			}
 			
 			if (StringUtil.isNotEmpty(teamRegistRequest.getDepartmentId())) {

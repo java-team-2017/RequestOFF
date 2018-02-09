@@ -1,21 +1,15 @@
 package com.dactech.requestoff.model.entity;
 
-import java.util.List;
-
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class DayOffType {
 	public static final long PAYMENT_FLAG_PAYING = 1;
 	public static final long PAYMENT_FLAG_NOT_PAYING = 0;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
@@ -26,15 +20,12 @@ public class DayOffType {
 	private long insertOperator;
 	private String updateDate;
 	private long updateOperator;
-	@OneToMany(mappedBy = "dayOffType", fetch = FetchType.LAZY)
-	@JsonIgnoreProperties("dayOffType")
-	private List<Request> listRequest;
 
 	public DayOffType() {
 	}
 
 	public DayOffType(long id, String name, int paymentFlag, int validFlag, String insertDate, long insertOperator,
-			String updateDate, long updateOperator, List<Request> listRequest) {
+			String updateDate, long updateOperator) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -44,7 +35,6 @@ public class DayOffType {
 		this.insertOperator = insertOperator;
 		this.updateDate = updateDate;
 		this.updateOperator = updateOperator;
-		this.listRequest = listRequest;
 	}
 
 	public long getId() {
@@ -109,14 +99,6 @@ public class DayOffType {
 
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
-	}
-
-	public List<Request> getListRequest() {
-		return listRequest;
-	}
-
-	public void setListRequest(List<Request> listRequest) {
-		this.listRequest = listRequest;
 	}
 
 }

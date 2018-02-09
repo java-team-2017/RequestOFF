@@ -1,17 +1,12 @@
 package com.dactech.requestoff.model.entity;
 
-import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -21,10 +16,7 @@ public class Team {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	private String name;
-	@OneToOne
-	@JoinColumn(name = "leader_id")
-	@JsonIgnoreProperties(value = {"listTeam", "team"})
-	private Employee leader;
+	private long leaderId;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "department_id")
 	@JsonIgnoreProperties("listTeam")
@@ -35,28 +27,22 @@ public class Team {
 	private String updateDate;
 	private long updateOperator;
 
-	@ManyToMany
-	@JoinTable(name = "team_employee", joinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"))
-	@JsonIgnoreProperties(value = {"listTeam", "team"})
-	private List<Employee> listEmployee;
-
 	public Team() {
 		super();
 	}
 
-	public Team(long id, String name, Employee leader, Department department, int validFlag, String insertDate,
-			long insertOperator, String updateDate, long updateOperator, List<Employee> listEmployee) {
+	public Team(long id, String name, long leaderId, Department department, int validFlag, String insertDate,
+			long insertOperator, String updateDate, long updateOperator) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.leader = leader;
+		this.leaderId = leaderId;
 		this.department = department;
 		this.validFlag = validFlag;
 		this.insertDate = insertDate;
 		this.insertOperator = insertOperator;
 		this.updateDate = updateDate;
 		this.updateOperator = updateOperator;
-		this.listEmployee = listEmployee;
 	}
 
 	public long getId() {
@@ -75,12 +61,12 @@ public class Team {
 		this.name = name;
 	}
 
-	public Employee getLeader() {
-		return leader;
+	public long getLeaderId() {
+		return leaderId;
 	}
 
-	public void setLeader(Employee leader) {
-		this.leader = leader;
+	public void setLeaderId(long leaderId) {
+		this.leaderId = leaderId;
 	}
 
 	public Department getDepartment() {
@@ -129,14 +115,6 @@ public class Team {
 
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
-	}
-
-	public List<Employee> getListEmployee() {
-		return listEmployee;
-	}
-
-	public void setListEmployee(List<Employee> listEmployee) {
-		this.listEmployee = listEmployee;
 	}
 
 }

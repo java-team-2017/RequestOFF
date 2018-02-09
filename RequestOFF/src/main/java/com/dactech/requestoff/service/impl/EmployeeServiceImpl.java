@@ -124,7 +124,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public EmployeeOffStatisticsPagingResponse employeeOffStatisticsPaging(
 			EmployeeOffStatisticsPagingRequest eospRequest) throws Exception {
-		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy HH");
+/*		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy HH");
 		
 		String requestFromTimeStr = eospRequest.getFromTime().equals("") ? "01/01/2000 08"
 				: eospRequest.getFromTime();
@@ -282,6 +282,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 		List<EmployeeOffStatisticsPagingResponse.EmployeeStatistics> truncatedList = lEStatistics.subList(start, end);
 		response.setListEmployeeStatistics(truncatedList);
 		return response;
+//*/
+		return null;
 	}
 
 	@Override

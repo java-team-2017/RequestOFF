@@ -8,8 +8,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 @Entity
 public class Request {
 	public static final long REQUEST_STATUS_SAVED = 1;
@@ -23,7 +21,6 @@ public class Request {
 	private long id;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "employee_id")
-	@JsonIgnoreProperties(value = { "listReceivedRequest", "listRequest" })
 	private Employee employee;
 	private String fromTime;
 	private String toTime;
@@ -32,12 +29,8 @@ public class Request {
 	private String responseMessage;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "day_off_type_id")
-	@JsonIgnoreProperties("listRequest")
 	private DayOffType dayOffType;
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "recipient_id")
-	@JsonIgnoreProperties(value = { "listReceivedRequest", "listRequest" })
-	private Employee recipient;
+	private long recipientId;
 	private int validFlag;
 	private String insertDate;
 	private long insertOperator;
@@ -49,7 +42,7 @@ public class Request {
 	}
 
 	public Request(long id, Employee employee, String fromTime, String toTime, String reason, long status,
-			String responseMessage, DayOffType dayOffType, Employee recipient, int validFlag, String insertDate,
+			String responseMessage, DayOffType dayOffType, long recipientId, int validFlag, String insertDate,
 			long insertOperator, String updateDate, long updateOperator) {
 		super();
 		this.id = id;
@@ -60,7 +53,7 @@ public class Request {
 		this.status = status;
 		this.responseMessage = responseMessage;
 		this.dayOffType = dayOffType;
-		this.recipient = recipient;
+		this.recipientId = recipientId;
 		this.validFlag = validFlag;
 		this.insertDate = insertDate;
 		this.insertOperator = insertOperator;
@@ -132,12 +125,12 @@ public class Request {
 		this.dayOffType = dayOffType;
 	}
 
-	public Employee getRecipient() {
-		return recipient;
+	public long getRecipientId() {
+		return recipientId;
 	}
 
-	public void setRecipient(Employee recipient) {
-		this.recipient = recipient;
+	public void setRecipientId(long recipientId) {
+		this.recipientId = recipientId;
 	}
 
 	public int getValidFlag() {

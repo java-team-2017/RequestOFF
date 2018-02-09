@@ -3,27 +3,16 @@ package com.dactech.requestoff.model.entity;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @IdClass(EmployeeOffStatus.EmployeeOffStatusId.class)
 public class EmployeeOffStatus {
 	@Id
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "year_id")
-	@JsonIgnoreProperties("listEmployeeOffStatus")
-	private CompanyYearOff companyYearOff;
+	private long yearId;
 	@Id
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "employee_id")
-	@JsonIgnoreProperties("listEmployeeOffStatus")
-	private Employee employee;
+	private long employeeId;
 	private long remainHours;
 	private long totalHours;
 	private int validFlag;
@@ -36,11 +25,11 @@ public class EmployeeOffStatus {
 		super();
 	}
 
-	public EmployeeOffStatus(CompanyYearOff companyYearOff, Employee employee, long remainHours, long totalHours,
-			int validFlag, String insertDate, long insertOperator, String updateDate, long updateOperator) {
+	public EmployeeOffStatus(long yearId, long employeeId, long remainHours, long totalHours, int validFlag,
+			String insertDate, long insertOperator, String updateDate, long updateOperator) {
 		super();
-		this.companyYearOff = companyYearOff;
-		this.employee = employee;
+		this.yearId = yearId;
+		this.employeeId = employeeId;
 		this.remainHours = remainHours;
 		this.totalHours = totalHours;
 		this.validFlag = validFlag;
@@ -50,20 +39,20 @@ public class EmployeeOffStatus {
 		this.updateOperator = updateOperator;
 	}
 
-	public CompanyYearOff getCompanyYearOff() {
-		return companyYearOff;
+	public long getYearId() {
+		return yearId;
 	}
 
-	public void setCompanyYearOff(CompanyYearOff companyYearOff) {
-		this.companyYearOff = companyYearOff;
+	public void setYearId(long yearId) {
+		this.yearId = yearId;
 	}
 
-	public Employee getEmployee() {
-		return employee;
+	public long getEmployeeId() {
+		return employeeId;
 	}
 
-	public void setEmployee(Employee employee) {
-		this.employee = employee;
+	public void setEmployeeId(long employeeId) {
+		this.employeeId = employeeId;
 	}
 
 	public long getRemainHours() {
@@ -124,23 +113,34 @@ public class EmployeeOffStatus {
 
 	@SuppressWarnings("serial")
 	public static class EmployeeOffStatusId implements Serializable {
-		private long companyYearOff;
-		private long employee;
+		private long yearId;
+		private long employeeId;
 
-		public long getCompanyYearOff() {
-			return companyYearOff;
+		public EmployeeOffStatusId() {
+			super();
+			// TODO Auto-generated constructor stub
 		}
 
-		public void setCompanyYearOff(long companyYearOff) {
-			this.companyYearOff = companyYearOff;
+		public EmployeeOffStatusId(long yearId, long employeeId) {
+			super();
+			this.yearId = yearId;
+			this.employeeId = employeeId;
 		}
 
-		public long getEmployee() {
-			return employee;
+		public long getYearId() {
+			return yearId;
 		}
 
-		public void setEmployee(long employee) {
-			this.employee = employee;
+		public void setYearId(long yearId) {
+			this.yearId = yearId;
+		}
+
+		public long getEmployeeId() {
+			return employeeId;
+		}
+
+		public void setEmployeeId(long employeeId) {
+			this.employeeId = employeeId;
 		}
 
 	}

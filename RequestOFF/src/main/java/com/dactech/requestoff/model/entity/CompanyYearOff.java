@@ -1,13 +1,7 @@
 package com.dactech.requestoff.model.entity;
 
-import java.util.List;
-
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class CompanyYearOff {
@@ -20,17 +14,13 @@ public class CompanyYearOff {
 	private long insertOperator;
 	private String updateDate;
 	private long updateOperator;
-	@OneToMany(mappedBy = "companyYearOff", fetch = FetchType.LAZY)
-	@JsonIgnoreProperties("companyYearOff")
-	private List<EmployeeOffStatus> listEmployeeOffStatus;
 
 	public CompanyYearOff() {
 		super();
 	}
 
 	public CompanyYearOff(long id, int dayOffResetFlag, int currentYearFlag, int validFlag, String insertDate,
-			long insertOperator, String updateDate, long updateOperator,
-			List<EmployeeOffStatus> listEmployeeOffStatus) {
+			long insertOperator, String updateDate, long updateOperator) {
 		super();
 		this.id = id;
 		this.dayOffResetFlag = dayOffResetFlag;
@@ -40,7 +30,6 @@ public class CompanyYearOff {
 		this.insertOperator = insertOperator;
 		this.updateDate = updateDate;
 		this.updateOperator = updateOperator;
-		this.listEmployeeOffStatus = listEmployeeOffStatus;
 	}
 
 	public long getId() {
@@ -105,14 +94,6 @@ public class CompanyYearOff {
 
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
-	}
-
-	public List<EmployeeOffStatus> getListEmployeeOffStatus() {
-		return listEmployeeOffStatus;
-	}
-
-	public void setListEmployeeOffStatus(List<EmployeeOffStatus> listEmployeeOffStatus) {
-		this.listEmployeeOffStatus = listEmployeeOffStatus;
 	}
 
 }

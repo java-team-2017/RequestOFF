@@ -39,11 +39,9 @@ public class EmployeeOffStatusServiceImpl implements EmployeeOffStatusService {
 		if (employeeOffStatus == null) { // create new
 			employeeOffStatus = new EmployeeOffStatus();
 
-			CompanyYearOff companyYearOff = companyYearOffRepository.findById(yearId);
-			employeeOffStatus.setCompanyYearOff(companyYearOff);
+			employeeOffStatus.setYearId(yearId);
 
-			Employee employee = employeeRepository.findById(employeeId);
-			employeeOffStatus.setEmployee(employee);
+			employeeOffStatus.setEmployeeId(employeeId);
 
 			employeeOffStatus.setRemainHours(Long.parseLong(eOSRRequest.getRemainHours()));
 			employeeOffStatus.setTotalHours(Long.parseLong(eOSRRequest.getTotalHours()));
@@ -52,8 +50,8 @@ public class EmployeeOffStatusServiceImpl implements EmployeeOffStatusService {
 		} else { // update
 			if (!employeeOffStatus.getUpdateDate().equals(eOSRRequest.getUpdateDate())) {
 				throw new Exception("Someone updated EmployeeOffStatus with year id "
-						+ employeeOffStatus.getCompanyYearOff().getId() + " and employee id "
-						+ employeeOffStatus.getEmployee().getId() + " at " + employeeOffStatus.getUpdateDate());
+						+ yearId + " and employee id "
+						+ employeeId + " at " + employeeOffStatus.getUpdateDate());
 			}
 
 			if (StringUtil.isNotEmpty(eOSRRequest.getRemainHours())) {
@@ -69,8 +67,7 @@ public class EmployeeOffStatusServiceImpl implements EmployeeOffStatusService {
 
 		employeeOffStatusRepository.save(employeeOffStatus);
 
-		return new EmployeeOffStatusRegistResponse(employeeOffStatus.getCompanyYearOff().getId(),
-				employeeOffStatus.getEmployee().getId());
+		return new EmployeeOffStatusRegistResponse(yearId, employeeId);
 	}
 
 	@Override

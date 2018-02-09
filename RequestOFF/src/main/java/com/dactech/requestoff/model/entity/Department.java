@@ -7,9 +7,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -19,10 +17,7 @@ public class Department {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	private String name;
-	@OneToOne
-	@JoinColumn(name = "manager_id")
-	@JsonIgnoreProperties(value = {"department", "listRequest", "listEmployeeOffStatus"})
-	private Employee manager;
+	private long managerId;
 	private int validFlag;
 	private String insertDate;
 	private long insertOperator;
@@ -37,12 +32,12 @@ public class Department {
 		super();
 	}
 
-	public Department(long id, String name, Employee manager, int validFlag, String insertDate, long insertOperator,
+	public Department(long id, String name, long managerId, int validFlag, String insertDate, long insertOperator,
 			String updateDate, long updateOperator, List<Team> listTeam) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.manager = manager;
+		this.managerId = managerId;
 		this.validFlag = validFlag;
 		this.insertDate = insertDate;
 		this.insertOperator = insertOperator;
@@ -67,12 +62,12 @@ public class Department {
 		this.name = name;
 	}
 
-	public Employee getManager() {
-		return manager;
+	public long getManagerId() {
+		return managerId;
 	}
 
-	public void setManager(Employee manager) {
-		this.manager = manager;
+	public void setManagerId(long managerId) {
+		this.managerId = managerId;
 	}
 
 	public int getValidFlag() {

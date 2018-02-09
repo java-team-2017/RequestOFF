@@ -3,18 +3,16 @@ package com.dactech.requestoff.model.entity;
 import java.util.List;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class Employee {
@@ -26,7 +24,6 @@ public class Employee {
 	private String birthday;
 	@ManyToOne
 	@JoinColumn(name = "position_id")
-	@JsonIgnoreProperties("listEmployee")
 	private Position position;
 	private String email;
 	@JsonIgnore
@@ -40,37 +37,45 @@ public class Employee {
 	private String updateDate;
 	private long updateOperator;
 
-	@OneToMany(mappedBy = "employee")
-	@JsonIgnoreProperties(value = { "employee", "recipient" })
-	private List<Request> listRequest;
-
-	@OneToMany(mappedBy = "recipient")
-	@JsonIgnoreProperties(value = { "employee", "recipient" })
-	private List<Request> listReceivedRequest;
-
-	@OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
-	@JsonIgnoreProperties("employee")
-	private List<EmployeeOffStatus> listEmployeeOffStatus;
-
-	@OneToOne(mappedBy = "manager")
-	@JsonIgnoreProperties("manager")
-	private Department department;
-
-	@OneToOne(mappedBy = "leader")
-	@JsonIgnoreProperties(value = { "leader", "listEmployee" })
-	private Team team;
-
-	@ManyToMany(mappedBy = "listEmployee")
-	@JsonIgnoreProperties(value = { "listEmployee" })
+	@ManyToMany
+	@JoinTable(name = "team_employee", joinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "team_id", referencedColumnName = "id"))
 	private List<Team> listTeam;
 
-	@ManyToMany(mappedBy = "listEmployee")
-	@JsonIgnoreProperties(value = { "listEmployee" })
+	@ManyToMany
+	@JoinTable(name = "employee_role", joinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
 	private List<Role> listRole;
+
+	@Transient
+	private String departmentName;
 
 	public Employee() {
 		super();
 		// TODO Auto-generated constructor stub
+	}
+
+	public Employee(long id, String name, String gender, String birthday, Position position, String email,
+			String password, long phone, String startWorkingDate, String officialWorkingDate, int validFlag,
+			String insertDate, long insertOperator, String updateDate, long updateOperator, List<Team> listTeam,
+			List<Role> listRole, String departmentName) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.gender = gender;
+		this.birthday = birthday;
+		this.position = position;
+		this.email = email;
+		this.password = password;
+		this.phone = phone;
+		this.startWorkingDate = startWorkingDate;
+		this.officialWorkingDate = officialWorkingDate;
+		this.validFlag = validFlag;
+		this.insertDate = insertDate;
+		this.insertOperator = insertOperator;
+		this.updateDate = updateDate;
+		this.updateOperator = updateOperator;
+		this.listTeam = listTeam;
+		this.listRole = listRole;
+		this.departmentName = departmentName;
 	}
 
 	public long getId() {
@@ -193,46 +198,6 @@ public class Employee {
 		this.updateOperator = updateOperator;
 	}
 
-	public List<Request> getListRequest() {
-		return listRequest;
-	}
-
-	public void setListRequest(List<Request> listRequest) {
-		this.listRequest = listRequest;
-	}
-
-	public List<Request> getListReceivedRequest() {
-		return listReceivedRequest;
-	}
-
-	public void setListReceivedRequest(List<Request> listReceivedRequest) {
-		this.listReceivedRequest = listReceivedRequest;
-	}
-
-	public List<EmployeeOffStatus> getListEmployeeOffStatus() {
-		return listEmployeeOffStatus;
-	}
-
-	public void setListEmployeeOffStatus(List<EmployeeOffStatus> listEmployeeOffStatus) {
-		this.listEmployeeOffStatus = listEmployeeOffStatus;
-	}
-
-	public Department getDepartment() {
-		return department;
-	}
-
-	public void setDepartment(Department department) {
-		this.department = department;
-	}
-
-	public Team getTeam() {
-		return team;
-	}
-
-	public void setTeam(Team team) {
-		this.team = team;
-	}
-
 	public List<Team> getListTeam() {
 		return listTeam;
 	}
@@ -249,36 +214,12 @@ public class Employee {
 		this.listRole = listRole;
 	}
 
-	public Employee(long id, String name, String gender, String birthday, Position position, String email,
-			String password, long phone, String startWorkingDate, String officialWorkingDate, int validFlag,
-			String insertDate, long insertOperator, String updateDate, long updateOperator, List<Request> listRequest,
-			List<Request> listReceivedRequest, List<EmployeeOffStatus> listEmployeeOffStatus, Department department,
-			Team team, List<Team> listTeam, List<Role> listRole) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.gender = gender;
-		this.birthday = birthday;
-		this.position = position;
-		this.email = email;
-		this.password = password;
-		this.phone = phone;
-		this.startWorkingDate = startWorkingDate;
-		this.officialWorkingDate = officialWorkingDate;
-		this.validFlag = validFlag;
-		this.insertDate = insertDate;
-		this.insertOperator = insertOperator;
-		this.updateDate = updateDate;
-		this.updateOperator = updateOperator;
-		this.listRequest = listRequest;
-		this.listReceivedRequest = listReceivedRequest;
-		this.listEmployeeOffStatus = listEmployeeOffStatus;
-		this.department = department;
-		this.team = team;
-		this.listTeam = listTeam;
-		this.listRole = listRole;
+	public String getDepartmentName() {
+		return departmentName;
 	}
 
-	
+	public void setDepartmentName(String departmentName) {
+		this.departmentName = departmentName;
+	}
 
 }

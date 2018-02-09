@@ -49,9 +49,7 @@ public class RequestServiceImpl implements RequestService{
 			dayOffType.setId(Long.parseLong(requestRegistRequest.getDayOffTypeId()));
 			request.setDayOffType(dayOffType);
 			
-			Employee recipient = new Employee();
-			recipient.setId(Long.parseLong(requestRegistRequest.getRecipientId()));
-			request.setRecipient(recipient);
+			request.setRecipientId(Long.parseLong(requestRegistRequest.getRecipientId()));
 			
 			request.setValidFlag(Integer.parseInt(requestRegistRequest.getValidFlag()));
 		}
@@ -91,9 +89,7 @@ public class RequestServiceImpl implements RequestService{
 					request.setDayOffType(dayOffType);
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getRecipientId())) {
-					Employee recipient = new Employee();
-					recipient.setId(Long.parseLong(requestRegistRequest.getRecipientId()));
-					request.setRecipient(recipient);
+					request.setRecipientId(Long.parseLong(requestRegistRequest.getRecipientId()));
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getValidFlag())) {
 					request.setValidFlag(Integer.parseInt(requestRegistRequest.getValidFlag()));
