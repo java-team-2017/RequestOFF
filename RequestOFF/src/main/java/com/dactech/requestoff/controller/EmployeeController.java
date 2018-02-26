@@ -101,6 +101,9 @@ public class EmployeeController {
 			List<GetUserResponse.IdName> forwards = employeeService.findForwardList(user.getId());
 			response.setListForward(forwards);
 			
+			List<GetUserResponse.IdName> recipients = employeeService.getListRecipients((user.getId()));
+			response.setListRecipients(recipients);
+			
 			response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
 		} catch (Exception e) {
 			response.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));

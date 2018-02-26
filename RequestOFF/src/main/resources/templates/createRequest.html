@@ -23,11 +23,9 @@
 		/*<![CDATA[*/
 			var employee;
 			var employeeId;
-			var listDayOffType;
-			
 			
 			$(function() {
-				var listRecipient = [];
+// 				var listRecipient = [];
 				var getStatus = {
 					'1': 'saved',
 					'2': 'approved',
@@ -35,7 +33,6 @@
 					'4': 'responded',
 					'5': 'waiting'
 				};
-				var remainHours, offHours;
 				
 				//get current user
 				$.ajax({
@@ -45,41 +42,19 @@
 					dataType : 'json',
 					data : JSON.stringify({}),
 					success : function(returnData) {
+						console.log(returnData);
 						employee = returnData.user;
-						console.log(employee);
 						employeeId = employee.id;
 						
-						remainHours = getRemainHours(employee);
-						renderRemainHours(remainHours, 'remainHours');
-						
-						//recipient select box
-						listRecipient = getListRecipient(employee);
-						renderRecipientSelect(listRecipient, 'id_recipient');
+						renderRemainHours(employeeId, 'remainHours');
+						renderDayOffTypeSelect('id_dayOffType');
+						renderRecipientSelect(returnData.listRecipients, 'id_recipient');
 					},
 					error : function(e) {
 						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 					}
 				});
-				
-				$.ajax({
-					type : "POST",
-					contentType : "application/json",
-					url : /*[[@{/dayOffType/search}]]*/,
-					dataType : 'json',
-					data : JSON.stringify({"valid_flag_id" : "1"}),
-					success : function(returnData) {
-						listDayOffType = returnData.listDayOffType;
-						var option = "";
-						$.each(returnData.listDayOffType, function(i, element){
-							option += "<option value='" + element.name + "'>" + element.name + "</option>"; 
-						});
-						$("#id_dayOffType").append(option);
-					},
-					error : function(e) {
-						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-					}
-				});
-				
+
 				$('.datepicker').on('changeDate', function(ev){
 					$(this).datepicker('hide');
 				});
@@ -137,105 +112,41 @@
 						$('#alertMessage').html(errors['DateError']).attr('class', 'alert alert-danger').show();
 					}
 					else {
-						//calculate hours of off time
+						var requestRegistRequest = {
+							"id" : "",
+							"employee_id" : employeeId,
+							"from_time" : from,
+							"to_time" : to,
+							"reason" : createRequestData.reason,
+							"status" : status,
+							"response_message" : "",
+							"day_off_type_id" : createRequestData.dayOffType,
+							"recipient_id" : createRequestData.recipient,
+							"valid_flag" : "1",
+							"update_date" : ""
+						};
+						console.log(requestRegistRequest);
 						$.ajax({
 							type : "POST",
 							contentType : "application/json",
-							url : /*[[@{/request/calculateHours}]]*/,
+							url : /*[[@{/request/regist}]]*/,
 							dataType : 'json',
-							data : JSON.stringify({
-								"from_time" : from,
-								"to_time" : to
-							}),
+							data : JSON.stringify(requestRegistRequest),
 							success : function(returnData) {
-								offHours = returnData.hours;
-								if(parseInt(offHours) == 0) {
-									$('#alertMessage').html(errors['weekend']).attr('class', 'alert alert-danger').show();
-								}
-								else if(remainHours < offHours) {
-									$('#alertMessage').html(errors['exceedTime']).attr('class', 'alert alert-danger').show();
+								if(returnData.status_info.status == "1") {
+									$('#alertMessage').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
 								}
 								else {
-									remainHours = parseInt(remainHours) - parseInt(offHours);
-									
-									//create request
-									var requestRegistRequest = {
-										"id" : "",
-										"employee_id" : employeeId,
-										"from_time" : from,
-										"to_time" : to,
-										"reason" : createRequestData.reason,
-										"status" : status,
-										"response_message" : "",
-										"day_off_type_id" : getDayOffTypeId(listDayOffType, createRequestData.dayOffType),
-										"recipient_id" : getRecipientNameOrId(listRecipient, createRequestData.recipient),
-										"valid_flag" : "1",
-										"update_date" : ""
-									};
-									console.log(requestRegistRequest);
-									$.ajax({
-										type : "POST",
-										contentType : "application/json",
-										url : /*[[@{/request/regist}]]*/,
-										dataType : 'json',
-										data : JSON.stringify(requestRegistRequest),
-										success : function(returnData) {
-										},
-										error : function(e) {
-											$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
-										}
-									});
-									
-									//get employee off status update date
-									$.ajax({
-										type : "POST",
-										contentType : "application/json",
-										url : /*[[@{/employeeOffStatus/details}]]*/,
-										dataType : 'json',
-										data : JSON.stringify({
-											"year_id" : (new Date()).getFullYear(),
-											"employee_id" : employeeId
-										}),
-										success : function(returnData) {
-											//update employee off status
-											var offStatusRegistRequest = {
-		 										"year_id" : (new Date()).getFullYear(),
-		 										"employee_id" : employeeId,
-		 										"remain_hours" : remainHours,
-		 										"total_hours" : "",
-		 										"update_date" : returnData.employee_off_status.updateDate,
-		 										"valid_flag" : ""
-		 									};
-		 									console.log(offStatusRegistRequest);
-		 									$.ajax({
-		 										type : "POST",
-		 										contentType : "application/json",
-		 										url : /*[[@{/employeeOffStatus/regist}]]*/,
-		 										dataType : 'json',
-		 										data : JSON.stringify(offStatusRegistRequest),
-		 										success : function(returnData) {
-		 										},
-		 										error : function(e) {
-		 											$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
-		 										}
-		 									});
-											
-											renderRemainHours(remainHours, 'remainHours');
-		 									$("#createRequestForm :input").not("button, select").val("");
-		 									$("#createRequestForm select").prop('selectedIndex', 0);
-		 									$('#alertMessage').html(alertStr).attr('class', 'alert alert-success').show();
-										},
-										error : function(e) {
-											$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
-										}
-									});
+									renderRemainHours(employeeId, 'remainHours');
+									$("#createRequestForm :input").not("button, select").val("");
+ 									$("#createRequestForm select").prop('selectedIndex', 0);
+ 									$('#alertMessage').html(alertStr).attr('class', 'alert alert-success').show();
 								}
 							},
 							error : function(e) {
-								$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
+								$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 							}
 						});
-						
 					}
 				});
 				

@@ -25,4 +25,6 @@ public interface EmployeeService {
 	public Employee findByEmail(String email);
 	
 	public List<GetUserResponse.IdName> findForwardList(long id);
+	
+	public List<GetUserResponse.IdName> getListRecipients(long employeeId);
 }

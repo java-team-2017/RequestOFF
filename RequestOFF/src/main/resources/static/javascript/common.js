@@ -44,16 +44,16 @@ var notification = {
 //	$('#' + containerId + ' > span').html(message);
 //}
 
-function getDayOffTypeId(dayOffTypeList, dayOffTypeName) {
-	var id;
-	$.each(dayOffTypeList, function(i, element) {
-		if(dayOffTypeName.localeCompare(element.name) == 0) {
-			id = element.id;
-			return false;	//return false to break the loop
-		}
-	});
-	return id;
-}
+//function getDayOffTypeId(dayOffTypeList, dayOffTypeName) {
+//	var id;
+//	$.each(dayOffTypeList, function(i, element) {
+//		if(dayOffTypeName.localeCompare(element.name) == 0) {
+//			id = element.id;
+//			return false;	//return false to break the loop
+//		}
+//	});
+//	return id;
+//}
 
 function getRecipientNameOrId(recipientList, recipientNameOrId) {
 	var returnValue;
@@ -70,47 +70,81 @@ function getRecipientNameOrId(recipientList, recipientNameOrId) {
 	return returnValue;
 }
 
-function getRemainHours(employee) {
+function renderRemainHours(employeeId, containerId) {
 	var currentYear = (new Date()).getFullYear();
-	listEmployeeOffStatus = employee.listEmployeeOffStatus;
 	var remainHours;
-	$.each(listEmployeeOffStatus, function(i, element) {
-		if(element.companyYearOff.id == currentYear) {
-			remainHours = element.remainHours;
-			return false;	//return false to break the loop
+	$.ajax({
+		type : "POST",
+		contentType : "application/json",
+		url : "/employeeOffStatus/details",
+//		url : /*[[@{/employeeOffStatus/details}]]*/,
+		dataType : 'json',
+		data : JSON.stringify({
+			"year_id" : currentYear,
+			"employee_id" : employeeId
+		}),
+		success : function(returnData) {
+			remainHours = returnData.employee_off_status.remainHours;
+			if(parseInt(remainHours) < 2) {
+				$("#" + containerId).html(remainHours + " hour");
+			}
+			else {
+				$("#" + containerId).html(remainHours + " hours");
+			}
+		},
+		error : function(e) {
+			$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
 		}
 	});
-	return remainHours;
 }
 
-function renderRemainHours(remainHours, containerId) {
-	if(parseInt(remainHours) < 2) {
-		$("#" + containerId).html(remainHours + " hour");
-	}
-	else {
-		$("#" + containerId).html(remainHours + " hours");
-	}
+function renderDayOffTypeSelect(containerId) {
+	$.ajax({
+		type : "POST",
+		contentType : "application/json",
+		url : "/dayOffType/search",
+//		url : /*[[@{/dayOffType/search}]]*/,
+		dataType : 'json',
+		data : JSON.stringify({"valid_flag_id" : "1"}),
+		success : function(returnData) {
+			var option = "";
+			$.each(returnData.listDayOffType, function(i, element){
+				option += "<option value='" + element.id + "'>" + element.name + "</option>"; 
+			});
+			$("#" + containerId).append(option);
+		},
+		error : function(e) {
+			console.log(html(errors['APIResponseError'](e)));
+		}
+	});
 }
 
-function getListRecipient(employee) {
-	var listRecipient = [];
-	if(employee.position.name == "leader") {
-		listRecipient.push(employee.team.department.manager);
-	}
-	else if(employee.position.name == "employee") {
-		listRecipient.push(employee.listTeam[0].leader);
-		listRecipient.push(employee.listTeam[0].department.manager);
-	}
-	else {
-		listRecipient.push(employee);
-	}
-	return listRecipient;
-}
+//function renderRecipientSelect(employeeId, selectBoxId) {
+//	$.ajax({
+//		type : "POST",
+//		contentType : "application/json",
+//		url : "/employee/getListRecipients",
+////		url : /*[[@{/employee/getListRecipients}]]*/,
+//		dataType : 'json',
+//		data : JSON.stringify({"employee_id" : employeeId}),
+//		success : function(returnData) {
+//			var option = "";
+//			var listRecipient = returnData.list_recipients;
+//			$.each(listRecipient, function(i, element) {
+//				option += "<option value='" + element.id + "'>" + element.name + "</option>"; 
+//			});
+//			$("#" + selectBoxId).append(option);
+//		},
+//		error : function(e) {
+//			$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
+//		}
+//	});
+//}
 
 function renderRecipientSelect(listRecipient, selectBoxId) {
 	var option = "";
 	$.each(listRecipient, function(i, element) {
-		option += "<option value='" + element.name + "'>" + element.name + "</option>"; 
+		option += "<option value='" + element.id + "'>" + element.name + "</option>"; 
 	});
 	$("#" + selectBoxId).append(option);
 }

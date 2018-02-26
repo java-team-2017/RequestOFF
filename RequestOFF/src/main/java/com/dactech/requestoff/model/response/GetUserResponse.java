@@ -9,16 +9,7 @@ import com.dactech.requestoff.model.entity.Employee;
 public class GetUserResponse extends Common {
 	Employee user;
 	List<IdName> listForward;
-
-	public GetUserResponse() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-	public GetUserResponse(StatusInfo statusInfo) {
-		super(statusInfo);
-		// TODO Auto-generated constructor stub
-	}
+	List<IdName> listRecipients;
 
 	public Employee getUser() {
 		return user;
@@ -36,9 +27,29 @@ public class GetUserResponse extends Common {
 		this.listForward = listForward;
 	}
 
-	public GetUserResponse(Employee user, List<IdName> listForward) {
+	public List<IdName> getListRecipients() {
+		return listRecipients;
+	}
+
+	public void setListRecipients(List<IdName> listRecipients) {
+		this.listRecipients = listRecipients;
+	}
+
+	public GetUserResponse(Employee user, List<IdName> listForward, List<IdName> listRecipients) {
+		super();
 		this.user = user;
 		this.listForward = listForward;
+		this.listRecipients = listRecipients;
+	}
+
+	public GetUserResponse() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public GetUserResponse(StatusInfo statusInfo) {
+		super(statusInfo);
+		// TODO Auto-generated constructor stub
 	}
 
 	public static class IdName {

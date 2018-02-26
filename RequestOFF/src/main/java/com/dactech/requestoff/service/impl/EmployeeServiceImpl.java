@@ -336,4 +336,27 @@ public class EmployeeServiceImpl implements EmployeeService {
 		
 		return forwards;
 	}
+	
+	@Override
+	public List<GetUserResponse.IdName> getListRecipients(long employeeId) {
+		List<GetUserResponse.IdName> listRecipients = new ArrayList<GetUserResponse.IdName>();
+		Employee e = employeeRepository.findById(employeeId);
+		if(e.getPosition().getName().equals("leader")) {
+			long managerId = teamRepository.findByLeaderId(employeeId).getDepartment().getManagerId();
+			Employee manager = employeeRepository.findById(managerId);
+			listRecipients.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
+		}
+		else if(e.getPosition().getName().equals("employee")) {
+			long leaderId = e.getListTeam().get(0).getLeaderId();
+			Employee leader = employeeRepository.findById(leaderId);
+			listRecipients.add(new GetUserResponse.IdName(leader.getId(), leader.getName()));
+			long managerId = e.getListTeam().get(0).getDepartment().getManagerId();
+			Employee manager = employeeRepository.findById(managerId);
+			listRecipients.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
+		}
+		else {
+			listRecipients.add(new GetUserResponse.IdName(e.getId(), e.getName()));
+		}
+		return listRecipients;
+	}
 }
