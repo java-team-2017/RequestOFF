@@ -12,26 +12,20 @@
 		//=====================================================================
 		// # Initialize form
 		//=====================================================================
-		var listDepartment;
+		var listDepartment; // for combobox display purpose
 		var listTeam;
 		
-		var editEmployee;
-		var editEmployeeOffStatus;
-		
-		// department data handler
-		function departmentDataHandler(departments) {
-			listDepartment = departments;
-		}
-		
-		function teamDataHandler(teams) {
-			listTeam = teams;
-		}
+		var editEmployee; // for editing remain hours of employee purpose
 		
 		//Department combobox
-		renderDepartmentSelect("department", departmentDataHandler);
+		renderDepartmentSelect("department", function(departments) {
+			listDepartment = departments;
+		});
 		
 		//Team combobox
-		renderTeamSelect("team", teamDataHandler);
+		renderTeamSelect("team", function(teams) {
+			listTeam = teams;
+		});
 		
 		//Employee text field type ahead
 		$('#employee').typeahead({
@@ -64,7 +58,7 @@
 			return false;
 		});
 		
-		//select department event
+		// change team combobox when department combobox is changed
 		$('#department').on('change', function() {
 			if ($(this).val() != '') {
 				var id = $(this).val();
@@ -109,7 +103,7 @@
 				processing: true,
 				serverSide: true,
 				searching: false,
-// 				pageLength: 2,
+//				pageLength: 2,
 				ajax: {
 					'url' : /*[[@{/employee/statisticsPaging}]]*/,
 					'type': "POST",
@@ -128,7 +122,7 @@
 						data: 'employee.listTeam[0].department.name',
 						render: function (data, type, row){
 							if(typeof(row.employee.listTeam[0]) == "undefined") {
-								data = row.employee.department.name;
+								data = row.employee.departmentName;
 							}
 							return data;
 						}
@@ -137,7 +131,7 @@
 						data: 'employee.listTeam[0].name',
 						render: function (data, type, row){
 							if(typeof(row.employee.listTeam[0]) == "undefined") {
-								data = "";
+								data = row.employee.teamName;
 							}
 							return data;
 						}
@@ -146,14 +140,8 @@
 					{ data: 'timeOffWithPaying' },
 					{ data: 'timeOffWithoutPaying' },
 					{
-						data: 'employee.listEmployeeOffStatus',
+						data: 'employee.employeeOffStatus.remainHours',
 						render: function (data, type, row){
-							var employeeOffStatus = $.grep(data, function(e){ return e.validFlag == 1; });
-							if (employeeOffStatus.length == 0) {
-								data = "";
-							} else {
-								data = employeeOffStatus[0].remainHours;
-							}
 							if (type == 'display' || type == 'filter') { // for display and search
 								if (data == "") data = 0;
 								return Math.floor(data/8) + " day " + (data % 8) + " h";
@@ -171,6 +159,7 @@
 				]
 			});
 		}
+		
 		$("#searchBtn").on('click', function() {
 			search();
 		});
@@ -200,7 +189,7 @@
 			$('#detailPosition').val(statisticsObj.employee.position.name);
 			
 			if(typeof(statisticsObj.employee.listTeam[0]) == "undefined") {
-				$('#detailDepartment').val(statisticsObj.employee.department.name);
+				$('#detailDepartment').val(statisticsObj.employee.departmentName);
 				$('#detailTeam').val("");
 			} else {
 				$('#detailDepartment').val(statisticsObj.employee.listTeam[0].department.name);
@@ -210,12 +199,7 @@
 			$('#detailWithPaying').val(statisticsObj.timeOffWithPaying);
 			$('#detailWithoutPaying').val(statisticsObj.timeOffWithoutPaying);
 			
-			var employeeOffStatus = $.grep(statisticsObj.employee.listEmployeeOffStatus, function(e){ return e.validFlag == 1; });
-			if (employeeOffStatus.length == 0) {
-				remainHours = -1;
-			} else {
-				remainHours = employeeOffStatus[0].remainHours;
-			}
+			var remainHours = statisticsObj.employee.employeeOffStatus.remainHours;
 			$('#detailRemainDay').val(Math.floor(remainHours/8) + " day " + (remainHours % 8) + " h");
 			
 			$('#withPayingTable').DataTable({
@@ -257,13 +241,7 @@
 			
 			$('#editEmployee').val(statisticsObj.employee.name);
 			
-			var employeeOffStatus = $.grep(statisticsObj.employee.listEmployeeOffStatus, function(e){ return e.validFlag == 1; });
-			if (employeeOffStatus.length == 0) {
-				remainHours = -1;
-			} else {
-				editEmployeeOffStatus = employeeOffStatus[0];
-				remainHours = employeeOffStatus[0].remainHours;
-			}
+			var remainHours = statisticsObj.employee.employeeOffStatus.remainHours;
 			$('#editRemainDay').val(Math.floor(remainHours/8) + " day " + (remainHours % 8) + " h");
 			$('#editDays').val(Math.floor(remainHours/8));
 			$('#editHours').val(remainHours % 8);
@@ -280,16 +258,15 @@
 			if (isNaN(parseInt(days)) || parseInt(days) != parseFloat(days) || parseInt(days) < 0) {
 				$('#editMsg').html("number of days must be a positive integer").show();
 			} else {
+				console.log(editEmployee);
 				var remainHours = days * 8 + hours;
 				eOSRequest = {
-					'year_id': editEmployeeOffStatus.companyYearOff.id,
+					'year_id': editEmployee.employeeOffStatus.yearId,
 					'employee_id': editEmployee.id,
 					'remain_hours': remainHours,
-					'update_date': editEmployeeOffStatus.updateDate,
+					'update_date': editEmployee.employeeOffStatus.updateDate,
 					"valid_flag": 1
 				}
-				
-				console.log(eOSRequest);
 				
 				$.ajax({
 					url : /*[[@{/employeeOffStatus/regist}]]*/,
@@ -300,6 +277,8 @@
 					success : function (teamSearchResponse){
 						if (teamSearchResponse.status_info.status != 0) {
 							$('#alertMessage').html(errors['APIResponseError'](teamSearchResponse.status_info.error)).attr('class', 'alert alert-danger').show();
+						} else {
+							$('#alertMessage').html("Edit success").attr('class', 'alert alert-success').show();
 						}
 						$('#editRemainHoursModal').modal('hide');
 						var statisticsTable = $('#statisticsTable').DataTable();
@@ -489,7 +468,7 @@
 					<div class="modal-body">
 						<div class="row">
 							<div class="col-sm-1"></div>
-							<div id="editMsg" class="alert-danger" style="display: none;"></div>
+							<div id="editMsg" class="alert alert-danger" style="display: none;"></div>
 							<br/>
 						</div>
 						<div class="row">

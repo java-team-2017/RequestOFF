@@ -46,7 +46,11 @@ public class Employee {
 	private List<Role> listRole;
 
 	@Transient
-	private String departmentName;
+	private String departmentName; // employee is a manager
+	@Transient
+	private String teamName; // employee is a leader
+	@Transient
+	private EmployeeOffStatus employeeOffStatus;
 
 	public Employee() {
 		super();
@@ -56,7 +60,7 @@ public class Employee {
 	public Employee(long id, String name, String gender, String birthday, Position position, String email,
 			String password, long phone, String startWorkingDate, String officialWorkingDate, int validFlag,
 			String insertDate, long insertOperator, String updateDate, long updateOperator, List<Team> listTeam,
-			List<Role> listRole, String departmentName) {
+			List<Role> listRole, String departmentName, String teamName, EmployeeOffStatus employeeOffStatus) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -76,6 +80,8 @@ public class Employee {
 		this.listTeam = listTeam;
 		this.listRole = listRole;
 		this.departmentName = departmentName;
+		this.teamName = teamName;
+		this.employeeOffStatus = employeeOffStatus;
 	}
 
 	public long getId() {
@@ -220,6 +226,22 @@ public class Employee {
 
 	public void setDepartmentName(String departmentName) {
 		this.departmentName = departmentName;
+	}
+
+	public String getTeamName() {
+		return teamName;
+	}
+
+	public void setTeamName(String teamName) {
+		this.teamName = teamName;
+	}
+
+	public EmployeeOffStatus getEmployeeOffStatus() {
+		return employeeOffStatus;
+	}
+
+	public void setEmployeeOffStatus(EmployeeOffStatus employeeOffStatus) {
+		this.employeeOffStatus = employeeOffStatus;
 	}
 
 }

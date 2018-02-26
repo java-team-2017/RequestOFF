@@ -13,19 +13,26 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.DayOffType;
+import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.EmployeeOffStatus;
 import com.dactech.requestoff.model.entity.Position;
 import com.dactech.requestoff.model.entity.Request;
+import com.dactech.requestoff.model.entity.Team;
 import com.dactech.requestoff.model.request.EmployeeDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatisticsPagingRequest;
 import com.dactech.requestoff.model.request.EmployeeRegistRequest;
 import com.dactech.requestoff.model.request.EmployeeSearchRequest;
+import com.dactech.requestoff.model.request.RequestSearchRequest;
 import com.dactech.requestoff.model.response.EmployeeDetailsResponse;
 import com.dactech.requestoff.model.response.EmployeeOffStatisticsPagingResponse;
 import com.dactech.requestoff.model.response.EmployeeRegistResponse;
 import com.dactech.requestoff.model.response.EmployeeSearchResponse;
+import com.dactech.requestoff.repository.DepartmentRepository;
+import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
+import com.dactech.requestoff.repository.RequestRepository;
+import com.dactech.requestoff.repository.TeamRepository;
 import com.dactech.requestoff.service.EmployeeService;
 import com.dactech.requestoff.util.DateUtils;
 import com.dactech.requestoff.util.StringUtil;
@@ -33,10 +40,17 @@ import com.dactech.requestoff.util.StringUtil;
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 	@Autowired
-	EmployeeRepository employeeRepository;
-
+	private EmployeeRepository employeeRepository;
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	@Autowired
+	private RequestRepository requestRepository;
+	@Autowired
+	private DepartmentRepository departmentRepository;
+	@Autowired
+	private TeamRepository teamRepository;
+	@Autowired
+	private EmployeeOffStatusRepository EOSRepository;
 
 	@Override
 	public EmployeeRegistResponse employeeRegist(EmployeeRegistRequest erRequest) throws Exception {
@@ -124,7 +138,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public EmployeeOffStatisticsPagingResponse employeeOffStatisticsPaging(
 			EmployeeOffStatisticsPagingRequest eospRequest) throws Exception {
-/*		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy HH");
+//*
+		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy HH");
 		
 		String requestFromTimeStr = eospRequest.getFromTime().equals("") ? "01/01/2000 08"
 				: eospRequest.getFromTime();
@@ -151,11 +166,38 @@ public class EmployeeServiceImpl implements EmployeeService {
 				listEmployee.size());
 		for (Employee employee : listEmployee) {
 			EmployeeOffStatisticsPagingResponse.EmployeeStatistics eStatistics = new EmployeeOffStatisticsPagingResponse.EmployeeStatistics();
+			if (employee.getPosition().getId() == Position.POSITION_PROJECT_MANAGER) {
+				Department dept = departmentRepository.findByManagerId(employee.getId());
+				if (dept != null) {
+					employee.setDepartmentName(dept.getName());
+				} else {
+					employee.setDepartmentName("No Department");
+				}
+			} else if (employee.getPosition().getId() == Position.POSITION_LEADER) {
+				Team team = teamRepository.findByLeaderId(employee.getId());
+				if (team != null) {
+					employee.setTeamName(team.getName());
+				} else {
+					employee.setTeamName("No Team");
+				}
+			}
+			
+			EmployeeOffStatus eos = EOSRepository.findById(Calendar.getInstance().get(Calendar.YEAR), employee.getId());
+			employee.setEmployeeOffStatus(eos);
+			
 			eStatistics.setEmployee(employee);
 
 			// classify request according to payment_flag
 			// calculate total off time of each class
-			List<Request> listRequest = employee.getListRequest();
+			formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+			RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
+			requestSearchRequest.setEmployeeId(Long.toString(employee.getId()));
+			requestSearchRequest.setFromTime(formatter.format(requestFromTime));
+			requestSearchRequest.setToTime(formatter.format(requestToTime));
+			requestSearchRequest.setStatus(Long.toString(Request.REQUEST_STATUS_APPROVED));
+			requestSearchRequest.setValidFlag("1");
+			List<Request> listRequest = requestRepository.searchRequest(requestSearchRequest);
+			
 			List<Request> listRequestWithPaying = new ArrayList<Request>(listRequest.size());
 			List<Request> listRequestWithoutPaying = new ArrayList<Request>(listRequest.size());
 			long timeOffWithPaying = 0;
@@ -163,21 +205,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 			formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 			for (Request request : listRequest) {
-				// eliminate Request entity with status != approved and valid_flag == 0
-				if (request.getStatus() != Request.REQUEST_STATUS_APPROVED || request.getValidFlag() == 0) {
-					continue;
-				}
-
-				// eliminate Request entity with time unmatch the time of statisticRequest
-				Date fromTime = formatter.parse(request.getFromTime());
-				Date toTime = formatter.parse(request.getToTime());
-				if (fromTime.after(requestToTime) || toTime.before(requestFromTime)) {
-					continue;
-				}
-
 				// get the offTime within StatisticsRequestTime
 				// (the range of Request off time may be over the range of
 				// StatisticsRequestTime)
+				Date fromTime = formatter.parse(request.getFromTime());
+				Date toTime = formatter.parse(request.getToTime());
 				Date startTime = fromTime.after(requestFromTime) ? fromTime : requestFromTime;
 				Date endTime = toTime.before(requestToTime) ? toTime : requestToTime;
 
@@ -226,24 +258,27 @@ public class EmployeeServiceImpl implements EmployeeService {
 					if (o1.getEmployee().getListTeam().size() > 0) {
 						name1 = o1.getEmployee().getListTeam().get(0).getDepartment().getName();
 					} else {
-						name1 = o1.getEmployee().getDepartment().getName();
+						name1 = o1.getEmployee().getDepartmentName();
 					}
-
 					if (o2.getEmployee().getListTeam().size() > 0) {
 						name2 = o2.getEmployee().getListTeam().get(0).getDepartment().getName();
 					} else {
-						name2 = o2.getEmployee().getDepartment().getName();
+						name2 = o2.getEmployee().getDepartmentName();
 					}
 					returnNumber = dir * name1.compareToIgnoreCase(name2);
 				} else if (colData.equals("employee.listTeam[0].name")) {
 					String name1, name2;
 					if (o1.getEmployee().getListTeam().size() > 0) {
 						name1 = o1.getEmployee().getListTeam().get(0).getName();
+					} else if (StringUtil.isNotEmpty(o1.getEmployee().getTeamName())) {
+						name1 = o1.getEmployee().getTeamName();
 					} else {
 						name1 = "";
 					}
 					if (o2.getEmployee().getListTeam().size() > 0) {
 						name2 = o2.getEmployee().getListTeam().get(0).getName();
+					} else if (StringUtil.isNotEmpty(o2.getEmployee().getTeamName())) {
+						name2 = o2.getEmployee().getTeamName();
 					} else {
 						name2 = "";
 					}
@@ -256,21 +291,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 					returnNumber = (int) (dir * (o1.getTimeOffWithPaying() - o2.getTimeOffWithPaying()));
 				} else if (colData.equals("timeOffWithoutPaying")) {
 					returnNumber = (int) (dir * (o1.getTimeOffWithoutPaying() - o2.getTimeOffWithoutPaying()));
-				} else if (colData.equals("employee.listEmployeeOffStatus")) {
-					long remainHours1 = -1, remainHours2 = -1;
-					for (EmployeeOffStatus e : o1.getEmployee().getListEmployeeOffStatus()) {
-						if (e.getValidFlag() == 1) {
-							remainHours1 = e.getRemainHours();
-							break;
-						}
-					}
-					
-					for (EmployeeOffStatus e : o2.getEmployee().getListEmployeeOffStatus()) {
-						if (e.getValidFlag() == 1) {
-							remainHours2 = e.getRemainHours();
-							break;
-						}
-					}
+				} else if (colData.equals("employee.employeeOffStatus.remainHours")) {
+					long remainHours1 = o1.getEmployee().getEmployeeOffStatus().getRemainHours();
+					long remainHours2 = o2.getEmployee().getEmployeeOffStatus().getRemainHours();
 					returnNumber = (int) (dir * (remainHours1 - remainHours2));
 				} else { // sort by id is default
 					returnNumber = (int) (dir * (o1.getEmployee().getId() - o2.getEmployee().getId()));
@@ -283,7 +306,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		response.setListEmployeeStatistics(truncatedList);
 		return response;
 //*/
-		return null;
+//		return null;
 	}
 
 	@Override

@@ -7,4 +7,5 @@ import com.dactech.requestoff.repository.custom.TeamRepositoryCustom;
 
 public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositoryCustom{
 	public Team findById(long id);
+	public Team findByLeaderId(long leaderId);
 }

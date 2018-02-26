@@ -7,4 +7,5 @@ import com.dactech.requestoff.repository.custom.DepartmentRepositoryCustom;
 
 public interface DepartmentRepository extends JpaRepository<Department, Long>, DepartmentRepositoryCustom {
 	public Department findById(long id);
+	public Department findByManagerId(long managerId);
 }
