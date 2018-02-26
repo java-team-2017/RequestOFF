@@ -19,13 +19,17 @@ public class EmployeeSearchRequest {
 	private String officalWorkingDate;
 	@JsonProperty("valid_flag")
 	private String validFlag;
+	@JsonProperty("team_id")
+	private String teamId;
+	@JsonProperty("department_id")
+	private String departmentId;
 
 	public EmployeeSearchRequest() {
 	}
 
 	public EmployeeSearchRequest(String id, String name, String nameMatchStatus, String gender, String birthday,
 			String positionId, String email, String phone, String startWorkingDate, String officalWorkingDate,
-			String validFlag) {
+			String validFlag, String teamId, String departmentId) {
 		this.id = id;
 		this.name = name;
 		this.nameMatchStatus = nameMatchStatus;
@@ -37,6 +41,8 @@ public class EmployeeSearchRequest {
 		this.startWorkingDate = startWorkingDate;
 		this.officalWorkingDate = officalWorkingDate;
 		this.validFlag = validFlag;
+		this.teamId = teamId;
+		this.departmentId = departmentId;
 	}
 
 	public String getId() {
@@ -125,6 +131,22 @@ public class EmployeeSearchRequest {
 
 	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
+	}
+
+	public String getTeamId() {
+		return teamId;
+	}
+
+	public void setTeamId(String teamId) {
+		this.teamId = teamId;
+	}
+
+	public String getDepartmentId() {
+		return departmentId;
+	}
+
+	public void setDepartmentId(String departmentId) {
+		this.departmentId = departmentId;
 	}
 
 }

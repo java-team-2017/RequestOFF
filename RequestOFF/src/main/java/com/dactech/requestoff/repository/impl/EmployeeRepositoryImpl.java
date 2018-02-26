@@ -18,84 +18,74 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Employee> search(EmployeeSearchRequest employeeSearchRequest) {
-		boolean whereClause = true;
 		Query query = null;
-		StringBuilder sqlJoinQuery = new StringBuilder(
-				"SELECT * FROM employee INNER JOIN team_employee ON employee.id = team_employee.employee_id INNER JOIN team ON team_employee.team_id = team.id ");
-		StringBuilder sqlQuery = new StringBuilder("SELECT * FROM employee ");
-
-		if (StringUtil.isNotEmpty(employeeSearchRequest.getId())) {
-			sqlQuery.append(" WHERE employee.id = '" + employeeSearchRequest.getId() + "'");
-			whereClause = false;
+		StringBuilder queryString = new StringBuilder("SELECT * FROM employee e ");
+		StringBuilder joinClause = new StringBuilder(" INNER JOIN team_employee te ON e.id = te.employee_id INNER JOIN team t ON te.team_id = t.id ");
+		StringBuilder whereClause = new StringBuilder("");
+		
+		if (StringUtil.isNotEmpty(employeeSearchRequest.getTeamId())) {
+			whereClause.append(" AND te.team_id = " + employeeSearchRequest.getTeamId());
 		}
-
-		if (StringUtil.isNotEmpty(employeeSearchRequest.getName())) {
-			if (StringUtil.isNotEmpty(employeeSearchRequest.getNameMatchStatus())) {
-				String sqlString = whereClause ? " WHERE " : " AND ";
-				sqlQuery.append(sqlString + "name like '%" + employeeSearchRequest.getName() + "%'");
-				whereClause = false;
+		
+		if (StringUtil.isNotEmpty(employeeSearchRequest.getDepartmentId())) {
+			whereClause.append(" AND t.department_id = " + employeeSearchRequest.getDepartmentId());
+		}
+		
+		if (whereClause.length() > 0) {
+			queryString.append(joinClause.toString());
+		}
+		
+		if(StringUtil.isNotEmpty(employeeSearchRequest.getId())) {
+			whereClause.append(" AND id = " + employeeSearchRequest.getId());
+		}
+		
+		if(StringUtil.isNotEmpty(employeeSearchRequest.getName())) {
+			if(StringUtil.isNotEmpty(employeeSearchRequest.getNameMatchStatus()) && employeeSearchRequest.getNameMatchStatus().equals("1")) {
+				whereClause.append(" AND e.name = '" + employeeSearchRequest.getName() + "'");
 			} else {
-				String sqlString = whereClause ? " WHERE " : " AND ";
-				sqlQuery.append(sqlString + "name = '" + employeeSearchRequest.getName() + "'");
-				whereClause = false;
+				whereClause.append(" AND e.name like '%" + employeeSearchRequest.getName() + "%'");
 			}
 		}
-
-		if (StringUtil.isNotEmpty(employeeSearchRequest.getGender())) {
-			String sqlString = whereClause ? " WHERE " : " AND ";
-			sqlQuery.append(sqlString + "gender = '" + employeeSearchRequest.getGender() + "'");
-			whereClause = false;
+		
+		if(StringUtil.isNotEmpty(employeeSearchRequest.getGender())) {
+			whereClause.append(" AND gender = '" + employeeSearchRequest.getGender() + "'");
 		}
-
-		if (StringUtil.isNotEmpty(employeeSearchRequest.getBirthday())) {
-			String sqlString = whereClause ? " WHERE " : " AND ";
-			sqlQuery.append(sqlString + "birthday = '" + employeeSearchRequest.getBirthday() + "'");
-			whereClause = false;
+		
+		if(StringUtil.isNotEmpty(employeeSearchRequest.getBirthday())) {
+			whereClause.append(" AND birthday = '" + employeeSearchRequest.getBirthday() + "'");
 		}
-
-		if (StringUtil.isNotEmpty(employeeSearchRequest.getPositionId())) {
-			String sqlString = whereClause ? " WHERE " : " AND ";
-			sqlQuery.append(sqlString + "position_id = '" + employeeSearchRequest.getPositionId() + "'");
-			whereClause = false;
+		
+		if(StringUtil.isNotEmpty(employeeSearchRequest.getPositionId())) {
+			whereClause.append(" AND position_id = '" + employeeSearchRequest.getPositionId() + "'");
 		}
-
-		if (StringUtil.isNotEmpty(employeeSearchRequest.getEmail())) {
-			String sqlString = whereClause ? " WHERE " : " AND ";
-			sqlQuery.append(sqlString + "email = '" + employeeSearchRequest.getEmail() + "'");
-			whereClause = false;
+		
+		if(StringUtil.isNotEmpty(employeeSearchRequest.getEmail())) {
+			whereClause.append(" AND email = '" + employeeSearchRequest.getEmail() + "'");
 		}
-
-		if (StringUtil.isNotEmpty(employeeSearchRequest.getPhone())) {
-			String sqlString = whereClause ? " WHERE " : " AND ";
-			sqlQuery.append(sqlString + "phone = '" + employeeSearchRequest.getPhone() + "'");
-			whereClause = false;
+		
+		if(StringUtil.isNotEmpty(employeeSearchRequest.getPhone())) {
+			whereClause.append(" AND phone = '" + employeeSearchRequest.getPhone() + "'");
 		}
-
-		if (StringUtil.isNotEmpty(employeeSearchRequest.getStartWorkingDate())) {
-			String sqlString = whereClause ? " WHERE " : " AND ";
-			sqlQuery.append(sqlString + "start_working_date = '" + employeeSearchRequest.getStartWorkingDate() + "'");
-			whereClause = false;
+		
+		if(StringUtil.isNotEmpty(employeeSearchRequest.getStartWorkingDate())) {
+			whereClause.append(" AND start_working_date = '" + employeeSearchRequest.getStartWorkingDate() + "'");
 		}
-
-		if (StringUtil.isNotEmpty(employeeSearchRequest.getOfficalWorkingDate())) {
-			String sqlString = whereClause ? " WHERE " : " AND ";
-			sqlQuery.append(
-					sqlString + "offical_working_date = '" + employeeSearchRequest.getOfficalWorkingDate() + "'");
-			whereClause = false;
+		
+		if(StringUtil.isNotEmpty(employeeSearchRequest.getOfficalWorkingDate())) {
+			whereClause.append(" AND offical_working_date = '" + employeeSearchRequest.getOfficalWorkingDate() + "'");
 		}
-
-		if (StringUtil.isNotEmpty(employeeSearchRequest.getValidFlag())) {
-			String sqlString = whereClause ? " WHERE " : " AND ";
-			sqlQuery.append(sqlString + "valid_flag = '" + employeeSearchRequest.getValidFlag() + "'");
-			whereClause = false;
+		
+		if(StringUtil.isNotEmpty(employeeSearchRequest.getValidFlag())) {
+			whereClause.append(" AND e.valid_flag = '" + employeeSearchRequest.getValidFlag() + "'");
 		}
-
-		if (sqlQuery.indexOf("WHERE") != -1) {
-			query = entityManager.createNativeQuery(sqlQuery.toString(), Employee.class);
-		} else {
-			query = entityManager.createNativeQuery(sqlJoinQuery.toString(), Employee.class);
+		
+		if (whereClause.length() > 0) {
+			whereClause.replace(0, 5, " WHERE ");
+			queryString.append(whereClause.toString());
 		}
-		return query.getResultList();
+		query = entityManager.createNativeQuery(queryString.toString(), Employee.class);
+		List<Employee> employees = query.getResultList();
+		return employees;
 	}
 
 	@SuppressWarnings("unchecked")
