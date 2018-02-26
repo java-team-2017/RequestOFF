@@ -28,6 +28,7 @@ import com.dactech.requestoff.model.response.EmployeeDetailsResponse;
 import com.dactech.requestoff.model.response.EmployeeOffStatisticsPagingResponse;
 import com.dactech.requestoff.model.response.EmployeeRegistResponse;
 import com.dactech.requestoff.model.response.EmployeeSearchResponse;
+import com.dactech.requestoff.model.response.GetUserResponse;
 import com.dactech.requestoff.repository.DepartmentRepository;
 import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
@@ -312,5 +313,27 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public Employee findByEmail(String email) {
 		return employeeRepository.findByEmail(email);
+	}
+
+	@Override
+	public List<GetUserResponse.IdName> findForwardList(long id) {
+		List<GetUserResponse.IdName> forwards = new ArrayList<GetUserResponse.IdName>(10);
+		Employee user = employeeRepository.findById(id);
+		
+		if (user.getPosition().getId() == Position.POSITION_LEADER) {
+			Team t = teamRepository.findByLeaderId(user.getId());
+			Employee manager = employeeRepository.findById(t.getDepartment().getManagerId());
+			forwards.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
+		} else if (user.getPosition().getId() == Position.POSITION_PROJECT_MANAGER) {
+			Department d = departmentRepository.findByManagerId(user.getId());
+			List<Team> teams = teamRepository.findByDepartmentId(d.getId());
+			for(Team team : teams) {
+				long leaderId = team.getLeaderId();
+				Employee leader = employeeRepository.findById(leaderId);
+				forwards.add(new GetUserResponse.IdName(leader.getId(), leader.getName()));
+			}
+		}
+		
+		return forwards;
 	}
 }

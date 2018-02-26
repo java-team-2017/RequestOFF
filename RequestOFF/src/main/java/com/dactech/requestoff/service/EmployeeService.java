@@ -1,5 +1,7 @@
 package com.dactech.requestoff.service;
 
+import java.util.List;
+
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.request.EmployeeDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatisticsPagingRequest;
@@ -9,6 +11,7 @@ import com.dactech.requestoff.model.response.EmployeeDetailsResponse;
 import com.dactech.requestoff.model.response.EmployeeOffStatisticsPagingResponse;
 import com.dactech.requestoff.model.response.EmployeeRegistResponse;
 import com.dactech.requestoff.model.response.EmployeeSearchResponse;
+import com.dactech.requestoff.model.response.GetUserResponse;
 
 public interface EmployeeService {
 	EmployeeOffStatisticsPagingResponse employeeOffStatisticsPaging(EmployeeOffStatisticsPagingRequest request) throws Exception;
@@ -20,4 +23,6 @@ public interface EmployeeService {
 	EmployeeDetailsResponse employeeDetails(EmployeeDetailsRequest employeeDetailsRequest);
 	
 	public Employee findByEmail(String email);
+	
+	public List<GetUserResponse.IdName> findForwardList(long id);
 }

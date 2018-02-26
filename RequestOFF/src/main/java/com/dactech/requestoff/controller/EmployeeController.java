@@ -1,5 +1,7 @@
 package com.dactech.requestoff.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -95,6 +97,10 @@ public class EmployeeController {
 				throw new Exception("Anonymous user");
 			}
 			response.setUser(user);
+			
+			List<GetUserResponse.IdName> forwards = employeeService.findForwardList(user.getId());
+			response.setListForward(forwards);
+			
 			response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
 		} catch (Exception e) {
 			response.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
