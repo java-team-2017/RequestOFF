@@ -31,6 +31,7 @@ public class RequestController {
 			statusInfo = new StatusInfo(StatusInfo.SUCCESS, null);
 		} catch (Exception e) {
 			statusInfo = new StatusInfo(StatusInfo.ERROR, e.getMessage());
+//			e.printStackTrace();
 		}
 		requestRegistResponse.setStatusInfo(statusInfo);
 		return requestRegistResponse;

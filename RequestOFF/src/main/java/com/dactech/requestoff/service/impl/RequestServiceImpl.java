@@ -1,6 +1,7 @@
 package com.dactech.requestoff.service.impl;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.DayOffType;
 import com.dactech.requestoff.model.entity.Employee;
+import com.dactech.requestoff.model.entity.EmployeeOffStatus;
 import com.dactech.requestoff.model.entity.Request;
 import com.dactech.requestoff.model.request.RequestCalculateHoursRequest;
 import com.dactech.requestoff.model.request.RequestDetailsRequest;
@@ -18,25 +20,73 @@ import com.dactech.requestoff.model.response.RequestCalculateHoursResponse;
 import com.dactech.requestoff.model.response.RequestDetailsResponse;
 import com.dactech.requestoff.model.response.RequestRegistResponse;
 import com.dactech.requestoff.model.response.RequestSearchResponse;
+import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
+import com.dactech.requestoff.repository.EmployeeRepository;
 import com.dactech.requestoff.repository.RequestRepository;
 import com.dactech.requestoff.service.RequestService;
-import com.dactech.requestoff.util.StringUtil;
 import com.dactech.requestoff.util.DateUtils;
+import com.dactech.requestoff.util.StringUtil;
 
 @Service
 public class RequestServiceImpl implements RequestService{
 	@Autowired
 	RequestRepository requestRepository;
+	@Autowired
+	EmployeeOffStatusRepository employeeOffStatusRepository;
+	@Autowired
+	EmployeeRepository employeeRepository;
 	
 	@Override
 	public RequestRegistResponse regist(RequestRegistRequest requestRegistRequest) throws Exception{
-		Request request;
+		long offHours, newRemainHours, employeeId;
+		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+		if(StringUtil.isEmpty(requestRegistRequest.getId())) {	//create new request
+			Date fromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(requestRegistRequest.getFromTime());
+			Date toTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(requestRegistRequest.getToTime());
+			offHours = DateUtils.diffHours(fromTime, toTime);
+			
+			employeeId = Long.parseLong(requestRegistRequest.getEmployeeId());
+			long remainHours = employeeOffStatusRepository.findById(currentYear, employeeId).getRemainHours();
+			if(offHours > remainHours) {
+				throw new Exception("Hours of off time exceed remain hours");
+			}
+			else {
+				newRemainHours = remainHours - offHours;
+			}
+		}
+		else {	//update request
+			Request request = requestRepository.findById(Long.parseLong(requestRegistRequest.getId()));
+			Date oldFromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(request.getFromTime());
+			Date oldToTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(request.getToTime());
+			long oldOffHours = DateUtils.diffHours(oldFromTime, oldToTime);
+			
+			employeeId = request.getEmployee().getId();
+			long remainHours = employeeOffStatusRepository.findById(currentYear, employeeId).getRemainHours();
+			
+			if(StringUtil.isNotEmpty(requestRegistRequest.getFromTime()) == true && StringUtil.isNotEmpty(requestRegistRequest.getToTime()) == true) {
+				Date fromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(requestRegistRequest.getFromTime());
+				Date toTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(requestRegistRequest.getToTime());
+				offHours = DateUtils.diffHours(fromTime, toTime);
+				
+				if(offHours > remainHours + oldOffHours) {
+					throw new Exception("Hours of off time exceed remain hours");
+				}
+				else {
+					newRemainHours = remainHours + oldOffHours - offHours;
+				}
+			}
+			else {
+				newRemainHours = remainHours;
+			}
+		}
 		
+		Request request;
 		if(StringUtil.isEmpty(requestRegistRequest.getId())) {	//create new request
 			request = new Request();
 			
 			Employee employee = new Employee();
-			employee.setId(Long.parseLong(requestRegistRequest.getEmployeeId()));
+			employeeId = Long.parseLong(requestRegistRequest.getEmployeeId());
+			employee.setId(employeeId);
 			request.setEmployee(employee);
 			
 			request.setFromTime(requestRegistRequest.getFromTime());
@@ -63,11 +113,6 @@ public class RequestServiceImpl implements RequestService{
 				throw new Exception("Someone updated request with id " + requestRegistRequest.getId() + " at " + request.getUpdateDate());
 			}
 			else {
-				if(StringUtil.isNotEmpty(requestRegistRequest.getEmployeeId())) {
-					Employee employee = new Employee();
-					employee.setId(Long.parseLong(requestRegistRequest.getEmployeeId()));
-					request.setEmployee(employee);
-				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getFromTime())) {
 					request.setFromTime(requestRegistRequest.getFromTime());
 				}
@@ -96,6 +141,10 @@ public class RequestServiceImpl implements RequestService{
 				}
 			}
 		}
+		
+		EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employeeId);
+		employeeOffStatus.setRemainHours(newRemainHours);
+		employeeOffStatusRepository.save(employeeOffStatus);
 		
 		requestRepository.save(request);
 		RequestRegistResponse requestRegistResponse = new RequestRegistResponse();
