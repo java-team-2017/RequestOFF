@@ -23,6 +23,7 @@
 		/*<![CDATA[*/
 			var employee;
 			var employeeId;
+			var remainHours;
 			var listDayOffType;
 			var listRecipient = [];
 			var table;
@@ -43,9 +44,11 @@
 					dataType : 'json',
 					data : JSON.stringify({}),
 					success : function(returnData) {
-						console.log("user: ");console.log(returnData);
+						console.log("user: ");
+						console.log(returnData);
 						employee = returnData.user;
 						employeeId = employee.id;
+						remainHours = returnData.remainHours;
 						listRecipient = returnData.listRecipients;
 						
 						renderRemainHours(returnData.remainHours, 'remainHours');
@@ -98,8 +101,6 @@
 						$("#modalTeam").empty().append(employee.teamName);
 						$("#modalDepartment").empty().append(employee.departmentName);
 						
-						oldFrom = rowData.fromTime;
-						oldTo = rowData.toTime;
 						var fromStr = rowData.fromTime.split(" ");
 						var fromDateStr = fromStr[0].split("-");
 						$("#modalFrom").val(fromDateStr[1] + "/" + fromDateStr[2] + "/" + fromDateStr[0]);
@@ -112,7 +113,8 @@
 						var toTimeStr = toStr[1].split(":");
 						$("#modalHourTo").val(toTimeStr[0]);
 						$("#modalMinuteTo").val(toTimeStr[1]);
-						
+						$("#modalOffDays").val(parseInt(parseInt(rowData.totalTime) / 8));
+						$("#modalOffHours").val(parseInt(rowData.totalTime) % 8);
 						$("#modalReason").val(rowData.reason);
 						$("#modalDayOffType").val(rowData.dayOffType.id);
 						$("#modalRecipient").val(rowData.recipientId);
@@ -190,6 +192,7 @@
 									dataType : 'json',
 									data : JSON.stringify({}),
 									success : function(returnData) {
+										remainHours = returnData.remainHours;
 										renderRemainHours(returnData.remainHours, 'remainHours');
 									},
 									error : function(e) {
@@ -216,13 +219,23 @@
 					var editRequestData = $('#modalForm').serializeJSON();
 					
 					//validate
-					var complete = 1, valid = 1, roundHours = 1;
+					var complete = 1, valid = 1, roundHours = 1, exceed = 0, offHoursEqual0 = 0;
 					var listInput = $("#modalForm").find(':input').not("#modalResponseMessage");
 					$.each(listInput, function() {
 						if($(this).val() == "") {
 							complete = 0;
 						}
 					});
+					
+					var offHours = parseInt(editRequestData.offDays) * 8 + parseInt(editRequestData.offHours);
+					if(offHours == 0){
+						offHoursEqual0 = 1;
+					}
+					else {
+						if(parseInt(offHours) > parseInt(remainHours)) {
+							exceed = 1;
+						}
+					}
 					
 					var fromDate = editRequestData.from_modalForm;
 					fromDate = fromDate.substr(6, 4) + "-" + fromDate.substr(0, 2) + "-" + fromDate.substr(3, 2);
@@ -249,6 +262,12 @@
 					else if(valid == 0) {
 						$('#alertMessage_edit').html(errors['DateError']).attr('class', 'alert alert-danger').show();
 					}
+					else if(offHoursEqual0 == 1) {
+						$('#alertMessage').html(errors['offHoursEqual0']).attr('class', 'alert alert-danger').show();
+					}
+					else if(exceed == 1) {
+						$('#alertMessage').html(errors['exceedTime']).attr('class', 'alert alert-danger').show();
+					}
 					else {
 						//update request
 						var requestId = $("#modalRequestId").html();
@@ -257,6 +276,7 @@
 							"employee_id" : employeeId,
 							"from_time" : from,
 							"to_time" : to,
+							"total_time" : offHours,
 							"reason" : editRequestData.reason_modalForm,
 							"status" : status,
 							"response_message" : editRequestData.responseMessage_modalForm,
@@ -281,6 +301,7 @@
 									dataType : 'json',
 									data : JSON.stringify({}),
 									success : function(returnData) {
+										remainHours = returnData.remainHours;
 										renderRemainHours(returnData.remainHours, 'remainHours');
 									},
 									error : function(e) {
@@ -329,6 +350,7 @@
 					"employee_id" : employeeId,
 					"from_time" : from,
 					"to_time" : to,
+					"total_time" : "",
 					"reason" : "",
 					"status" : searchData.requestType,
 					"response_message" : "",
@@ -606,7 +628,7 @@
 										<div class="form-group row">
 											<label class="control-label col-sm-3">Off hours * : </label>
 											<div class="form-inline">
-												<select class="form-control" name="offDays" style="width:100px;">
+												<select class="form-control" name="offDays" id="modalOffDays" style="width:100px;">
 													<option value="0">0</option>
 													<option value="1">1</option>
 													<option value="2">2</option>
@@ -621,7 +643,7 @@
 													<option value="11">11</option>
 													<option value="12">12</option>
 												</select>&nbsp;day(s)&nbsp;
-												<select class="form-control" name="offHours" style="width:100px;">
+												<select class="form-control" name="offHours" id="modalOffHours" style="width:100px;">
 													<option value="0">0</option>
 													<option value="1">1</option>
 													<option value="2">2</option>

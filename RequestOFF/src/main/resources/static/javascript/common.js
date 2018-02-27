@@ -2,6 +2,7 @@ var webRootPath = '/';
 var errors = {
 	'DateError': 'time of To field must be after From field',
 	'incompleteFields': 'Please fill in all required fields',
+	'offHoursEqual0': 'Off hours must be greater than 0',
 	'exceedTime': 'Hours of off time exceed remain hours',
 	'roundHour': 'Your hours of off time must be round',
 	'weekend': 'Your choosen hours are belong to weekends',

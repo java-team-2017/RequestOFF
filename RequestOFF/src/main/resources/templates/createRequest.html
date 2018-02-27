@@ -26,7 +26,6 @@
 			var remainHours;
 			
 			$(function() {
-// 				var listRecipient = [];
 				var getStatus = {
 					'1': 'saved',
 					'2': 'approved',
@@ -46,6 +45,7 @@
 						console.log(returnData);
 						employee = returnData.user;
 						employeeId = employee.id;
+						remainHours = returnData.remainHours;
 						
 						renderRemainHours(returnData.remainHours, 'remainHours');
 						renderDayOffTypeSelect('id_dayOffType');
@@ -77,7 +77,7 @@
 					}
 					
 					//validate
-					var complete = 1, valid = 1, roundHours = 1;
+					var complete = 1, valid = 1, roundHours = 1, exceed = 0, offHoursEqual0 = 0;
 					var listInput = $('#createRequestForm').find(':input').not("button");
 					$.each(listInput, function() {
 						if($(this).val() == "") {
@@ -86,6 +86,16 @@
 					});
 					
 					var createRequestData = $('#createRequestForm').serializeJSON();
+					var offHours = parseInt(createRequestData.offDays) * 8 + parseInt(createRequestData.offHours);
+					if(offHours == 0){
+						offHoursEqual0 = 1;
+					}
+					else {
+						if(parseInt(offHours) > parseInt(remainHours)) {
+							exceed = 1;
+						}
+					}
+					
 					var fromDate = createRequestData.from;
 					fromDate = fromDate.substr(6, 4) + "-" + fromDate.substr(0, 2) + "-" + fromDate.substr(3, 2);
 					var fromTime = createRequestData.hourFrom + ":" + createRequestData.minuteFrom + ":00.0";
@@ -112,12 +122,19 @@
 					else if(valid == 0) {
 						$('#alertMessage').html(errors['DateError']).attr('class', 'alert alert-danger').show();
 					}
+					else if(offHoursEqual0 == 1) {
+						$('#alertMessage').html(errors['offHoursEqual0']).attr('class', 'alert alert-danger').show();
+					}
+					else if(exceed == 1) {
+						$('#alertMessage').html(errors['exceedTime']).attr('class', 'alert alert-danger').show();
+					}
 					else {
 						var requestRegistRequest = {
 							"id" : "",
 							"employee_id" : employeeId,
 							"from_time" : from,
 							"to_time" : to,
+							"total_time" : offHours,
 							"reason" : createRequestData.reason,
 							"status" : status,
 							"response_message" : "",
@@ -134,29 +151,24 @@
 							dataType : 'json',
 							data : JSON.stringify(requestRegistRequest),
 							success : function(returnData) {
-								if(returnData.status_info.status == "1") {
-									$('#alertMessage').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
-								}
-								else {
-									//get current user
-									$.ajax({
-										type : "POST",
-										contentType : "application/json",
-										url : /*[[@{/employee/getUser}]]*/,
-										dataType : 'json',
-										data : JSON.stringify({}),
-										success : function(returnData) {
-											renderRemainHours(returnData.remainHours, 'remainHours');
-										},
-										error : function(e) {
-											$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-										}
-									});
-									
-									$("#createRequestForm :input").not("button, select").val("");
- 									$("#createRequestForm select").prop('selectedIndex', 0);
- 									$('#alertMessage').html(alertStr).attr('class', 'alert alert-success').show();
-								}
+								//get current user
+								$.ajax({
+									type : "POST",
+									contentType : "application/json",
+									url : /*[[@{/employee/getUser}]]*/,
+									dataType : 'json',
+									data : JSON.stringify({}),
+									success : function(returnData) {
+										renderRemainHours(returnData.remainHours, 'remainHours');
+									},
+									error : function(e) {
+										$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+									}
+								});
+								
+								$("#createRequestForm :input").not("button, select").val("");
+								$("#createRequestForm select").prop('selectedIndex', 0);
+								$('#alertMessage').html(alertStr).attr('class', 'alert alert-success').show();
 							},
 							error : function(e) {
 								$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
