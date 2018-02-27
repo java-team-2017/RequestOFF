@@ -10,6 +10,8 @@ public class RequestSearchRequest {
 	private String fromTime;
 	@JsonProperty("to_time")
 	private String toTime;
+	@JsonProperty("total_time")
+	private String totalTime;
 	private String reason;
 	private String status;
 	@JsonProperty("response_message")
@@ -27,13 +29,15 @@ public class RequestSearchRequest {
 		super();
 	}
 
-	public RequestSearchRequest(String id, String employeeId, String fromTime, String toTime, String reason,
-			String status, String responseMessage, String dayOffTypeId, String recipientId, String validFlag,
-			String nameOfEmployee) {
+	public RequestSearchRequest(String id, String employeeId, String fromTime, String toTime, String totalTime,
+			String reason, String status, String responseMessage, String dayOffTypeId, String recipientId,
+			String validFlag, String nameOfEmployee) {
+		super();
 		this.id = id;
 		this.employeeId = employeeId;
 		this.fromTime = fromTime;
 		this.toTime = toTime;
+		this.totalTime = totalTime;
 		this.reason = reason;
 		this.status = status;
 		this.responseMessage = responseMessage;
@@ -73,6 +77,14 @@ public class RequestSearchRequest {
 
 	public void setToTime(String toTime) {
 		this.toTime = toTime;
+	}
+
+	public String getTotalTime() {
+		return totalTime;
+	}
+
+	public void setTotalTime(String totalTime) {
+		this.totalTime = totalTime;
 	}
 
 	public String getReason() {
