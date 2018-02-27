@@ -29,4 +29,8 @@ public interface EmployeeService {
 	public List<GetUserResponse.IdName> getListRecipients(long employeeId);
 	
 	public long getRemainHours(long employeeId);
+	
+	public String getTeamName(long employeeId);
+	
+	public String getDepartmentName(long employeeId);
 }

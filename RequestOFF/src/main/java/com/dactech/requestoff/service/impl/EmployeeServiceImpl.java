@@ -343,12 +343,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public List<GetUserResponse.IdName> getListRecipients(long employeeId) {
 		List<GetUserResponse.IdName> listRecipients = new ArrayList<GetUserResponse.IdName>();
 		Employee e = employeeRepository.findById(employeeId);
-		if(e.getPosition().getName().equals("leader")) {
+		if(e.getPosition().getId() == Position.POSITION_LEADER) {
 			long managerId = teamRepository.findByLeaderId(employeeId).getDepartment().getManagerId();
 			Employee manager = employeeRepository.findById(managerId);
 			listRecipients.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
 		}
-		else if(e.getPosition().getName().equals("employee")) {
+		else if(e.getPosition().getId() == Position.POSITION_EMPLOYEE) {
 			long leaderId = e.getListTeam().get(0).getLeaderId();
 			Employee leader = employeeRepository.findById(leaderId);
 			listRecipients.add(new GetUserResponse.IdName(leader.getId(), leader.getName()));
@@ -367,5 +367,37 @@ public class EmployeeServiceImpl implements EmployeeService {
 		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
 		long remainHours = employeeOffStatusRepository.findById(currentYear, employeeId).getRemainHours();
 		return remainHours;
+	}
+	
+	@Override
+	public String getTeamName(long employeeId) {
+		String teamName;
+		Employee e = employeeRepository.findById(employeeId);
+		if(e.getPosition().getId() == Position.POSITION_LEADER) {
+			teamName = teamRepository.findByLeaderId(employeeId).getName();
+		}
+		else if(e.getPosition().getId() == Position.POSITION_EMPLOYEE) {
+			teamName = e.getListTeam().get(0).getName();
+		}
+		else {
+			teamName = "";
+		}
+		return teamName;
+	}
+	
+	@Override
+	public String getDepartmentName(long employeeId) {
+		String departmentName;
+		Employee e = employeeRepository.findById(employeeId);
+		if(e.getPosition().getId() == Position.POSITION_LEADER) {
+			departmentName = teamRepository.findByLeaderId(employeeId).getDepartment().getName();
+		}
+		else if(e.getPosition().getId() == Position.POSITION_EMPLOYEE) {
+			departmentName = e.getListTeam().get(0).getDepartment().getName();
+		}
+		else {
+			departmentName = departmentRepository.findByManagerId(employeeId).getName();
+		}
+		return departmentName;
 	}
 }

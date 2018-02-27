@@ -96,6 +96,12 @@ public class EmployeeController {
 			if (user == null) {
 				throw new Exception("Anonymous user");
 			}
+			
+			String teamName = employeeService.getTeamName(user.getId());
+			user.setTeamName(teamName);
+			String departmentName = employeeService.getDepartmentName(user.getId());
+			user.setDepartmentName(departmentName);
+			
 			response.setUser(user);
 			
 			List<GetUserResponse.IdName> forwards = employeeService.findForwardList(user.getId());
