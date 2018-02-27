@@ -59,6 +59,10 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		if (StringUtil.isNotEmpty(requestSearchRequest.getToTime())) {
 			whereClause.append(" AND from_time <= '" + requestSearchRequest.getToTime() + "'");
 		}
+		
+		if (StringUtil.isNotEmpty(requestSearchRequest.getTotalTime())) {
+			whereClause.append(" AND total_time = '" + requestSearchRequest.getTotalTime() + "'");
+		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getValidFlag())) {
 			whereClause.append(" AND request.valid_flag = '" + requestSearchRequest.getValidFlag() + "'");

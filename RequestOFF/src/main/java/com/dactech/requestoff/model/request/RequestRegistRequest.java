@@ -10,6 +10,8 @@ public class RequestRegistRequest {
 	private String fromTime;
 	@JsonProperty("to_time")
 	private String toTime;
+	@JsonProperty("total_time")
+	private String totalTime;
 	private String reason;
 	private String status;
 	@JsonProperty("response_message")
@@ -27,14 +29,15 @@ public class RequestRegistRequest {
 		super();
 	}
 
-	public RequestRegistRequest(String id, String employeeId, String fromTime, String toTime, String reason,
-			String status, String responseMessage, String dayOffTypeId, String recipientId, String validFlag,
-			String updateDate) {
+	public RequestRegistRequest(String id, String employeeId, String fromTime, String toTime, String totalTime,
+			String reason, String status, String responseMessage, String dayOffTypeId, String recipientId,
+			String validFlag, String updateDate) {
 		super();
 		this.id = id;
 		this.employeeId = employeeId;
 		this.fromTime = fromTime;
 		this.toTime = toTime;
+		this.totalTime = totalTime;
 		this.reason = reason;
 		this.status = status;
 		this.responseMessage = responseMessage;
@@ -74,6 +77,14 @@ public class RequestRegistRequest {
 
 	public void setToTime(String toTime) {
 		this.toTime = toTime;
+	}
+
+	public String getTotalTime() {
+		return totalTime;
+	}
+
+	public void setTotalTime(String totalTime) {
+		this.totalTime = totalTime;
 	}
 
 	public String getReason() {

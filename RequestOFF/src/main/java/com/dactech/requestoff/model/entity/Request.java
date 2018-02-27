@@ -24,6 +24,7 @@ public class Request {
 	private Employee employee;
 	private String fromTime;
 	private String toTime;
+	private long totalTime;
 	private String reason;
 	private long status;
 	private String responseMessage;
@@ -41,14 +42,15 @@ public class Request {
 		super();
 	}
 
-	public Request(long id, Employee employee, String fromTime, String toTime, String reason, long status,
-			String responseMessage, DayOffType dayOffType, long recipientId, int validFlag, String insertDate,
-			long insertOperator, String updateDate, long updateOperator) {
+	public Request(long id, Employee employee, String fromTime, String toTime, long totalTime, String reason,
+			long status, String responseMessage, DayOffType dayOffType, long recipientId, int validFlag,
+			String insertDate, long insertOperator, String updateDate, long updateOperator) {
 		super();
 		this.id = id;
 		this.employee = employee;
 		this.fromTime = fromTime;
 		this.toTime = toTime;
+		this.totalTime = totalTime;
 		this.reason = reason;
 		this.status = status;
 		this.responseMessage = responseMessage;
@@ -91,6 +93,14 @@ public class Request {
 
 	public void setToTime(String toTime) {
 		this.toTime = toTime;
+	}
+
+	public long getTotalTime() {
+		return totalTime;
+	}
+
+	public void setTotalTime(long totalTime) {
+		this.totalTime = totalTime;
 	}
 
 	public String getReason() {
