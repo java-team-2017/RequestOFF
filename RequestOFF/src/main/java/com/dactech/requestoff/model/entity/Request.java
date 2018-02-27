@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 @Entity
 public class Request {
@@ -38,14 +39,21 @@ public class Request {
 	private String updateDate;
 	private long updateOperator;
 
+	@Transient
+	private String recipientName;
+	@Transient
+	private long forwardId;
+	@Transient
+	private String forwardName;
+
 	public Request() {
 		super();
 	}
 
 	public Request(long id, Employee employee, String fromTime, String toTime, long totalTime, String reason,
 			long status, String responseMessage, DayOffType dayOffType, long recipientId, int validFlag,
-			String insertDate, long insertOperator, String updateDate, long updateOperator) {
-		super();
+			String insertDate, long insertOperator, String updateDate, long updateOperator, String recipientName,
+			long forwardId, String forwardName) {
 		this.id = id;
 		this.employee = employee;
 		this.fromTime = fromTime;
@@ -61,6 +69,9 @@ public class Request {
 		this.insertOperator = insertOperator;
 		this.updateDate = updateDate;
 		this.updateOperator = updateOperator;
+		this.recipientName = recipientName;
+		this.forwardId = forwardId;
+		this.forwardName = forwardName;
 	}
 
 	public long getId() {
@@ -181,6 +192,30 @@ public class Request {
 
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
+	}
+
+	public String getRecipientName() {
+		return recipientName;
+	}
+
+	public void setRecipientName(String recipientName) {
+		this.recipientName = recipientName;
+	}
+
+	public long getForwardId() {
+		return forwardId;
+	}
+
+	public void setForwardId(long forwardId) {
+		this.forwardId = forwardId;
+	}
+
+	public String getForwardName() {
+		return forwardName;
+	}
+
+	public void setForwardName(String forwardName) {
+		this.forwardName = forwardName;
 	}
 
 	public static long getRequestStatusSaved() {

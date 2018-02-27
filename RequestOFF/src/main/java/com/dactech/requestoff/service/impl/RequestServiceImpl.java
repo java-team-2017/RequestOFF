@@ -10,9 +10,11 @@ import com.dactech.requestoff.model.entity.DayOffType;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.EmployeeOffStatus;
 import com.dactech.requestoff.model.entity.Request;
+import com.dactech.requestoff.model.request.RequestBrowsingRequest;
 import com.dactech.requestoff.model.request.RequestDetailsRequest;
 import com.dactech.requestoff.model.request.RequestRegistRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
+import com.dactech.requestoff.model.response.RequestBrowsingResponse;
 import com.dactech.requestoff.model.response.RequestDetailsResponse;
 import com.dactech.requestoff.model.response.RequestRegistResponse;
 import com.dactech.requestoff.model.response.RequestSearchResponse;
@@ -165,6 +167,14 @@ public class RequestServiceImpl implements RequestService{
 		Request request = requestRepository.findById(Long.parseLong(requestDetailsRequest.getId()));
 		RequestDetailsResponse requestDetailsResponse = new RequestDetailsResponse(request);
 		return requestDetailsResponse;
+	}
+
+	@Override
+	public RequestBrowsingResponse requestBrowsing(RequestBrowsingRequest request) {
+		List<Request> requests = requestRepository.browseRequest(request);
+		RequestBrowsingResponse response = new RequestBrowsingResponse();
+		response.setRequests(requests);
+		return response;
 	}
 	
 }

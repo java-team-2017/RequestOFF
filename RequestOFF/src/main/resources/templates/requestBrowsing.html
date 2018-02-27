@@ -8,6 +8,8 @@
 <script th:inline="javascript">
 	/*<![CDATA[*/
 		var employeeLoginId;
+		var userData;
+		
 		$(function() {
 			var objReturnRequestDetails;
 			var listRequest;
@@ -26,6 +28,9 @@
 				data : JSON.stringify({}),
 				dataType : 'json',
 				success : function(data) {
+					userData = data;
+					console.log("userData");
+					console.log(userData);
 					employeeLoginId = data.user.id;
 				},
 				error : function(e) {
@@ -59,79 +64,57 @@
 					var table = $('#requestTable').DataTable();
 					var rowData = table.row(this).data();
 					objReturnRequestDetails = rowData;
-					$('#recipientDetails').val(rowData.recipient.name);
+					console.log(rowData);
 					$('#nameDetails').val(rowData.employee.name);
 					$('#positionDetails').val(rowData.employee.position.name);
-					$('#teamDetails').val(rowData.employee.listTeam[0].name);
-					$('#departmentDetails').val(rowData.employee.listTeam[0].department.name);
+					if(rowData.employee.position.id == 2 || rowData.employee.position.id == 3){
+						$('#teamDetails').val(rowData.employee.teamName);
+						$('#departmentDetails').val(rowData.employee.departmentName);
+					} else if(rowData.employee.position.id == 1){
+						$('#teamDetails').val(rowData.employee.listTeam[0].name);
+						$('#departmentDetails').val(rowData.employee.listTeam[0].department.name);
+					}
+					$('#recipientDetails').val(rowData.recipientName);
 					$('#fromTimeDetails').val(rowData.fromTime);
 					$('#toTimeDetails').val(rowData.toTime);
 					$('#reasonDetails').val(rowData.reason);
 					$('#statusDetails').val(requestStatus[rowData.status]);
+					
 					$('#statusDetailsId').val(rowData.status);
 					$('#dayOffTypeDetails').val(rowData.dayOffType.name);
 					$('#responseMessage').val(rowData.responseMessage);
-					$('#remainHours').val(getRemainHours(rowData.employee));
+// 					$('#remainHours').val(getRemainHours(rowData.employee));
 					$('#employeeIdDetails').val(rowData.employee.id);
 					
-					var listForward = []; 
-					
-					if (rowData.recipient.position.id == 2) {
-						listForward.push(rowData.recipient.team.department.manager);
-					} else if (rowData.recipient.position.id == 3){
-						$.each(rowData.recipient.department.listTeam, function (index, team) {
-							listForward.push(team.leader);
-						})
-					}
-					$('#forward').empty();
-					$.each(listForward, function(index, recipient) {
-						$('#forward').append('<option value = "' + recipient.id + '">' + recipient.name + '</option>');
-					});
-					
-					if($('#statusDetailsId').val() != 5){
+// 					if (rowData.recipient.position.id == 2) {
+// 						listForward.push(rowData.recipient.team.department.manager);
+// 					} else if (rowData.recipient.position.id == 3){
+// 						$.each(rowData.recipient.department.listTeam, function (index, team) {
+// 							listForward.push(team.leader);
+// 						})
+// 					}
+
+					if(rowData.status != 5){
 						$('#btnApproveModal').prop('disabled', true);
 						$('#btnDenyModal').prop('disabled', true);
 						$('#btnSendModal').prop('disabled', true);
+						$('#btnForward').prop('disabled', true);
 						$('#responseMessage').prop('disabled', true);
 					} else {
+						if (rowData.recipientId == userData.user.id) {
+							if (rowData.forwardId != 0 && rowData.forwardName != null) {
+								$('#forward').empty().append('<option value = "' + rowData.forwardId + '">' + rowData.forwardName + '</option>');
+							}
+						}
 						$('#btnApproveModal').prop('disabled', false);
 						$('#btnDenyModal').prop('disabled', false);
 						$('#btnSendModal').prop('disabled', false);
+						$('#btnForward').prop('disabled', false);
 						$('#responseMessage').prop('disabled', false);
 					}
 					
 					$('#modalDetails').modal('show');
 				}
-			});
-			
-			$("#btnApprove, #btnDeny").on('click', function() {
-				var status = $(this).attr('id') == 'btnApprove' ? 2 : 3;
-				var requestObj = {
-					"status" : status
-				}
-				$('#requestTable input[type="checkbox"]:checked').each(function(){
-					var table = $('#requestTable').DataTable();
-					var rowData = table.row($(this).parent()).data();
-					
-					requestObj.id = rowData.id;
-					requestObj.update_date = rowData.updateDate;
-					updateRequest(requestObj);
-				});
-			});
-			
-			$('#requestTable').on('click', '.btnApprove, .btnDeny', function () {
-				var table = $('#requestTable').DataTable();
-				var rowData = table.row($(this).parent()).data();
-				var requestObj = {
-					"id" : rowData.id ,
-					"update_date": rowData.updateDate
-					}
-				if ($(this).hasClass('btnApprove')) {
-					requestObj.status = 2;
-				} else {
-					requestObj.status = 3;
-				}
-				updateRequest(requestObj);
 			});
 			
 			$("#btnApproveModal, #btnDenyModal, #btnSendModal, #btnForward").on('click', function(){
@@ -140,6 +123,16 @@
 					"update_date": objReturnRequestDetails.updateDate
 				}
 				var selectedValue = $("#forward").val();
+				
+				//update remain hours when click button Deny
+				var remainHours = $('#remainHours').val();
+				console.log(remainHours);
+				var employeeId = $('#employeeIdDetails').val();
+				var requestHours = {
+					"from_time" : objReturnRequestDetails.fromTime ,
+					"to_time": objReturnRequestDetails.toTime
+				}//
+				
 				if ($(this).attr('id') == 'btnApproveModal') {
 					requestObj.status = 2;
 				} else if ($(this).attr('id') == 'btnDenyModal') {
@@ -151,26 +144,14 @@
 				}
 				requestObj.response_message = $('#responseMessage').val();
 				updateRequest(requestObj);
-			});
-			
-			$("#btnDenyModal").on('click', function(){
-				var remainHours = $('#remainHours').val();
-				console.log(remainHours);
-				var employeeId = $('#employeeIdDetails').val();
-				var requestObj = {
-					"from_time" : objReturnRequestDetails.fromTime ,
-					"to_time": objReturnRequestDetails.toTime
-				}
-				if ($(this).attr('id') == 'btnDenyModal') {
-					requestObj.status = 3;
-				} 
 				
+				//calculate remain hours
 				$.ajax({
 					type : "POST",
 					contentType : "application/json",
 					url : /*[[@{/request/calculateHours}]]*/,
 					dataType : 'json',
-					data : JSON.stringify(requestObj),
+					data : JSON.stringify(requestHours),
 					success : function(resultData) {
 						remainHours = parseInt(remainHours) + parseInt(resultData.hours);
 						updateRemainHours(employeeId, remainHours);
@@ -178,31 +159,38 @@
 					error : function(e) {
 						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 					}
-					
 				});
 			});
 			
-			$("#btnDeny").on('click', function(){
+			$("#btnApprove, #btnDeny").on('click', function() {
+				var status = $(this).attr('id') == 'btnApprove' ? 2 : 3;
+				var requestObj = {
+					"status" : status
+				}
 				$('#requestTable input[type="checkbox"]:checked').each(function(){
 					var table = $('#requestTable').DataTable();
 					var rowData = table.row($(this).parent()).data();
+					
+					//update remain hours
 					var remainHours = getRemainHours(rowData.employee);
 					var employeeId = rowData.employee.id;
 					console.log(remainHours);
-					var requestObj = {
+					var requestHours = {
 						"from_time" : rowData.fromTime ,
 						"to_time": rowData.toTime
-					}
-					if ($(this).attr('id') == 'btnDeny') {
-						requestObj.status = 3;
-					}
+					}//
+
+					requestObj.id = rowData.id;
+					requestObj.update_date = rowData.updateDate;
+					updateRequest(requestObj);
 					
+					//calculate remain hours
 					$.ajax({
 						type : "POST",
 						contentType : "application/json",
 						url : /*[[@{/request/calculateHours}]]*/,
 						dataType : 'json',
-						data : JSON.stringify(requestObj),
+						data : JSON.stringify(requestHours),
 						success : function(resultData) {
 							remainHours = parseInt(remainHours) + parseInt(resultData.hours);
 							updateRemainHours(employeeId, remainHours);
@@ -210,30 +198,40 @@
 						error : function(e) {
 							$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 						}
-						
 					});
 				});
 			});
 			
-			$('#requestTable').on('click', '.btnDeny', function () {
+			$('#requestTable').on('click', '.btnApprove, .btnDeny', function () {
 				var table = $('#requestTable').DataTable();
 				var rowData = table.row($(this).parent()).data();
+				var requestObj = {
+					"id" : rowData.id ,
+					"update_date": rowData.updateDate
+				}
+				
+				//update remain hours when click button deny
 				var remainHours = getRemainHours(rowData.employee);
 				var employeeId = rowData.employee.id;
-				var requestObj = {
+				var requestHours = {
 					"from_time" : rowData.fromTime ,
 					"to_time": rowData.toTime
 				}
-				if ($(this).hasClass('btnDeny')) {
+				
+				if ($(this).hasClass('btnApprove')) {
+					requestObj.status = 2;
+				} else {
 					requestObj.status = 3;
 				}
+				updateRequest(requestObj);
 				
+				//calculate remain hours
 				$.ajax({
 					type : "POST",
 					contentType : "application/json",
 					url : /*[[@{/request/calculateHours}]]*/,
 					dataType : 'json',
-					data : JSON.stringify(requestObj),
+					data : JSON.stringify(requestHours),
 					success : function(resultData) {
 						remainHours = parseInt(remainHours) + parseInt(resultData.hours);
 						updateRemainHours(employeeId, remainHours);
@@ -242,7 +240,6 @@
 						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 					}
 				});
-				
 			});
 			
 			$(document).ready(function(){
@@ -341,17 +338,18 @@
 		function search(){
 			var requestData = $('#requestForm').serializeJSON();
 			var requestSearch = {
+				"user_id": userData.user.id,
 				"from_time" : requestData.from_time,
 				"to_time" : requestData.to_time,
 				"status" : requestData.status,
-				"recipient_id" : employeeLoginId,
 				"name": requestData.name
 			};
+			
 			$('#requestTable').DataTable( {
 				ajax: {
 					type: "POST",
 					contentType: "application/json",
-					url : /*[[@{/request/search}]]*/,
+					url : /*[[@{/request/getRequestBrowsing}]]*/,
 					dataType : 'json',
 					data: function () {
 						return JSON.stringify(requestSearch);
@@ -452,8 +450,8 @@
 				<table class="table table-bordered table-striped table-hover" id="requestTable">
 					<thead>
 						<tr>
-							<th class="text-center" name="select"><span>Select</span></th>
-							<th class="text-center" name="id" id="id"><span>ID</span></th>
+							<th class="text-center" name="select" style="width: 40px;"><span>Select</span></th>
+							<th class="text-center" name="id" id="id" style="width: 40px;"><span>ID</span></th>
 							<th class="text-center" name="name"><span>Employee</span></th>
 							<th class="text-center" name="from"><span>From</span></th>
 							<th class="text-center" name="to"><span>To</span></th>

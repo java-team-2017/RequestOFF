@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dactech.requestoff.model.common.StatusInfo;
+import com.dactech.requestoff.model.request.RequestBrowsingRequest;
 import com.dactech.requestoff.model.request.RequestDetailsRequest;
 import com.dactech.requestoff.model.request.RequestRegistRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
+import com.dactech.requestoff.model.response.RequestBrowsingResponse;
 import com.dactech.requestoff.model.response.RequestDetailsResponse;
 import com.dactech.requestoff.model.response.RequestRegistResponse;
 import com.dactech.requestoff.model.response.RequestSearchResponse;
@@ -59,5 +61,19 @@ public class RequestController {
 		}
 		
 		return requestDetailsResponse;
+	}
+	
+	@RequestMapping(value = "/request/getRequestBrowsing", method = RequestMethod.POST)
+	public RequestBrowsingResponse getRequestBrowsing(@RequestBody RequestBrowsingRequest request) {
+		RequestBrowsingResponse response = new RequestBrowsingResponse();
+		try {
+			response = requestService.requestBrowsing(request);
+			response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			response.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
+		}
+		
+		return response;
 	}
 }
