@@ -114,6 +114,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 			queryString.append(" AND NOT (status = '5' AND recipient_id <> '" + RBRequest.getUserId() + "')");
 		}
 		
+		queryString.append(" AND status <> 1"); // eliminate saved request
 		
 		if (StringUtil.isNotEmpty(RBRequest.getFromTime())) {
 			queryString.append(" AND to_time >= '" + RBRequest.getFromTime() + "'");
