@@ -1,8 +1,6 @@
 package com.dactech.requestoff.service.impl;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +10,9 @@ import com.dactech.requestoff.model.entity.DayOffType;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.EmployeeOffStatus;
 import com.dactech.requestoff.model.entity.Request;
-import com.dactech.requestoff.model.request.RequestCalculateHoursRequest;
 import com.dactech.requestoff.model.request.RequestDetailsRequest;
 import com.dactech.requestoff.model.request.RequestRegistRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
-import com.dactech.requestoff.model.response.RequestCalculateHoursResponse;
 import com.dactech.requestoff.model.response.RequestDetailsResponse;
 import com.dactech.requestoff.model.response.RequestRegistResponse;
 import com.dactech.requestoff.model.response.RequestSearchResponse;
@@ -24,7 +20,6 @@ import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
 import com.dactech.requestoff.repository.RequestRepository;
 import com.dactech.requestoff.service.RequestService;
-import com.dactech.requestoff.util.DateUtils;
 import com.dactech.requestoff.util.StringUtil;
 
 @Service
@@ -41,12 +36,9 @@ public class RequestServiceImpl implements RequestService{
 		long offHours, newRemainHours, employeeId;
 		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
 		if(StringUtil.isEmpty(requestRegistRequest.getId())) {	//create new request
-			Date fromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(requestRegistRequest.getFromTime());
-			Date toTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(requestRegistRequest.getToTime());
-			offHours = DateUtils.diffHours(fromTime, toTime);
-			
 			employeeId = Long.parseLong(requestRegistRequest.getEmployeeId());
 			long remainHours = employeeOffStatusRepository.findById(currentYear, employeeId).getRemainHours();
+			offHours = Long.parseLong(requestRegistRequest.getTotalTime());
 			if(offHours > remainHours) {
 				throw new Exception("Hours of off time exceed remain hours");
 			}
@@ -54,20 +46,14 @@ public class RequestServiceImpl implements RequestService{
 				newRemainHours = remainHours - offHours;
 			}
 		}
-		else {	//update request
+		else {	//update or delete request
 			Request request = requestRepository.findById(Long.parseLong(requestRegistRequest.getId()));
-			Date oldFromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(request.getFromTime());
-			Date oldToTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(request.getToTime());
-			long oldOffHours = DateUtils.diffHours(oldFromTime, oldToTime);
-			
 			employeeId = request.getEmployee().getId();
 			long remainHours = employeeOffStatusRepository.findById(currentYear, employeeId).getRemainHours();
+			long oldOffHours = request.getTotalTime();
 			
-			if(StringUtil.isNotEmpty(requestRegistRequest.getFromTime()) == true && StringUtil.isNotEmpty(requestRegistRequest.getToTime()) == true) {
-				Date fromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(requestRegistRequest.getFromTime());
-				Date toTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(requestRegistRequest.getToTime());
-				offHours = DateUtils.diffHours(fromTime, toTime);
-				
+			if(StringUtil.isNotEmpty(requestRegistRequest.getTotalTime())) {
+				offHours = Long.parseLong(requestRegistRequest.getTotalTime());
 				if(offHours > remainHours + oldOffHours) {
 					throw new Exception("Hours of off time exceed remain hours");
 				}
@@ -76,7 +62,12 @@ public class RequestServiceImpl implements RequestService{
 				}
 			}
 			else {
-				newRemainHours = remainHours;
+				if(requestRegistRequest.getValidFlag().equals("0")) {	//delete request
+					newRemainHours = remainHours + oldOffHours;
+				}
+				else {
+					newRemainHours = remainHours;
+				}
 			}
 		}
 		
@@ -91,6 +82,7 @@ public class RequestServiceImpl implements RequestService{
 			
 			request.setFromTime(requestRegistRequest.getFromTime());
 			request.setToTime(requestRegistRequest.getToTime());
+			request.setTotalTime(Long.parseLong(requestRegistRequest.getTotalTime()));
 			request.setReason(requestRegistRequest.getReason());
 			request.setStatus(Integer.parseInt(requestRegistRequest.getStatus()));
 			request.setResponseMessage(requestRegistRequest.getResponseMessage());
@@ -119,6 +111,9 @@ public class RequestServiceImpl implements RequestService{
 				if(StringUtil.isNotEmpty(requestRegistRequest.getToTime())) {
 					request.setToTime(requestRegistRequest.getToTime());
 				}
+				if(StringUtil.isNotEmpty(requestRegistRequest.getTotalTime())) {
+					request.setTotalTime(Long.parseLong(requestRegistRequest.getTotalTime()));
+				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getReason())) {
 					request.setReason(requestRegistRequest.getReason());
 				}
@@ -143,6 +138,7 @@ public class RequestServiceImpl implements RequestService{
 		}
 		
 		EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employeeId);
+		System.out.println(newRemainHours);
 		employeeOffStatus.setRemainHours(newRemainHours);
 		employeeOffStatusRepository.save(employeeOffStatus);
 		
@@ -169,17 +165,6 @@ public class RequestServiceImpl implements RequestService{
 		Request request = requestRepository.findById(Long.parseLong(requestDetailsRequest.getId()));
 		RequestDetailsResponse requestDetailsResponse = new RequestDetailsResponse(request);
 		return requestDetailsResponse;
-	}
-	
-	@Override
-	public RequestCalculateHoursResponse calculateHours(RequestCalculateHoursRequest calculateHoursRequest) throws Exception {
-//		System.out.println(calculateHoursRequest.getFromTime());
-//		System.out.println(calculateHoursRequest.getToTime());
-		Date fromTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(calculateHoursRequest.getFromTime());
-		Date toTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").parse(calculateHoursRequest.getToTime());
-		int hours = DateUtils.diffHours(fromTime, toTime);
-		RequestCalculateHoursResponse calculateHoursResponse = new RequestCalculateHoursResponse(hours + "");
-		return calculateHoursResponse;
 	}
 	
 }
