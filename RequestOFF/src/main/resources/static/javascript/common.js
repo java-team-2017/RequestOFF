@@ -55,47 +55,43 @@ var notification = {
 //	return id;
 //}
 
-function getRecipientNameOrId(recipientList, recipientNameOrId) {
-	var returnValue;
-	$.each(recipientList, function(i, element) {
-		if(recipientNameOrId.localeCompare(element.name) == 0) {
-			returnValue = element.id;
-			return false;	//return false to break the loop
-		}
-		else if(recipientNameOrId.localeCompare(element.id) == 0) {
-			returnValue = element.name;
-			return false;	//return false to break the loop
-		}
-	});
-	return returnValue;
-}
+//function getRecipientNameOrId(recipientList, recipientNameOrId) {
+//	var returnValue;
+//	$.each(recipientList, function(i, element) {
+//		if(String(recipientNameOrId).localeCompare(element.name) == 0) {
+//			returnValue = element.id;
+//			return false;	//return false to break the loop
+//		}
+//		else if(String(recipientNameOrId).localeCompare(element.id) == 0) {
+//			returnValue = element.name;
+//			return false;	//return false to break the loop
+//		}
+//	});
+//	return returnValue;
+//}
 
-function renderRemainHours(employeeId, containerId) {
-	var currentYear = (new Date()).getFullYear();
-	var remainHours;
-	$.ajax({
-		type : "POST",
-		contentType : "application/json",
-		url : "/employeeOffStatus/details",
-//		url : /*[[@{/employeeOffStatus/details}]]*/,
-		dataType : 'json',
-		data : JSON.stringify({
-			"year_id" : currentYear,
-			"employee_id" : employeeId
-		}),
-		success : function(returnData) {
-			remainHours = returnData.employee_off_status.remainHours;
-			if(parseInt(remainHours) < 2) {
-				$("#" + containerId).html(remainHours + " hour");
-			}
-			else {
-				$("#" + containerId).html(remainHours + " hours");
-			}
-		},
-		error : function(e) {
-			$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
-		}
-	});
+//function getDayOffTypeNameOrId(dayOffTypeList, dayOffTypeNameOrId) {
+//	var returnValue;
+//	$.each(dayOffTypeList, function(i, element) {
+//		if(String(dayOffTypeNameOrId).localeCompare(element.name) == 0) {
+//			returnValue = element.id;
+//			return false;	//return false to break the loop
+//		}
+//		else if(String(dayOffTypeNameOrId).localeCompare(element.id) == 0) {
+//			returnValue = element.name;
+//			return false;	//return false to break the loop
+//		}
+//	});
+//	return returnValue;
+//}
+
+function renderRemainHours(remainHours, containerId) {
+	if(parseInt(remainHours) < 2) {
+		$("#" + containerId).html(remainHours + " hour");
+	}
+	else {
+		$("#" + containerId).html(remainHours + " hours");
+	}
 }
 
 function renderDayOffTypeSelect(containerId) {

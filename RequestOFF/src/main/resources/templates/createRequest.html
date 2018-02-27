@@ -23,6 +23,7 @@
 		/*<![CDATA[*/
 			var employee;
 			var employeeId;
+			var remainHours;
 			
 			$(function() {
 // 				var listRecipient = [];
@@ -46,7 +47,7 @@
 						employee = returnData.user;
 						employeeId = employee.id;
 						
-						renderRemainHours(employeeId, 'remainHours');
+						renderRemainHours(returnData.remainHours, 'remainHours');
 						renderDayOffTypeSelect('id_dayOffType');
 						renderRecipientSelect(returnData.listRecipients, 'id_recipient');
 					},
@@ -137,7 +138,21 @@
 									$('#alertMessage').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
 								}
 								else {
-									renderRemainHours(employeeId, 'remainHours');
+									//get current user
+									$.ajax({
+										type : "POST",
+										contentType : "application/json",
+										url : /*[[@{/employee/getUser}]]*/,
+										dataType : 'json',
+										data : JSON.stringify({}),
+										success : function(returnData) {
+											renderRemainHours(returnData.remainHours, 'remainHours');
+										},
+										error : function(e) {
+											$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+										}
+									});
+									
 									$("#createRequestForm :input").not("button, select").val("");
  									$("#createRequestForm select").prop('selectedIndex', 0);
  									$('#alertMessage').html(alertStr).attr('class', 'alert alert-success').show();

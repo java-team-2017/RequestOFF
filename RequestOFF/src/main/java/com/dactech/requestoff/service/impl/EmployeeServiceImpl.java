@@ -43,6 +43,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Autowired
 	private EmployeeRepository employeeRepository;
 	@Autowired
+	EmployeeOffStatusRepository employeeOffStatusRepository;
+	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	@Autowired
 	private RequestRepository requestRepository;
@@ -358,5 +360,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 			listRecipients.add(new GetUserResponse.IdName(e.getId(), e.getName()));
 		}
 		return listRecipients;
+	}
+	
+	@Override
+	public long getRemainHours(long employeeId) {
+		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+		long remainHours = employeeOffStatusRepository.findById(currentYear, employeeId).getRemainHours();
+		return remainHours;
 	}
 }

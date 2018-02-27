@@ -27,4 +27,6 @@ public interface EmployeeService {
 	public List<GetUserResponse.IdName> findForwardList(long id);
 	
 	public List<GetUserResponse.IdName> getListRecipients(long employeeId);
+	
+	public long getRemainHours(long employeeId);
 }
