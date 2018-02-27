@@ -44,47 +44,6 @@ var notification = {
 //	$('#' + containerId + ' > span').html(message);
 //}
 
-//function getDayOffTypeId(dayOffTypeList, dayOffTypeName) {
-//	var id;
-//	$.each(dayOffTypeList, function(i, element) {
-//		if(dayOffTypeName.localeCompare(element.name) == 0) {
-//			id = element.id;
-//			return false;	//return false to break the loop
-//		}
-//	});
-//	return id;
-//}
-
-//function getRecipientNameOrId(recipientList, recipientNameOrId) {
-//	var returnValue;
-//	$.each(recipientList, function(i, element) {
-//		if(String(recipientNameOrId).localeCompare(element.name) == 0) {
-//			returnValue = element.id;
-//			return false;	//return false to break the loop
-//		}
-//		else if(String(recipientNameOrId).localeCompare(element.id) == 0) {
-//			returnValue = element.name;
-//			return false;	//return false to break the loop
-//		}
-//	});
-//	return returnValue;
-//}
-
-//function getDayOffTypeNameOrId(dayOffTypeList, dayOffTypeNameOrId) {
-//	var returnValue;
-//	$.each(dayOffTypeList, function(i, element) {
-//		if(String(dayOffTypeNameOrId).localeCompare(element.name) == 0) {
-//			returnValue = element.id;
-//			return false;	//return false to break the loop
-//		}
-//		else if(String(dayOffTypeNameOrId).localeCompare(element.id) == 0) {
-//			returnValue = element.name;
-//			return false;	//return false to break the loop
-//		}
-//	});
-//	return returnValue;
-//}
-
 function renderRemainHours(remainHours, containerId) {
 	if(parseInt(remainHours) < 2) {
 		$("#" + containerId).html(remainHours + " hour");
