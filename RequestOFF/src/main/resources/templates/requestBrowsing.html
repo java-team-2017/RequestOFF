@@ -79,21 +79,11 @@
 					$('#toTimeDetails').val(rowData.toTime);
 					$('#reasonDetails').val(rowData.reason);
 					$('#statusDetails').val(requestStatus[rowData.status]);
-					
 					$('#statusDetailsId').val(rowData.status);
 					$('#dayOffTypeDetails').val(rowData.dayOffType.name);
 					$('#responseMessage').val(rowData.responseMessage);
-// 					$('#remainHours').val(getRemainHours(rowData.employee));
 					$('#employeeIdDetails').val(rowData.employee.id);
 					
-// 					if (rowData.recipient.position.id == 2) {
-// 						listForward.push(rowData.recipient.team.department.manager);
-// 					} else if (rowData.recipient.position.id == 3){
-// 						$.each(rowData.recipient.department.listTeam, function (index, team) {
-// 							listForward.push(team.leader);
-// 						})
-// 					}
-
 					if(rowData.status != 5){
 						$('#btnApproveModal').prop('disabled', true);
 						$('#btnDenyModal').prop('disabled', true);
@@ -122,17 +112,8 @@
 					"id" : objReturnRequestDetails.id ,
 					"update_date": objReturnRequestDetails.updateDate
 				}
+				
 				var selectedValue = $("#forward").val();
-				
-				//update remain hours when click button Deny
-				var remainHours = $('#remainHours').val();
-				console.log(remainHours);
-				var employeeId = $('#employeeIdDetails').val();
-				var requestHours = {
-					"from_time" : objReturnRequestDetails.fromTime ,
-					"to_time": objReturnRequestDetails.toTime
-				}//
-				
 				if ($(this).attr('id') == 'btnApproveModal') {
 					requestObj.status = 2;
 				} else if ($(this).attr('id') == 'btnDenyModal') {
@@ -142,24 +123,11 @@
 				} else if ($(this).attr('id') == 'btnForward') {
 					requestObj.recipient_id = selectedValue;
 				}
+				console.log("status");
+				console.log(requestObj.status);
+				console.log(requestObj.recipientId);
 				requestObj.response_message = $('#responseMessage').val();
 				updateRequest(requestObj);
-				
-				//calculate remain hours
-				$.ajax({
-					type : "POST",
-					contentType : "application/json",
-					url : /*[[@{/request/calculateHours}]]*/,
-					dataType : 'json',
-					data : JSON.stringify(requestHours),
-					success : function(resultData) {
-						remainHours = parseInt(remainHours) + parseInt(resultData.hours);
-						updateRemainHours(employeeId, remainHours);
-					},
-					error : function(e) {
-						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-					}
-				});
 			});
 			
 			$("#btnApprove, #btnDeny").on('click', function() {
@@ -171,34 +139,9 @@
 					var table = $('#requestTable').DataTable();
 					var rowData = table.row($(this).parent()).data();
 					
-					//update remain hours
-					var remainHours = getRemainHours(rowData.employee);
-					var employeeId = rowData.employee.id;
-					console.log(remainHours);
-					var requestHours = {
-						"from_time" : rowData.fromTime ,
-						"to_time": rowData.toTime
-					}//
-
 					requestObj.id = rowData.id;
 					requestObj.update_date = rowData.updateDate;
 					updateRequest(requestObj);
-					
-					//calculate remain hours
-					$.ajax({
-						type : "POST",
-						contentType : "application/json",
-						url : /*[[@{/request/calculateHours}]]*/,
-						dataType : 'json',
-						data : JSON.stringify(requestHours),
-						success : function(resultData) {
-							remainHours = parseInt(remainHours) + parseInt(resultData.hours);
-							updateRemainHours(employeeId, remainHours);
-						},
-						error : function(e) {
-							$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-						}
-					});
 				});
 			});
 			
@@ -210,36 +153,12 @@
 					"update_date": rowData.updateDate
 				}
 				
-				//update remain hours when click button deny
-				var remainHours = getRemainHours(rowData.employee);
-				var employeeId = rowData.employee.id;
-				var requestHours = {
-					"from_time" : rowData.fromTime ,
-					"to_time": rowData.toTime
-				}
-				
 				if ($(this).hasClass('btnApprove')) {
 					requestObj.status = 2;
 				} else {
 					requestObj.status = 3;
 				}
 				updateRequest(requestObj);
-				
-				//calculate remain hours
-				$.ajax({
-					type : "POST",
-					contentType : "application/json",
-					url : /*[[@{/request/calculateHours}]]*/,
-					dataType : 'json',
-					data : JSON.stringify(requestHours),
-					success : function(resultData) {
-						remainHours = parseInt(remainHours) + parseInt(resultData.hours);
-						updateRemainHours(employeeId, remainHours);
-					},
-					error : function(e) {
-						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-					}
-				});
 			});
 			
 			$(document).ready(function(){
@@ -278,43 +197,6 @@
 			
 		});
 		
-		function updateRemainHours(employeeId, remainHours){
-			$.ajax({
-				type : "POST",
-				contentType : "application/json",
-				url : /*[[@{/employeeOffStatus/details}]]*/,
-				dataType : 'json',
-				data : JSON.stringify({
-					"year_id" : (new Date()).getFullYear(),
-					"employee_id" : employeeId
-				}),
-				success : function(resultData) {
-					var employeeOffStatusRequest = {
-						"year_id" : (new Date()).getFullYear(),
-						"employee_id" : employeeId,
-						"remain_hours" : remainHours,
-						"update_date" : resultData.employee_off_status.updateDate
-					};
-					console.log(employeeOffStatusRequest);
-					$.ajax({
-						type : "POST",
-						contentType : "application/json",
-						url : /*[[@{/employeeOffStatus/regist}]]*/,
-						dataType : 'json',
-						data : JSON.stringify(employeeOffStatusRequest),
-						success : function(returnData) {
-						},
-						error : function(e) {
-							$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
-						}
-					});
-				},
-				error : function(e) {
-					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
-				}
-			});
-		}
-		
 		function updateRequest(requestObj) {
 			if(confirm('Are you sure?')){
 				$.ajax({
@@ -324,9 +206,14 @@
 					dataType : 'json',
 					data : JSON.stringify(requestObj),
 					success : function(resultData) {
-						$('#modalDetails').modal('hide');
-						var loadTable = $('#requestTable').DataTable();
-						loadTable.ajax.reload();
+						if (resultData.status_info.status == 0) {
+							$('#modalDetails').modal('hide');
+							var loadTable = $('#requestTable').DataTable();
+							loadTable.ajax.reload();
+						} else {
+							$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
+						}
+						
 					},
 					error : function(e) {
 						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
