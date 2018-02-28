@@ -16,7 +16,10 @@ public class Team {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	private String name;
-	private long leaderId;
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "leader_id")
+	@JsonIgnoreProperties("listTeam")
+	private Employee leader;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "department_id")
 	@JsonIgnoreProperties("listTeam")
@@ -31,12 +34,12 @@ public class Team {
 		super();
 	}
 
-	public Team(long id, String name, long leaderId, Department department, int validFlag, String insertDate,
+	public Team(long id, String name, Employee leader, Department department, int validFlag, String insertDate,
 			long insertOperator, String updateDate, long updateOperator) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.leaderId = leaderId;
+		this.leader = leader;
 		this.department = department;
 		this.validFlag = validFlag;
 		this.insertDate = insertDate;
@@ -61,12 +64,12 @@ public class Team {
 		this.name = name;
 	}
 
-	public long getLeaderId() {
-		return leaderId;
+	public Employee getLeader() {
+		return leader;
 	}
 
-	public void setLeaderId(long leaderId) {
-		this.leaderId = leaderId;
+	public void setLeader(Employee leader) {
+		this.leader = leader;
 	}
 
 	public Department getDepartment() {
