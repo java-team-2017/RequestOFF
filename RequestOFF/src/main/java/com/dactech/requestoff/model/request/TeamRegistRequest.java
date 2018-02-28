@@ -1,5 +1,7 @@
 package com.dactech.requestoff.model.request;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TeamRegistRequest {
@@ -13,12 +15,14 @@ public class TeamRegistRequest {
 	private String updateDate;
 	@JsonProperty("valid_flag")
 	private String validFlag;
+	@JsonProperty("list_member")
+	private List<String> listMember;
 
 	public TeamRegistRequest() {
 	}
 
 	public TeamRegistRequest(String id, String name, String leaderId, String departmentId, String updateDate,
-			String validFlag) {
+			String validFlag, List<String> listMember) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -26,6 +30,7 @@ public class TeamRegistRequest {
 		this.departmentId = departmentId;
 		this.updateDate = updateDate;
 		this.validFlag = validFlag;
+		this.listMember = listMember;
 	}
 
 	public String getId() {
@@ -75,4 +80,13 @@ public class TeamRegistRequest {
 	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
 	}
+
+	public List<String> getListMember() {
+		return listMember;
+	}
+
+	public void setListMember(List<String> listMember) {
+		this.listMember = listMember;
+	}
+
 }

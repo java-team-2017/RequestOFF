@@ -4,16 +4,19 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.Team;
+import com.dactech.requestoff.model.entity.TeamEmployee;
 import com.dactech.requestoff.model.request.TeamDetailsRequest;
 import com.dactech.requestoff.model.request.TeamRegistRequest;
 import com.dactech.requestoff.model.request.TeamSearchRequest;
 import com.dactech.requestoff.model.response.TeamDetailsResponse;
 import com.dactech.requestoff.model.response.TeamRegistResponse;
 import com.dactech.requestoff.model.response.TeamSearchResponse;
+import com.dactech.requestoff.repository.TeamEmployeeRepository;
 import com.dactech.requestoff.repository.TeamRepository;
 import com.dactech.requestoff.service.TeamService;
 import com.dactech.requestoff.util.StringUtil;
@@ -26,8 +29,11 @@ import com.dactech.requestoff.util.StringUtil;
 public class TeamServiceImpl implements TeamService {
 	@Autowired
 	TeamRepository teamRepository;
+	@Autowired
+	TeamEmployeeRepository TERepository;
 
 	@Override
+	@Transactional
 	public TeamRegistResponse teamRegist(TeamRegistRequest teamRegistRequest) throws Exception {
 		Team team;
 		if (StringUtil.isEmpty(teamRegistRequest.getId())) { // create new team
@@ -77,7 +83,27 @@ public class TeamServiceImpl implements TeamService {
 		}
 		
 		teamRepository.save(team);
-
+		if (teamRegistRequest.getListMember() != null) {
+			long teamId = team.getId();
+			List<TeamEmployee> TEmployees = TERepository.findByTeamId(teamId); 
+			for (String member : teamRegistRequest.getListMember()) {
+				long memberId = Long.parseLong(member);
+				TeamEmployee te = TERepository.findByTeamIdAndEmployeeId(teamId, memberId);
+				if (te == null) {
+					TeamEmployee teamEmployee = new TeamEmployee();
+					teamEmployee.setTeamId(teamId);
+					teamEmployee.setEmployeeId(memberId);
+					teamEmployee.setValidFlag(1);
+					TERepository.save(teamEmployee);
+				} else {
+					TEmployees.remove(te);
+				}
+			}
+			for (TeamEmployee te : TEmployees) {
+				TERepository.delete(te);
+			}
+		}
+		
 		return new TeamRegistResponse(team.getId());
 	}
 
