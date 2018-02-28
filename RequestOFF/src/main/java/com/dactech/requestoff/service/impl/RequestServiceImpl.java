@@ -53,23 +53,48 @@ public class RequestServiceImpl implements RequestService{
 			employeeId = request.getEmployee().getId();
 			long remainHours = employeeOffStatusRepository.findById(currentYear, employeeId).getRemainHours();
 			long oldOffHours = request.getTotalTime();
+			long oldStatus = request.getStatus();
 			
-			if(StringUtil.isNotEmpty(requestRegistRequest.getTotalTime())) {
+			if(StringUtil.isNotEmpty(requestRegistRequest.getTotalTime()) && StringUtil.isEmpty(requestRegistRequest.getValidFlag())
+					&& StringUtil.isEmpty(requestRegistRequest.getStatus())) {
 				offHours = Long.parseLong(requestRegistRequest.getTotalTime());
-				if(offHours > remainHours + oldOffHours) {
-					throw new Exception("Hours of off time exceed remain hours");
-				}
-				else {
-					newRemainHours = remainHours + oldOffHours - offHours;
-				}
+				newRemainHours = remainHours + oldOffHours - offHours;
 			}
-			else {
-				if(requestRegistRequest.getValidFlag().equals("0")) {	//delete request
+			else if(StringUtil.isEmpty(requestRegistRequest.getTotalTime()) && StringUtil.isNotEmpty(requestRegistRequest.getValidFlag())
+					&& StringUtil.isEmpty(requestRegistRequest.getStatus())) {
+				if(requestRegistRequest.getValidFlag().equals("0") && request.getValidFlag() == 1
+						&& (oldStatus == 1 || oldStatus == 4)) { //delete request
 					newRemainHours = remainHours + oldOffHours;
 				}
 				else {
 					newRemainHours = remainHours;
 				}
+			}
+			else if(StringUtil.isEmpty(requestRegistRequest.getTotalTime()) && StringUtil.isEmpty(requestRegistRequest.getValidFlag())
+					&& StringUtil.isNotEmpty(requestRegistRequest.getStatus())) {
+				if(requestRegistRequest.getStatus().equals("3") && oldStatus != 3) { //deny request
+					newRemainHours = remainHours + oldOffHours;
+				}
+				else {
+					newRemainHours = remainHours;
+				}
+			}
+			else if(StringUtil.isNotEmpty(requestRegistRequest.getTotalTime()) && StringUtil.isEmpty(requestRegistRequest.getValidFlag())
+					&& StringUtil.isNotEmpty(requestRegistRequest.getStatus())) {
+				if(oldStatus == 1 || oldStatus == 4) {
+					offHours = Long.parseLong(requestRegistRequest.getTotalTime());
+					newRemainHours = remainHours + oldOffHours - offHours;
+				}
+				else {
+					newRemainHours = remainHours;
+				}
+			}
+			else if(StringUtil.isEmpty(requestRegistRequest.getTotalTime()) && StringUtil.isEmpty(requestRegistRequest.getValidFlag())
+					&& StringUtil.isEmpty(requestRegistRequest.getStatus())) {
+				newRemainHours = remainHours;
+			}
+			else {
+				throw new Exception("RequestRegistRequest parameter is invalid");
 			}
 		}
 		
