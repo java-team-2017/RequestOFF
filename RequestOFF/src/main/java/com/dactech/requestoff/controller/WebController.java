@@ -56,5 +56,15 @@ public class WebController {
 	public String createRequestScreen() {
 		return "createRequest";
 	}
+	
+	@GetMapping("/departmentManagement")
+	public String departmentManagement() {
+		return "/departmentManagement";
+	}
+	
+	@GetMapping("/teamManagement")
+	public String teamManagement() {
+		return "/teamManagement";
+	}
 
 }
