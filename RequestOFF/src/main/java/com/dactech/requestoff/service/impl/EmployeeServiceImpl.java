@@ -324,7 +324,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		
 		if (user.getPosition().getId() == Position.POSITION_LEADER) {
 			Team t = teamRepository.findByLeaderId(user.getId());
-			Employee manager = employeeRepository.findById(t.getDepartment().getManagerId());
+			Employee manager = t.getDepartment().getManager();
 			forwards.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
 		} else if (user.getPosition().getId() == Position.POSITION_PROJECT_MANAGER) {
 			Department d = departmentRepository.findByManagerId(user.getId());
@@ -343,15 +343,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 		List<GetUserResponse.IdName> listRecipients = new ArrayList<GetUserResponse.IdName>();
 		Employee e = employeeRepository.findById(employeeId);
 		if(e.getPosition().getId() == Position.POSITION_LEADER) {
-			long managerId = teamRepository.findByLeaderId(employeeId).getDepartment().getManagerId();
-			Employee manager = employeeRepository.findById(managerId);
+			Employee manager = teamRepository.findByLeaderId(employeeId).getDepartment().getManager();
 			listRecipients.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
 		}
 		else if(e.getPosition().getId() == Position.POSITION_EMPLOYEE) {
 			Employee leader = e.getListTeam().get(0).getLeader();
 			listRecipients.add(new GetUserResponse.IdName(leader.getId(), leader.getName()));
-			long managerId = e.getListTeam().get(0).getDepartment().getManagerId();
-			Employee manager = employeeRepository.findById(managerId);
+			Employee manager = e.getListTeam().get(0).getDepartment().getManager();
 			listRecipients.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
 		}
 		else {

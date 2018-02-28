@@ -29,7 +29,9 @@ public class DepartmentServiceImpl implements DepartmentService {
 			department = new Department();
 			department.setName(departmentRegistRequest.getName());
 			
-			department.setManagerId(Long.parseLong(departmentRegistRequest.getManagerId()));
+			Employee manager = new Employee();
+			manager.setId(Long.parseLong(departmentRegistRequest.getManagerId()));
+			department.setManager(manager);
 			
 			department.setValidFlag(Integer.parseInt(departmentRegistRequest.getValidFlag()));
 		}
@@ -46,7 +48,9 @@ public class DepartmentServiceImpl implements DepartmentService {
 					department.setName(departmentRegistRequest.getName());
 				}
 				if(StringUtil.isNotEmpty(departmentRegistRequest.getManagerId())) {
-					department.setManagerId(Long.parseLong(departmentRegistRequest.getManagerId()));
+					Employee manager = new Employee();
+					manager.setId(Long.parseLong(departmentRegistRequest.getManagerId()));
+					department.setManager(manager);
 				}
 				if(StringUtil.isNotEmpty(departmentRegistRequest.getValidFlag())) {
 					department.setValidFlag(Integer.parseInt(departmentRegistRequest.getValidFlag()));
