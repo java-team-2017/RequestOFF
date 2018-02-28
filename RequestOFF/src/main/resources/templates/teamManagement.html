@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Team Management</title>
+	<div th:replace="library"></div>
+</head>
+
+<script th:inline="javascript">
+	/*<![CDATA[*/
+		var employeeLoginId;
+		$(function() {
+			var objReturnRequestDetails;
+			var listRequest;
+			var requestStatus = {
+				'1' : 'Java',
+				'2' : 'PHP',
+				'3' : 'Ruby',
+				'4' : 'QC',
+				'5' : 'iOS'
+			};
+			
+			$('#btnSearch').on('click', function(){
+				search();
+			});
+			
+			$("#requestForm select").keydown(function(e){
+				if(e.keyCode == 13) {
+					this.blur();
+				}
+			});
+			
+			$(document).keypress(function(e) {
+				if(e.which == 13) {
+					search();
+				}
+			});
+			
+			$('#team').typeahead({
+				name: 'suggest-employee',
+				limit: 100,
+				hint: false,
+				remote: {
+					rateLimitWait: 1000,
+					url: '/team/search',
+					replace: function (url, uriEncodedQuery){
+						return url + "#" + uriEncodedQuery;
+					},
+					beforeSend: function (jqXhr, settings) {
+						jqXhr.setRequestHeader('Content-Type','application/json');
+						settings.type = 'POST';
+						settings.hasContent = true;
+						settings.data = JSON.stringify({"name": $('#team').val(), "name_match_status": "0"});
+					},
+					filter: function (data) {
+						var result = data.teams;
+						var sourceArr = [];
+						$.each(result, function(index, object) {
+							sourceArr.push(object.name);
+						});
+						return sourceArr;
+					}
+				}
+			}).bind('typeahead:selected', function(obj, selected, name) {
+				$(this).typeahead('setQuery', $("<div/>").html(selected.value).text());
+				return false;
+			});
+			
+		});
+		
+		function search(){
+			var requestData = $('#requestForm').serializeJSON();
+			var requestSearch = {
+				"id" : requestData.id,
+				"name" : requestData.name,
+				"leader_id" : requestData.leader_id,
+				"department_id" : requestData.department_id
+			};
+			console.log(requestSearch);
+			$('#requestTable').DataTable( {
+				ajax: {
+					type: "POST",
+					contentType: "application/json",
+					url : /*[[@{/team/search}]]*/,
+					dataType : 'json',
+					data: function () {
+						return JSON.stringify(requestSearch);
+					},
+					dataSrc: 'teams'
+				},
+				destroy: true,
+				searching: false,
+				order: [[ 1, "desc" ]],
+				//data: listRequest,
+				columns: [
+					{ data: 'id' },
+					{ data: 'name' },
+					{ data: 'leader.name' },
+					{ data: 'department.name' },
+					{
+						render: function () {
+								return '<a href="#" id="btnEdit"><span class="glyphicon glyphicon-pencil"></span></a>';
+						},
+					}
+				]
+			});
+		}
+	/*]]>*/
+</script>
+
+<body class="content-body">
+	<div th:replace="fragments/header"></div>
+	<div th:replace="menu"></div>
+	
+	<div class="requestOffContentBody">			
+		<h2>Team Management</h2>
+		<div id="alertMessage" class="alert" style="display:none;"></div>
+			<form id="requestForm" class="form-input">
+				<div class="form-group">
+					<label class="control-label">Team: </label>
+					<input class="form-control" type="text" name="name" id="team" value=""></input>
+				</div>
+				
+				<div class="form-group">
+					<label class="control-label">Leader: </label>
+					<input class="form-control" type="text" name="leader_id" id="leader" value=""></input>
+				</div>
+						
+				<div class="form-group">
+					<label class="control-label">Department</label>
+					<select name="department_id" id="status" value="" class="form-control">
+						<option value=""></option>
+						<option value="1">Java</option>
+						<option value="2">PHP</option>
+						<option value="3">Ruby</option>
+						<option value="4">QC</option>
+						<option value="5">iOS</option>
+					</select>
+				</div>
+						
+				<p>
+					<button id="btnSearch" type="button" class="btn btn-primary" style="width:76px;">Search</button>&nbsp;&nbsp;
+					<button id="btnAdd" type="button" class="btn btn-primary" style="width:76px;">Add</button>&nbsp;&nbsp;
+					<button type="reset" class="btn btn-primary" style="width:76px;">Clear</button>
+				</p>
+			</form>
+					
+			<div class="table-responsive" style="margin-top:3em;"> 
+				<table class="table table-bordered table-striped table-hover" id="requestTable">
+					<thead>
+						<tr>
+							<th class="text-center" name="id" id="id" style="width: 40px;"><span>ID</span></th>
+							<th class="text-center" name="team"><span>Team</span></th>
+							<th class="text-center" name="leader"><span>Leader</span></th>
+							<th class="text-center" name="department"><span>Department</span></th>
+							<th class="text-center" name="edit" style="width: 40px;"><span>Edit</span></th>
+						</tr>
+					</thead>
+					<tbody class="text-center">
+					</tbody>
+				</table>
+			</div>
+				
+			<div class="modal fade" id="modalDetails" role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">�</button>
+							<h4 class="modal-title">Details</h4>
+						</div>
+						
+						<div class="modal-body">
+							<form class="form-horizontal" id="formModal">
+								<label class="col-md-3 control-label">Employee:</label>
+								<div class="col-md-9">
+									<input id="nameDetails" class="form-control" readonly="readonly"></input>
+								</div>
+			
+								<label class="col-md-3 control-label">Position:</label>
+								<div class="col-md-9">
+									<input id="positionDetails" class="form-control" readonly="readonly"></input>
+								</div>
+			
+								<label class="col-md-3 control-label">Team:</label>
+								<div class="col-md-9">
+									<input id="teamDetails" class="form-control" readonly="readonly"></input>
+								</div>
+			
+								<label class="col-md-3 control-label">Department:</label>
+								<div class="col-md-9">
+									<input id="departmentDetails" class="form-control" readonly="readonly"></input>
+								</div>
+			
+								<label class="col-md-3 control-label">Recipient:</label>
+								<div class="col-md-9">
+									<input id="recipientDetails" class="form-control" readonly="readonly"></input>
+								</div>
+								
+								<label class="col-md-3 control-label">From:</label>
+								<div class="col-md-9">
+									<input id="fromTimeDetails" class="form-control" readonly="readonly"></input>
+								</div>
+								
+								<label class="col-md-3 control-label">To:</label>
+								<div class="col-md-9">
+									<input id="toTimeDetails" class="form-control" readonly="readonly"></input>
+								</div>
+			
+								<label class="col-md-3 control-label">Reason:</label>
+								<div class="col-md-9">
+									<input id="reasonDetails" class="form-control" readonly="readonly"></input>
+								</div>
+								
+								<label class="col-md-3 control-label">Status:</label>
+								<div class="col-md-9">
+									<input id="statusDetails" class="form-control" readonly="readonly"></input>
+								</div>
+			
+								<label class="col-md-3 control-label">Day Off Type:</label>
+								<div class="col-md-9">
+									<input id="dayOffTypeDetails" class="form-control" readonly="readonly"></input>
+								</div>
+			
+								<label class="col-md-3 control-label">Response Message:</label>
+								<div class="col-md-9">
+									<textarea id="responseMessage" name="responseMessage"
+										placeholder="Write message..."
+										style="height: 100px; width: 100%;">
+									</textarea>
+								</div>&nbsp;
+								
+								<p align="center">
+									<button type="button" class="btn btn-default" style="width:76px;" id="btnApproveModal">Approve</button>
+									<button type="button" class="btn btn-default" style="width:76px;" id="btnDenyModal">Deny</button>
+									<button type="button" class="btn btn-default" style="width:76px;" id="btnSendModal">Send</button>
+									<button type="button" class="btn btn-default" style="width:76px;" data-dismiss="modal">Cancel</button>
+								</p>
+			
+								<label> Forward request to : <select name="forward" id="forward" value=""></select>
+								</label>
+								
+								<button type="button" class="btn btn-default btn-sm" id="btnForward">
+									<span class="glyphicon glyphicon-share-alt"></span>Forward
+								</button>
+								
+								<input type="hidden" id="statusDetailsId"></input>
+								<input type="hidden" id="remainHours"></input>
+								<input type="hidden" id="employeeIdDetails"></input>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	<div th:replace="fragments/footer"></div>
+</body>
+</html>
