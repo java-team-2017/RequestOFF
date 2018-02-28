@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.dactech.requestoff.model.entity.DayOffType;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.EmployeeOffStatus;
+import com.dactech.requestoff.model.entity.Position;
 import com.dactech.requestoff.model.entity.Request;
 import com.dactech.requestoff.model.request.RequestBrowsingRequest;
 import com.dactech.requestoff.model.request.RequestDetailsRequest;
@@ -41,12 +42,7 @@ public class RequestServiceImpl implements RequestService{
 			employeeId = Long.parseLong(requestRegistRequest.getEmployeeId());
 			long remainHours = employeeOffStatusRepository.findById(currentYear, employeeId).getRemainHours();
 			offHours = Long.parseLong(requestRegistRequest.getTotalTime());
-			if(offHours > remainHours) {
-				throw new Exception("Hours of off time exceed remain hours");
-			}
-			else {
-				newRemainHours = remainHours - offHours;
-			}
+			newRemainHours = remainHours - offHours;
 		}
 		else {	//update or delete request
 			Request request = requestRepository.findById(Long.parseLong(requestRegistRequest.getId()));
@@ -98,12 +94,16 @@ public class RequestServiceImpl implements RequestService{
 			}
 		}
 		
+		if(newRemainHours < 0) {
+			throw new Exception("Hours of off time exceed remain hours");
+		}
+		
 		Request request;
 		if(StringUtil.isEmpty(requestRegistRequest.getId())) {	//create new request
 			request = new Request();
 			
 			Employee employee = new Employee();
-			employeeId = Long.parseLong(requestRegistRequest.getEmployeeId());
+//			employeeId = Long.parseLong(requestRegistRequest.getEmployeeId());
 			employee.setId(employeeId);
 			request.setEmployee(employee);
 			
@@ -111,7 +111,13 @@ public class RequestServiceImpl implements RequestService{
 			request.setToTime(requestRegistRequest.getToTime());
 			request.setTotalTime(Long.parseLong(requestRegistRequest.getTotalTime()));
 			request.setReason(requestRegistRequest.getReason());
-			request.setStatus(Integer.parseInt(requestRegistRequest.getStatus()));
+			if(employeeRepository.findById(employeeId).getPosition().getId() == Position.POSITION_PROJECT_MANAGER 
+					&& requestRegistRequest.getStatus().equals("5")) {
+				request.setStatus(Request.REQUEST_STATUS_APPROVED);
+			}
+			else {
+				request.setStatus(Integer.parseInt(requestRegistRequest.getStatus()));
+			}
 			request.setResponseMessage(requestRegistRequest.getResponseMessage());
 			
 			DayOffType dayOffType = new DayOffType();
@@ -145,7 +151,13 @@ public class RequestServiceImpl implements RequestService{
 					request.setReason(requestRegistRequest.getReason());
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getStatus())) {
-					request.setStatus(Integer.parseInt(requestRegistRequest.getStatus()));
+					if(employeeRepository.findById(employeeId).getPosition().getId() == Position.POSITION_PROJECT_MANAGER 
+						&& requestRegistRequest.getStatus().equals("5")) {
+						request.setStatus(Request.REQUEST_STATUS_APPROVED);
+					}
+					else {
+						request.setStatus(Integer.parseInt(requestRegistRequest.getStatus()));
+					}
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getResponseMessage())) {
 					request.setResponseMessage(requestRegistRequest.getResponseMessage());

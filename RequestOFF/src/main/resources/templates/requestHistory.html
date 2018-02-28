@@ -263,17 +263,16 @@
 						$('#alertMessage_edit').html(errors['DateError']).attr('class', 'alert alert-danger').show();
 					}
 					else if(offHoursEqual0 == 1) {
-						$('#alertMessage').html(errors['offHoursEqual0']).attr('class', 'alert alert-danger').show();
+						$('#alertMessage_edit').html(errors['offHoursEqual0']).attr('class', 'alert alert-danger').show();
 					}
 					else if(exceed == 1) {
-						$('#alertMessage').html(errors['exceedTime']).attr('class', 'alert alert-danger').show();
+						$('#alertMessage_edit').html(errors['exceedTime']).attr('class', 'alert alert-danger').show();
 					}
 					else {
 						//update request
 						var requestId = $("#modalRequestId").html();
 						var requestRegistRequest = {
 							"id" : requestId,
-							"employee_id" : employeeId,
 							"from_time" : from,
 							"to_time" : to,
 							"total_time" : offHours,
@@ -282,7 +281,6 @@
 							"response_message" : editRequestData.responseMessage_modalForm,
 							"day_off_type_id" : editRequestData.dayOffType_modalForm,
 							"recipient_id" : editRequestData.recipient_modalForm,
-							"valid_flag" : "",
 							"update_date" : editRequestData.updateDate_modalForm
 						};
 						console.log(requestRegistRequest);
