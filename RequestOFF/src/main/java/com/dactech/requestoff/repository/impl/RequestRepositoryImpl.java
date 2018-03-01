@@ -94,43 +94,47 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 	}
 
 	@Override
-	public List<Request> browseRequest(RequestBrowsingRequest RBRequest) {
-		Employee user = employeeRepository.findById(Long.parseLong(RBRequest.getUserId()));
-		StringBuilder queryString = new StringBuilder("SELECT * FROM request WHERE  ");
+	public List<Request> browseRequest(RequestBrowsingRequest requests) {
+		Employee user = employeeRepository.findById(Long.parseLong(requests.getUserId()));
+		StringBuilder queryString = new StringBuilder("SELECT * FROM request INNER JOIN employee ON request.employee_id = employee.id WHERE ");
 		if (user.getPosition().getId() == Position.POSITION_LEADER) {
-			queryString.append(" (employee_id IN (SELECT employee_id from team t INNER JOIN team_employee te ON t.id = te.team_id WHERE t.leader_id = " + RBRequest.getUserId() + ")) ");
+			queryString.append(" (employee_id IN (SELECT employee_id from team t INNER JOIN team_employee te ON t.id = te.team_id WHERE t.leader_id = " + requests.getUserId() + ")) ");
 		} else if (user.getPosition().getId() == Position.POSITION_PROJECT_MANAGER) {
-			queryString.append(" (employee_id IN (select employee_id from team_employee te inner join team t on t.id=te.team_id inner join department d on d.id=t.department_id where manager_id= " + RBRequest.getUserId() + ") "
-					+ "OR employee_id IN (select leader_id from team t inner join department d on t.department_id=d.id where manager_id= " + RBRequest.getUserId() + " )) ");
+			queryString.append(" (employee_id IN (SELECT employee_id from team_employee te INNER JOIN team t ON t.id=te.team_id INNER JOIN department d ON d.id=t.department_id WHERE manager_id= " + requests.getUserId() + ") "
+					+ "OR employee_id IN (SELECT leader_id FROM team t INNER JOIN department d ON t.department_id=d.id WHERE manager_id= " + requests.getUserId() + " )) ");
 		}
 		
-		if (StringUtil.isNotEmpty(RBRequest.getStatus())) {
-			if (RBRequest.getStatus().equals("5")) {
-				queryString.append(" AND status = '5' AND recipient_id = '" + RBRequest.getUserId() + "'");
+		if (StringUtil.isNotEmpty(requests.getStatus())) {
+			if (requests.getStatus().equals("5")) {
+				queryString.append(" AND status = '5' AND recipient_id = '" + requests.getUserId() + "'");
 			} else {
-				queryString.append(" AND status = '" + RBRequest.getStatus() + "'");
+				queryString.append(" AND status = '" + requests.getStatus() + "'");
 			}
 		} else {
-			queryString.append(" AND NOT (status = '5' AND recipient_id <> '" + RBRequest.getUserId() + "')");
+			queryString.append(" AND NOT (status = '5' AND recipient_id <> '" + requests.getUserId() + "')");
 		}
 		
-		queryString.append(" AND status <> 1"); // eliminate saved request
+		queryString.append(" AND status <> 1 AND status <> 4"); // eliminate saved and responded request
 		
-		if (StringUtil.isNotEmpty(RBRequest.getFromTime())) {
-			queryString.append(" AND to_time >= '" + RBRequest.getFromTime() + "'");
+		if (StringUtil.isNotEmpty(requests.getName())) {
+			queryString.append(" AND employee.name like '%" + requests.getName() + "%'");
+		}
+		
+		if (StringUtil.isNotEmpty(requests.getFromTime())) {
+			queryString.append(" AND to_time >= '" + requests.getFromTime() + "'");
 		}
 
-		if (StringUtil.isNotEmpty(RBRequest.getToTime())) {
-			queryString.append(" AND from_time <= '" + RBRequest.getToTime() + "'");
+		if (StringUtil.isNotEmpty(requests.getToTime())) {
+			queryString.append(" AND from_time <= '" + requests.getToTime() + "'");
 		}
 		
 		queryString.append(" AND request.valid_flag = '1'");
 	
 		Query query = entityManager.createNativeQuery(queryString.toString(), Request.class);
 		@SuppressWarnings("unchecked")
-		List<Request> requests = query.getResultList();
+		List<Request> listRequests = query.getResultList();
 		
-		for (Request request : requests) {
+		for (Request request : listRequests) {
 			Employee recipient = employeeRepository.findById(request.getRecipientId());
 			Employee sender = request.getEmployee();
 			// set recipient Name
@@ -182,7 +186,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 				}
 			}
 		}
-		return requests;
+		return listRequests;
 	}
 
 }

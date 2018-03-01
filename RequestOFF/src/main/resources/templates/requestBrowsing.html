@@ -29,8 +29,6 @@
 				dataType : 'json',
 				success : function(data) {
 					userData = data;
-					console.log("userData");
-					console.log(userData);
 					employeeLoginId = data.user.id;
 				},
 				error : function(e) {
@@ -64,7 +62,6 @@
 					var table = $('#requestTable').DataTable();
 					var rowData = table.row(this).data();
 					objReturnRequestDetails = rowData;
-					console.log(rowData);
 					$('#nameDetails').val(rowData.employee.name);
 					$('#positionDetails').val(rowData.employee.position.name);
 					if(rowData.employee.position.id == 2 || rowData.employee.position.id == 3){
@@ -79,27 +76,30 @@
 					$('#toTimeDetails').val(rowData.toTime);
 					$('#reasonDetails').val(rowData.reason);
 					$('#statusDetails').val(requestStatus[rowData.status]);
-					$('#statusDetailsId').val(rowData.status);
 					$('#dayOffTypeDetails').val(rowData.dayOffType.name);
 					$('#responseMessage').val(rowData.responseMessage);
-					$('#employeeIdDetails').val(rowData.employee.id);
 					
+					$('#forward').empty();
 					if(rowData.status != 5){
 						$('#btnApproveModal').prop('disabled', true);
 						$('#btnDenyModal').prop('disabled', true);
 						$('#btnSendModal').prop('disabled', true);
 						$('#btnForward').prop('disabled', true);
+						$('#forward').prop('disabled', true);
 						$('#responseMessage').prop('disabled', true);
 					} else {
 						if (rowData.recipientId == userData.user.id) {
 							if (rowData.forwardId != 0 && rowData.forwardName != null) {
-								$('#forward').empty().append('<option value = "' + rowData.forwardId + '">' + rowData.forwardName + '</option>');
+								$('#forward').append('<option value = "' + rowData.forwardId + '">' + rowData.forwardName + '</option>');
+								$('#btnForward').prop('disabled', false);
+							} else {
+								$('#btnForward').prop('disabled', true);
 							}
 						}
 						$('#btnApproveModal').prop('disabled', false);
 						$('#btnDenyModal').prop('disabled', false);
 						$('#btnSendModal').prop('disabled', false);
-						$('#btnForward').prop('disabled', false);
+						$('#forward').prop('disabled', false);
 						$('#responseMessage').prop('disabled', false);
 					}
 					
@@ -112,6 +112,7 @@
 					"id" : objReturnRequestDetails.id ,
 					"update_date": objReturnRequestDetails.updateDate
 				}
+				$('#confirmModal').modal('show');
 				
 				var selectedValue = $("#forward").val();
 				if ($(this).attr('id') == 'btnApproveModal') {
@@ -123,25 +124,28 @@
 				} else if ($(this).attr('id') == 'btnForward') {
 					requestObj.recipient_id = selectedValue;
 				}
-				console.log("status");
-				console.log(requestObj.status);
-				console.log(requestObj.recipientId);
 				requestObj.response_message = $('#responseMessage').val();
-				updateRequest(requestObj);
+				
+				$('#btnYes').on("click", function(){
+					updateRequest(requestObj);
+				});
 			});
 			
 			$("#btnApprove, #btnDeny").on('click', function() {
+				$('#confirmModal').modal('show');
 				var status = $(this).attr('id') == 'btnApprove' ? 2 : 3;
 				var requestObj = {
 					"status" : status
 				}
-				$('#requestTable input[type="checkbox"]:checked').each(function(){
-					var table = $('#requestTable').DataTable();
-					var rowData = table.row($(this).parent()).data();
-					
-					requestObj.id = rowData.id;
-					requestObj.update_date = rowData.updateDate;
-					updateRequest(requestObj);
+				$('#btnYes').on("click", function(){
+					$('#requestTable input[type="checkbox"]:checked').each(function(){
+						var table = $('#requestTable').DataTable();
+						var rowData = table.row($(this).parent()).data();
+						
+						requestObj.id = rowData.id;
+						requestObj.update_date = rowData.updateDate;
+						updateRequest(requestObj);
+					});
 				});
 			});
 			
@@ -152,13 +156,15 @@
 					"id" : rowData.id ,
 					"update_date": rowData.updateDate
 				}
-				
+				$('#confirmModal').modal('show');
 				if ($(this).hasClass('btnApprove')) {
 					requestObj.status = 2;
 				} else {
 					requestObj.status = 3;
 				}
-				updateRequest(requestObj);
+				$('#btnYes').on("click", function(){
+					updateRequest(requestObj);
+				});
 			});
 			
 			$(document).ready(function(){
@@ -198,28 +204,26 @@
 		});
 		
 		function updateRequest(requestObj) {
-			if(confirm('Are you sure?')){
-				$.ajax({
-					type : "POST",
-					contentType : "application/json",
-					url : /*[[@{/request/regist}]]*/,
-					dataType : 'json',
-					data : JSON.stringify(requestObj),
-					success : function(resultData) {
-						if (resultData.status_info.status == 0) {
-							$('#modalDetails').modal('hide');
-							var loadTable = $('#requestTable').DataTable();
-							loadTable.ajax.reload();
-						} else {
-							$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
-						}
-						
-					},
-					error : function(e) {
-						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+			$.ajax({
+				type : "POST",
+				contentType : "application/json",
+				url : /*[[@{/request/regist}]]*/,
+				dataType : 'json',
+				data : JSON.stringify(requestObj),
+				success : function(resultData) {
+					if (resultData.status_info.status == 0) {
+						$('#modalDetails').modal('hide');
+						var loadTable = $('#requestTable').DataTable();
+						loadTable.ajax.reload();
+					} else {
+						$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
 					}
-				});
-			}
+					
+				},
+				error : function(e) {
+					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+				}
+			});
 		}
 		
 		function search(){
@@ -231,7 +235,7 @@
 				"status" : requestData.status,
 				"name": requestData.name
 			};
-			
+			console.log(requestSearch);
 			$('#requestTable').DataTable( {
 				ajax: {
 					type: "POST",
@@ -302,7 +306,6 @@
 						<option value=""></option>
 						<option value="2">Approved</option>
 						<option value="3">Denied</option>
-						<option value="4">Responded</option>
 						<option value="5">Waiting</option>
 					</select>
 				</div>
@@ -358,7 +361,7 @@
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">�</button>
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 							<h4 class="modal-title">Details</h4>
 						</div>
 						
@@ -436,15 +439,33 @@
 									<span class="glyphicon glyphicon-share-alt"></span>Forward
 								</button>
 								
-								<input type="hidden" id="statusDetailsId"></input>
-								<input type="hidden" id="remainHours"></input>
-								<input type="hidden" id="employeeIdDetails"></input>
 							</form>
 						</div>
 					</div>
 				</div>
 			</div>
+
+		<div class="modal fade" id="confirmModal" role="dialog">
+			<div class="modal-dialog">
+
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h2 class="modal-title">Confirm</h2>
+					</div>
+					<div class="modal-body">
+						<h4>Are you sure?</h4>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal" id="btnYes">Yes</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal" id="btnNo">No</button>
+					</div>
+				</div>
+
+			</div>
 		</div>
+		
+	</div>
 	<div th:replace="fragments/footer"></div>
 </body>
 </html>
