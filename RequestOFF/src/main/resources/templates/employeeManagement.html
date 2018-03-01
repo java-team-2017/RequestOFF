@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Employee Management</title>
+		<link rel="stylesheet" type="text/css" href="css/layoutStyle.css" />
+		<link rel="stylesheet" type="text/css" href="css/common.css" />
+		<link rel="stylesheet" type="text/css" href="css/requestHistoryStyle.css" />
+		<link rel="stylesheet"	type="text/css" href="css/bootstrap.min.css" />
+		<link rel="stylesheet"	type="text/css" href="css/notify.css" />
+		<link rel="stylesheet" type="text/css" href="css/datatables.min.css"/>
+		<link rel="stylesheet" type="text/css" href="css/bootstrap-datepicker.min.css"/>
+		<script src="javascript/jquery-3.2.1.js"></script>
+		<script src="javascript/bootstrap.min.js"></script>
+		<script src="javascript/jquery.serializejson.js"></script>
+		<script src="javascript/common.js"></script>
+		<script src="javascript/notify.js"></script>
+		<script type="text/javascript" src="javascript/datatables.min.js"></script>
+		<script type="text/javascript" src="javascript/bootstrap-confirmation.min.js"></script>
+		<script type="text/javascript" src="javascript/bootstrap-datepicker.min.js"></script>
+	</head>
+	<body class="content-body">
+		<script th:inline="javascript">
+		/*<![CDATA[*/
+			$(function() {
+				var listPosition, listTeam, listDepartment, listRole;
+				var table;
+
+				renderPositionSelect("positionId", function(positions) {
+					listPosition = positions;
+				});
+				renderPositionSelect("positionModalDetailsId", function(positions) {
+					listPosition = positions;
+				});
+				renderPositionSelect("positionModalAddId", function(positions) {
+					listPosition = positions;
+				});
+				
+				renderTeamSelect("teamId", function(teams) {
+					listTeam = teams;
+				});
+				renderTeamSelect("teamModalDetailsId", function(teams) {
+					listTeam = teams;
+				});
+// 				renderTeamSelect("teamModalAddId", function(teams) {
+// 					listTeam = teams;
+// 				});
+
+				renderDepartmentSelect("departmentId", function(departments) {
+					listDepartment = departments;
+				});
+				renderDepartmentSelect("departmentModalDetailsId", function(departments) {
+					listDepartment = departments;
+				});
+// 				renderDepartmentSelect("departmentModalAddId", function(departments) {
+// 					listDepartment = departments;
+// 				});
+				
+				renderRoleSelect("roleModalAddId", function(roles) {
+					listRole = roles;
+				});
+				renderRoleSelect("roleModalDetailsId", function(roles) {
+					listRole = roles;
+				});
+				
+				$('.datepicker').on('changeDate', function(ev){
+					$(this).datepicker('hide');
+				});
+
+				$('#employeeTable tbody').on('click', 'td', function() {
+					var index = $(this).index();
+					if(index <= 6) {
+						table = $('#employeeTable').DataTable();
+						var rowData = table.row(this).data();
+						console.log(rowData);
+						$("#idModalDetailsId").empty().append(rowData.id);
+						$("#nameModalDetailsId").val(rowData.name);
+						$("#genderModalDetailsId").val(rowData.gender);
+						var birthday = String(rowData.birthday).split("-");
+						$("#birthdayModalDetailsId").val(birthday[1] + "/" + birthday[2] + "/" + birthday[0]);
+						$("#emailModalDetailsId").val(rowData.email);
+						$("#phoneModalDetailsId").val(rowData.phone);
+						var startWorkingDate = String(rowData.startWorkingDate).split("-");
+						$("#startWorkingModalDetailsId").val(startWorkingDate[1] + "/" + startWorkingDate[2] + "/" + startWorkingDate[0]);
+						var officialWorkingDate = String(rowData.officialWorkingDate).split("-");
+						$("#officialWorkingModalDetailsId").val(officialWorkingDate[1] + "/" + officialWorkingDate[2] + "/" + officialWorkingDate[0]);
+						$("#positionModalDetailsId").val(rowData.position.id);
+						$("#teamModalDetailsId").val(getTeamId(listTeam, rowData.teamName));
+						$("#departmentModalDetailsId").val(getDepartmentId(listDepartment, rowData.departmentName));
+						$("#updateDateModalDetailsId").val(rowData.updateDate);
+						$("#roleModalDetailsId option").prop("selected", false);
+						$.each(rowData.listRole, function(i, e){
+							console.log(e.role);
+							$("#roleModalDetailsId option[value='" + e.id + "']").prop("selected", true);
+						});
+						
+						$('#employeeDetailsModal').modal('show');
+					}
+				});
+
+				$('#btnSearch').on('click', function() {
+					var employeeSearchRequest = getEmployeeSearchRequest();
+					console.log("employeeSearchRequest:");
+					console.log(employeeSearchRequest);
+					search(employeeSearchRequest);
+				});
+				
+				$('#btnAdd').on('click', function() {
+					$('#employeeAddModal').modal('show');
+				});
+				
+				$('#btnClear').on('click', function() {
+					alert("clear");
+				});
+				
+				$('#btnAdd_modalAdd').on('click', function() {
+					var addData = $('#modalAddForm').serializeJSON();
+					var birthday = addData.birthdayModalAdd;
+					birthday = birthday.substr(6, 4) + "-" + birthday.substr(0, 2) + "-" + birthday.substr(3, 2);
+					var startWorkingDate = addData.startWorkingModalAdd;
+					startWorkingDate = startWorkingDate.substr(6, 4) + "-" + startWorkingDate.substr(0, 2) + "-" + startWorkingDate.substr(3, 2);
+					var officialWorkingDate = addData.officialWorkingModalAdd;
+					officialWorkingDate = officialWorkingDate.substr(6, 4) + "-" + officialWorkingDate.substr(0, 2) + "-"
+											+ officialWorkingDate.substr(3, 2);
+					
+					var employeeRegistRequest = {
+						"id" : "",
+						"name" : addData.nameModalAdd,
+						"gender" : addData.genderModalAdd,
+						"birthday" : birthday,
+						"position_id" : addData.positionModalAdd,
+						"email" : addData.emailModalAdd,
+						"password" : "",
+						"phone" : addData.phoneModalAdd,
+						"start_working_date" : startWorkingDate,
+						"official_working_date" : officialWorkingDate,
+						"valid_flag" : "1",
+// 						"team_id" : addData.teamModalAdd,
+						"role_ids" : $("#roleModalAddId").val()
+					};
+					console.log(employeeRegistRequest);
+					$.ajax({
+						type : "POST",
+						contentType : "application/json",
+						url : /*[[@{/employee/regist}]]*/,
+						dataType : 'json',
+						data : JSON.stringify(employeeRegistRequest),
+						success : function(returnData) {
+							table = $('#employeeTable').DataTable();
+							console.log(table);
+							table.ajax.reload();
+							$("#modalAddForm :input").not("button, select").val("");
+							$("#modalAddForm select").prop('selectedIndex', 0);
+// 							$('#alertMessage').html(alertStr).attr('class', 'alert alert-success').show();
+						},
+						error : function(e) {
+							$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+						}
+					});
+					$('#employeeAddModal').modal('hide');
+				});
+				
+				$('#btnSave_modalDetails').on('click', function() {
+					var updateData = $('#modalDetailsForm').serializeJSON();
+					var id = $("#idModalDetailsId").html();
+					var birthday = updateData.birthdayModalDetails;
+					birthday = birthday.substr(6, 4) + "-" + birthday.substr(0, 2) + "-" + birthday.substr(3, 2);
+					var startWorkingDate = updateData.startWorkingModalDetails;
+					startWorkingDate = startWorkingDate.substr(6, 4) + "-" + startWorkingDate.substr(0, 2) + "-" + startWorkingDate.substr(3, 2);
+					var officialWorkingDate = updateData.officialWorkingModalDetails;
+					officialWorkingDate = officialWorkingDate.substr(6, 4) + "-" + officialWorkingDate.substr(0, 2) + "-"
+											+ officialWorkingDate.substr(3, 2);
+					var employeeRegistRequest = {
+						"id" : id,
+						"name" : updateData.nameModalDetails,
+						"gender" : updateData.genderModalDetails,
+						"birthday" : birthday,
+						"position_id" : updateData.positionModalDetails,
+						"email" : updateData.emailModalDetails,
+						"password" : "",
+						"phone" : updateData.phoneModalDetails,
+						"start_working_date" : startWorkingDate,
+						"official_working_date" : officialWorkingDate,
+						"update_date" : updateData.updateDateModalDetails,
+// 						"team_id" : updateData.teamModalDetails,
+						"role_ids" : $("#roleModalDetailsId").val()
+					};
+					console.log(employeeRegistRequest);
+					$.ajax({
+						type : "POST",
+						contentType : "application/json",
+						url : /*[[@{/employee/regist}]]*/,
+						dataType : 'json',
+						data : JSON.stringify(employeeRegistRequest),
+						success : function(returnData) {
+							table = $('#employeeTable').DataTable();
+							table.ajax.reload();
+						},
+						error : function(e) {
+							$('#alertMessage_modalDetails').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+						}
+					});
+					$('#employeeDetailsModal').modal('hide');
+				});
+			});
+			
+			$("body").on("click", ".btnDelete", function(event) {
+				$("#confirmModal").modal('show');
+				var row = $(this).closest("tr");	// Finds the closest row <tr> 
+				var id = row.find("td:nth-child(1)").html();	//Find the 1st <td> element
+				table = $('#employeeTable').DataTable();
+				rowData = table.row($(this).parent()).data();
+				var updateDate = rowData.updateDate;
+				
+				$("#yesConfirm").on("click", function(e) {
+					$.ajax({
+						type : "POST",
+						contentType : "application/json",
+						url : /*[[@{/employee/regist}]]*/,
+						dataType : 'json',
+						data : JSON.stringify({
+							"id" : id,
+							"valid_flag" : "0",
+							"update_date" : updateDate
+						}),
+						success : function(returnData) {
+							table = $('#employeeTable').DataTable();
+							table.ajax.reload();
+						},
+						error : function(e) {
+							$('#alertMessage_modalDetails').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+						}
+					});
+				});
+			});
+		
+			function getEmployeeSearchRequest() {
+				var searchData = $('#employeeForm').serializeJSON();
+				var employeeSearchRequest = {
+					"id" : "",
+					"name" : searchData.name,
+					"name_match_status" : "",
+					"gender" : searchData.gender,
+					"birthday" : "",
+					"position_id" : searchData.position,
+					"email" : "",
+					"phone" : "",
+					"start_working_date" : "",
+					"offical_working_date" : "",
+					"valid_flag" : "1",
+					"team_id" : searchData.team,
+					"department_id" : searchData.department
+				};
+				return employeeSearchRequest;
+			}
+
+			function search(employeeSearchRequest) {
+				$('#employeeTable').DataTable({
+					ajax: {
+						type : "POST",
+						contentType : "application/json",
+						url : /*[[@{/employee/search}]]*/,
+						dataType : 'json',
+						data : function() {
+							return JSON.stringify(employeeSearchRequest);
+						},
+						dataSrc: 'employees'
+					},
+					destroy: true,
+					searching: false,
+					order: [[ 0, "desc" ]],
+					columnDefs: [
+						{
+							"targets": [ 0 ],
+							"data": 'id'
+						},
+						{
+							"targets": [ 1 ],
+							"data": 'name'
+						},
+						{
+							"targets": [ 2 ],
+							"data": 'gender'
+						},
+						{
+							"targets": [ 3 ],
+							"data": 'position.name'
+						},
+						{
+							"targets": [ 4 ],
+							"data": 'teamName'
+						},
+						{
+							"targets": [ 5 ],
+							"data": 'departmentName'
+						},
+						{
+							"targets": [ 6 ],
+							"className": "text-center",
+							"data": null,
+							"defaultContent": "<a href='#'><span class='glyphicon glyphicon-pencil'></span></a>"
+						},
+						{
+							"targets": [ 7 ],
+							"className": "text-center",
+							"data": null,
+							"defaultContent": "<a href='#' class='btnDelete'><span class='glyphicon glyphicon-remove'></span></a>"
+						}
+					]
+				});
+			}
+		/*]]>*/
+		</script>
+		
+		<div>
+			<div th:replace="fragments/header"></div>
+			<div th:replace="menu"></div>
+			
+			<div class="requestOffContentBody">
+				<h2>Employee Management</h2>
+				<div>
+					<div id="alertMessage_search" class="alert" style="display:none;"></div>
+					
+					<form class="form-input" id="employeeForm">
+						<div class="form-group">
+							<label for="name">Name</label>
+							<input type="text" class="form-control" name="name" id="nameId" />
+						</div>
+						<div class="form-group">
+							<label for="gender">Gender</label>
+							<select class="form-control" name="gender">
+								<option value=""></option>
+								<option value="male">Male</option>
+								<option value="female">Female</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="position">Position</label>
+							<select class="form-control" name="position" id="positionId">
+								<option value=""></option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="team">Team</label>
+							<select class="form-control" name="team" id="teamId">
+								<option value=""></option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="department">Department</label>
+							<select class="form-control" name="department" id="departmentId">
+								<option value=""></option>
+							</select>
+						</div>
+						<br/>
+						<div>
+							<button type="button" class="btn btn-primary" id="btnSearch">Search</button>&nbsp;&nbsp;
+							<button type="button" class="btn btn-primary" id="btnAdd">Add</button>&nbsp;&nbsp;
+							<button type="button" class="btn btn-primary" id="btnClear">Clear</button>
+						</div>
+					</form>
+					<br/>
+					
+					<table class="display table table-bordered" cellspacing="0" width="100%" id="employeeTable">
+						<thead>
+							<tr>
+								<th class="text-center idCell">ID</th>
+								<th class="text-center nameCell">Name</th>
+								<th class="text-center genderCell">Gender</th>
+								<th class="text-center positionCell">Position</th>
+								<th class="text-center teamCell">Team</th>
+								<th class="text-center departmentCell">Department</th>
+								<th class="text-center editCell">Edit</th>
+								<th class="text-center deleteCell">Delete</th>
+							</tr>
+						</thead>
+						
+						<tbody>
+						</tbody>
+					</table>
+					
+					<div class="modal fade" id="employeeDetailsModal" role="dialog">
+						<div class="modal-dialog modal-dialog-centered">
+							
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">&times;</button>
+									<h4 class="modal-title" id="modalDetailsTitle">Employee details</h4>
+								</div>
+								<div class="modal-body">
+									<div id="alertMessage_modalDetails" class="alert" style="display:none;"></div>
+									<form id="modalDetailsForm">
+										<div class="form-group row">
+											<label class="control-label col-sm-3">ID: </label>
+											<label class="control-label col-sm-9" style="text-align: left;" id="idModalDetailsId"></label>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Name: </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<input type="text" class="form-control" name="nameModalDetails" id="nameModalDetailsId" />
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Gender: </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<select class="form-control" name="genderModalDetails" id="genderModalDetailsId">
+													<option value="male">Male</option>
+													<option value="female">Female</option>
+												</select>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Birthday: </label>
+											<div class="col-sm-9" style="padding-left:0px;">
+												<div class="input-group date datepicker" data-provide="datepicker">
+													<input type="text" class="form-control" name="birthdayModalDetails" id="birthdayModalDetailsId"/>
+													<div class="input-group-addon">
+														<span class="glyphicon glyphicon-th"></span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Email: </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<input type="text" class="form-control" name="emailModalDetails" id="emailModalDetailsId" />
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Phone: </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<input type="text" class="form-control" name="phoneModalDetails" id="phoneModalDetailsId" />
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Start working date: </label>
+											<div class="col-sm-9" style="padding-left:0px;">
+												<div class="input-group date datepicker" data-provide="datepicker">
+													<input type="text" class="form-control" name="startWorkingModalDetails" id="startWorkingModalDetailsId"/>
+													<div class="input-group-addon">
+														<span class="glyphicon glyphicon-th"></span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Official working date: </label>
+											<div class="col-sm-9" style="padding-left:0px;">
+												<div class="input-group date datepicker" data-provide="datepicker">
+													<input type="text" class="form-control" name="officialWorkingModalDetails" id="officialWorkingModalDetailsId"/>
+													<div class="input-group-addon">
+														<span class="glyphicon glyphicon-th"></span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Position: </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<select class="form-control" name="positionModalDetails" id="positionModalDetailsId">
+												</select>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Team: </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<select readonly="true" class="form-control" name="teamModalDetails" id="teamModalDetailsId">
+												</select>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Department: </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<select readonly="true" class="form-control" name="departmentModalDetails" id="departmentModalDetailsId">
+												</select>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Role: </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<select multiple="multiple" class="form-control" name="roleModalDetails" id="roleModalDetailsId">
+												</select>
+											</div>
+										</div>
+										<input type="hidden" name="updateDateModalDetails" id="updateDateModalDetailsId" />
+									</form>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-default" id="btnSave_modalDetails">Save</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal" id="btnCancel_modalDetails">Cancel</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="modal fade" id="employeeAddModal" role="dialog">
+						<div class="modal-dialog modal-dialog-centered">
+							
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">&times;</button>
+									<h4 class="modal-title" id="modalAddTitle">Add employee</h4>
+								</div>
+								<div class="modal-body">
+									<div id="alertMessage_modalAdd" class="alert" style="display:none;"></div>
+									<form id="modalAddForm">
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Name: </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<input type="text" class="form-control" name="nameModalAdd" id="nameModalAddId" />
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Gender: </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<select class="form-control" name="genderModalAdd" id="genderModalAddId">
+													<option value="male">Male</option>
+													<option value="female">Female</option>
+												</select>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Birthday: </label>
+											<div class="col-sm-9" style="padding-left:0px;">
+												<div class="input-group date datepicker" data-provide="datepicker">
+													<input type="text" class="form-control" name="birthdayModalAdd" id="birthdayModalAddId"/>
+													<div class="input-group-addon">
+														<span class="glyphicon glyphicon-th"></span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Email: </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<input type="text" class="form-control" name="emailModalAdd" id="emailModalAddId" />
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Phone: </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<input type="text" class="form-control" name="phoneModalAdd" id="phoneModalAddId" />
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Start working date: </label>
+											<div class="col-sm-9" style="padding-left:0px;">
+												<div class="input-group date datepicker" data-provide="datepicker">
+													<input type="text" class="form-control" name="startWorkingModalAdd" id="startWorkingModalAddId"/>
+													<div class="input-group-addon">
+														<span class="glyphicon glyphicon-th"></span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Official working date: </label>
+											<div class="col-sm-9" style="padding-left:0px;">
+												<div class="input-group date datepicker" data-provide="datepicker">
+													<input type="text" class="form-control" name="officialWorkingModalAdd" id="officialWorkingModalAddId"/>
+													<div class="input-group-addon">
+														<span class="glyphicon glyphicon-th"></span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Position: </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<select class="form-control" name="positionModalAdd" id="positionModalAddId">
+												</select>
+											</div>
+										</div>
+<!-- 										<div class="form-group row"> -->
+<!-- 											<label class="control-label col-sm-3">Team: </label> -->
+<!-- 											<div class="input-group col-sm-9" style="padding-right:15px;"> -->
+<!-- 												<select class="form-control" name="teamModalAdd" id="teamModalAddId"> -->
+<!-- 												</select> -->
+<!-- 											</div> -->
+<!-- 										</div> -->
+<!-- 										<div class="form-group row"> -->
+<!-- 											<label class="control-label col-sm-3">Department: </label> -->
+<!-- 											<div class="input-group col-sm-9" style="padding-right:15px;"> -->
+<!-- 												<select class="form-control" name="departmentModalAdd" id="departmentModalAddId"> -->
+<!-- 												</select> -->
+<!-- 											</div> -->
+<!-- 										</div> -->
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Role: </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<select multiple="multiple" class="form-control" name="roleModalAdd" id="roleModalAddId">
+												</select>
+											</div>
+										</div>
+									</form>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-default" id="btnAdd_modalAdd">Add</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal" id="btnCancel_modalAdd">Cancel</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div id="confirmModal" class="modal fade" role="dialog">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">&times;</button>
+									<h4 class="modal-title">Confirm delete</h4>
+								</div>
+								<div class="modal-body">
+									<p>Are you sure you want to delete this employee?</p>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-default" data-dismiss="modal" id="yesConfirm">Yes</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal" id="noConfirm">No</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+			<div th:replace="fragments/footer"></div>
+		</div>
+
+	</body>
+</html>

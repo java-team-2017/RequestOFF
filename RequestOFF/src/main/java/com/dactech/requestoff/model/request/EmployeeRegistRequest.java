@@ -1,5 +1,7 @@
 package com.dactech.requestoff.model.request;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EmployeeRegistRequest {
@@ -21,6 +23,9 @@ public class EmployeeRegistRequest {
 	@JsonProperty("valid_flag")
 	private String validFlag;
 
+	@JsonProperty("role_ids")
+	private List<String> roleIds;
+
 	public EmployeeRegistRequest() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -28,7 +33,7 @@ public class EmployeeRegistRequest {
 
 	public EmployeeRegistRequest(String id, String name, String gender, String birthday, String positionId,
 			String email, String password, String phone, String startWorkingDate, String officialWorkingDate,
-			String updateDate, String validFlag) {
+			String updateDate, String validFlag, List<String> roleIds) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -42,6 +47,7 @@ public class EmployeeRegistRequest {
 		this.officialWorkingDate = officialWorkingDate;
 		this.updateDate = updateDate;
 		this.validFlag = validFlag;
+		this.roleIds = roleIds;
 	}
 
 	public String getId() {
@@ -138,6 +144,14 @@ public class EmployeeRegistRequest {
 
 	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
+	}
+
+	public List<String> getRoleIds() {
+		return roleIds;
+	}
+
+	public void setRoleIds(List<String> roleIds) {
+		this.roleIds = roleIds;
 	}
 
 }

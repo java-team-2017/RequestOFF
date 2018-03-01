@@ -18,6 +18,7 @@ import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.EmployeeOffStatus;
 import com.dactech.requestoff.model.entity.Position;
 import com.dactech.requestoff.model.entity.Request;
+import com.dactech.requestoff.model.entity.Role;
 import com.dactech.requestoff.model.entity.Team;
 import com.dactech.requestoff.model.request.EmployeeDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatisticsPagingRequest;
@@ -33,6 +34,7 @@ import com.dactech.requestoff.repository.DepartmentRepository;
 import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
 import com.dactech.requestoff.repository.RequestRepository;
+import com.dactech.requestoff.repository.RoleRepository;
 import com.dactech.requestoff.repository.TeamRepository;
 import com.dactech.requestoff.service.EmployeeService;
 import com.dactech.requestoff.util.DateUtils;
@@ -54,6 +56,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 	private TeamRepository teamRepository;
 	@Autowired
 	private EmployeeOffStatusRepository EOSRepository;
+	@Autowired
+	private RoleRepository roleRepository;
 
 	@Override
 	public EmployeeRegistResponse employeeRegist(EmployeeRegistRequest erRequest) throws Exception {
@@ -74,6 +78,18 @@ public class EmployeeServiceImpl implements EmployeeService {
 			employee.setStartWorkingDate(erRequest.getStartWorkingDate());
 			employee.setOfficialWorkingDate(erRequest.getOfficialWorkingDate());
 			employee.setValidFlag(Integer.parseInt(erRequest.getValidFlag()));
+			
+//			Team team = teamRepository.findById(Long.parseLong(erRequest.getTeamId()));
+//			List<Team> listTeam = new ArrayList<Team>();
+//			listTeam.add(team);
+//			employee.setListTeam(listTeam);
+			
+			List<Role> listRole = new ArrayList<Role>();
+			for(String roleId : erRequest.getRoleIds()) {
+				Role role = roleRepository.findById(Long.parseLong(roleId));
+				listRole.add(role);
+			}
+			employee.setListRole(listRole);
 		} else { // update employee
 			Long EmployeeId = Long.parseLong(erRequest.getId());
 			employee = employeeRepository.findById(EmployeeId);
@@ -114,8 +130,28 @@ public class EmployeeServiceImpl implements EmployeeService {
 			if (StringUtil.isNotEmpty(erRequest.getOfficialWorkingDate())) {
 				employee.setOfficialWorkingDate(erRequest.getOfficialWorkingDate());
 			}
+//			if (StringUtil.isNotEmpty(erRequest.getTeamId())) {
+//				Team team = teamRepository.findById(Long.parseLong(erRequest.getTeamId()));
+//				List<Team> listTeam = new ArrayList<Team>();
+//				listTeam.add(team);
+//				employee.setListTeam(listTeam);
+//			}
+			if (erRequest.getRoleIds().size() > 0) {
+				List<Role> listRole = new ArrayList<Role>();
+				for(String roleId : erRequest.getRoleIds()) {
+					Role role = roleRepository.findById(Long.parseLong(roleId));
+					listRole.add(role);
+				}
+				employee.setListRole(listRole);
+			}
 			if (StringUtil.isNotEmpty(erRequest.getValidFlag())) {
 				employee.setValidFlag(Integer.parseInt(erRequest.getValidFlag()));
+//				if(erRequest.getValidFlag().equals("0")) {
+//					List<Team> listTeam = employee.getListTeam();
+//					for(Team t : listTeam) {
+////						t.set
+//					}
+//				}
 			}
 		}
 
@@ -126,6 +162,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public EmployeeSearchResponse employeeSearch(EmployeeSearchRequest employeeSearchRequest) {
 		List<Employee> listEmployee = employeeRepository.search(employeeSearchRequest);
+		
+		for(int i = 0; i < listEmployee.size(); i++) {
+			Employee e = listEmployee.get(i);
+			String teamName = getTeamName(e.getId());
+			e.setTeamName(teamName);
+			String departmentName = getDepartmentName(e.getId());
+			e.setDepartmentName(departmentName);
+			listEmployee.set(i, e);
+		}
+		
 		EmployeeSearchResponse response = new EmployeeSearchResponse();
 		response.setEmployees(listEmployee);
 		return response;
@@ -370,10 +416,21 @@ public class EmployeeServiceImpl implements EmployeeService {
 		String teamName;
 		Employee e = employeeRepository.findById(employeeId);
 		if(e.getPosition().getId() == Position.POSITION_LEADER) {
-			teamName = teamRepository.findByLeaderId(employeeId).getName();
+			Team team = teamRepository.findByLeaderId(employeeId);
+			if(team != null) {
+				teamName = team.getName();
+			}
+			else {
+				teamName = "";
+			}
 		}
-		else if(e.getPosition().getId() == Position.POSITION_EMPLOYEE) {
-			teamName = e.getListTeam().get(0).getName();
+		else if(e.getPosition().getId() == Position.POSITION_EMPLOYEE || e.getPosition().getId() == Position.POSITION_HR) {
+			if(e.getListTeam().size() > 0) {
+				teamName = e.getListTeam().get(0).getName();
+			}
+			else {
+				teamName = "";
+			}
 		}
 		else {
 			teamName = "";
@@ -386,13 +443,42 @@ public class EmployeeServiceImpl implements EmployeeService {
 		String departmentName;
 		Employee e = employeeRepository.findById(employeeId);
 		if(e.getPosition().getId() == Position.POSITION_LEADER) {
-			departmentName = teamRepository.findByLeaderId(employeeId).getDepartment().getName();
+			Team team = teamRepository.findByLeaderId(employeeId);
+			if(team != null) {
+				Department department = team.getDepartment();
+				if(department != null) {
+					departmentName = department.getName();
+				}
+				else {
+					departmentName = "";
+				}
+			}
+			else {
+				departmentName = "";
+			}
 		}
-		else if(e.getPosition().getId() == Position.POSITION_EMPLOYEE) {
-			departmentName = e.getListTeam().get(0).getDepartment().getName();
+		else if(e.getPosition().getId() == Position.POSITION_EMPLOYEE || e.getPosition().getId() == Position.POSITION_HR) {
+			if(e.getListTeam().size() > 0) {
+				Department department = e.getListTeam().get(0).getDepartment();
+				if(department != null) {
+					departmentName = department.getName();
+				}
+				else {
+					departmentName = "";
+				}
+			}
+			else {
+				departmentName = "";
+			}
 		}
 		else {
-			departmentName = departmentRepository.findByManagerId(employeeId).getName();
+			Department department = departmentRepository.findByManagerId(employeeId);
+			if(department != null) {
+				departmentName = department.getName();
+			}
+			else {
+				departmentName = "";
+			}
 		}
 		return departmentName;
 	}

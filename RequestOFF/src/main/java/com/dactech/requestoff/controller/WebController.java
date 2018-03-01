@@ -66,5 +66,9 @@ public class WebController {
 	public String teamManagement() {
 		return "/teamManagement";
 	}
-
+	
+	@GetMapping("/employeeManagement")
+	public String employeeManagement() {
+		return "/employeeManagement";
+	}
 }
