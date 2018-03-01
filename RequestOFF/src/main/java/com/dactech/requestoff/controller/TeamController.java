@@ -7,10 +7,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dactech.requestoff.model.common.StatusInfo;
+import com.dactech.requestoff.model.request.TeamDeleteRequest;
 import com.dactech.requestoff.model.request.TeamDetailsRequest;
+import com.dactech.requestoff.model.request.TeamEditInfoRequest;
 import com.dactech.requestoff.model.request.TeamRegistRequest;
 import com.dactech.requestoff.model.request.TeamSearchRequest;
+import com.dactech.requestoff.model.response.TeamDeleteResponse;
 import com.dactech.requestoff.model.response.TeamDetailsResponse;
+import com.dactech.requestoff.model.response.TeamEditInfoResponse;
 import com.dactech.requestoff.model.response.TeamRegistResponse;
 import com.dactech.requestoff.model.response.TeamSearchResponse;
 import com.dactech.requestoff.service.TeamService;
@@ -55,6 +59,38 @@ public class TeamController {
 		try {
 			response = teamService.teamDetails(teamDetailsRequest);
 			statusInfo = new StatusInfo(StatusInfo.SUCCESS, null);
+		} catch (Exception e) {
+			statusInfo = new StatusInfo(StatusInfo.ERROR, e.getMessage());
+		}
+		response.setStatusInfo(statusInfo);
+		return response;
+	}
+	
+	@RequestMapping(value = "/team/editInfo", method = RequestMethod.POST)
+	public TeamEditInfoResponse teamEditInfo(@RequestBody TeamEditInfoRequest request) {
+		TeamEditInfoResponse response = new TeamEditInfoResponse();
+		StatusInfo statusInfo = null;
+		try {
+			response = teamService.teamEditInfo(request);
+			statusInfo = new StatusInfo(StatusInfo.SUCCESS, null);
+		} catch (Exception e) {
+			statusInfo = new StatusInfo(StatusInfo.ERROR, e.getMessage());
+		}
+		response.setStatusInfo(statusInfo);
+		return response;
+	}
+	
+	@RequestMapping(value = "/team/delete", method = RequestMethod.POST)
+	public TeamDeleteResponse teamDelete(@RequestBody TeamDeleteRequest request) {
+		TeamDeleteResponse response = new TeamDeleteResponse();
+		StatusInfo statusInfo = null;
+		try {
+			boolean isSuccess = teamService.teamDelete(Long.parseLong(request.getTeamId()));
+			if (isSuccess) {
+				statusInfo = new StatusInfo(StatusInfo.SUCCESS, null);
+			} else {
+				statusInfo = new StatusInfo(StatusInfo.ERROR, "Cannot delete Team");
+			}
 		} catch (Exception e) {
 			statusInfo = new StatusInfo(StatusInfo.ERROR, e.getMessage());
 		}

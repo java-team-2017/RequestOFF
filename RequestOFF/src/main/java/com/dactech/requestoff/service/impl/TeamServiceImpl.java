@@ -11,11 +11,15 @@ import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.Team;
 import com.dactech.requestoff.model.entity.TeamEmployee;
 import com.dactech.requestoff.model.request.TeamDetailsRequest;
+import com.dactech.requestoff.model.request.TeamEditInfoRequest;
 import com.dactech.requestoff.model.request.TeamRegistRequest;
 import com.dactech.requestoff.model.request.TeamSearchRequest;
 import com.dactech.requestoff.model.response.TeamDetailsResponse;
+import com.dactech.requestoff.model.response.TeamEditInfoResponse;
 import com.dactech.requestoff.model.response.TeamRegistResponse;
 import com.dactech.requestoff.model.response.TeamSearchResponse;
+import com.dactech.requestoff.repository.DepartmentRepository;
+import com.dactech.requestoff.repository.EmployeeRepository;
 import com.dactech.requestoff.repository.TeamEmployeeRepository;
 import com.dactech.requestoff.repository.TeamRepository;
 import com.dactech.requestoff.service.TeamService;
@@ -31,6 +35,10 @@ public class TeamServiceImpl implements TeamService {
 	TeamRepository teamRepository;
 	@Autowired
 	TeamEmployeeRepository TERepository;
+	@Autowired
+	EmployeeRepository employeeRepository;
+	@Autowired
+	DepartmentRepository departmentRepository;
 
 	@Override
 	@Transactional
@@ -118,6 +126,37 @@ public class TeamServiceImpl implements TeamService {
 		Team team = teamRepository.findById(Long.parseLong(teamDetailsRequest.getId()));
 		TeamDetailsResponse response = new TeamDetailsResponse(team);
 		return response;
+	}
+
+	@Override
+	public TeamEditInfoResponse teamEditInfo(TeamEditInfoRequest request) {
+		TeamEditInfoResponse response = new TeamEditInfoResponse();
+		if (StringUtil.isNotEmpty(request.getTeamId())) {
+			List<Employee> listMember = employeeRepository.findByTeamId(Long.parseLong(request.getTeamId())); 
+			response.setListMember(listMember);
+		}
+		response.setListLeader(employeeRepository.findLeaderNotInTeam());
+		response.setListMemberNotInTeam(employeeRepository.findEmployeeNotInTeam());
+		response.setListDepartment(departmentRepository.findAll());
+		
+		return response;
+	}
+
+	@Override
+	@Transactional
+	public boolean teamDelete(long teamId) {
+		Team team = teamRepository.findById(teamId);
+		if (team == null) {
+			return false;
+		}
+		
+		List<TeamEmployee> listTE = TERepository.findByTeamId(teamId);
+		for (TeamEmployee te : listTE) {
+			TERepository.delete(te);
+		}
+		
+		teamRepository.delete(team);
+		return true;
 	}
 
 }

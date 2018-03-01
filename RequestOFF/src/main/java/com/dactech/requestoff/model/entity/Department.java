@@ -28,16 +28,12 @@ public class Department {
 	private String updateDate;
 	private long updateOperator;
 
-	@OneToMany(mappedBy = "department", fetch = FetchType.LAZY)
-	@JsonIgnoreProperties("department")
-	private List<Team> listTeam;
-
 	public Department() {
 		super();
 	}
 
 	public Department(long id, String name, Employee manager, int validFlag, String insertDate, long insertOperator,
-			String updateDate, long updateOperator, List<Team> listTeam) {
+			String updateDate, long updateOperator) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -47,7 +43,6 @@ public class Department {
 		this.insertOperator = insertOperator;
 		this.updateDate = updateDate;
 		this.updateOperator = updateOperator;
-		this.listTeam = listTeam;
 	}
 
 	public long getId() {
@@ -112,14 +107,6 @@ public class Department {
 
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
-	}
-
-	public List<Team> getListTeam() {
-		return listTeam;
-	}
-
-	public void setListTeam(List<Team> listTeam) {
-		this.listTeam = listTeam;
 	}
 
 }

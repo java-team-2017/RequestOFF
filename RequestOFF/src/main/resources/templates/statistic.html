@@ -62,10 +62,9 @@
 		$('#department').on('change', function() {
 			if ($(this).val() != '') {
 				var id = $(this).val();
-				var department = $.grep(listDepartment, function(department) {
-					return department.id == id;
-				})[0];
-				teams = department.listTeam;
+				var teams = $.grep(listTeam, function(team) { // find team in department
+					return team.department.id == id;
+				});
 				$('#team').empty().append('<option value=""></option>');
 				$.each(teams, function(index, team) {
 					$('#team').append('<option value="' + team.id + '">' + team.name + '</option>');

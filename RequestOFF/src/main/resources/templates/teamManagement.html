@@ -6,105 +6,366 @@
 </head>
 
 <script th:inline="javascript">
-	/*<![CDATA[*/
-		var employeeLoginId;
-		$(function() {
-			var objReturnRequestDetails;
-			var listRequest;
-			var requestStatus = {
-				'1' : 'Java',
-				'2' : 'PHP',
-				'3' : 'Ruby',
-				'4' : 'QC',
-				'5' : 'iOS'
-			};
-			
-			$('#btnSearch').on('click', function(){
+/*<![CDATA[*/
+	function search(){
+		var requestSearch = {
+			"id": $('#team').val(),
+			"department_id": $('#department').val(),
+			"valid_flag": 1
+		};
+		console.log(requestSearch);
+		$('#teamTable').DataTable( {
+			ajax: {
+				type: "POST",
+				contentType: "application/json",
+				url : /*[[@{/team/search}]]*/,
+				dataType : 'json',
+				data: function () {
+					return JSON.stringify(requestSearch);
+				},
+				dataSrc: 'teams'
+			},
+			destroy: true,
+			searching: false,
+			order: [[ 1, "desc" ]],
+			columns: [
+				{ data: 'id' },
+				{ data: 'name' },
+				{ data: 'leader.name' },
+				{ data: 'department.name' },
+				{
+					render: function () {
+							return '<a class="btnEdit teamTableEdit"><span class="glyphicon glyphicon-pencil"></span></a>';
+					},
+				},
+				{
+					render: function () {
+							return '<a class="btnDelete"><span class="glyphicon glyphicon-trash"></span></a>';
+					},
+				}
+			]
+		});
+	}
+	
+	$(function() {
+		//=====================================================================
+		// # Initialize form
+		//=====================================================================
+		var listDepartment; // for combobox display purpose
+		var listTeam;
+		var selectedRow; // data of selected row of teamTable
+		
+		function reloadPage() {
+			var teamTable = $('#teamTable').DataTable();
+			var teamId = $('#team').val();
+			renderTeamSelect("team", function(teams) {
+				listTeam = teams;
+				$('#team').val(teamId);
 				search();
 			});
-			
-			$("#requestForm select").keydown(function(e){
-				if(e.keyCode == 13) {
-					this.blur();
-				}
+		}
+		
+		//Department combobox
+		renderDepartmentSelect("department", function(departments) {
+			listDepartment = departments;
+			//Render department for team editing function
+			$('#editDepartment').empty();
+			$.each(listDepartment, function(index, department) {
+				$('#editDepartment').append('<option value="' + department.id + '">' + department.name + '</option>');
 			});
+		});
+		
+		//Team combobox
+		renderTeamSelect("team", function(teams) {
+			listTeam = teams;
+		});
+		
+		// change team combobox when department combobox is changed
+		$('#department').on('change', function() {
+			if ($(this).val() != '') {
+				var id = $(this).val();
+				var teams = $.grep(listTeam, function(team) { // find team in department
+					return team.department.id == id;
+				});
+				$('#team').empty().append('<option value=""></option>');
+				$.each(teams, function(index, team) {
+					$('#team').append('<option value="' + team.id + '">' + team.name + '</option>');
+				});
+			} else {
+				$('#team').empty().append('<option value=""></option>');
+				$.each(listTeam, function(index, team) {
+					$('#team').append('<option value="' + team.id + '">' + team.name + '</option>');
+				});
+			}
+		})
+		
+		
+		var objReturnRequestDetails;
+		var listRequest;
+		var requestStatus = {
+			'1' : 'Java',
+			'2' : 'PHP',
+			'3' : 'Ruby',
+			'4' : 'QC',
+			'5' : 'iOS'
+		};
+		
+		$('#btnSearch').on('click', function(){
+			search();
+		});
+		
+		$("#requestForm select").keydown(function(e){
+			if(e.keyCode == 13) {
+				this.blur();
+			}
+		});
+		
+		$(document).keypress(function(e) {
+			if(e.which == 13) {
+				search();
+			}
+		});
+		
+		//=====================================================================
+		// # Row detail
+		//=====================================================================
+		$('#teamTable tbody').on('click', 'td', function() {
+			if($(this).index() >= 4) return;
+			var teamTable = $('#teamTable').DataTable();
+			var rowData = teamTable.row(this).data();
+			selectedRow = rowData;
+			console.log("rowData");
+			console.log(rowData);
 			
-			$(document).keypress(function(e) {
-				if(e.which == 13) {
-					search();
-				}
-			});
+			$('#detailDepartment').val(rowData.department.name);
+			$('#detailTeam').val(rowData.name);
+			$('#detailLeader').val(rowData.leader.name);
 			
-			$('#team').typeahead({
-				name: 'suggest-employee',
-				limit: 100,
-				hint: false,
-				remote: {
-					rateLimitWait: 1000,
-					url: '/team/search',
-					replace: function (url, uriEncodedQuery){
-						return url + "#" + uriEncodedQuery;
-					},
-					beforeSend: function (jqXhr, settings) {
-						jqXhr.setRequestHeader('Content-Type','application/json');
-						settings.type = 'POST';
-						settings.hasContent = true;
-						settings.data = JSON.stringify({"name": $('#team').val(), "name_match_status": "0"});
-					},
-					filter: function (data) {
-						var result = data.teams;
-						var sourceArr = [];
-						$.each(result, function(index, object) {
-							sourceArr.push(object.name);
+			$.ajax({
+				url : /*[[@{/employee/search}]]*/,
+				type : "post",
+				dataType :"json",
+				contentType : "application/json",
+				data : JSON.stringify({
+					"position_id": 1,
+					"team_id": rowData.id,
+					"valid_flag": 1
+				}),
+				success : function (response){
+					if (response.status_info.status != 0) {
+						$('#detailMsg').html(errors['APIResponseError'](teamSearchResponse.status_info.error)).attr('class', 'alert alert-danger').show();
+					} else {
+						$('#detailNumOfMem').val(response.employees.length);
+						$('#detailMemberTable').DataTable({
+							destroy: true,
+							searching: false,
+							info: false,
+							lengthChange: false,
+							paging: false,
+							data: response.employees,
+							columns: [
+								{ data: 'id' },
+								{ data: 'name' },
+							]
 						});
-						return sourceArr;
 					}
+				},
+				error : function(e) {
+					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 				}
-			}).bind('typeahead:selected', function(obj, selected, name) {
-				$(this).typeahead('setQuery', $("<div/>").html(selected.value).text());
-				return false;
 			});
+			
+			$('#detailModal').modal('show');
+		});
+		
+		//=====================================================================
+		// # Edit and create
+		//=====================================================================
+		$('body').on('click', '.btnEdit, #btnAdd', function() {
+			$('#teamEditMsg').hide();
+			$('#editOk').hide();
+			$('#createBtn').hide();
+			var isCreateEvent;
+			
+			var editInfoData = {};
+			if ($(this).attr('id') == 'btnAdd') {
+				$('#editTeam').val("");
+				isCreateEvent = true;
+			} else {
+				if ($(this).hasClass("teamTableEdit")) {
+					var table = $('#teamTable').DataTable();
+					selectedRow = table.row($(this).parent()).data();
+				}
+				editInfoData.team_id = selectedRow.id;
+				$('#editTeam').val(selectedRow.name);
+				$('#editDepartment').val(selectedRow.department.id);
+				isCreateEvent = false;
+				$('#editOk').show();
+			}
+			
+			$.ajax({
+				url : /*[[@{/team/editInfo}]]*/,
+				type : "post",
+				dataType :"json",
+				contentType : "application/json",
+				data : JSON.stringify(editInfoData),
+				success : function (response){
+					if (response.status_info.status != 0) {
+						$('#teamEditMsg').html(errors['APIResponseError'](response.status_info.error)).attr('class', 'alert alert-danger').show();
+					} else {
+						console.log("response")
+						console.log(response);
+						
+						$('#editLeader').empty();
+						$('#editMemberInTeam').empty();
+						if (isCreateEvent == false) { // update
+							$('#editLeader').append('<option value="' + selectedRow.leader.id + '" selected="true">' + selectedRow.leader.name + '</option>');
+							$.each(response.listMember, function(index, member) {
+								$('#editMemberInTeam').append('<option value="' + member.id + '">' + member.name + '</option>');
+							});
+						} else { // for create event
+							if (response.listLeader.length == 0) {
+								$('#teamEditMsg').html("No leader found").attr('class', 'alert alert-danger').show();
+							} else {
+								$('#createBtn').show();
+							}
+						}
+						
+						$.each(response.listLeader, function(index, leader) {
+							$('#editLeader').append('<option value="' + leader.id + '">' + leader.name + '</option>');
+						});
+						
+						$('#editMemberNotInTeam').empty();
+						$.each(response.listMemberNotInTeam, function(index, member) {
+							$('#editMemberNotInTeam').append('<option value="' + member.id + '">' + member.name + '</option>');
+						});
+					}
+				},
+				error : function(e) {
+					$('#teamEditMsg').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+				}
+			});
+			
+			$('#teamEditModal').modal('show');
+		});
+		
+		$('#teamToNotTeam').on('click', function() {
+			$('#editMemberInTeam > option:selected').each(function() {
+				$('#editMemberNotInTeam').append('<option value="' + $(this).val() + '">' + $(this).text() + '</option>');
+				$(this).remove();
+			});
+		});
+		
+		$('#notTeamToTeam').on('click', function() {
+			$('#editMemberNotInTeam > option:selected').each(function() {
+				$('#editMemberInTeam').append('<option value="' + $(this).val() + '">' + $(this).text() + '</option>');
+				$(this).remove();
+			});
+		});
+		
+		$('#editOk, #createBtn').on('click', function() {
+			var members = [];
+			var isCreate;
+			$('#editMemberInTeam > option').each(function() {
+				members.push($(this).val());
+			});
+			
+			// validate form
+// 			if (members.length == 0) {
+// 				$('#teamEditMsg').html("Team must have at least 1 member").attr('class', 'alert alert-danger').show();
+// 				return;
+// 			}
+			
+			if ($('#editTeam').val() == "") {
+				$('#teamEditMsg').html("Please fill all field in form").attr('class', 'alert alert-danger').show();
+				return;
+			}
+			
+			var teamData = {
+				"name": $('#editTeam').val(),
+				"department_id": $('#editDepartment').val(),
+				"leader_id": $('#editLeader').val(),
+				"list_member": members
+			}
+			
+			if ($(this).attr('id') == 'editOk') {
+				teamData.id =  selectedRow.id;
+				teamData.update_date = selectedRow.updateDate;
+				isCreate = false;
+			} else {
+				teamData.valid_flag = 1;
+				isCreate = true;
+			}
+			
+			$.ajax({
+				url : /*[[@{/team/regist}]]*/,
+				type : "post",
+				dataType :"json",
+				contentType : "application/json",
+				data : JSON.stringify(teamData),
+				success : function (response){
+					if (response.status_info.status != 0) {
+						$('#alertMessage').html(errors['APIResponseError'](response.status_info.error)).attr('class', 'alert alert-danger').show();
+					} else {
+						if (isCreate == false) {
+							$('#alertMessage').html("Edit Success").attr('class', 'alert alert-success').show();
+						} else {
+							$('#alertMessage').html("Create Success").attr('class', 'alert alert-success').show();
+						}
+						
+						reloadPage();
+					}
+					$('#teamEditModal').modal('hide');
+				},
+				error : function(e) {
+					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+					$('#teamEditModal').modal('hide');
+				}
+			});
+			console.log("teamData");
+			console.log(teamData);
+		});
+		
+		//=====================================================================
+		// # Delete
+		//=====================================================================
+		$('body').on('click', '.btnDelete', function() {
+			var button = $(this);
+			$(this).confirmation({
+				placement: 'left',
+				onConfirm: function() {
+					var table = $('#teamTable').DataTable();
+					selectedRow = table.row(button.parent()).data();
+					$.ajax({
+						url : /*[[@{/team/delete}]]*/,
+						type : "post",
+						dataType :"json",
+						contentType : "application/json",
+						data : JSON.stringify({
+							'team_id': selectedRow.id
+						}),
+						success : function (response){
+							if (response.status_info.status != 0) {
+								$('#alertMessage').html(errors['APIResponseError'](response.status_info.error)).attr('class', 'alert alert-danger').show();
+							} else {
+								$('#alertMessage').html("Delete Success").attr('class', 'alert alert-success').show();
+							}
+							reloadPage();
+						},
+						error : function(e) {
+							$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+						}
+					});
+				}
+			});
+			$(this).confirmation("show");
+			
 			
 		});
 		
-		function search(){
-			var requestData = $('#requestForm').serializeJSON();
-			var requestSearch = {
-				"id" : requestData.id,
-				"name" : requestData.name,
-				"leader_id" : requestData.leader_id,
-				"department_id" : requestData.department_id
-			};
-			console.log(requestSearch);
-			$('#requestTable').DataTable( {
-				ajax: {
-					type: "POST",
-					contentType: "application/json",
-					url : /*[[@{/team/search}]]*/,
-					dataType : 'json',
-					data: function () {
-						return JSON.stringify(requestSearch);
-					},
-					dataSrc: 'teams'
-				},
-				destroy: true,
-				searching: false,
-				order: [[ 1, "desc" ]],
-				//data: listRequest,
-				columns: [
-					{ data: 'id' },
-					{ data: 'name' },
-					{ data: 'leader.name' },
-					{ data: 'department.name' },
-					{
-						render: function () {
-								return '<a href="#" id="btnEdit"><span class="glyphicon glyphicon-pencil"></span></a>';
-						},
-					}
-				]
-			});
-		}
-	/*]]>*/
+	});
+	
+/*]]>*/
 </script>
 
 <body class="content-body">
@@ -116,25 +377,13 @@
 		<div id="alertMessage" class="alert" style="display:none;"></div>
 			<form id="requestForm" class="form-input">
 				<div class="form-group">
-					<label class="control-label">Team: </label>
-					<input class="form-control" type="text" name="name" id="team" value=""></input>
+					<label>Department</label>
+					<select id="department" name="department_id" class="form-control"></select>
 				</div>
 				
 				<div class="form-group">
-					<label class="control-label">Leader: </label>
-					<input class="form-control" type="text" name="leader_id" id="leader" value=""></input>
-				</div>
-						
-				<div class="form-group">
-					<label class="control-label">Department</label>
-					<select name="department_id" id="status" value="" class="form-control">
-						<option value=""></option>
-						<option value="1">Java</option>
-						<option value="2">PHP</option>
-						<option value="3">Ruby</option>
-						<option value="4">QC</option>
-						<option value="5">iOS</option>
-					</select>
+					<label>Team</label>
+					<select id="team" name="team_id" class="form-control"></select>
 				</div>
 						
 				<p>
@@ -145,7 +394,7 @@
 			</form>
 					
 			<div class="table-responsive" style="margin-top:3em;"> 
-				<table class="table table-bordered table-striped table-hover" id="requestTable">
+				<table class="table table-bordered table-striped table-hover" id="teamTable">
 					<thead>
 						<tr>
 							<th class="text-center" name="id" id="id" style="width: 40px;"><span>ID</span></th>
@@ -153,100 +402,138 @@
 							<th class="text-center" name="leader"><span>Leader</span></th>
 							<th class="text-center" name="department"><span>Department</span></th>
 							<th class="text-center" name="edit" style="width: 40px;"><span>Edit</span></th>
+							<th class="text-center" name="delete" style="width: 40px;"><span>Delete</span></th>
 						</tr>
 					</thead>
 					<tbody class="text-center">
 					</tbody>
 				</table>
 			</div>
-				
-			<div class="modal fade" id="modalDetails" role="dialog">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">�</button>
-							<h4 class="modal-title">Details</h4>
+		</div>
+		<div id="detailModal" class="modal fade bd-example-modal-lg">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title" align="center">Team Details</h4>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-sm-1"></div>
+							<div id="detailModalMsg" class="alert alert-danger" style="display: none;"></div>
+							<br/>
+						</div>
+						<div class="row">
+							<label class="col-sm-4 col-form-label">Team</label>
+							<div class="col-sm-8">
+								<input id="detailTeam" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
+							</div>
+						</div>
+						<div class="row">
+							<label class="col-sm-4 col-form-label">Department</label>
+							<div class="col-sm-8">
+								<input id="detailDepartment" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
+							</div>
+						</div>
+						<div class="row">
+							<label class="col-sm-4 col-form-label">Leader</label>
+							<div class="col-sm-8">
+								<input id="detailLeader" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
+							</div>
+						</div>
+						<div class="row">
+							<label class="col-sm-4 col-form-label">Number Of Member</label>
+							<div class="col-sm-8">
+								<input id="detailNumOfMem" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-12">
+								<table id="detailMemberTable" class="table table-bordered table-hover" style="width: 100%">
+									<caption>Team Members</caption>
+									<thead>
+										<tr>
+											<th class="col-md-2 text-center">Id</th>
+											<th class="col-md-10 text-center">Name</th>
+										</tr>
+									</thead>
+									<tbody>
+									</tbody>
+								</table>
+							</div>
 						</div>
 						
-						<div class="modal-body">
-							<form class="form-horizontal" id="formModal">
-								<label class="col-md-3 control-label">Employee:</label>
-								<div class="col-md-9">
-									<input id="nameDetails" class="form-control" readonly="readonly"></input>
-								</div>
-			
-								<label class="col-md-3 control-label">Position:</label>
-								<div class="col-md-9">
-									<input id="positionDetails" class="form-control" readonly="readonly"></input>
-								</div>
-			
-								<label class="col-md-3 control-label">Team:</label>
-								<div class="col-md-9">
-									<input id="teamDetails" class="form-control" readonly="readonly"></input>
-								</div>
-			
-								<label class="col-md-3 control-label">Department:</label>
-								<div class="col-md-9">
-									<input id="departmentDetails" class="form-control" readonly="readonly"></input>
-								</div>
-			
-								<label class="col-md-3 control-label">Recipient:</label>
-								<div class="col-md-9">
-									<input id="recipientDetails" class="form-control" readonly="readonly"></input>
-								</div>
-								
-								<label class="col-md-3 control-label">From:</label>
-								<div class="col-md-9">
-									<input id="fromTimeDetails" class="form-control" readonly="readonly"></input>
-								</div>
-								
-								<label class="col-md-3 control-label">To:</label>
-								<div class="col-md-9">
-									<input id="toTimeDetails" class="form-control" readonly="readonly"></input>
-								</div>
-			
-								<label class="col-md-3 control-label">Reason:</label>
-								<div class="col-md-9">
-									<input id="reasonDetails" class="form-control" readonly="readonly"></input>
-								</div>
-								
-								<label class="col-md-3 control-label">Status:</label>
-								<div class="col-md-9">
-									<input id="statusDetails" class="form-control" readonly="readonly"></input>
-								</div>
-			
-								<label class="col-md-3 control-label">Day Off Type:</label>
-								<div class="col-md-9">
-									<input id="dayOffTypeDetails" class="form-control" readonly="readonly"></input>
-								</div>
-			
-								<label class="col-md-3 control-label">Response Message:</label>
-								<div class="col-md-9">
-									<textarea id="responseMessage" name="responseMessage"
-										placeholder="Write message..."
-										style="height: 100px; width: 100%;">
-									</textarea>
-								</div>&nbsp;
-								
-								<p align="center">
-									<button type="button" class="btn btn-default" style="width:76px;" id="btnApproveModal">Approve</button>
-									<button type="button" class="btn btn-default" style="width:76px;" id="btnDenyModal">Deny</button>
-									<button type="button" class="btn btn-default" style="width:76px;" id="btnSendModal">Send</button>
-									<button type="button" class="btn btn-default" style="width:76px;" data-dismiss="modal">Cancel</button>
-								</p>
-			
-								<label> Forward request to : <select name="forward" id="forward" value=""></select>
-								</label>
-								
-								<button type="button" class="btn btn-default btn-sm" id="btnForward">
-									<span class="glyphicon glyphicon-share-alt"></span>Forward
-								</button>
-								
-								<input type="hidden" id="statusDetailsId"></input>
-								<input type="hidden" id="remainHours"></input>
-								<input type="hidden" id="employeeIdDetails"></input>
-							</form>
+					</div>
+					<div class="modal-footer">
+						<button id="editModal" type="button" class="btn btn-default btnEdit"> Edit </button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="teamEditModal" class="modal fade bd-example-modal-lg">
+			<div class="modal-dialog modal-dialog-centered modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title" align="center">Edit team</h4>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-sm-1"></div>
+							<div id="teamEditMsg" class="alert alert-danger" style="display: none; width: 100%"></div>
+							<br/>
 						</div>
+						<div class="row">
+							<label class="col-sm-3 col-form-label">Team</label>
+							<div class="col-sm-3">
+								<input id="editTeam" class="col-sm-3 form-control" type="text"></input>
+							</div>
+						</div>
+						<div class="row">
+							<label class="col-sm-3 col-form-label">Department</label>
+							<div class="col-sm-3">
+								<select id="editDepartment" class="form-control"></select>
+							</div>
+						</div>
+						<div class="row">
+							<label class="col-sm-3 col-form-label">Leader</label>
+							<div class="col-sm-3">
+								<select id="editLeader" class="form-control"></select>
+							</div>
+						</div>
+						
+						<div class="row">
+							<label class="col-sm-7 col-form-label">Member in team</label>
+							<label class="col-sm-5 col-form-label">Member not in team</label>
+						</div>
+						<div class="row">
+							<div class="col-md-5">
+								<select id="editMemberInTeam" class="form-control" multiple="true"></select>
+							</div>
+							<div class="col-md-2">
+								<button type="button" id="notTeamToTeam" style="width: 100%">
+									<span class="glyphicon glyphicon-menu-left"></span>
+									<span class="glyphicon glyphicon-menu-left"></span>
+									<span class="glyphicon glyphicon-menu-left"></span>
+								</button>
+								<br/>
+								<br/>
+								<button type="button" id="teamToNotTeam" style="width: 100%">
+									<span class="glyphicon glyphicon-menu-right"></span>
+									<span class="glyphicon glyphicon-menu-right"></span>
+									<span class="glyphicon glyphicon-menu-right"></span>
+								</button>
+							</div>
+							<div class="col-md-5">
+								<select id="editMemberNotInTeam" class="form-control" multiple="true"></select>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+					<button type="button" id="createBtn" class="btn btn-default">Create</button>
+					<button type="button" id="editOk" class="btn btn-default">Ok</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 					</div>
 				</div>
 			</div>
