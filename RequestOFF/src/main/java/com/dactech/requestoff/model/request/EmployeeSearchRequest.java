@@ -23,13 +23,19 @@ public class EmployeeSearchRequest {
 	private String teamId;
 	@JsonProperty("department_id")
 	private String departmentId;
+	@JsonProperty("team_dept_flag")
+	private String teamDeptFlag; // 1: search by team and department (eliminate employee not in team or dept)
+								 // 0: other
 
 	public EmployeeSearchRequest() {
+		super();
+		// TODO Auto-generated constructor stub
 	}
 
 	public EmployeeSearchRequest(String id, String name, String nameMatchStatus, String gender, String birthday,
 			String positionId, String email, String phone, String startWorkingDate, String officalWorkingDate,
-			String validFlag, String teamId, String departmentId) {
+			String validFlag, String teamId, String departmentId, String teamDeptFlag) {
+		super();
 		this.id = id;
 		this.name = name;
 		this.nameMatchStatus = nameMatchStatus;
@@ -43,6 +49,7 @@ public class EmployeeSearchRequest {
 		this.validFlag = validFlag;
 		this.teamId = teamId;
 		this.departmentId = departmentId;
+		this.teamDeptFlag = teamDeptFlag;
 	}
 
 	public String getId() {
@@ -147,6 +154,14 @@ public class EmployeeSearchRequest {
 
 	public void setDepartmentId(String departmentId) {
 		this.departmentId = departmentId;
+	}
+
+	public String getTeamDeptFlag() {
+		return teamDeptFlag;
+	}
+
+	public void setTeamDeptFlag(String teamDeptFlag) {
+		this.teamDeptFlag = teamDeptFlag;
 	}
 
 }

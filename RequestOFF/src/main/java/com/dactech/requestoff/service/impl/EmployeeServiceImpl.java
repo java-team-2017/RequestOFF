@@ -207,8 +207,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 		System.out.println(requestToTime);
 		
 		// get list employee from database with name, team and department
-		List<Employee> listEmployee = employeeRepository.search(eospRequest.getEmployee(), eospRequest.getTeamId(),
-				eospRequest.getDepartmentId());
+		EmployeeSearchRequest ESRequest = new EmployeeSearchRequest();
+		ESRequest.setName(eospRequest.getEmployee());
+		ESRequest.setTeamDeptFlag("1");
+		ESRequest.setTeamId(eospRequest.getTeamId());
+		ESRequest.setDepartmentId(eospRequest.getDepartmentId());
+		List<Employee> listEmployee = employeeRepository.search(ESRequest);
 
 		// create list statistics correspond to each employee
 		List<EmployeeOffStatisticsPagingResponse.EmployeeStatistics> lEStatistics = new ArrayList<EmployeeOffStatisticsPagingResponse.EmployeeStatistics>(

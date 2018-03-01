@@ -147,6 +147,7 @@
 				dataType :"json",
 				contentType : "application/json",
 				data : JSON.stringify({
+					"team_dept_flag": 1,
 					"position_id": 1,
 					"team_id": rowData.id,
 					"valid_flag": 1
@@ -155,14 +156,17 @@
 					if (response.status_info.status != 0) {
 						$('#detailMsg').html(errors['APIResponseError'](teamSearchResponse.status_info.error)).attr('class', 'alert alert-danger').show();
 					} else {
-						$('#detailNumOfMem').val(response.employees.length);
+						var teamMembers = $.grep(response.employees, function(employee) { // find team in department
+							return employee.position.id == 1; // position employee
+						});
+						$('#detailNumOfMem').val(teamMembers.length);
 						$('#detailMemberTable').DataTable({
 							destroy: true,
 							searching: false,
 							info: false,
 							lengthChange: false,
 							paging: false,
-							data: response.employees,
+							data: teamMembers,
 							columns: [
 								{ data: 'id' },
 								{ data: 'name' },
@@ -308,9 +312,9 @@
 						$('#alertMessage').html(errors['APIResponseError'](response.status_info.error)).attr('class', 'alert alert-danger').show();
 					} else {
 						if (isCreate == false) {
-							$('#alertMessage').html("Edit Success").attr('class', 'alert alert-success').show();
+							$('#alertMessage').html("Edit Successfully").attr('class', 'alert alert-success').show();
 						} else {
-							$('#alertMessage').html("Create Success").attr('class', 'alert alert-success').show();
+							$('#alertMessage').html("Create Successfully").attr('class', 'alert alert-success').show();
 						}
 						
 						reloadPage();
@@ -348,7 +352,7 @@
 							if (response.status_info.status != 0) {
 								$('#alertMessage').html(errors['APIResponseError'](response.status_info.error)).attr('class', 'alert alert-danger').show();
 							} else {
-								$('#alertMessage').html("Delete Success").attr('class', 'alert alert-success').show();
+								$('#alertMessage').html("Delete Successfully").attr('class', 'alert alert-success').show();
 							}
 							reloadPage();
 						},

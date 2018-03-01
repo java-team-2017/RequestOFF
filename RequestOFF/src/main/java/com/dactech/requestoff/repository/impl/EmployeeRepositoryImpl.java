@@ -23,18 +23,31 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 		StringBuilder joinClause = new StringBuilder(" INNER JOIN team_employee te ON e.id = te.employee_id INNER JOIN team t ON te.team_id = t.id ");
 		StringBuilder whereClause = new StringBuilder("");
 		
-		if (StringUtil.isNotEmpty(employeeSearchRequest.getTeamId())) {
-			whereClause.append(" AND te.team_id = " + employeeSearchRequest.getTeamId());
-		}
+		StringBuilder inClause = new StringBuilder("");
 		
-		if (StringUtil.isNotEmpty(employeeSearchRequest.getDepartmentId())) {
-			whereClause.append(" AND t.department_id = " + employeeSearchRequest.getDepartmentId());
+		if (StringUtil.isNotEmpty(employeeSearchRequest.getTeamDeptFlag()) && employeeSearchRequest.getTeamDeptFlag().equals("1")) {
+			if (StringUtil.isNotEmpty(employeeSearchRequest.getTeamId())) { // team param not null
+				inClause.append(" ( e.id IN (SELECT leader_id FROM team where id = " + employeeSearchRequest.getTeamId() + ") OR "
+						+ " e.id IN (SELECT employee_id FROM team_employee where team_id = " + employeeSearchRequest.getTeamId() + " ) ");
+				if (StringUtil.isNotEmpty(employeeSearchRequest.getDepartmentId())) { // department not null
+					inClause.append(" OR e.id IN (SELECT manager_id FROM department where id = " + employeeSearchRequest.getDepartmentId() + ") ");
+				} else { // department null
+				}
+				
+			} else { // team param null
+				if (StringUtil.isNotEmpty(employeeSearchRequest.getDepartmentId())) { // department not null
+					inClause.append(" ( e.id IN (SELECT leader_id FROM team where department_id = " + employeeSearchRequest.getDepartmentId() + ") OR "
+							+ " e.id IN (SELECT employee_id FROM team_employee te INNER JOIN team t ON te.team_id = t.id WHERE t.department_id = " + employeeSearchRequest.getDepartmentId() + ") OR "
+							+ " e.id IN (SELECT manager_id FROM department where id = " + employeeSearchRequest.getDepartmentId() + ")");
+				} else { // department null
+					inClause.append(" ( e.id IN (SELECT leader_id FROM team) OR "
+							+ " e.id IN (SELECT employee_id FROM team_employee te INNER JOIN team t ON te.team_id = t.id) OR "
+							+ " e.id IN (SELECT manager_id FROM department) ");
+				}
+			}
+			inClause.append(" )");
 		}
-		
-		if (whereClause.length() > 0) {
-			queryString.append(joinClause.toString());
-		}
-		
+
 		if(StringUtil.isNotEmpty(employeeSearchRequest.getId())) {
 			whereClause.append(" AND id = " + employeeSearchRequest.getId());
 		}
@@ -79,63 +92,21 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 			whereClause.append(" AND e.valid_flag = '" + employeeSearchRequest.getValidFlag() + "'");
 		}
 		
-		if (whereClause.length() > 0) {
-			whereClause.replace(0, 5, " WHERE ");
+		if (inClause.length() > 0) {
+			queryString.append(" WHERE ");
+			queryString.append(inClause.toString());
 			queryString.append(whereClause.toString());
+		} else {
+			if (whereClause.length() > 0) {
+				whereClause.replace(0, 5, " WHERE ");
+				queryString.append(whereClause.toString());
+			}
 		}
+		
+		System.out.println(queryString.toString());
+		
 		query = entityManager.createNativeQuery(queryString.toString(), Employee.class);
 		List<Employee> employees = query.getResultList();
-		return employees;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<Employee> search(String name, String teamId, String departmentId) {
-		StringBuilder queryString = new StringBuilder(
-				"SELECT * " + "FROM employee e INNER JOIN team_employee te ON te.employee_id = e.id"
-						+ " INNER JOIN team t ON te.team_id = t.id ");
-		StringBuilder whereClause = new StringBuilder("");
-
-		if (StringUtil.isNotEmpty(name)) {
-			whereClause.append(" AND e.name like '%" + name + "%'");
-		}
-
-		if (StringUtil.isNotEmpty(teamId)) {
-			whereClause.append(" AND t.id = '" + teamId + "'");
-		}
-
-		if (StringUtil.isNotEmpty(departmentId)) {
-			whereClause.append(" AND t.department_id = '" + departmentId + "'");
-		}
-
-		whereClause.append(" AND e.valid_flag = '1' AND te.valid_flag = '1' AND t.valid_flag = '1' ");
-
-		if (whereClause.length() > 0) {
-			whereClause.replace(0, 5, " WHERE ");
-			queryString.append(whereClause);
-		}
-
-		Query query = entityManager.createNativeQuery(queryString.toString(), Employee.class);
-		List<Employee> employees = query.getResultList(); // list employees without manager
-
-		if (StringUtil.isEmpty(teamId)) { // if team ID is empty== 0, select manager
-			StringBuilder managerQueryString = new StringBuilder(
-					"SELECT * FROM employee e INNER JOIN department d ON e.id = d.manager_id "
-							+ "WHERE e.valid_flag = '1' AND d.valid_flag = '1' ");
-			if (StringUtil.isNotEmpty(departmentId)) { // select 1 manager
-				managerQueryString.append("AND d.id = " + departmentId + " ");
-			}
-			if (StringUtil.isNotEmpty(name)) {
-				managerQueryString.append(" AND e.name like '%" + name + "%'");
-			}
-
-			query = entityManager.createNativeQuery(managerQueryString.toString(), Employee.class);
-			List<Employee> managers = query.getResultList(); // list employees without manager
-			if (managers != null && managers.size() > 0) {
-				employees.addAll(managers);
-			}
-		}
-
 		return employees;
 	}
 
