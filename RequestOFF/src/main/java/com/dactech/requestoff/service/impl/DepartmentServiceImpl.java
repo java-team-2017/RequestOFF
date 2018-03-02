@@ -7,13 +7,18 @@ import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
+import com.dactech.requestoff.model.entity.Team;
 import com.dactech.requestoff.model.request.DepartmentDetailsRequest;
+import com.dactech.requestoff.model.request.DepartmentInfoRequest;
 import com.dactech.requestoff.model.request.DepartmentRegistRequest;
 import com.dactech.requestoff.model.request.DepartmentSearchRequest;
 import com.dactech.requestoff.model.response.DepartmentDetailsResponse;
+import com.dactech.requestoff.model.response.DepartmentInfoResponse;
 import com.dactech.requestoff.model.response.DepartmentRegistResponse;
 import com.dactech.requestoff.model.response.DepartmentSearchResponse;
 import com.dactech.requestoff.repository.DepartmentRepository;
+import com.dactech.requestoff.repository.EmployeeRepository;
+import com.dactech.requestoff.repository.TeamRepository;
 import com.dactech.requestoff.service.DepartmentService;
 import com.dactech.requestoff.util.StringUtil;
 
@@ -21,6 +26,10 @@ import com.dactech.requestoff.util.StringUtil;
 public class DepartmentServiceImpl implements DepartmentService {
 	@Autowired
 	DepartmentRepository departmentRepository;
+	@Autowired
+	EmployeeRepository employeeRepository;
+	@Autowired
+	TeamRepository teamRepository;
 	
 	public DepartmentRegistResponse registDepartment(DepartmentRegistRequest departmentRegistRequest) throws Exception {
 		Department department;
@@ -79,5 +88,28 @@ public class DepartmentServiceImpl implements DepartmentService {
 		Department department = departmentRepository.findById(Long.parseLong(departmentDetailsRequest.getId()));
 		DepartmentDetailsResponse departmentDetailsResponse = new DepartmentDetailsResponse(department);
 		return departmentDetailsResponse;
+	}
+
+	@Override
+	public DepartmentInfoResponse departmentInfo(DepartmentInfoRequest departmentInfoRequest) {
+		DepartmentInfoResponse response = new DepartmentInfoResponse();
+		response.setListManagerNotInDepartment(employeeRepository.findManagerNotInDepartment());
+		return response;
+	}
+
+	@Override
+	public boolean departmentDelete(long departmentId) throws Exception {
+		Department department = departmentRepository.findById(departmentId);
+		if(department == null) {
+			throw new Exception("Can not find department!");
+		}
+		
+		List<Team> teams = teamRepository.findByDepartmentId(departmentId);
+		if(teams.size() == 0) {
+			departmentRepository.delete(department);
+		} else {
+			throw new Exception("Please remove all team before delete department");
+		}
+		return true;
 	}
 }

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Department Management</title>
+	<div th:replace="library"></div>
+</head>
+
+<script th:inline="javascript">
+	/*<![CDATA[*/
+	var employeeLoginId;
+	var tableData;
+		$(function() {
+			var rowDataRequest;
+			var listRequest;
+			
+			$('#btnSearch').on('click', function(){
+				search();
+			});
+			
+			$("#requestForm select").keydown(function(e){
+				if(e.keyCode == 13) {
+					this.blur();
+				}
+			});
+			
+			$(document).keypress(function(e) {
+				if(e.which == 13) {
+					search();
+				}
+			});
+			
+			$('#departmentTable').on('click', 'td', function () {
+				var position = $(this).index();
+				if(position != 3 && position != 4){
+					var table = $('#departmentTable').DataTable();
+					var rowData = table.row($(this).parent()).data();
+					$('#departmentDetails').val(rowData.name);
+					$('#managerDetails').val(rowData.manager.name);
+					$('#modalDetails').modal('show');
+				}
+				
+			});
+			
+			$('body').on('click', '#btnEdit, #btnAdd', function () {
+				$('#btnSave').hide();
+				$('#btnCreate').hide();
+				$('#editMsg').hide();
+				var isAdd;
+				if ($(this).attr("id") == 'btnAdd') {
+					isAdd = 1;
+					$('#editDepartment').val("");
+					$('#editModalName').text("Add Department");
+				} else {
+					isAdd = 0;
+					var table = $('#departmentTable').DataTable();
+					rowDataRequest = table.row($(this).parent()).data();
+					$('#editDepartment').val(rowDataRequest.name);
+					$('#editModalName').text("Edit Department");
+					$('#btnSave').show();
+				}
+
+				$('#editModal').modal('show');
+				
+				$.ajax({
+					type : "POST",
+					contentType : "application/json",
+					url : /*[[@{/department/departmentInfo}]]*/,
+					dataType : 'json',
+					data : JSON.stringify({}),
+					success : function(resultData) {
+						if (resultData.status_info.status == 0) {
+							$('#editManager').empty();
+							if (isAdd == false) {
+								$('#editManager').append('<option value="' + rowDataRequest.manager.id + '" selected="true">' + rowDataRequest.manager.name + '</option>');
+							} else {
+								if (resultData.listManagerNotInDepartment.length > 0) {
+									$('#btnCreate').show();
+								} else {
+									$('#editMsg').html("No manager found").attr('class', 'alert alert-danger').show();
+								}
+							}
+							
+							$.each(resultData.listManagerNotInDepartment, function(index, manager) {
+								$('#editManager').append('<option value="' + manager.id + '">' + manager.name + '</option>');
+							});
+						} else {
+							$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
+						}
+					},
+					error : function(e) {
+						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+					}
+				});
+			});
+			
+			$('#btnSave, #btnCreate').on('click', function(){
+				var isAdd;
+				var requestData = {
+					"name" : $('#editDepartment').val(),
+					"manager_id" : $('#editManager').val()
+				}
+				
+				if($('#editDepartment').val() == ""){
+					$('#editMsg').html("Please fill in department field").attr('class', 'alert alert-danger').show();
+					return;
+				}
+				
+				if ($(this).attr("id") == 'btnCreate') {
+					isAdd = true;
+					requestData.valid_flag = 1;
+				} else {
+					isAdd = false;
+					requestData.id = rowDataRequest.id;
+					requestData.update_date = rowDataRequest.updateDate;
+				}
+				
+				$.ajax({
+					type : "POST",
+					contentType : "application/json",
+					url : /*[[@{/department/regist}]]*/,
+					dataType : 'json',
+					data : JSON.stringify(requestData),
+					success : function(resultData) {
+						if (resultData.status_info.status == 0) {
+							$('#editModal').modal('hide');
+							var loadTable = $('#departmentTable').DataTable();
+							loadTable.ajax.reload();
+							if (isAdd) {
+								$('#alertMessage').html("Create Department Successfully").attr('class', 'alert alert-success').show();
+							} else {
+								$('#alertMessage').html("Edit Department Successfully").attr('class', 'alert alert-success').show();
+							}
+							
+						} else {
+							$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
+						}
+					},
+					error : function(e) {
+						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+					}
+				});
+			});
+			
+			$('#departmentTable').on('click', '#btnDelete', function () {
+				var table = $('#departmentTable').DataTable();
+				rowDataRequest = table.row($(this).parent()).data();
+				var deleteRequets = {
+					"department_id" : rowDataRequest.id
+				}
+				
+				$('#confirmModal').modal('show');
+				$('#btnYes').on("click", function(){
+					$.ajax({
+						type : "POST",
+						contentType : "application/json",
+						url : /*[[@{/department/delete}]]*/,
+						dataType : 'json',
+						data : JSON.stringify(deleteRequets),
+						success : function(resultData) {
+							if (resultData.status_info.status == 0) {
+								var loadTable = $('#departmentTable').DataTable();
+								loadTable.ajax.reload();
+								$('#alertMessage').html("Delete Department Successfully").attr('class', 'alert alert-success').show();
+							} else {
+								$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
+							}
+						},
+						error : function(e) {
+							$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+						}
+					});
+				});
+			});
+			
+			
+			$('#department').typeahead({
+				name: 'suggest-employee',
+				limit: 100,
+				hint: false,
+				remote: {
+					rateLimitWait: 1000,
+					url: /*[[@{/department/search}]]*/,
+					replace: function (url, uriEncodedQuery){
+						return url + "#" + uriEncodedQuery;
+					},
+					beforeSend: function (jqXhr, settings) {
+						jqXhr.setRequestHeader('Content-Type','application/json');
+						settings.type = 'POST';
+						settings.hasContent = true;
+						settings.data = JSON.stringify({"name": $('#department').val(), "name_match_status": "0"});
+					},
+					filter: function (data) {
+						var result = data.listDepartment;
+						var sourceArr = [];
+						$.each(result, function(index, object) {
+							sourceArr.push(object.name);
+						});
+						return sourceArr;
+					}
+				}
+			}).bind('typeahead:selected', function(obj, selected, name) {
+				$(this).typeahead('setQuery', $("<div/>").html(selected.value).text());
+				return false;
+			});
+			
+		});
+		
+		function search(){
+			var requestData = $('#requestForm').serializeJSON();
+			var requestSearch = {
+				"id" : requestData.id,
+				"name" : requestData.name,
+				"manager_id" : requestData.manager_id
+			};
+			$('#departmentTable').DataTable( {
+				ajax: {
+					type: "POST",
+					contentType: "application/json",
+					url : /*[[@{/department/search}]]*/,
+					dataType : 'json',
+					data: function () {
+						return JSON.stringify(requestSearch);
+					},
+					dataSrc: 'listDepartment'
+				},
+				destroy: true,
+				searching: false,
+// 				order: [[ 1, "desc" ]],
+				//data: listRequest,
+				columns: [
+					{ data: 'id' },
+					{ data: 'name' },
+					{ data: 'manager.name' },
+					{
+						render: function (index) {
+								return '<a href="#" id="btnEdit"><span class="glyphicon glyphicon-pencil" value="' + index + '"></span></a>';
+						},
+					},
+					{
+						render: function (index) {
+								return '<a href="#" id="btnDelete"><span class="glyphicon glyphicon-trash" value="' + index + '"></span></a>';
+						},
+					}
+				]
+			});
+		}
+	/*]]>*/
+</script>
+
+<body class="content-body">
+	<div th:replace="fragments/header"></div>
+	<div th:replace="menu"></div>
+	
+	<div class="requestOffContentBody">			
+		<h2>Department Management</h2>
+		<div id="alertMessage" class="alert" style="display:none;"></div>
+			<form id="requestForm" class="form-input">
+				<div class="form-group">
+					<label class="control-label">Department: </label>
+					<input class="form-control" type="text" name="name" id="department" value=""></input>
+				</div>
+				
+				<p>
+					<button id="btnSearch" type="button" class="btn btn-primary" style="width:76px;">Search</button>&nbsp;&nbsp;
+					<button id="btnAdd" type="button" class="btn btn-primary" style="width:76px;">Add</button>&nbsp;&nbsp;
+					<button type="reset" class="btn btn-primary" style="width:76px;">Clear</button>
+				</p>
+			</form>
+					
+			<div class="table-responsive" style="margin-top:3em;"> 
+				<table class="table table-bordered table-striped table-hover" id="departmentTable">
+					<thead>
+						<tr>
+							<th class="text-center" name="id" id="id" style="width: 40px;"><span>ID</span></th>
+							<th class="text-center" name="department"><span>Department</span></th>
+							<th class="text-center" name="manager"><span>Manager</span></th>
+							<th class="text-center" name="edit" style="width: 40px;"><span>Edit</span></th>
+							<th class="text-center" name="delete" style="width: 40px;"><span>Delete</span></th>
+						</tr>
+					</thead>
+					<tbody class="text-center">
+					</tbody>
+				</table>
+			</div>
+			
+			<div class="modal fade" id="modalDetails" role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title">Details</h4>
+						</div>
+						
+						<div class="modal-body">
+							<div id="detailMsg" class="alert" style="display:none;"></div>
+							<form class="form-horizontal" id="formModal">
+								<label class="col-md-3 control-label">Department:</label>
+								<div class="col-md-9">
+									<input id="departmentDetails" class="form-control" readonly="readonly"></input>
+								</div>
+			
+								<label class="col-md-3 control-label">Manager:</label>
+								<div class="col-md-9">
+									<input id="managerDetails" class="form-control" readonly="readonly"></input>
+								</div>&nbsp;
+								
+								<p align="right">
+									<button type="button" class="btn btn-default" style="width:76px;" data-dismiss="modal">Close</button>
+								</p>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="modal fade" id="editModal" role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 id="editModalName" class="modal-title">Edit</h4>
+						</div>
+						
+						<div class="modal-body">
+							<div id="editMsg" class="alert" style="display:none;"></div>
+							<form class="form-horizontal" id="formModal">
+								<label class="col-md-3 control-label">Department:</label>
+								<div class="col-md-9">
+									<input id="editDepartment" class="form-control"></input>
+								</div>
+			
+								<label class="col-md-3 control-label">Manager:</label>
+								<div class="col-md-9">
+									<select id="editManager" class="form-control"></select>
+								</div>&nbsp;
+								
+								<p align="center">
+									<button type="button" class="btn btn-default" id="btnCreate" style="width:76px;">Create</button>&nbsp;
+									<button type="button" class="btn btn-default" id="btnSave" style="width:76px;" data-dismiss="modal">Save</button>&nbsp;
+									<button type="button" class="btn btn-default" style="width:76px;" data-dismiss="modal">Cancel</button>
+								</p>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="modal fade" id="confirmModal" role="dialog">
+			<div class="modal-dialog">
+
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h2 class="modal-title">Confirm</h2>
+					</div>
+					<div class="modal-body">
+						<h4>Are you sure want to delete this department?</h4>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal" id="btnYes">Yes</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal" id="btnNo">No</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+				
+		</div>
+	<div th:replace="fragments/footer"></div>
+</body>
+</html>
