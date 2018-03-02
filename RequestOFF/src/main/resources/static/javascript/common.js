@@ -6,6 +6,7 @@ var errors = {
 	'exceedTime': 'Hours of off time exceed remain hours',
 	'roundHour': 'Your hours of off time must be round',
 	'weekend': 'Your choosen hours are belong to weekends',
+	'stringExceedLimit': 'Values exceed the limit',
 	'APIResponseError': function (errMsg) {
 		return errMsg;
 	}
@@ -117,7 +118,6 @@ function renderPositionSelect(selectBoxId, dataHandler) {
 		success: function (positionSearchResponse){
 			if (positionSearchResponse.status_info.status == 0) {
 				listPosition = positionSearchResponse.listPosition;
-				$('#' + selectBoxId).empty().append('<option value=""></option>');
 				$.each(listPosition, function(index, position) {
 					$('#' + selectBoxId).append('<option value="' + position.id + '">' + position.name + '</option>');
 				});

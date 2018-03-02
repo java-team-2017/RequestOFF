@@ -62,6 +62,25 @@
 					listRole = roles;
 				});
 				
+				// change team select box when department select box is changed
+				$('#departmentId').on('change', function() {
+					if ($(this).val() != '') {
+						var id = $(this).val();
+						var teams = $.grep(listTeam, function(team) { // find team in department
+							return team.department.id == id;
+						});
+						$('#teamId').empty().append('<option value=""></option>');
+						$.each(teams, function(index, team) {
+							$('#teamId').append('<option value="' + team.id + '">' + team.name + '</option>');
+						});
+					} else {
+						$('#teamId').empty().append('<option value=""></option>');
+						$.each(listTeam, function(index, team) {
+							$('#teamId').append('<option value="' + team.id + '">' + team.name + '</option>');
+						});
+					}
+				});
+				
 				$('.datepicker').on('changeDate', function(ev){
 					$(this).datepicker('hide');
 				});
@@ -85,7 +104,9 @@
 						$("#officialWorkingModalDetailsId").val(officialWorkingDate[1] + "/" + officialWorkingDate[2] + "/" + officialWorkingDate[0]);
 						$("#positionModalDetailsId").val(rowData.position.id);
 						$("#teamModalDetailsId").val(getTeamId(listTeam, rowData.teamName));
+						$("#teamModalDetailsId").prop('disabled', true);
 						$("#departmentModalDetailsId").val(getDepartmentId(listDepartment, rowData.departmentName));
+						$("#departmentModalDetailsId").prop('disabled', true);
 						$("#updateDateModalDetailsId").val(rowData.updateDate);
 						$("#roleModalDetailsId option").prop("selected", false);
 						$.each(rowData.listRole, function(i, e){
@@ -93,6 +114,7 @@
 							$("#roleModalDetailsId option[value='" + e.id + "']").prop("selected", true);
 						});
 						
+						$('#alertMessage_modalDetails').hide();
 						$('#employeeDetailsModal').modal('show');
 					}
 				});
@@ -104,13 +126,38 @@
 					search(employeeSearchRequest);
 				});
 				
+				//prevent select box from opening when pressing enter after selecting
+				$("#employeeForm select").keydown(function(e){
+					if(e.keyCode == 13) {
+						this.blur();
+					}
+				});
+				
+				//search when pressing enter
+				$(document).keypress(function(e) {
+					if(e.which == 13) {
+						var employeeSearchRequest = getEmployeeSearchRequest();
+						console.log("employeeSearchRequest:");
+						console.log(employeeSearchRequest);
+						search(employeeSearchRequest);
+					}
+				});
+				
 				$('#btnAdd').on('click', function() {
+					$('#alertMessage_modalAdd').hide();
+					$("#modalAddForm :input").not("button, select").val("");
+					$("#modalAddForm select").not("#roleModalAddId").prop('selectedIndex', 0);
+					$("#roleModalAddId option").prop("selected", false);
 					$('#employeeAddModal').modal('show');
 				});
 				
 				$('#btnClear').on('click', function() {
 					$("#employeeForm input, #employeeForm select").each(function(){
 						$(this).val("");
+					});
+					$('#teamId').empty().append('<option value=""></option>');
+					$.each(listTeam, function(index, team) {
+						$('#teamId').append('<option value="' + team.id + '">' + team.name + '</option>');
 					});
 				});
 				
@@ -122,92 +169,144 @@
 				
 				$('#btnAdd_modalAdd').on('click', function() {
 					var addData = $('#modalAddForm').serializeJSON();
-					var birthday = addData.birthdayModalAdd;
-					birthday = birthday.substr(6, 4) + "-" + birthday.substr(0, 2) + "-" + birthday.substr(3, 2);
-					var startWorkingDate = addData.startWorkingModalAdd;
-					startWorkingDate = startWorkingDate.substr(6, 4) + "-" + startWorkingDate.substr(0, 2) + "-" + startWorkingDate.substr(3, 2);
-					var officialWorkingDate = addData.officialWorkingModalAdd;
-					officialWorkingDate = officialWorkingDate.substr(6, 4) + "-" + officialWorkingDate.substr(0, 2) + "-"
-											+ officialWorkingDate.substr(3, 2);
 					
-					var employeeRegistRequest = {
-						"id" : "",
-						"name" : addData.nameModalAdd,
-						"gender" : addData.genderModalAdd,
-						"birthday" : birthday,
-						"position_id" : addData.positionModalAdd,
-						"email" : addData.emailModalAdd,
-						"password" : "",
-						"phone" : addData.phoneModalAdd,
-						"start_working_date" : startWorkingDate,
-						"official_working_date" : officialWorkingDate,
-						"valid_flag" : "1",
-// 						"team_id" : addData.teamModalAdd,
-						"role_ids" : $("#roleModalAddId").val()
-					};
-					console.log(employeeRegistRequest);
-					$.ajax({
-						type : "POST",
-						contentType : "application/json",
-						url : /*[[@{/employee/regist}]]*/,
-						dataType : 'json',
-						data : JSON.stringify(employeeRegistRequest),
-						success : function(returnData) {
-							table = $('#employeeTable').DataTable();
-							console.log(table);
-							table.ajax.reload();
-							$("#modalAddForm :input").not("button, select").val("");
-							$("#modalAddForm select").prop('selectedIndex', 0);
-// 							$('#alertMessage').html(alertStr).attr('class', 'alert alert-success').show();
-						},
-						error : function(e) {
-							$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+					//-----------validate------------
+					var complete = 1, valid = 1;
+					var listInput = $("#modalAddForm").find(':input');
+					$.each(listInput, function() {
+						if($(this).val() == "") {
+							complete = 0;
 						}
 					});
-					$('#employeeAddModal').modal('hide');
+					if((addData.nameModalAdd).length > 200) {
+						valid = 0;
+					}
+					if((addData.phoneModalAdd).length > 20) {
+						valid = 0;
+					}
+					//----------end validate---------
+					
+					if(complete == 0) {
+						$('#alertMessage_modalAdd').html(errors['incompleteFields']).attr('class', 'alert alert-danger').show();
+					}
+					else if(valid == 0) {
+						$('#alertMessage_modalAdd').html(errors['stringExceedLimit']).attr('class', 'alert alert-danger').show();
+					}
+					else {
+						var birthday = addData.birthdayModalAdd;
+						birthday = birthday.substr(6, 4) + "-" + birthday.substr(0, 2) + "-" + birthday.substr(3, 2);
+						var startWorkingDate = addData.startWorkingModalAdd;
+						startWorkingDate = startWorkingDate.substr(6, 4) + "-" + startWorkingDate.substr(0, 2) + "-" + startWorkingDate.substr(3, 2);
+						var officialWorkingDate = addData.officialWorkingModalAdd;
+						officialWorkingDate = officialWorkingDate.substr(6, 4) + "-" + officialWorkingDate.substr(0, 2) + "-"
+												+ officialWorkingDate.substr(3, 2);
+						
+						var employeeRegistRequest = {
+							"id" : "",
+							"name" : addData.nameModalAdd,
+							"gender" : addData.genderModalAdd,
+							"birthday" : birthday,
+							"position_id" : addData.positionModalAdd,
+							"email" : addData.emailModalAdd,
+							"password" : "",
+							"phone" : addData.phoneModalAdd,
+							"start_working_date" : startWorkingDate,
+							"official_working_date" : officialWorkingDate,
+							"valid_flag" : "1",
+//	 						"team_id" : addData.teamModalAdd,
+							"role_ids" : $("#roleModalAddId").val()
+						};
+						console.log(employeeRegistRequest);
+						
+						$.ajax({
+							type : "POST",
+							contentType : "application/json",
+							url : /*[[@{/employee/regist}]]*/,
+							dataType : 'json',
+							data : JSON.stringify(employeeRegistRequest),
+							success : function(returnData) {
+								if(returnData.status_info.status == 1) {
+									$('#alertMessage_modalAdd').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+								}
+								var employeeSearchRequest = getEmployeeSearchRequest();
+								search(employeeSearchRequest);
+								table = $('#employeeTable').DataTable();
+								console.log(table);
+								table.ajax.reload();
+							},
+							error : function(e) {
+								$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+							}
+						});
+						$('#employeeAddModal').modal('hide');
+					}
+					
+					
 				});
 				
 				$('#btnSave_modalDetails').on('click', function() {
 					var updateData = $('#modalDetailsForm').serializeJSON();
-					var id = $("#idModalDetailsId").html();
-					var birthday = updateData.birthdayModalDetails;
-					birthday = birthday.substr(6, 4) + "-" + birthday.substr(0, 2) + "-" + birthday.substr(3, 2);
-					var startWorkingDate = updateData.startWorkingModalDetails;
-					startWorkingDate = startWorkingDate.substr(6, 4) + "-" + startWorkingDate.substr(0, 2) + "-" + startWorkingDate.substr(3, 2);
-					var officialWorkingDate = updateData.officialWorkingModalDetails;
-					officialWorkingDate = officialWorkingDate.substr(6, 4) + "-" + officialWorkingDate.substr(0, 2) + "-"
-											+ officialWorkingDate.substr(3, 2);
-					var employeeRegistRequest = {
-						"id" : id,
-						"name" : updateData.nameModalDetails,
-						"gender" : updateData.genderModalDetails,
-						"birthday" : birthday,
-						"position_id" : updateData.positionModalDetails,
-						"email" : updateData.emailModalDetails,
-						"password" : "",
-						"phone" : updateData.phoneModalDetails,
-						"start_working_date" : startWorkingDate,
-						"official_working_date" : officialWorkingDate,
-						"update_date" : updateData.updateDateModalDetails,
-// 						"team_id" : updateData.teamModalDetails,
-						"role_ids" : $("#roleModalDetailsId").val()
-					};
-					console.log(employeeRegistRequest);
-					$.ajax({
-						type : "POST",
-						contentType : "application/json",
-						url : /*[[@{/employee/regist}]]*/,
-						dataType : 'json',
-						data : JSON.stringify(employeeRegistRequest),
-						success : function(returnData) {
-							table = $('#employeeTable').DataTable();
-							table.ajax.reload();
-						},
-						error : function(e) {
-							$('#alertMessage_modalDetails').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+					
+					//---------validate------------
+					var complete = 1, valid = 1;
+					var listInput = $("#modalDetailsForm").find(':input');
+					$.each(listInput, function() {
+						if($(this).val() == "") {
+							complete = 0;
 						}
 					});
-					$('#employeeDetailsModal').modal('hide');
+					if((updateData.nameModalDetails).length > 200) {
+						valid = 0;
+					}
+					if((updateData.phoneModalDetails).length > 20) {
+						valid = 0;
+					}
+					//---------end validate----------
+					
+					if(complete == 0 || valid == 0) {
+						$('#alertMessage_modalDetails').html(errors['incompleteFields']).attr('class', 'alert alert-danger').show();
+					}
+					else {
+						var id = $("#idModalDetailsId").html();
+						var birthday = updateData.birthdayModalDetails;
+						birthday = birthday.substr(6, 4) + "-" + birthday.substr(0, 2) + "-" + birthday.substr(3, 2);
+						var startWorkingDate = updateData.startWorkingModalDetails;
+						startWorkingDate = startWorkingDate.substr(6, 4) + "-" + startWorkingDate.substr(0, 2) + "-" + startWorkingDate.substr(3, 2);
+						var officialWorkingDate = updateData.officialWorkingModalDetails;
+						officialWorkingDate = officialWorkingDate.substr(6, 4) + "-" + officialWorkingDate.substr(0, 2) + "-"
+												+ officialWorkingDate.substr(3, 2);
+						var employeeRegistRequest = {
+							"id" : id,
+							"name" : updateData.nameModalDetails,
+							"gender" : updateData.genderModalDetails,
+							"birthday" : birthday,
+							"position_id" : updateData.positionModalDetails,
+							"email" : updateData.emailModalDetails,
+							"password" : "",
+							"phone" : updateData.phoneModalDetails,
+							"start_working_date" : startWorkingDate,
+							"official_working_date" : officialWorkingDate,
+							"update_date" : updateData.updateDateModalDetails,
+	// 						"team_id" : updateData.teamModalDetails,
+							"role_ids" : $("#roleModalDetailsId").val()
+						};
+						console.log(employeeRegistRequest);
+						$.ajax({
+							type : "POST",
+							contentType : "application/json",
+							url : /*[[@{/employee/regist}]]*/,
+							dataType : 'json',
+							data : JSON.stringify(employeeRegistRequest),
+							success : function(returnData) {
+								table = $('#employeeTable').DataTable();
+								table.ajax.reload();
+							},
+							error : function(e) {
+								$('#alertMessage_modalDetails').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+							}
+						});
+						$('#employeeDetailsModal').modal('hide');
+					}
 				});
 			});
 			
@@ -218,7 +317,6 @@
 // 					alert("ok");
 // 				});
 // 			});
-			
 			
 			$("body").on("click", ".btnDelete", function(event) {
 				var button = $(this);
@@ -279,6 +377,7 @@
 			}
 
 			function search(employeeSearchRequest) {
+				$('#alertMessage_search').hide();
 				$('#employeeTable').DataTable({
 					ajax: {
 						type : "POST",
@@ -420,13 +519,13 @@
 											<label class="control-label col-sm-9" style="text-align: left;" id="idModalDetailsId"></label>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Name: </label>
+											<label class="control-label col-sm-3">Name * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<input type="text" class="form-control" name="nameModalDetails" id="nameModalDetailsId" />
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Gender: </label>
+											<label class="control-label col-sm-3">Gender * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<select class="form-control" name="genderModalDetails" id="genderModalDetailsId">
 													<option value="male">Male</option>
@@ -435,7 +534,7 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Birthday: </label>
+											<label class="control-label col-sm-3">Birthday * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
 												<div class="input-group date datepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="birthdayModalDetails" id="birthdayModalDetailsId"/>
@@ -446,19 +545,19 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Email: </label>
+											<label class="control-label col-sm-3">Email * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<input type="text" class="form-control" name="emailModalDetails" id="emailModalDetailsId" />
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Phone: </label>
+											<label class="control-label col-sm-3">Phone * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<input type="text" class="form-control" name="phoneModalDetails" id="phoneModalDetailsId" />
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Start working date: </label>
+											<label class="control-label col-sm-3">Start working date * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
 												<div class="input-group date datepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="startWorkingModalDetails" id="startWorkingModalDetailsId"/>
@@ -469,7 +568,7 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Official working date: </label>
+											<label class="control-label col-sm-3">Official working date * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
 												<div class="input-group date datepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="officialWorkingModalDetails" id="officialWorkingModalDetailsId"/>
@@ -480,28 +579,28 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Position: </label>
+											<label class="control-label col-sm-3">Position * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<select class="form-control" name="positionModalDetails" id="positionModalDetailsId">
 												</select>
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Team: </label>
+											<label class="control-label col-sm-3">Team </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
-												<select readonly="true" class="form-control" name="teamModalDetails" id="teamModalDetailsId">
+												<select class="form-control" name="teamModalDetails" id="teamModalDetailsId">
 												</select>
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Department: </label>
+											<label class="control-label col-sm-3">Department </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<select readonly="true" class="form-control" name="departmentModalDetails" id="departmentModalDetailsId">
 												</select>
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Role: </label>
+											<label class="control-label col-sm-3">Role * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<select multiple="multiple" class="form-control" name="roleModalDetails" id="roleModalDetailsId">
 												</select>
@@ -530,13 +629,13 @@
 									<div id="alertMessage_modalAdd" class="alert" style="display:none;"></div>
 									<form id="modalAddForm">
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Name: </label>
+											<label class="control-label col-sm-3">Name * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<input type="text" class="form-control" name="nameModalAdd" id="nameModalAddId" />
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Gender: </label>
+											<label class="control-label col-sm-3">Gender * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<select class="form-control" name="genderModalAdd" id="genderModalAddId">
 													<option value="male">Male</option>
@@ -545,7 +644,7 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Birthday: </label>
+											<label class="control-label col-sm-3">Birthday * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
 												<div class="input-group date datepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="birthdayModalAdd" id="birthdayModalAddId"/>
@@ -556,19 +655,19 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Email: </label>
+											<label class="control-label col-sm-3">Email * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<input type="text" class="form-control" name="emailModalAdd" id="emailModalAddId" />
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Phone: </label>
+											<label class="control-label col-sm-3">Phone * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<input type="text" class="form-control" name="phoneModalAdd" id="phoneModalAddId" />
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Start working date: </label>
+											<label class="control-label col-sm-3">Start working date * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
 												<div class="input-group date datepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="startWorkingModalAdd" id="startWorkingModalAddId"/>
@@ -579,7 +678,7 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Official working date: </label>
+											<label class="control-label col-sm-3">Official working date * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
 												<div class="input-group date datepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="officialWorkingModalAdd" id="officialWorkingModalAddId"/>
@@ -590,7 +689,7 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Position: </label>
+											<label class="control-label col-sm-3">Position * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<select class="form-control" name="positionModalAdd" id="positionModalAddId">
 												</select>
@@ -611,7 +710,7 @@
 <!-- 											</div> -->
 <!-- 										</div> -->
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Role: </label>
+											<label class="control-label col-sm-3">Role * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<select multiple="multiple" class="form-control" name="roleModalAdd" id="roleModalAddId">
 												</select>
