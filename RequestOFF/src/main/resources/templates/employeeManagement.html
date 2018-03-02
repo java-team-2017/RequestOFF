@@ -2,21 +2,7 @@
 <html>
 	<head>
 		<title>Employee Management</title>
-		<link rel="stylesheet" type="text/css" href="css/layoutStyle.css" />
-		<link rel="stylesheet" type="text/css" href="css/common.css" />
-		<link rel="stylesheet" type="text/css" href="css/requestHistoryStyle.css" />
-		<link rel="stylesheet"	type="text/css" href="css/bootstrap.min.css" />
-		<link rel="stylesheet"	type="text/css" href="css/notify.css" />
-		<link rel="stylesheet" type="text/css" href="css/datatables.min.css"/>
-		<link rel="stylesheet" type="text/css" href="css/bootstrap-datepicker.min.css"/>
-		<script src="javascript/jquery-3.2.1.js"></script>
-		<script src="javascript/bootstrap.min.js"></script>
-		<script src="javascript/jquery.serializejson.js"></script>
-		<script src="javascript/common.js"></script>
-		<script src="javascript/notify.js"></script>
-		<script type="text/javascript" src="javascript/datatables.min.js"></script>
-		<script type="text/javascript" src="javascript/bootstrap-confirmation.min.js"></script>
-		<script type="text/javascript" src="javascript/bootstrap-datepicker.min.js"></script>
+		<div th:replace="library"></div>
 	</head>
 	<body class="content-body">
 		<script th:inline="javascript">
@@ -60,6 +46,37 @@
 				});
 				renderRoleSelect("roleModalDetailsId", function(roles) {
 					listRole = roles;
+				});
+				
+				//Employee text field type ahead
+				$('#nameId').typeahead({
+					name: 'suggest-employee',
+					limit: 100,
+					hint: false,
+					remote: {
+						rateLimitWait: 1000,
+						url: '/employee/search',
+						replace: function (url, uriEncodedQuery){
+							return url + "#" + uriEncodedQuery;
+						},
+						beforeSend: function (jqXhr, settings) {
+							jqXhr.setRequestHeader('Content-Type','application/json');
+							settings.type = 'POST';
+							settings.hasContent = true;
+							settings.data = JSON.stringify({"name": $('#nameId').val(), "name_match_status": "0"});
+						},
+						filter: function (data) {
+							var result = data.employees;
+							var sourceArr = [];
+							$.each(result, function(index, object) {
+								sourceArr.push(object.name);
+							});
+							return sourceArr;
+						}
+					}
+				}).bind('typeahead:selected', function(obj, selected, name) {
+					$(this).typeahead('setQuery', $("<div/>").html(selected.value).text());
+					return false;
 				});
 				
 				// change team select box when department select box is changed
@@ -240,8 +257,6 @@
 						});
 						$('#employeeAddModal').modal('hide');
 					}
-					
-					
 				});
 				
 				$('#btnSave_modalDetails').on('click', function() {
@@ -263,8 +278,11 @@
 					}
 					//---------end validate----------
 					
-					if(complete == 0 || valid == 0) {
+					if(complete == 0) {
 						$('#alertMessage_modalDetails').html(errors['incompleteFields']).attr('class', 'alert alert-danger').show();
+					}
+					else if(valid == 0) {
+						$('#alertMessage_modalDetails').html(errors['stringExceedLimit']).attr('class', 'alert alert-danger').show();
 					}
 					else {
 						var id = $("#idModalDetailsId").html();
@@ -427,7 +445,7 @@
 							"targets": [ 7 ],
 							"className": "text-center",
 							"data": null,
-							"defaultContent": "<a href='#' class='btnDelete'><span class='glyphicon glyphicon-remove'></span></a>"
+							"defaultContent": "<a class='btnDelete'><span class='glyphicon glyphicon-remove'></span></a>"
 						}
 					]
 				});
