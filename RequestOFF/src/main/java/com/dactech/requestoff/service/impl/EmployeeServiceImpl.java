@@ -146,12 +146,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 			}
 			if (StringUtil.isNotEmpty(erRequest.getValidFlag())) {
 				employee.setValidFlag(Integer.parseInt(erRequest.getValidFlag()));
-//				if(erRequest.getValidFlag().equals("0")) {
-//					List<Team> listTeam = employee.getListTeam();
-//					for(Team t : listTeam) {
-////						t.set
-//					}
-//				}
 			}
 		}
 
@@ -485,5 +479,35 @@ public class EmployeeServiceImpl implements EmployeeService {
 			}
 		}
 		return departmentName;
+	}
+	
+	@Override
+	public boolean delete(long employeeId) throws Exception {
+		Employee employee = employeeRepository.findById(employeeId);
+		if (employee == null) {
+			throw new Exception("can not find employee with id " + employeeId);
+		}
+		
+		if (employee.getPosition().getId() == Position.POSITION_EMPLOYEE || employee.getPosition().getId() == Position.POSITION_HR) {
+			if (employee.getListTeam() != null && employee.getListTeam().size() > 0 && employee.getListTeam().get(0)!= null) {
+				throw new Exception("Employee is a member of Team : " + employee.getListTeam().get(0).getName());
+			}
+		} else if (employee.getPosition().getId() == Position.POSITION_PROJECT_MANAGER) {
+			Department dept = departmentRepository.findByManagerId(employeeId);
+			if (dept != null) {
+				throw new Exception("Employee is a Manager of Department : " + dept.getName());
+			}
+		} else if (employee.getPosition().getId() == Position.POSITION_LEADER) {
+			Team team = teamRepository.findByLeaderId(employeeId);
+			if (team != null) {
+				throw new Exception("Employee is a Leader of Department : " + team.getName());
+			}
+		} else {
+			throw new Exception("Unsolved ");
+		}
+
+		employeeRepository.delete(employee);
+
+		return true;
 	}
 }

@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dactech.requestoff.model.common.StatusInfo;
 import com.dactech.requestoff.model.entity.Employee;
+import com.dactech.requestoff.model.request.EmployeeDeleteRequest;
 import com.dactech.requestoff.model.request.EmployeeDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatisticsPagingRequest;
 import com.dactech.requestoff.model.request.EmployeeRegistRequest;
 import com.dactech.requestoff.model.request.EmployeeSearchRequest;
 import com.dactech.requestoff.model.request.GetUserRequest;
+import com.dactech.requestoff.model.response.EmployeeDeleteResponse;
 import com.dactech.requestoff.model.response.EmployeeDetailsResponse;
 import com.dactech.requestoff.model.response.EmployeeOffStatisticsPagingResponse;
 import com.dactech.requestoff.model.response.EmployeeRegistResponse;
@@ -39,7 +41,26 @@ public class EmployeeController {
 			response = employeeService.employeeRegist(employeeRegistRequest);
 			response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
 		} catch (Exception e) {
+			e.printStackTrace();
 			response = new EmployeeRegistResponse();
+			response.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
+		}
+
+		return response;
+	}
+	
+	@RequestMapping(value = "/employee/delete", method = RequestMethod.POST)
+	EmployeeDeleteResponse employeeDelete(@RequestBody EmployeeDeleteRequest employeeDeleteRequest) {System.out.println("ok");
+		EmployeeDeleteResponse response = new EmployeeDeleteResponse();
+		try {
+			boolean isDeleted = employeeService.delete(Long.parseLong(employeeDeleteRequest.getId()));
+			if (isDeleted == true) {
+				response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
+			} else {
+				throw new Exception("Cannot delete Employee");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 			response.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
 		}
 

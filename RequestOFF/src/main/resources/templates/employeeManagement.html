@@ -109,7 +109,15 @@
 				});
 				
 				$('#btnClear').on('click', function() {
-					alert("clear");
+					$("#employeeForm input, #employeeForm select").each(function(){
+						$(this).val("");
+					});
+				});
+				
+				$('#btnCancel_modalAdd').on('click', function() {
+					$("#modalAddForm input, #modalAddForm select").each(function(){
+						$(this).val("");
+					});
 				});
 				
 				$('#btnAdd_modalAdd').on('click', function() {
@@ -153,7 +161,7 @@
 // 							$('#alertMessage').html(alertStr).attr('class', 'alert alert-success').show();
 						},
 						error : function(e) {
-							$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+							$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 						}
 					});
 					$('#employeeAddModal').modal('hide');
@@ -203,38 +211,54 @@
 				});
 			});
 			
+// 			$('#btnTest').on('click', function() {
+// 				alert("ok");
+// 				$("#confirmModal").modal('show');
+// 				$("#yes").on("click", function() {
+// 					alert("ok");
+// 				});
+// 			});
+			
+			
 			$("body").on("click", ".btnDelete", function(event) {
-				$("#confirmModal").modal('show');
-				var row = $(this).closest("tr");	// Finds the closest row <tr> 
-				var id = row.find("td:nth-child(1)").html();	//Find the 1st <td> element
-				table = $('#employeeTable').DataTable();
-				rowData = table.row($(this).parent()).data();
-				var updateDate = rowData.updateDate;
-				
-				$("#yesConfirm").on("click", function(e) {
-					$.ajax({
-						type : "POST",
-						contentType : "application/json",
-						url : /*[[@{/employee/regist}]]*/,
-						dataType : 'json',
-						data : JSON.stringify({
-							"id" : id,
-							"valid_flag" : "0",
-							"update_date" : updateDate
-						}),
-						success : function(returnData) {
-							table = $('#employeeTable').DataTable();
-							table.ajax.reload();
-						},
-						error : function(e) {
-							$('#alertMessage_modalDetails').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-						}
-					});
+				var button = $(this);
+				$(this).confirmation({
+					placement: 'left',
+					onConfirm: function() {
+						var table = $('#employeeTable').DataTable();
+						selectedRow = table.row(button.parent()).data();
+						$.ajax({
+							url : /*[[@{/employee/delete}]]*/,
+							type : "post",
+							dataType :"json",
+							contentType : "application/json",
+							data : JSON.stringify({
+								'id': selectedRow.id
+							}),
+							success : function (returnData){
+								if(returnData.status_info.status == 1) {
+									$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+								}
+	 							table.ajax.reload();
+							},
+							error : function(e) {
+								$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+							}
+						});
+					}
 				});
+				$(this).confirmation("show");
 			});
 		
 			function getEmployeeSearchRequest() {
 				var searchData = $('#employeeForm').serializeJSON();
+				var teamDepartment;
+				if(searchData.team != "" || searchData.department != "") {
+					teamDepartment = 1;
+				}
+				else {
+					teamDepartment = 0;
+				}
 				var employeeSearchRequest = {
 					"id" : "",
 					"name" : searchData.name,
@@ -248,7 +272,8 @@
 					"offical_working_date" : "",
 					"valid_flag" : "1",
 					"team_id" : searchData.team,
-					"department_id" : searchData.department
+					"department_id" : searchData.department,
+					"team_dept_flag" : teamDepartment
 				};
 				return employeeSearchRequest;
 			}
@@ -356,6 +381,7 @@
 							<button type="button" class="btn btn-primary" id="btnSearch">Search</button>&nbsp;&nbsp;
 							<button type="button" class="btn btn-primary" id="btnAdd">Add</button>&nbsp;&nbsp;
 							<button type="button" class="btn btn-primary" id="btnClear">Clear</button>
+<!-- 							<button type="button" class="btn btn-primary" id="btnTest">Test</button> -->
 						</div>
 					</form>
 					<br/>
@@ -612,7 +638,7 @@
 									<p>Are you sure you want to delete this employee?</p>
 								</div>
 								<div class="modal-footer">
-									<button type="button" class="btn btn-default" data-dismiss="modal" id="yesConfirm">Yes</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal" id="yes">Yes</button>
 									<button type="button" class="btn btn-default" data-dismiss="modal" id="noConfirm">No</button>
 								</div>
 							</div>

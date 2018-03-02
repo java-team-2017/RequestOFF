@@ -33,4 +33,6 @@ public interface EmployeeService {
 	public String getTeamName(long employeeId);
 	
 	public String getDepartmentName(long employeeId);
+	
+	public boolean delete(long employeeId) throws Exception;
 }

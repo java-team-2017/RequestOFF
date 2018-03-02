@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.dactech.requestoff.model.entity.TeamEmployee;
 
 public interface TeamEmployeeRepository extends JpaRepository<TeamEmployee, Long>{
+	List<TeamEmployee> findByEmployeeId(long employeeId);
 	List<TeamEmployee> findByTeamId(long teamId);
 	TeamEmployee findByTeamIdAndEmployeeId(long teamId, long employeeId);
 }
