@@ -28,7 +28,7 @@ public class Employee {
 	private String email;
 	@JsonIgnore
 	private String password;
-	private long phone;
+	private String phone;
 	private String startWorkingDate;
 	private String officialWorkingDate;
 	private int validFlag;
@@ -58,7 +58,7 @@ public class Employee {
 	}
 
 	public Employee(long id, String name, String gender, String birthday, Position position, String email,
-			String password, long phone, String startWorkingDate, String officialWorkingDate, int validFlag,
+			String password, String phone, String startWorkingDate, String officialWorkingDate, int validFlag,
 			String insertDate, long insertOperator, String updateDate, long updateOperator, List<Team> listTeam,
 			List<Role> listRole, String departmentName, String teamName, EmployeeOffStatus employeeOffStatus) {
 		super();
@@ -140,11 +140,11 @@ public class Employee {
 		this.password = password;
 	}
 
-	public long getPhone() {
+	public String getPhone() {
 		return phone;
 	}
 
-	public void setPhone(long phone) {
+	public void setPhone(String phone) {
 		this.phone = phone;
 	}
 

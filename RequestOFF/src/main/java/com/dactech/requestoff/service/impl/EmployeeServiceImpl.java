@@ -74,7 +74,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 			employee.setEmail(erRequest.getEmail());
 			employee.setPassword(bCryptPasswordEncoder.encode(erRequest.getPassword()));
-			employee.setPhone(Long.parseLong(erRequest.getPhone()));
+			employee.setPhone(erRequest.getPhone());
 			employee.setStartWorkingDate(erRequest.getStartWorkingDate());
 			employee.setOfficialWorkingDate(erRequest.getOfficialWorkingDate());
 			employee.setValidFlag(Integer.parseInt(erRequest.getValidFlag()));
@@ -122,7 +122,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 				employee.setPassword(bCryptPasswordEncoder.encode(erRequest.getPassword()));
 			}
 			if (StringUtil.isNotEmpty(erRequest.getPhone())) {
-				employee.setPhone(Long.parseLong(erRequest.getPhone()));
+				employee.setPhone(erRequest.getPhone());
 			}
 			if (StringUtil.isNotEmpty(erRequest.getStartWorkingDate())) {
 				employee.setStartWorkingDate(erRequest.getStartWorkingDate());
