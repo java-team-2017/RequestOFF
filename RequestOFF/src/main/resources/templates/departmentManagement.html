@@ -142,36 +142,38 @@
 			});
 			
 			$('#departmentTable').on('click', '#btnDelete', function () {
-				var table = $('#departmentTable').DataTable();
-				rowDataRequest = table.row($(this).parent()).data();
-				var deleteRequets = {
-					"department_id" : rowDataRequest.id
-				}
-				
-				$('#confirmModal').modal('show');
-				$('#btnYes').on("click", function(){
-					$.ajax({
-						type : "POST",
-						contentType : "application/json",
-						url : /*[[@{/department/delete}]]*/,
-						dataType : 'json',
-						data : JSON.stringify(deleteRequets),
-						success : function(resultData) {
-							if (resultData.status_info.status == 0) {
-								var loadTable = $('#departmentTable').DataTable();
-								loadTable.ajax.reload();
-								$('#alertMessage').html("Delete Department Successfully").attr('class', 'alert alert-success').show();
-							} else {
-								$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
-							}
-						},
-						error : function(e) {
-							$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+				var button = $(this);
+				$(this).confirmation({
+					placement: 'left',
+					onConfirm: function() {
+						var table = $('#departmentTable').DataTable();
+						rowDataRequest = table.row(button.parent()).data();
+						var deleteRequets = {
+							"department_id" : rowDataRequest.id
 						}
-					});
+						$.ajax({
+							type : "POST",
+							contentType : "application/json",
+							url : /*[[@{/department/delete}]]*/,
+							dataType : 'json',
+							data : JSON.stringify(deleteRequets),
+							success : function(resultData) {
+								if (resultData.status_info.status == 0) {
+									var loadTable = $('#departmentTable').DataTable();
+									loadTable.ajax.reload();
+									$('#alertMessage').html("Delete Department Successfully").attr('class', 'alert alert-success').show();
+								} else {
+									$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
+								}
+							},
+							error : function(e) {
+								$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+							}
+						});
+					}
 				});
+				$(this).confirmation("show");
 			});
-			
 			
 			$('#department').typeahead({
 				name: 'suggest-employee',
@@ -233,12 +235,12 @@
 					{ data: 'manager.name' },
 					{
 						render: function (index) {
-								return '<a href="#" id="btnEdit"><span class="glyphicon glyphicon-pencil" value="' + index + '"></span></a>';
+								return '<a id="btnEdit"><span class="glyphicon glyphicon-pencil" value="' + index + '"></span></a>';
 						},
 					},
 					{
 						render: function (index) {
-								return '<a href="#" id="btnDelete"><span class="glyphicon glyphicon-trash" value="' + index + '"></span></a>';
+								return '<a id="btnDelete"><span class="glyphicon glyphicon-trash" value="' + index + '"></span></a>';
 						},
 					}
 				]
