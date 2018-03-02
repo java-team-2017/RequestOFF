@@ -116,12 +116,16 @@
 				
 				var selectedValue = $("#forward").val();
 				if ($(this).attr('id') == 'btnApproveModal') {
+					$('#confirmMsg').text("Are you sure want to approve this request?");
 					requestObj.status = 2;
 				} else if ($(this).attr('id') == 'btnDenyModal') {
+					$('#confirmMsg').text("Are you sure want to deny this request?");
 					requestObj.status = 3;
 				} else if ($(this).attr('id') == 'btnSendModal') {
+					$('#confirmMsg').text("Are you sure want to send message to this request?");
 					requestObj.status = 4;
 				} else if ($(this).attr('id') == 'btnForward') {
+					$('#confirmMsg').text("Are you sure want to forward to this person?");
 					requestObj.recipient_id = selectedValue;
 				}
 				requestObj.response_message = $('#responseMessage').val();
@@ -133,6 +137,11 @@
 			
 			$("#btnApprove, #btnDeny").on('click', function() {
 				$('#confirmModal').modal('show');
+				if ($(this).attr('id') == 'btnApprove') {
+					$('#confirmMsg').text("Are you sure want to approve this request?");
+				} else if ($(this).attr('id') == 'btnDeny') {
+					$('#confirmMsg').text("Are you sure want to deny this request?");
+				}
 				var status = $(this).attr('id') == 'btnApprove' ? 2 : 3;
 				var requestObj = {
 					"status" : status
@@ -158,8 +167,10 @@
 				}
 				$('#confirmModal').modal('show');
 				if ($(this).hasClass('btnApprove')) {
+					$('#confirmMsg').text("Are you sure want to approve this request?");
 					requestObj.status = 2;
 				} else {
+					$('#confirmMsg').text("Are you sure want to deny this request?");
 					requestObj.status = 3;
 				}
 				$('#btnYes').on("click", function(){
@@ -277,7 +288,7 @@
 							} else if(row.status == 4){
 								return '<p>Responded</p>';
 							} else if(row.status == 5) {
-								return '<a href="#" data-toggle="tooltip" title="Approve" class="btnApprove"><span class="glyphicon glyphicon-ok">&nbsp;&nbsp;<a href="#" data-toggle="tooltip" title="Deny" class="btnDeny"><span class="glyphicon glyphicon-remove"></span></a></a>';
+								return '<a data-toggle="tooltip" title="Approve" class="btnApprove"><span class="glyphicon glyphicon-ok">&nbsp;&nbsp;<a href="#" data-toggle="tooltip" title="Deny" class="btnDeny"><span class="glyphicon glyphicon-remove"></span></a></a>';
 							}
 						},
 					}
@@ -454,7 +465,7 @@
 						<h2 class="modal-title">Confirm</h2>
 					</div>
 					<div class="modal-body">
-						<h4>Are you sure?</h4>
+						<h4 id="confirmMsg">Are you sure?</h4>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-default" data-dismiss="modal" id="btnYes">Yes</button>
