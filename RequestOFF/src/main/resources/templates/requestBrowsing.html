@@ -58,7 +58,7 @@
 			
 			$('#requestTable').on('click', 'td', function () {
 				var position = $(this).index();
-				if(position != 0 && position != 6){
+				if(position != 0 && position != 7){
 					var table = $('#requestTable').DataTable();
 					var rowData = table.row(this).data();
 					objReturnRequestDetails = rowData;
@@ -74,6 +74,7 @@
 					$('#recipientDetails').val(rowData.recipientName);
 					$('#fromTimeDetails').val(rowData.fromTime);
 					$('#toTimeDetails').val(rowData.toTime);
+					$('#totalTimeDetails').val(rowData.totalTime);
 					$('#reasonDetails').val(rowData.reason);
 					$('#statusDetails').val(requestStatus[rowData.status]);
 					$('#dayOffTypeDetails').val(rowData.dayOffType.name);
@@ -153,6 +154,7 @@
 						
 						requestObj.id = rowData.id;
 						requestObj.update_date = rowData.updateDate;
+						console.log(requestObj);
 						updateRequest(requestObj);
 					});
 				});
@@ -161,6 +163,8 @@
 			$('#requestTable').on('click', '.btnApprove, .btnDeny', function () {
 				var table = $('#requestTable').DataTable();
 				var rowData = table.row($(this).parent()).data();
+				console.log("rowData: ");
+				console.log(rowData);
 				var requestObj = {
 					"id" : rowData.id ,
 					"update_date": rowData.updateDate
@@ -174,6 +178,8 @@
 					requestObj.status = 3;
 				}
 				$('#btnYes').on("click", function(){
+					console.log("requestObj: ");
+					console.log(requestObj);
 					updateRequest(requestObj);
 				});
 			});
@@ -277,6 +283,7 @@
 					{ data: 'employee.name' },
 					{ data: 'fromTime' },
 					{ data: 'toTime' },
+					{ data: 'totalTime' },
 					{ data: 'reason' },
 					{
 						data: 'status',
@@ -356,6 +363,7 @@
 							<th class="text-center" name="name"><span>Employee</span></th>
 							<th class="text-center" name="from"><span>From</span></th>
 							<th class="text-center" name="to"><span>To</span></th>
+							<th class="text-center" name="totalTime"><span>Total Time</span></th>
 							<th class="text-center" name="reason"><span>Reason</span></th>
 							<th class="text-center" name="approve"><span>Status</span></th>
 						</tr>
@@ -411,6 +419,11 @@
 								<label class="col-md-3 control-label">To:</label>
 								<div class="col-md-9">
 									<input id="toTimeDetails" class="form-control" readonly="readonly"></input>
+								</div>
+								
+								<label class="col-md-3 control-label">Total Time:</label>
+								<div class="col-md-9">
+									<input id="totalTimeDetails" class="form-control" readonly="readonly"></input>
 								</div>
 			
 								<label class="col-md-3 control-label">Reason:</label>
