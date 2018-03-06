@@ -230,7 +230,8 @@
 			var requestSearch = {
 				"id" : requestData.id,
 				"name" : requestData.name,
-				"manager_id" : requestData.manager_id
+				"manager_id" : requestData.manager_id,
+				"name_of_employee" : requestData.name_of_employee
 			};
 			$('#departmentTable').DataTable( {
 				ajax: {
@@ -246,7 +247,6 @@
 				destroy: true,
 				searching: false,
 // 				order: [[ 1, "desc" ]],
-				//data: listRequest,
 				columns: [
 					{ data: 'id' },
 					{ data: 'name' },
@@ -278,6 +278,11 @@
 				<div class="form-group">
 					<label class="control-label">Department: </label>
 					<input class="form-control" type="text" name="name" id="department" value=""></input>
+				</div>
+				
+				<div class="form-group">
+					<label class="control-label">Manager: </label>
+					<input class="form-control" type="text" name="name_of_employee" id="manager" value=""></input>
 				</div>
 				
 				<p>

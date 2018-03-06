@@ -11,18 +11,21 @@ public class DepartmentSearchRequest {
 	private String managerId;
 	@JsonProperty("valid_flag")
 	private String validFlag;
+	@JsonProperty("name_of_employee")
+	private String nameOfEmployee;
 
 	public DepartmentSearchRequest() {
 		super();
 	}
 
-	public DepartmentSearchRequest(String id, String name, String nameMatchStatus, String managerId, String validFlag) {
-		super();
+	public DepartmentSearchRequest(String id, String name, String nameMatchStatus, String managerId, String validFlag,
+			String nameOfEmployee) {
 		this.id = id;
 		this.name = name;
 		this.nameMatchStatus = nameMatchStatus;
 		this.managerId = managerId;
 		this.validFlag = validFlag;
+		this.nameOfEmployee = nameOfEmployee;
 	}
 
 	public String getId() {
@@ -63,6 +66,14 @@ public class DepartmentSearchRequest {
 
 	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
+	}
+
+	public String getNameOfEmployee() {
+		return nameOfEmployee;
+	}
+
+	public void setNameOfEmployee(String nameOfEmployee) {
+		this.nameOfEmployee = nameOfEmployee;
 	}
 
 }
