@@ -71,4 +71,9 @@ public class WebController {
 	public String employeeManagement() {
 		return "/employeeManagement";
 	}
+	
+	@GetMapping("/slack")
+	String slack() {
+		return "slack";
+	}
 }

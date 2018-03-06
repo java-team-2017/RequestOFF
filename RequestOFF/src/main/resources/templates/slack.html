@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<div th:replace="library"></div>
+</head>
+
+<script th:inline="javascript">
+	/*<![CDATA[*/
+	/*]]>*/
+</script>
+
+<body class="content-body">
+	<div th:replace="fragments/header"></div>
+	<div th:replace="menu"></div>
+	
+	<div class="requestOffContentBody">			
+		<h2>Slack Request Message Management</h2>
+		<div id="alertMessage" class="alert" style="display:none;"></div>
+			<form id="requestForm" class="form-input">
+				<div class="form-group">
+					<label class="control-label">From: </label>
+					<input class="form-control" type="text" name="" id="" value=""></input>
+				</div>
+				<div class="form-group">
+					<label class="control-label">To: </label>
+					<input class="form-control" type="text" name="" id="" value=""></input>
+				</div>
+				
+				<div class="form-group">
+					<label class="control-label">Type:</label>
+						<select id="" class="form-control">
+							<option value = "0"></option>
+							<option value = "1">valid request message</option>
+							<option value = "2">invalid request message</option>
+						</select>
+				</div>
+				<p>
+					<button id="" type="button" class="btn btn-primary" style="width:76px;">Search</button>
+				</p>
+			</form>
+					
+			<div class="table-responsive" style="margin-top:3em;"> 
+				<table class="table table-bordered table-striped table-hover" id="departmentTable">
+					<thead>
+						<tr>
+							<th class="text-center" style="width: 40px;">Id</th>
+							<th class="text-center">Name</th>
+							<th class="text-center">from</th>
+							<th class="text-center">to</th>
+							<th class="text-center">total Time (h)</th>
+						</tr>
+					</thead>
+					<tbody class="text-center">
+					</tbody>
+				</table>
+			</div>
+			
+				
+		</div>
+	<div th:replace="fragments/footer"></div>
+</body>
+</html>
