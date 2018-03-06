@@ -30,18 +30,40 @@
 			});
 			
 			$('#departmentTable').on('click', 'td', function () {
+				var table = $('#departmentTable').DataTable();
+				var rowData = table.row($(this).parent()).data();
 				var position = $(this).index();
 				if(position != 3 && position != 4){
-					var table = $('#departmentTable').DataTable();
-					var rowData = table.row($(this).parent()).data();
 					$('#departmentDetails').val(rowData.name);
 					$('#managerDetails').val(rowData.manager.name);
 					$('#modalDetails').modal('show');
 				}
 				
+				$('#teamDetails').DataTable( {
+					ajax: {
+						type: "POST",
+						contentType: "application/json",
+						url : /*[[@{/team/search}]]*/,
+						dataType : 'json',
+						data: function () {
+							return JSON.stringify({'department_id': rowData.id});
+						},
+						dataSrc: 'teams'
+					},
+					destroy: true,
+					searching: false,
+					columns: [
+						{ data: 'id' },
+						{ data: 'name' },
+						{ data: 'leader.name' }
+					]
+				});
 			});
 			
-			$('body').on('click', '#btnEdit, #btnAdd', function () {
+			$('body').on('click', '#btnAdd, .glyphiconEdit', function () {
+				var table = $('#departmentTable').DataTable();
+				rowDataRequest = table.row($(this).parent()).data();
+				$('#editModal').modal('show');
 				$('#btnSave').hide();
 				$('#btnCreate').hide();
 				$('#editMsg').hide();
@@ -52,14 +74,10 @@
 					$('#editModalName').text("Add Department");
 				} else {
 					isAdd = 0;
-					var table = $('#departmentTable').DataTable();
-					rowDataRequest = table.row($(this).parent()).data();
 					$('#editDepartment').val(rowDataRequest.name);
 					$('#editModalName').text("Edit Department");
 					$('#btnSave').show();
 				}
-
-				$('#editModal').modal('show');
 				
 				$.ajax({
 					type : "POST",
@@ -235,7 +253,7 @@
 					{ data: 'manager.name' },
 					{
 						render: function (index) {
-								return '<a id="btnEdit"><span class="glyphicon glyphicon-pencil" value="' + index + '"></span></a>';
+								return '<a class="glyphiconEdit"><span class="glyphicon glyphicon-pencil" value="' + index + '"></span></a>';
 						},
 					},
 					{
@@ -306,6 +324,23 @@
 									<input id="managerDetails" class="form-control" readonly="readonly"></input>
 								</div>&nbsp;
 								
+								<div class="row">
+									<div class="col-sm-12">
+										<table id="teamDetails" class="table table-bordered table-hover" style="width: 100%">
+											<label>List Teams</label>
+											<thead>
+												<tr>
+													<th class="text-center">ID</th>
+													<th class="text-center">Team</th>
+													<th class="text-center">Leader</th>
+												</tr>
+											</thead>
+											<tbody>
+											</tbody>
+										</table>
+									</div>
+								</div>
+								
 								<p align="right">
 									<button type="button" class="btn btn-default" style="width:76px;" data-dismiss="modal">Close</button>
 								</p>
@@ -347,26 +382,6 @@
 				</div>
 			</div>
 			
-			<div class="modal fade" id="confirmModal" role="dialog">
-			<div class="modal-dialog">
-
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h2 class="modal-title">Confirm</h2>
-					</div>
-					<div class="modal-body">
-						<h4>Are you sure want to delete this department?</h4>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal" id="btnYes">Yes</button>
-						<button type="button" class="btn btn-default" data-dismiss="modal" id="btnNo">No</button>
-					</div>
-				</div>
-
-			</div>
-		</div>
-				
 		</div>
 	<div th:replace="fragments/footer"></div>
 </body>

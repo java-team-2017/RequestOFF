@@ -11,7 +11,13 @@
 		var userData;
 		var requestObj;
 		var buttonIsClicked;
-		
+		var requestStatus = {
+			'1' : 'Saved',
+			'2' : 'Approved',
+			'3' : 'Denied',
+			'4' : 'Responded',
+			'5' : 'Waiting'
+		};
 		$(function() {
 			var objReturnRequestDetails;
 			var listRequest;
@@ -24,8 +30,8 @@
 			};
 			
 			$('[data-toggle="tooltip"]').tooltip();
-			$('#btnApprove').prop('disabled', true);
-			$('#btnDeny').prop('disabled', true);
+			$('#btnApprove').hide();
+			$('#btnDeny').hide();
 			
 			$.ajax({
 				type : "post",
@@ -68,6 +74,7 @@
 					var table = $('#requestTable').DataTable();
 					var rowData = table.row(this).data();
 					objReturnRequestDetails = rowData;
+					console.log("rowData" + rowData);
 					$('#nameDetails').val(rowData.employee.name);
 					$('#positionDetails').val(rowData.employee.position.name);
 					if(rowData.employee.position.id == 2 || rowData.employee.position.id == 3){
@@ -120,16 +127,16 @@
 					"update_date": objReturnRequestDetails.updateDate
 				}
 				if ($(this).attr('id') == 'btnApproveModal') {
-					$('#confirmMsg').text("Are you sure want to approve this request?");
+					$('#confirmMsg').text("Are you sure want to APPROVE this request ?");
 					requestObj['status'] = 2;
 				} else if ($(this).attr('id') == 'btnDenyModal') {
-					$('#confirmMsg').text("Are you sure want to deny this request?");
+					$('#confirmMsg').text("Are you sure want to DENY this request ?");
 					requestObj['status'] = 3;
 				} else if ($(this).attr('id') == 'btnSendModal') {
-					$('#confirmMsg').text("Are you sure want to send message to this request?");
+					$('#confirmMsg').text("Are you sure want to SEND MESSAGE to this request ?");
 					requestObj['status'] = 4;
 				} else if ($(this).attr('id') == 'btnForward') {
-					$('#confirmMsg').text("Are you sure want to forward to this person?");
+					$('#confirmMsg').text("Are you sure want to FORWARD this request to " + objReturnRequestDetails.forwardName + " ?");
 					requestObj['recipient_id'] = $("#forward").val();
 				}
 				requestObj['response_message'] = $('#responseMessage').val();
@@ -138,15 +145,24 @@
 			
 			$('#requestTable').on('click', '#checkbox', function() {
 				if($('#requestTable input[type="checkbox"]:checked').length > 0){
-					$('#btnApprove').prop('disabled', false);
-					$('#btnDeny').prop('disabled', false);
+					$('#btnApprove').show();
+					$('#btnDeny').show();
 					
 					$("#btnApprove, #btnDeny").on('click', function() {
 						buttonIsClicked = $(this).attr('id');
+						var numberOfRequest = $('#requestTable input[type="checkbox"]:checked').length;
 						if (buttonIsClicked == 'btnApprove') {
-							$('#confirmMsg').text("Are you sure want to approve this request?");
+							if(numberOfRequest == 1){
+								$('#confirmMsg').text("Are you sure want to APPROVE this request ?");
+							} else {
+								$('#confirmMsg').text("Are you sure want to APPROVE "+ numberOfRequest + " requests ?");
+							}
 						} else if (buttonIsClicked == 'btnDeny') {
-							$('#confirmMsg').text("Are you sure want to deny this request?");
+							if(numberOfRequest == 1){
+								$('#confirmMsg').text("Are you sure want to DENY this request ?");
+							} else {
+								$('#confirmMsg').text("Are you sure want to DENY "+ numberOfRequest + " requests ?");
+							}
 						}
 						var status = $(this).attr('id') == 'btnApprove' ? 2 : 3;
 						requestObj = {
@@ -156,8 +172,8 @@
 						$('#confirmModal').modal('show');
 					});
 				} else {
-					$('#btnApprove').prop('disabled', true);
-					$('#btnDeny').prop('disabled', true);
+					$('#btnApprove').hide();
+					$('#btnDeny').hide();
 				}
 			});
 			
@@ -169,10 +185,10 @@
 					"update_date": rowData.updateDate
 				}
 				if ($(this).hasClass('btnApprove')) {
-					$('#confirmMsg').text("Are you sure want to approve this request?");
+					$('#confirmMsg').text("Are you sure want to APPROVE this request ?");
 					requestObj["status"] = 2;
 				} else {
-					$('#confirmMsg').text("Are you sure want to deny this request?");
+					$('#confirmMsg').text("Are you sure want to DENY this request ?");
 					requestObj["status"] = 3;
 				}
 				
@@ -187,11 +203,10 @@
 						
 						requestObj.id = rowData.id;
 						requestObj.update_date = rowData.updateDate;
-						console.log(requestObj);
 						updateRequest(requestObj);
 					});
-					$('#btnApprove').prop('disabled', true);
-					$('#btnDeny').prop('disabled', true);
+					$('#btnApprove').hide();
+					$('#btnDeny').hide();
 					buttonIsClicked = 0;
 				} else {
 					updateRequest(requestObj);
@@ -283,9 +298,9 @@
 						data: 'status',
 						render: function (data, type, row) {
 							if(row.status != 5){
-								return '<input id="checkbox" type="checkbox" class="editor-active" disabled="disabled">';
+								return '<input id="checkbox" type="checkbox" disabled="disabled">';
 							} else {
-								return '<input id="checkbox" type="checkbox" class="editor-active">';
+								return '<input id="checkbox" type="checkbox" >';
 							}
 						},
 					},
@@ -298,14 +313,10 @@
 					{
 						data: 'status',
 						render: function (data, type, row) {
-							if(row.status == 2){
-								return '<p>Approved</p>';
-							} else if(row.status == 3){
-								return '<p>Denied</p>';
-							} else if(row.status == 4){
-								return '<p>Responded</p>';
-							} else if(row.status == 5) {
+							if(row.status == 5) {
 								return '<a data-toggle="tooltip" title="Approve" class="btnApprove"><span class="glyphicon glyphicon-ok">&nbsp;&nbsp;<a data-toggle="tooltip" title="Deny" class="btnDeny"><span class="glyphicon glyphicon-remove"></span></a></a>';
+							} else {
+								return requestStatus[data];
 							}
 						},
 					}
@@ -368,14 +379,14 @@
 				<table class="table table-bordered table-striped table-hover" id="requestTable">
 					<thead>
 						<tr>
-							<th class="text-center" name="select" style="width: 40px;"><span>Select</span></th>
-							<th class="text-center" name="id" id="id" style="width: 40px;"><span>ID</span></th>
-							<th class="text-center" name="name"><span>Employee</span></th>
-							<th class="text-center" name="from"><span>From</span></th>
-							<th class="text-center" name="to"><span>To</span></th>
-							<th class="text-center" name="totalTime"><span>Total Time</span></th>
-							<th class="text-center" name="reason"><span>Reason</span></th>
-							<th class="text-center" name="approve"><span>Status</span></th>
+							<th class="text-center" name="select" style="width: 40px;">Select</th>
+							<th class="text-center" name="id" id="id" style="width: 40px;">ID</th>
+							<th class="text-center" name="name">Employee</th>
+							<th class="text-center" name="from">From</th>
+							<th class="text-center" name="to">To</th>
+							<th class="text-center" name="totalTime">Total Time</th>
+							<th class="text-center" name="reason">Reason</th>
+							<th class="text-center" name="approve">Status</th>
 						</tr>
 					</thead>
 					<tbody class="text-center">
@@ -453,7 +464,7 @@
 			
 								<label class="col-md-3 control-label">Response Message:</label>
 								<div class="col-md-9">
-									<textarea id="responseMessage" name="responseMessage"
+									<textarea id="responseMessage"
 										placeholder="Write message..."
 										style="height: 100px; width: 100%;">
 									</textarea>
