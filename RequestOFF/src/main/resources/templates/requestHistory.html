@@ -2,21 +2,8 @@
 <html>
 	<head>
 		<title>Request History</title>
-		<link rel="stylesheet" type="text/css" href="css/layoutStyle.css" />
-		<link rel="stylesheet" type="text/css" href="css/common.css" />
+		<div th:replace="library"></div>
 		<link rel="stylesheet" type="text/css" href="css/requestHistoryStyle.css" />
-		<link rel="stylesheet"	type="text/css" href="css/bootstrap.min.css" />
-		<link rel="stylesheet"	type="text/css" href="css/notify.css" />
-		<link rel="stylesheet" type="text/css" href="css/datatables.min.css"/>
-		<link rel="stylesheet" type="text/css" href="css/bootstrap-datepicker.min.css"/>
-		<script src="javascript/jquery-3.2.1.js"></script>
-		<script src="javascript/bootstrap.min.js"></script>
-		<script src="javascript/jquery.serializejson.js"></script>
-		<script src="javascript/common.js"></script>
-		<script src="javascript/notify.js"></script>
-		<script type="text/javascript" src="javascript/datatables.min.js"></script>
-		<script type="text/javascript" src="javascript/bootstrap-confirmation.min.js"></script>
-		<script type="text/javascript" src="javascript/bootstrap-datepicker.min.js"></script>
 	</head>
 	<body class="content-body">
 		<script th:inline="javascript">
@@ -430,9 +417,20 @@
 					table.column(6).visible(false);
 					table.column(7).visible(false);
 				}
-				if(requestStatus == 4) { //4: responded
-					table.column(7).visible(false);
-				}
+				
+				
+				
+// 				$('#requestHistoryTable').find('tr').each(function(i, e) {
+// 					console.log("*********");
+// 					console.log(e);
+// 				});
+				
+// 				console.log(table.rows().eq(0).length + ">>>>>>>>>>>>");
+// 				console.log(table.row(1).data());
+				
+// 				if(requestStatus == 4) { //4: responded
+// 					table.column(7).visible(false);
+// 				}
 			}
 			
 		/*]]>*/
@@ -450,7 +448,7 @@
 					<form class="form-input" id="requestHistoryForm">
 						<div class="form-group">
 							<label for="fromTime">From</label>
-							<div class="input-group date datepicker" data-provide="datepicker">
+							<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 								<input type="text" class="form-control" name="fromTime" id="fromTimeId" />
 								<div class="input-group-addon">
 									<span class="glyphicon glyphicon-th"></span>
@@ -460,7 +458,7 @@
 	
 						<div class="form-group">
 							<label for="toTime">To</label>
-							<div class="input-group date datepicker" data-provide="datepicker">
+							<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 								<input type="text" class="form-control" name="toTime" id="toTimeId" />
 								<div class="input-group-addon">
 									<span class="glyphicon glyphicon-th"></span>
@@ -544,7 +542,7 @@
 										<div class="form-group row">
 											<label class="control-label col-sm-3">From * </label>
 											<div class="col-sm-5" style="padding-left:0px;">
-												<div class="input-group date datepicker" data-provide="datepicker">
+												<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="from_modalForm" id="modalFrom"/>
 													<div class="input-group-addon">
 														<span class="glyphicon glyphicon-th"></span>
@@ -585,7 +583,7 @@
 										<div class="form-group row">
 											<label class="control-label col-sm-3">To * </label>
 											<div class="col-sm-5" style="padding-left:0px;">
-												<div class="input-group date datepicker" data-provide="datepicker">
+												<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="to_modalForm" id="modalTo"/>
 													<div class="input-group-addon">
 														<span class="glyphicon glyphicon-th"></span>

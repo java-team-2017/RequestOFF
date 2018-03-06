@@ -2,21 +2,8 @@
 <html lang="en">
 	<head>
 		<title>Create Request</title>
-		<link rel="stylesheet" type="text/css" href="css/layoutStyle.css" />
-		<link rel="stylesheet" type="text/css" href="css/common.css" />
+		<div th:replace="library"></div>
 		<link rel="stylesheet" type="text/css" href="css/createRequestStyle.css" />
-		<link rel="stylesheet"	type="text/css" href="css/bootstrap.min.css" />
-		<link rel="stylesheet"	type="text/css" href="css/notify.css" />
-		<link rel="stylesheet" type="text/css" href="css/datatables.min.css"/>
-		<link rel="stylesheet" type="text/css" href="css/bootstrap-datepicker.min.css"/>
-		<script src="javascript/jquery-3.2.1.js"></script>
-		<script src="javascript/bootstrap.min.js"></script>
-		<script src="javascript/jquery.serializejson.js"></script>
-		<script src="javascript/common.js"></script>
-		<script src="javascript/notify.js"></script>
-		<script type="text/javascript" src="javascript/datatables.min.js"></script>
-		<script type="text/javascript" src="javascript/bootstrap-confirmation.min.js"></script>
-		<script type="text/javascript" src="javascript/bootstrap-datepicker.min.js"></script>
 	</head>
 	<body class="content-body">
 		<script th:inline="javascript">
@@ -200,7 +187,7 @@
 							<label>From * </label>
 							<div class="row">
 								<div class="col-sm-6">
-									<div class="input-group date datepicker" data-provide="datepicker">
+									<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 										<input type="text" class="form-control" name="from"/>
 										<div class="input-group-addon">
 											<span class="glyphicon glyphicon-th"></span>
@@ -243,7 +230,7 @@
 							<label>To * </label>
 							<div class="row">
 								<div class="col-sm-6">
-									<div class="input-group date datepicker" data-provide="datepicker">
+									<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 										<input type="text" class="form-control" name="to"/>
 										<div class="input-group-addon">
 											<span class="glyphicon glyphicon-th"></span>

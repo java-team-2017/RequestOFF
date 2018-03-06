@@ -24,9 +24,9 @@ public interface EmployeeService {
 	
 	public Employee findByEmail(String email);
 	
-	public List<GetUserResponse.IdName> findForwardList(long id);
+	public List<GetUserResponse.IdName> findForwardList(long id) throws Exception;
 	
-	public List<GetUserResponse.IdName> getListRecipients(long employeeId);
+	public List<GetUserResponse.IdName> getListRecipients(long employeeId) throws Exception;
 	
 	public long getRemainHours(long employeeId);
 	

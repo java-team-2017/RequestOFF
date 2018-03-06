@@ -11,6 +11,7 @@ public class Position {
 	public static final long POSITION_LEADER = 2;
 	public static final long POSITION_PROJECT_MANAGER = 3;
 	public static final long POSITION_HR = 4;
+	public static final long POSITION_HR_MANAGER = 5;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

@@ -20,6 +20,7 @@ import com.dactech.requestoff.model.entity.Position;
 import com.dactech.requestoff.model.entity.Request;
 import com.dactech.requestoff.model.entity.Role;
 import com.dactech.requestoff.model.entity.Team;
+import com.dactech.requestoff.model.entity.TeamEmployee;
 import com.dactech.requestoff.model.request.EmployeeDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatisticsPagingRequest;
 import com.dactech.requestoff.model.request.EmployeeRegistRequest;
@@ -35,6 +36,7 @@ import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
 import com.dactech.requestoff.repository.RequestRepository;
 import com.dactech.requestoff.repository.RoleRepository;
+import com.dactech.requestoff.repository.TeamEmployeeRepository;
 import com.dactech.requestoff.repository.TeamRepository;
 import com.dactech.requestoff.service.EmployeeService;
 import com.dactech.requestoff.util.DateUtils;
@@ -58,6 +60,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 	private EmployeeOffStatusRepository EOSRepository;
 	@Autowired
 	private RoleRepository roleRepository;
+	@Autowired
+	private TeamEmployeeRepository teamEmployeeRepository;
 
 	@Override
 	public EmployeeRegistResponse employeeRegist(EmployeeRegistRequest erRequest) throws Exception {
@@ -111,6 +115,37 @@ public class EmployeeServiceImpl implements EmployeeService {
 				employee.setBirthday(erRequest.getBirthday());
 			}
 			if (StringUtil.isNotEmpty(erRequest.getPositionId())) {
+				Position oldPosition = employee.getPosition();
+				if((oldPosition.getId() == Position.POSITION_EMPLOYEE && Long.parseLong(erRequest.getPositionId()) != Position.POSITION_EMPLOYEE)
+					|| (oldPosition.getId() == Position.POSITION_HR && Long.parseLong(erRequest.getPositionId()) != Position.POSITION_HR)) {
+					if(employee.getListTeam() != null && employee.getListTeam().size() > 0) {
+						Team team = employee.getListTeam().get(0);
+						if(team != null) {
+							TeamEmployee teamEmployee = teamEmployeeRepository.findByTeamIdAndEmployeeId(team.getId(), EmployeeId);
+							if(teamEmployee != null) {
+								teamEmployeeRepository.delete(teamEmployee);
+							}
+						}
+					}
+				}
+				else if(oldPosition.getId() == Position.POSITION_LEADER && Long.parseLong(erRequest.getPositionId()) != Position.POSITION_LEADER) {
+					Team team = teamRepository.findByLeaderId(EmployeeId);
+					if (team != null) {
+						throw new Exception(employee.getName() + " is currently the leader of " + team.getName() + ". Please remove " + employee.getName() 
+											+ " from " + team.getName() + " first!");
+					}
+				}
+				else if((oldPosition.getId() == Position.POSITION_PROJECT_MANAGER 
+						&& Long.parseLong(erRequest.getPositionId()) != Position.POSITION_PROJECT_MANAGER)
+						|| (oldPosition.getId() == Position.POSITION_HR_MANAGER 
+						&& Long.parseLong(erRequest.getPositionId()) != Position.POSITION_HR_MANAGER)) {
+					Department dept = departmentRepository.findByManagerId(EmployeeId);
+					if(dept != null) {
+						throw new Exception(employee.getName() + " is currently the manager of " + dept.getName() + ". Please remove " + employee.getName() 
+											+ " from " + dept.getName() + " first!");
+					}
+				}
+				
 				Position position = new Position();
 				position.setId(Long.parseLong(erRequest.getPositionId()));
 				employee.setPosition(position);
@@ -362,42 +397,72 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public List<GetUserResponse.IdName> findForwardList(long id) {
+	public List<GetUserResponse.IdName> findForwardList(long employeeId) throws Exception {
 		List<GetUserResponse.IdName> forwards = new ArrayList<GetUserResponse.IdName>(10);
-		Employee user = employeeRepository.findById(id);
-		
-		if (user.getPosition().getId() == Position.POSITION_LEADER) {
-			Team t = teamRepository.findByLeaderId(user.getId());
-			Employee manager = t.getDepartment().getManager();
-			forwards.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
-		} else if (user.getPosition().getId() == Position.POSITION_PROJECT_MANAGER) {
-			Department d = departmentRepository.findByManagerId(user.getId());
-			List<Team> teams = teamRepository.findByDepartmentId(d.getId());
-			for(Team team : teams) {
-				Employee leader = team.getLeader();
-				forwards.add(new GetUserResponse.IdName(leader.getId(), leader.getName()));
+		Employee user = employeeRepository.findById(employeeId);
+		if(user != null) {
+			if (user.getPosition().getId() == Position.POSITION_LEADER) {
+				Team t = teamRepository.findByLeaderId(user.getId());
+				if(t != null) {
+					Department dept = t.getDepartment();
+					if(dept != null) {
+						Employee manager = dept.getManager();
+						forwards.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
+					}
+				}
+			} else if (user.getPosition().getId() == Position.POSITION_PROJECT_MANAGER) {
+				Department d = departmentRepository.findByManagerId(user.getId());
+				if(d != null) {
+					List<Team> teams = teamRepository.findByDepartmentId(d.getId());
+					if(teams != null && teams.size() > 0) {
+						for(Team team : teams) {
+							Employee leader = team.getLeader();
+							forwards.add(new GetUserResponse.IdName(leader.getId(), leader.getName()));
+						}
+					}
+				}
 			}
+		} else {
+			throw new Exception("Can not find employee with id " + employeeId);
 		}
 		
 		return forwards;
 	}
 	
 	@Override
-	public List<GetUserResponse.IdName> getListRecipients(long employeeId) {
+	public List<GetUserResponse.IdName> getListRecipients(long employeeId) throws Exception {
 		List<GetUserResponse.IdName> listRecipients = new ArrayList<GetUserResponse.IdName>();
 		Employee e = employeeRepository.findById(employeeId);
-		if(e.getPosition().getId() == Position.POSITION_LEADER) {
-			Employee manager = teamRepository.findByLeaderId(employeeId).getDepartment().getManager();
-			listRecipients.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
-		}
-		else if(e.getPosition().getId() == Position.POSITION_EMPLOYEE) {
-			Employee leader = e.getListTeam().get(0).getLeader();
-			listRecipients.add(new GetUserResponse.IdName(leader.getId(), leader.getName()));
-			Employee manager = e.getListTeam().get(0).getDepartment().getManager();
-			listRecipients.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
+		if(e != null) {
+			if(e.getPosition().getId() == Position.POSITION_LEADER) {
+				Team team = teamRepository.findByLeaderId(employeeId);
+				if(team != null) {
+					Department dept = team.getDepartment();
+					if(dept != null) {
+						Employee manager = dept.getManager();
+						listRecipients.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
+					}
+				}
+			}
+			else if(e.getPosition().getId() == Position.POSITION_EMPLOYEE) {
+				if(e.getListTeam() != null && e.getListTeam().size() > 0) {
+					Employee leader = e.getListTeam().get(0).getLeader();
+					if(leader != null) {
+						listRecipients.add(new GetUserResponse.IdName(leader.getId(), leader.getName()));
+						Department dept = e.getListTeam().get(0).getDepartment();
+						if(dept != null) {
+							Employee manager = dept.getManager();
+							listRecipients.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
+						}
+					}
+				}
+			}
+			else {
+				listRecipients.add(new GetUserResponse.IdName(e.getId(), e.getName()));
+			}
 		}
 		else {
-			listRecipients.add(new GetUserResponse.IdName(e.getId(), e.getName()));
+			throw new Exception("Can not find employee with id " + employeeId);
 		}
 		return listRecipients;
 	}
@@ -490,24 +555,26 @@ public class EmployeeServiceImpl implements EmployeeService {
 		
 		if (employee.getPosition().getId() == Position.POSITION_EMPLOYEE || employee.getPosition().getId() == Position.POSITION_HR) {
 			if (employee.getListTeam() != null && employee.getListTeam().size() > 0 && employee.getListTeam().get(0)!= null) {
-				throw new Exception("Employee is a member of Team : " + employee.getListTeam().get(0).getName());
+				throw new Exception(employee.getName() + " is currently a member of team : " + employee.getListTeam().get(0).getName()
+									+ ". Please remove " + employee.getName() + " from " + employee.getListTeam().get(0).getName() + " first!");
 			}
 		} else if (employee.getPosition().getId() == Position.POSITION_PROJECT_MANAGER) {
 			Department dept = departmentRepository.findByManagerId(employeeId);
 			if (dept != null) {
-				throw new Exception("Employee is a Manager of Department : " + dept.getName());
+				throw new Exception(employee.getName() + " is currently the manager of department : " + dept.getName() + ". Please remove "
+									+ employee.getName() + " from " + dept.getName() + " first!");
 			}
 		} else if (employee.getPosition().getId() == Position.POSITION_LEADER) {
 			Team team = teamRepository.findByLeaderId(employeeId);
 			if (team != null) {
-				throw new Exception("Employee is a Leader of Department : " + team.getName());
+				throw new Exception(employee.getName() + " is currently the leader of team : " + team.getName() + ". Please remove "
+									+ employee.getName() + " from " + team.getName() + " first!");
 			}
 		} else {
 			throw new Exception("Unsolved ");
 		}
 
 		employeeRepository.delete(employee);
-
 		return true;
 	}
 }

@@ -136,6 +136,7 @@ public class EmployeeController {
 			
 			response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
 		} catch (Exception e) {
+			e.printStackTrace();
 			response.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
 		}
 		return response;

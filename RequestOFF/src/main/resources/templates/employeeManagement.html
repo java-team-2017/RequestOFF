@@ -3,6 +3,7 @@
 	<head>
 		<title>Employee Management</title>
 		<div th:replace="library"></div>
+		<link rel="stylesheet" type="text/css" href="css/employeeManagementStyle.css" />
 	</head>
 	<body class="content-body">
 		<script th:inline="javascript">
@@ -316,14 +317,18 @@
 							dataType : 'json',
 							data : JSON.stringify(employeeRegistRequest),
 							success : function(returnData) {
-								table = $('#employeeTable').DataTable();
-								table.ajax.reload();
+								if(returnData.status_info.status == 1) {
+									$('#alertMessage_modalDetails').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+								} else {
+									table = $('#employeeTable').DataTable();
+									table.ajax.reload();
+									$('#employeeDetailsModal').modal('hide');
+								}
 							},
 							error : function(e) {
 								$('#alertMessage_modalDetails').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 							}
 						});
-						$('#employeeDetailsModal').modal('hide');
 					}
 				});
 			});
@@ -355,7 +360,9 @@
 								if(returnData.status_info.status == 1) {
 									$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
 								}
-	 							table.ajax.reload();
+								else {
+									table.ajax.reload();
+								}
 							},
 							error : function(e) {
 								$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
@@ -554,7 +561,7 @@
 										<div class="form-group row">
 											<label class="control-label col-sm-3">Birthday * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
-												<div class="input-group date datepicker" data-provide="datepicker">
+												<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="birthdayModalDetails" id="birthdayModalDetailsId"/>
 													<div class="input-group-addon">
 														<span class="glyphicon glyphicon-th"></span>
@@ -577,7 +584,7 @@
 										<div class="form-group row">
 											<label class="control-label col-sm-3">Start working date * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
-												<div class="input-group date datepicker" data-provide="datepicker">
+												<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="startWorkingModalDetails" id="startWorkingModalDetailsId"/>
 													<div class="input-group-addon">
 														<span class="glyphicon glyphicon-th"></span>
@@ -588,7 +595,7 @@
 										<div class="form-group row">
 											<label class="control-label col-sm-3">Official working date * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
-												<div class="input-group date datepicker" data-provide="datepicker">
+												<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="officialWorkingModalDetails" id="officialWorkingModalDetailsId"/>
 													<div class="input-group-addon">
 														<span class="glyphicon glyphicon-th"></span>
@@ -664,7 +671,7 @@
 										<div class="form-group row">
 											<label class="control-label col-sm-3">Birthday * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
-												<div class="input-group date datepicker" data-provide="datepicker">
+												<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="birthdayModalAdd" id="birthdayModalAddId"/>
 													<div class="input-group-addon">
 														<span class="glyphicon glyphicon-th"></span>
@@ -687,7 +694,7 @@
 										<div class="form-group row">
 											<label class="control-label col-sm-3">Start working date * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
-												<div class="input-group date datepicker" data-provide="datepicker">
+												<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="startWorkingModalAdd" id="startWorkingModalAddId"/>
 													<div class="input-group-addon">
 														<span class="glyphicon glyphicon-th"></span>
@@ -698,7 +705,7 @@
 										<div class="form-group row">
 											<label class="control-label col-sm-3">Official working date * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
-												<div class="input-group date datepicker" data-provide="datepicker">
+												<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="officialWorkingModalAdd" id="officialWorkingModalAddId"/>
 													<div class="input-group-addon">
 														<span class="glyphicon glyphicon-th"></span>
