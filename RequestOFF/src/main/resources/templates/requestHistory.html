@@ -152,47 +152,48 @@
 				});
 				
 				$("body").on("click", ".btnDelete", function(event) {
-					$("#confirmModal").modal('show');
 					var row = $(this).closest("tr");	// Finds the closest row <tr> 
 					var id = row.find("td:nth-child(1)").html();	//Find the 1st <td> element
 					rowData = table.row($(this).parent()).data();
 					var updateDate = rowData.updateDate;
-					var from = rowData.fromTime;
-					var to = rowData.toTime;
 					
-					$("#yesConfirm").on("click", function(e) {
-						//update request
-						$.ajax({
-							type : "POST",
-							contentType : "application/json",
-							url : /*[[@{/request/regist}]]*/,
-							dataType : 'json',
-							data : JSON.stringify({
-								"id" : id,
-								"valid_flag" : "0",
-								"update_date" : updateDate
-							}),
-							success : function(returnData) {
-								table.ajax.reload();
-								$.ajax({
-									type : "POST",
-									contentType : "application/json",
-									url : /*[[@{/employee/getUser}]]*/,
-									dataType : 'json',
-									data : JSON.stringify({}),
-									success : function(returnData) {
-										remainHours = returnData.remainHours;
-										renderRemainHours(returnData.remainHours, 'remainHours');
-									},
-									error : function(e) {
-										$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-									}
-								});
-							},
-							error : function(e) {
-								$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-							}
-						});
+					$("#requestId_confirmModalId").val(id);
+					$("#updateDate_confirmModalId").val(updateDate);
+					$("#confirmModal").modal('show');
+				});
+				
+				$("#yesConfirm").on("click", function(e) {
+					//update request
+					$.ajax({
+						type : "POST",
+						contentType : "application/json",
+						url : /*[[@{/request/regist}]]*/,
+						dataType : 'json',
+						data : JSON.stringify({
+							"id" : $("#requestId_confirmModalId").val(),
+							"valid_flag" : "0",
+							"update_date" : $("#updateDate_confirmModalId").val()
+						}),
+						success : function(returnData) {
+							table.ajax.reload();
+							$.ajax({
+								type : "POST",
+								contentType : "application/json",
+								url : /*[[@{/employee/getUser}]]*/,
+								dataType : 'json',
+								data : JSON.stringify({}),
+								success : function(returnData) {
+									remainHours = returnData.remainHours;
+									renderRemainHours(returnData.remainHours, 'remainHours');
+								},
+								error : function(e) {
+									$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+								}
+							});
+						},
+						error : function(e) {
+							$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+						}
 					});
 				});
 				
@@ -211,7 +212,7 @@
 					var complete = 1, valid = 1, roundHours = 1, exceed = 0, offHoursEqual0 = 0;
 					var listInput = $("#modalForm").find(':input').not("#modalResponseMessage");
 					$.each(listInput, function() {
-						if($(this).val() == "") {
+						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
 							complete = 0;
 						}
 					});
@@ -751,6 +752,8 @@
 									<button type="button" class="btn btn-default" data-dismiss="modal" id="yesConfirm">Yes</button>
 									<button type="button" class="btn btn-default" data-dismiss="modal" id="noConfirm">No</button>
 								</div>
+								<input type="hidden" name="requestId_confirmModal" id="requestId_confirmModalId" />
+								<input type="hidden" name="updateDate_confirmModal" id="updateDate_confirmModalId" />
 							</div>
 						</div>
 					</div>

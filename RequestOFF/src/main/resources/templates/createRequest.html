@@ -67,7 +67,7 @@
 					var complete = 1, valid = 1, roundHours = 1, exceed = 0, offHoursEqual0 = 0;
 					var listInput = $('#createRequestForm').find(':input').not("button");
 					$.each(listInput, function() {
-						if($(this).val() == "") {
+						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
 							complete = 0;
 						}
 					});
