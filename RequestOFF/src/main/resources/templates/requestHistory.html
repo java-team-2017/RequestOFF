@@ -76,48 +76,50 @@
 				
 				$('#requestHistoryTable tbody').on('click', 'td', function() {
 					var index = $(this).index();
-					if(index <= 6) {
+					if(index <= 7) {
 // 						table = $('#requestHistoryTable').DataTable();
 						rowData = table.row(this).data();
 						console.log(rowData);
-						$("#modalRequestId").empty().append(rowData.id);
-						$("#modalStatus").empty().append(getStatus[rowData.status]);
-						$("#modalTitle").empty().append(rowData.employee.name);
-						$("#modalName").empty().append(rowData.employee.name);
-						$("#modalPosition").empty().append(rowData.employee.position.name);
-						$("#modalTeam").empty().append(employee.teamName);
-						$("#modalDepartment").empty().append(employee.departmentName);
+						if(index <= 6 || (index == 7 && rowData.status == 1 || rowData.status == 4)) {
+							$("#modalRequestId").empty().append(rowData.id);
+							$("#modalStatus").empty().append(getStatus[rowData.status]);
+							$("#modalTitle").empty().append(rowData.employee.name);
+							$("#modalName").empty().append(rowData.employee.name);
+							$("#modalPosition").empty().append(rowData.employee.position.name);
+							$("#modalTeam").empty().append(employee.teamName);
+							$("#modalDepartment").empty().append(employee.departmentName);
+							
+							var fromStr = rowData.fromTime.split(" ");
+							var fromDateStr = fromStr[0].split("-");
+							$("#modalFrom").val(fromDateStr[1] + "/" + fromDateStr[2] + "/" + fromDateStr[0]);
+							var fromTimeStr = fromStr[1].split(":");
+							$("#modalHourFrom").val(fromTimeStr[0]);
+							$("#modalMinuteFrom").val(fromTimeStr[1]);
+							var toStr = rowData.toTime.split(" ");
+							var toDateStr = toStr[0].split("-");
+							$("#modalTo").val(toDateStr[1] + "/" + toDateStr[2] + "/" + toDateStr[0]);
+							var toTimeStr = toStr[1].split(":");
+							$("#modalHourTo").val(toTimeStr[0]);
+							$("#modalMinuteTo").val(toTimeStr[1]);
+							$("#modalOffDays").val(parseInt(parseInt(rowData.totalTime) / 8));
+							$("#modalOffHours").val(parseInt(rowData.totalTime) % 8);
+							$("#modalReason").val(rowData.reason);
+							$("#modalDayOffType").val(rowData.dayOffType.id);
+							$("#modalRecipient").val(rowData.recipientId);
+							$("#modalResponseMessage").empty();
+							$("#modalResponseMessage").val(rowData.responseMessage);
+							$("#modalUpdateDate").val(rowData.updateDate);
 						
-						var fromStr = rowData.fromTime.split(" ");
-						var fromDateStr = fromStr[0].split("-");
-						$("#modalFrom").val(fromDateStr[1] + "/" + fromDateStr[2] + "/" + fromDateStr[0]);
-						var fromTimeStr = fromStr[1].split(":");
-						$("#modalHourFrom").val(fromTimeStr[0]);
-						$("#modalMinuteFrom").val(fromTimeStr[1]);
-						var toStr = rowData.toTime.split(" ");
-						var toDateStr = toStr[0].split("-");
-						$("#modalTo").val(toDateStr[1] + "/" + toDateStr[2] + "/" + toDateStr[0]);
-						var toTimeStr = toStr[1].split(":");
-						$("#modalHourTo").val(toTimeStr[0]);
-						$("#modalMinuteTo").val(toTimeStr[1]);
-						$("#modalOffDays").val(parseInt(parseInt(rowData.totalTime) / 8));
-						$("#modalOffHours").val(parseInt(rowData.totalTime) % 8);
-						$("#modalReason").val(rowData.reason);
-						$("#modalDayOffType").val(rowData.dayOffType.id);
-						$("#modalRecipient").val(rowData.recipientId);
-						$("#modalResponseMessage").empty();
-						$("#modalResponseMessage").val(rowData.responseMessage);
-						$("#modalUpdateDate").val(rowData.updateDate);
-					
-						if(rowData.status == "1" || rowData.status == "4") {
-							$("#modalForm :input").prop('disabled', false);
-							$("#btnSave_modal, #btnSend_modal").show();
-						} else {
-							$("#modalForm :input").prop('disabled', true);
-							$("#btnSave_modal, #btnSend_modal").hide();
+							if(rowData.status == "1" || rowData.status == "4") {
+								$("#modalForm :input").prop('disabled', false);
+								$("#btnSave_modal, #btnSend_modal").show();
+							} else {
+								$("#modalForm :input").prop('disabled', true);
+								$("#btnSave_modal, #btnSend_modal").hide();
+							}
+							$('#alertMessage_edit').hide();
+							$('#requestDetailsModal').modal('show');
 						}
-						$('#alertMessage_edit').hide();
-						$('#requestDetailsModal').modal('show');
 					}
 				} );
 				
@@ -385,38 +387,82 @@
 							},
 							{
 								"targets": [ 4 ],
-								"data": 'reason'
+								"data": 'totalTime',
+								"render": function(data, type, full, meta) {
+									var offDays = parseInt(parseInt(data) / 8);
+									var offHours = parseInt(parseInt(data) % 8);
+									var returnStr = "";
+									if(offDays >= 2) {
+										returnStr = offDays + " days and ";
+										if(offHours >= 2) {
+											returnStr += offHours + " hours";
+										}
+										else {
+											returnStr += offHours + " hour";
+										}
+									}
+									else {
+										returnStr = offDays + " day and ";
+										if(offHours >= 2) {
+											returnStr += offHours + " hours";
+										}
+										else {
+											returnStr += offHours + " hour";
+										}
+									}
+									return returnStr;
+								}
 							},
 							{
 								"targets": [ 5 ],
+								"data": 'reason'
+							},
+							{
+								"targets": [ 6 ],
 								"data": 'status',
 								"render": function(data, type, full, meta) {
 									return getStatus[data];
 								}
 							},
 							{
-								"targets": [ 6 ],
-								"className": "text-center",
-								"data": null,
-								"defaultContent": "<a href='#'><span class='glyphicon glyphicon-pencil'></span></a>"
-							},
-							{
 								"targets": [ 7 ],
 								"className": "text-center",
 								"data": null,
-								"defaultContent": "<a href='#' class='btnDelete'><span class='glyphicon glyphicon-remove'></span></a>"
+// 								"defaultContent": "<a href='#'><span class='glyphicon glyphicon-pencil'></span></a>",
+								"render": function(data, type, row) {
+									if(row.status == 1 || row.status == 4) {
+										return "<a><span class='glyphicon glyphicon-pencil' style='cursor: pointer;'></span></a>";
+									}
+									else {
+										return "<a class='not-active'><span class='glyphicon glyphicon-pencil' style='opacity: 0.5;'></span></a>";
+									}
+								}
+							},
+							{
+								"targets": [ 8 ],
+								"className": "text-center",
+								"data": null,
+// 								"defaultContent": "<a href='#' class='btnDelete'><span class='glyphicon glyphicon-remove'></span></a>",
+								"render": function(data, type, row) {
+									if(row.status == 1 || row.status == 4) {
+										return "<a class='btnDelete'><span class='glyphicon glyphicon-remove' style='cursor: pointer;'></span></a>";
+									}
+									else {
+										return "<a class='btnDelete not-active'><span class='glyphicon glyphicon-remove' style='opacity: 0.5;'></span></a>";
+									}
+								}
 							}
 						]
 					});
 				}
 				
 				table = $('#requestHistoryTable').DataTable();
-				var requestStatus = requestSearchRequest.status;
-				if(requestStatus == 0 || requestStatus == 2 || requestStatus == 3 
-						|| requestStatus == 5) { //0: all request, 2: approved, 3: denied, 5: waiting
-					table.column(6).visible(false);
-					table.column(7).visible(false);
-				}
+// 				var requestStatus = requestSearchRequest.status;
+// 				if(requestStatus == 0 || requestStatus == 2 || requestStatus == 3 
+// 						|| requestStatus == 5) { //0: all request, 2: approved, 3: denied, 5: waiting
+// 					table.column(7).visible(false);
+// 					table.column(8).visible(false);
+// 				}
 				
 				
 				
@@ -429,7 +475,7 @@
 // 				console.log(table.row(1).data());
 				
 // 				if(requestStatus == 4) { //4: responded
-// 					table.column(7).visible(false);
+// 					table.column(8).visible(false);
 // 				}
 			}
 			
@@ -492,6 +538,7 @@
 								<th class="text-center timeOfCreationCell">Time of creation</th>
 								<th class="text-center fromCell">From</th>
 								<th class="text-center toCell">To</th>
+								<th class="text-center offHoursCell">Off hours</th>
 								<th class="text-center reasonCell">Reason</th>
 								<th class="text-center statusCell">Status</th>
 								<th class="text-center editCell">Edit</th>

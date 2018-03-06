@@ -26,8 +26,8 @@
 	width: 15%;
 }
 
-.fromCell, .toCell, .timeOfCreationCell {
-	width: 15%;
+.fromCell, .toCell, .timeOfCreationCell, .offHoursCell {
+	width: 13%;
 }
 
 .pleaseFillIn {
@@ -36,4 +36,9 @@
 
 .mydatepicker {
 	padding: 0px;
+}
+
+.not-active {
+	pointer-events: none;
+	cursor: default;
 }
