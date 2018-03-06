@@ -9,6 +9,8 @@
 	/*<![CDATA[*/
 		var employeeLoginId;
 		var userData;
+		var requestObj;
+		var buttonIsClicked;
 		
 		$(function() {
 			var objReturnRequestDetails;
@@ -20,6 +22,10 @@
 				'4' : 'Responded',
 				'5' : 'Waiting'
 			};
+			
+			$('[data-toggle="tooltip"]').tooltip();
+			$('#btnApprove').prop('disabled', true);
+			$('#btnDeny').prop('disabled', true);
 			
 			$.ajax({
 				type : "post",
@@ -57,8 +63,8 @@
 			});
 			
 			$('#requestTable').on('click', 'td', function () {
-				var position = $(this).index();
-				if(position != 0 && position != 7){
+				var isFirstOrLast = $(this).is(':first-child') || $(this).is(':last-child');
+				if(!isFirstOrLast){
 					var table = $('#requestTable').DataTable();
 					var rowData = table.row(this).data();
 					objReturnRequestDetails = rowData;
@@ -109,45 +115,72 @@
 			});
 			
 			$("#btnApproveModal, #btnDenyModal, #btnSendModal, #btnForward").on('click', function(){
-				var requestObj = {
+				requestObj = {
 					"id" : objReturnRequestDetails.id ,
 					"update_date": objReturnRequestDetails.updateDate
 				}
-				$('#confirmModal').modal('show');
-				
-				var selectedValue = $("#forward").val();
 				if ($(this).attr('id') == 'btnApproveModal') {
 					$('#confirmMsg').text("Are you sure want to approve this request?");
-					requestObj.status = 2;
+					requestObj['status'] = 2;
 				} else if ($(this).attr('id') == 'btnDenyModal') {
 					$('#confirmMsg').text("Are you sure want to deny this request?");
-					requestObj.status = 3;
+					requestObj['status'] = 3;
 				} else if ($(this).attr('id') == 'btnSendModal') {
 					$('#confirmMsg').text("Are you sure want to send message to this request?");
-					requestObj.status = 4;
+					requestObj['status'] = 4;
 				} else if ($(this).attr('id') == 'btnForward') {
 					$('#confirmMsg').text("Are you sure want to forward to this person?");
-					requestObj.recipient_id = selectedValue;
+					requestObj['recipient_id'] = $("#forward").val();
 				}
-				requestObj.response_message = $('#responseMessage').val();
-				
-				$('#btnYes').on("click", function(){
-					updateRequest(requestObj);
-				});
+				requestObj['response_message'] = $('#responseMessage').val();
+				$('#confirmModal').modal('show');
 			});
 			
-			$("#btnApprove, #btnDeny").on('click', function() {
-				$('#confirmModal').modal('show');
-				if ($(this).attr('id') == 'btnApprove') {
+			$('#requestTable').on('click', '#checkbox', function() {
+				if($('#requestTable input[type="checkbox"]:checked').length > 0){
+					$('#btnApprove').prop('disabled', false);
+					$('#btnDeny').prop('disabled', false);
+					
+					$("#btnApprove, #btnDeny").on('click', function() {
+						buttonIsClicked = $(this).attr('id');
+						if (buttonIsClicked == 'btnApprove') {
+							$('#confirmMsg').text("Are you sure want to approve this request?");
+						} else if (buttonIsClicked == 'btnDeny') {
+							$('#confirmMsg').text("Are you sure want to deny this request?");
+						}
+						var status = $(this).attr('id') == 'btnApprove' ? 2 : 3;
+						requestObj = {
+							"status" : status
+						}
+						
+						$('#confirmModal').modal('show');
+					});
+				} else {
+					$('#btnApprove').prop('disabled', true);
+					$('#btnDeny').prop('disabled', true);
+				}
+			});
+			
+			$('#requestTable').on('click', '.btnApprove, .btnDeny', function () {
+				var table = $('#requestTable').DataTable();
+				var rowData = table.row($(this).parent()).data();
+				requestObj = {
+					"id" : rowData.id ,
+					"update_date": rowData.updateDate
+				}
+				if ($(this).hasClass('btnApprove')) {
 					$('#confirmMsg').text("Are you sure want to approve this request?");
-				} else if ($(this).attr('id') == 'btnDeny') {
+					requestObj["status"] = 2;
+				} else {
 					$('#confirmMsg').text("Are you sure want to deny this request?");
+					requestObj["status"] = 3;
 				}
-				var status = $(this).attr('id') == 'btnApprove' ? 2 : 3;
-				var requestObj = {
-					"status" : status
-				}
-				$('#btnYes').on("click", function(){
+				
+				$('#confirmModal').modal('show');
+			});
+			
+			$('#btnYes').on("click", function(){
+				if(buttonIsClicked == "btnApprove" || buttonIsClicked == "btnDeny"){
 					$('#requestTable input[type="checkbox"]:checked').each(function(){
 						var table = $('#requestTable').DataTable();
 						var rowData = table.row($(this).parent()).data();
@@ -157,35 +190,12 @@
 						console.log(requestObj);
 						updateRequest(requestObj);
 					});
-				});
-			});
-			
-			$('#requestTable').on('click', '.btnApprove, .btnDeny', function () {
-				var table = $('#requestTable').DataTable();
-				var rowData = table.row($(this).parent()).data();
-				console.log("rowData: ");
-				console.log(rowData);
-				var requestObj = {
-					"id" : rowData.id ,
-					"update_date": rowData.updateDate
-				}
-				$('#confirmModal').modal('show');
-				if ($(this).hasClass('btnApprove')) {
-					$('#confirmMsg').text("Are you sure want to approve this request?");
-					requestObj.status = 2;
+					$('#btnApprove').prop('disabled', true);
+					$('#btnDeny').prop('disabled', true);
+					buttonIsClicked = 0;
 				} else {
-					$('#confirmMsg').text("Are you sure want to deny this request?");
-					requestObj.status = 3;
-				}
-				$('#btnYes').on("click", function(){
-					console.log("requestObj: ");
-					console.log(requestObj);
 					updateRequest(requestObj);
-				});
-			});
-			
-			$(document).ready(function(){
-				$('[data-toggle="tooltip"]').tooltip();
+				}
 			});
 			
 			$('#employee').typeahead({
@@ -194,7 +204,7 @@
 				hint: false,
 				remote: {
 					rateLimitWait: 1000,
-					url: '/employee/search',
+					url : /*[[@{/employee/search}]]*/,
 					replace: function (url, uriEncodedQuery){
 						return url + "#" + uriEncodedQuery;
 					},
@@ -273,9 +283,9 @@
 						data: 'status',
 						render: function (data, type, row) {
 							if(row.status != 5){
-								return '<input type="checkbox" class="editor-active" disabled="disabled">';
+								return '<input id="checkbox" type="checkbox" class="editor-active" disabled="disabled">';
 							} else {
-								return '<input type="checkbox" class="editor-active">';
+								return '<input id="checkbox" type="checkbox" class="editor-active">';
 							}
 						},
 					},
@@ -295,7 +305,7 @@
 							} else if(row.status == 4){
 								return '<p>Responded</p>';
 							} else if(row.status == 5) {
-								return '<a data-toggle="tooltip" title="Approve" class="btnApprove"><span class="glyphicon glyphicon-ok">&nbsp;&nbsp;<a href="#" data-toggle="tooltip" title="Deny" class="btnDeny"><span class="glyphicon glyphicon-remove"></span></a></a>';
+								return '<a data-toggle="tooltip" title="Approve" class="btnApprove"><span class="glyphicon glyphicon-ok">&nbsp;&nbsp;<a data-toggle="tooltip" title="Deny" class="btnDeny"><span class="glyphicon glyphicon-remove"></span></a></a>';
 							}
 						},
 					}
@@ -481,7 +491,7 @@
 						<h4 id="confirmMsg">Are you sure?</h4>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal" id="btnYes">Yes</button>
+						<button type="button" class="btn btn-danger" data-dismiss="modal" id="btnYes">Yes</button>
 						<button type="button" class="btn btn-default" data-dismiss="modal" id="btnNo">No</button>
 					</div>
 				</div>
