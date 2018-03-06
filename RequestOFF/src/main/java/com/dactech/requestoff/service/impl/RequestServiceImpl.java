@@ -196,6 +196,16 @@ public class RequestServiceImpl implements RequestService{
 			requestSearchRequest.setToTime(requestSearchRequest.getToTime() + " 23:59:59");
 		}
 		List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
+		
+		for(int i = 0; i < requests.size(); i++) {
+			Request r = requests.get(i);
+			Employee e = employeeRepository.findById(r.getRecipientId());
+			if(e != null) {
+				String recipientName = e.getName();
+				r.setRecipientName(recipientName);
+			}
+		}
+		
 		return new RequestSearchResponse(requests);
 	}
 

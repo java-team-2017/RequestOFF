@@ -265,7 +265,7 @@
 					
 					//---------validate------------
 					var complete = 1, valid = 1;
-					var listInput = $("#modalDetailsForm").find(':input');
+					var listInput = $("#modalDetailsForm").find(':input').not("#teamModalDetailsId, #departmentModalDetailsId");
 					$.each(listInput, function() {
 						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
 							complete = 0;
@@ -338,31 +338,31 @@
 	 				var row = $(this).closest("tr");	// Finds the closest row <tr> 
 	 				var id = row.find("td:nth-child(1)").html();	//Find the 1st <td> element
 					
-	 				$("#employeeId_confirmModalId").val(id);
+					$("#employeeId_confirmModalId").val(id);
 				});
 				
 				$("#yesConfirm").on("click", function(e) {
-	 				$.ajax({
-	 					url : /*[[@{/employee/delete}]]*/,
-	 					type : "post",
-	 					dataType :"json",
-	 					contentType : "application/json",
-	 					data : JSON.stringify({
-	 						'id': $("#employeeId_confirmModalId").val()
-	 					}),
-	 					success : function (returnData){
-	 						if(returnData.status_info.status == 1) {
-	 							$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
-	 						}
-	 						else {
-	 							table = $('#employeeTable').DataTable();
-	 							table.ajax.reload();
-	 						}
-	 					},
-	 					error : function(e) {
-	 						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-	 					}
-	 				});
+					$.ajax({
+						url : /*[[@{/employee/delete}]]*/,
+						type : "post",
+						dataType :"json",
+						contentType : "application/json",
+						data : JSON.stringify({
+							'id': $("#employeeId_confirmModalId").val()
+						}),
+						success : function (returnData){
+							if(returnData.status_info.status == 1) {
+								$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+							}
+							else {
+								table = $('#employeeTable').DataTable();
+								table.ajax.reload();
+							}
+						},
+						error : function(e) {
+							$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+						}
+					});
 				});
 			});
 			
