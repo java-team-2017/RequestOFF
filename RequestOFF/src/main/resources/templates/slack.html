@@ -6,8 +6,113 @@
 </head>
 
 <script th:inline="javascript">
-	/*<![CDATA[*/
-	/*]]>*/
+/*<![CDATA[*/
+	var rowData; // data of selected row of table
+	
+	$(function() {
+		$('#editHours').empty();
+		for (var i = 0; i < 8 ; i++) {
+			$('#detailTotalHour').append('<option value="' + i + '">' + i + '</option>');
+		}
+		
+		
+		$('#searchBtn').on('click', function() {
+			$('#alertMessage').hide();
+			var searchData = {
+				is_valid_msg: $('#validStatus').val()
+			}
+			var fromTime = new Date($('#from').val());
+			var toTime = new Date($('#to').val());
+			if (fromTime != 'Invalid Date' && toTime != 'Invalid Date' && fromTime.getTime() > toTime.getTime()) {
+				$('#alertMessage').html("From time must be after to time").attr('class', 'alert alert-danger').show();
+				return;
+			}
+				
+			if (fromTime != 'Invalid Date') {
+				searchData.msg_time_from = fromTime.getTime();
+			}
+			
+			if (toTime != 'Invalid Date') {
+				var nextDay = new Date(toTime);
+				nextDay.setDate(toTime.getDate()+1);
+				searchData.msg_time_to = nextDay.getTime()-1;
+			}
+			console.log(searchData);
+			
+			$('#slackRequestTable').DataTable({
+				destroy: true,
+				searching: false,
+				ajax: {
+					'url' : /*[[@{/slack/search}]]*/,
+					'type': "POST",
+					contentType : "application/json",
+					'data': function () {
+						return JSON.stringify(searchData);
+					},
+					'dataSrc': 'slackRequests'
+				},
+				columns: [
+					{ data: 'id' },
+					{
+						data: 'msgTime',
+						render: function (data, type, row){
+							if (type == 'display' || type == 'filter') { // for display and search
+								var m = new Date(data);
+								var dateString = m.getHours() + ":" + m.getMinutes() + ":" + m.getSeconds() + " " + m.getDate() +"/"+ (m.getMonth()+1) +"/"+ m.getFullYear();
+								return dateString;
+							} else { // for sort and type detection
+								if (data == "") return 0;
+								return data;
+							}
+						}
+					},
+					{ data: 'name' },
+					{ data: 'dayOffFrom' },
+					{ data: 'dayOffTo' },
+					{
+						data: 'totalHours',
+						render: function (data, type, row){
+							if (type == 'display' || type == 'filter') { // for display and search
+								if (data == "") data = 0;
+								return Math.floor(data/8) + " day " + (data % 8) + " h";
+							} else { // for sort and type detection
+								if (data == "") return 0;
+								return data;
+							}
+						}
+					},
+				]
+			});
+		});
+		
+		$('#slackRequestTable tbody').on('click', 'td', function() {
+			rowData = $('#slackRequestTable').DataTable().row(this).data();
+			console.log(rowData);
+			
+			$('#detailId').val(rowData.id);
+			var m = new Date(rowData.msgTime);
+			var dateString = m.getHours() + ":" + m.getMinutes() + ":" + m.getSeconds() + " " + m.getDate() +"/"+ (m.getMonth()+1) +"/"+ m.getFullYear();
+			$('#detailMsgTime').val(dateString);
+			$('#detailName').val(rowData.name);
+			$('#detailMsgContent').val(rowData.msgContent);
+			$('#detailFrom').val(rowData.dayOffFrom);
+			$('#detailTo').val(rowData.dayOffTo);
+			$('#detailValidStatus').val(rowData.isValidMsg);
+			$('#detailProcessFlag').val(rowData.processFlag);
+			$('#detailTotalDay').val( Math.floor(rowData.totalHours/8));
+			$('#detailTotalHour').val(rowData.totalHours % 8);
+
+			$('#detailModal').modal('show');
+		});
+		
+		$('#modalSaveBtn').on('click', function() {
+// 			if (isNaN(parseInt(days)) || parseInt(days) != parseFloat(days) || parseInt(days) < 0) {
+// 				$('#editMsg').html("number of days must be a positive integer").show();
+// 			}
+		});
+		
+	});
+/*]]>*/
 </script>
 
 <body class="content-body">
@@ -17,57 +122,140 @@
 	<div class="requestOffContentBody">			
 		<h2>Slack Request Message Management</h2>
 		<div id="alertMessage" class="alert" style="display:none;"></div>
-			<form id="requestForm" class="form-input">
-				<div class="form-group">
-					<label class="control-label">From: </label>
-					<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
-						<input type="text" class="form-control" name="from_modalForm" id="modalFrom"/>
-						<div class="input-group-addon">
-							<span class="glyphicon glyphicon-th"></span>
-						</div>
+		<form id="slackForm" class="form-input">
+			<div class="form-group">
+				<label class="control-label">From: </label>
+				<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
+					<input class="form-control" type="text" name="msg_time_from" id="from" value=""></input>
+					<div class="input-group-addon">
+						<span class="glyphicon glyphicon-th"></span>
 					</div>
 				</div>
-				<div class="form-group">
-					<label class="control-label">To: </label>
-					<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
-						<input type="text" class="form-control" name="from_modalForm" id="modalFrom"/>
-						<div class="input-group-addon">
-							<span class="glyphicon glyphicon-th"></span>
-						</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label">To: </label>
+				<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
+					<input class="form-control" type="text" name="msg_time_to" id="to" value=""></input>
+					<div class="input-group-addon">
+						<span class="glyphicon glyphicon-th"></span>
 					</div>
 				</div>
-				
-				<div class="form-group">
-					<label class="control-label">Type:</label>
-						<select id="" class="form-control">
-							<option value = "0"></option>
-							<option value = "1">valid request message</option>
-							<option value = "2">invalid request message</option>
-						</select>
-				</div>
-				<p>
-					<button id="" type="button" class="btn btn-primary" style="width:76px;">Search</button>
-				</p>
-			</form>
-					
-			<div class="table-responsive" style="margin-top:3em;"> 
-				<table class="table table-bordered table-striped table-hover" id="departmentTable">
-					<thead>
-						<tr>
-							<th class="text-center" style="width: 40px;">Id</th>
-							<th class="text-center">Name</th>
-							<th class="text-center">from</th>
-							<th class="text-center">to</th>
-							<th class="text-center">total Time (h)</th>
-						</tr>
-					</thead>
-					<tbody class="text-center">
-					</tbody>
-				</table>
 			</div>
 			
+			<div class="form-group">
+				<label class="control-label">Message valid status:</label>
+					<select id="validStatus" name="is_valid_msg" class="form-control">
+						<option value = ""></option>
+						<option value = "1">valid request message</option>
+						<option value = "0">invalid request message</option>
+					</select>
+			</div>
+			<p>
+				<button id="searchBtn" type="button" class="btn btn-primary" style="width:76px;">Search</button>
+			</p>
+		</form>
 				
+		<div class="table-responsive" style="margin-top:3em;"> 
+			<table class="table table-bordered table-striped table-hover" id="slackRequestTable">
+				<thead>
+					<tr>
+						<th class="text-center" style="width: 40px;">Id</th>
+						<th class="text-center">Message Time</th>
+						<th class="text-center">Name</th>
+						<th class="text-center">From</th>
+						<th class="text-center">To</th>
+						<th class="text-center">Total Time</th>
+					</tr>
+				</thead>
+				<tbody class="text-center">
+				</tbody>
+			</table>
 		</div>
+		
+		<div id="detailModal" class="modal fade bd-example-modal-lg">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title" align="center">Detail</h4>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-sm-1"></div>
+							<div id="modalMsg" class="alert alert-danger" style="display: none;"></div>
+							<br/>
+						</div>
+						<div class="row">
+							<label class="col-sm-4 col-form-label">Id</label>
+							<div class="col-sm-8">
+								<input id="detailId" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
+							</div>
+						</div>
+						<div class="row">
+							<label class="col-sm-4 col-form-label">Message Time</label>
+							<div class="col-sm-8">
+								<input id="detailMsgTime" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
+							</div>
+						</div>
+						<div class="row">
+							<label class="col-sm-4 col-form-label">Employee Name</label>
+							<div class="col-sm-8">
+								<input id="detailName" class="col-sm-3 form-control" type="text"></input>
+							</div>
+						</div>
+						<div class="row">
+							<label class="col-sm-4 col-form-label">From</label>
+							<div class="col-sm-8">
+								<input id="detailFrom" class="col-sm-3 form-control" type="text"></input>
+							</div>
+						</div>
+						<div class="row">
+							<label class="col-sm-4 col-form-label">To</label>
+							<div class="col-sm-8">
+								<input id="detailTo" class="col-sm-3 form-control" type="text"></input>
+							</div>
+						</div>
+						<div class="row">
+							<label class="col-sm-4 col-form-label">Total Time</label>
+							<div class="col-sm-2">
+								<input id="detailTotalDay" class="col-sm-3 form-control" type="text"></input>
+							</div>
+							<label class="col-sm-1" style="padding-top: 5px">Days</label>
+							<div class="col-sm-1"></div>
+							<div class="col-sm-2">
+								<select id="detailTotalHour" class="form-control"></select>
+							</div>
+							<label class="col-sm-1 col-form-label" style="padding-top: 5px">Hours</label>
+						</div>
+						<div class="row">
+							<label class="col-sm-4 col-form-label">Message Content</label>
+							<div class="col-sm-8">
+								<textarea id="detailMsgContent" rows="4" cols="10" class="col-sm-3 form-control" readonly="readonly" style="height: 176px;"></textarea>
+							</div>
+						</div>
+						<div class="row">
+							<label class="col-sm-4 col-form-label">Valid Message Flag</label>
+							<div class="col-sm-8">
+								<input id="detailValidStatus" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
+							</div>
+						</div>
+						<div class="row">
+							<label class="col-sm-4 col-form-label">Process Flag</label>
+							<div class="col-sm-8">
+								<input id="detailProcessFlag" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button id="modalApproveBtn" type="button" class="btn btn-default">Approve</button>
+						<button id="modalDenyBtn" type="button" class="btn btn-default">Deny</button>
+						<button id="modalSaveBtn" type="button" class="btn btn-default">Save</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 	<div th:replace="fragments/footer"></div>
 </body>
 </html>
