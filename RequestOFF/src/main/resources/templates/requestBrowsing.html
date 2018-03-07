@@ -9,8 +9,7 @@
 	/*<![CDATA[*/
 		var employeeLoginId;
 		var userData;
-		var requestObj;
-		var buttonIsClicked;
+		var requestObjArr = [];
 		var requestStatus = {
 			'1' : 'Saved',
 			'2' : 'Approved',
@@ -19,19 +18,7 @@
 			'5' : 'Waiting'
 		};
 		$(function() {
-			var objReturnRequestDetails;
-			var listRequest;
-			var requestStatus = {
-				'1' : 'Saved',
-				'2' : 'Approved',
-				'3' : 'Denied',
-				'4' : 'Responded',
-				'5' : 'Waiting'
-			};
-			
-			$('[data-toggle="tooltip"]').tooltip();
-			$('#btnApprove').hide();
-			$('#btnDeny').hide();
+			var dataReturnRequest;
 			
 			$.ajax({
 				type : "post",
@@ -48,6 +35,8 @@
 				}
 			});
 			
+			$('[data-toggle="tooltip"]').tooltip();
+			
 			$('.datepicker').on('changeDate', function(ev){
 				$(this).datepicker('hide');
 			});
@@ -56,13 +45,7 @@
 				search();
 			});
 			
-			$("#requestForm select").keydown(function(e){
-				if(e.keyCode == 13) {
-					this.blur();
-				}
-			});
-			
-			$(document).keypress(function(e) {
+			$('#requestForm').keypress(function(e) {
 				if(e.which == 13) {
 					search();
 				}
@@ -73,7 +56,7 @@
 				if(!isFirstOrLast){
 					var table = $('#requestTable').DataTable();
 					var rowData = table.row(this).data();
-					objReturnRequestDetails = rowData;
+					dataReturnRequest = rowData;
 					console.log("rowData" + rowData);
 					$('#nameDetails').val(rowData.employee.name);
 					$('#positionDetails').val(rowData.employee.position.name);
@@ -122,9 +105,10 @@
 			});
 			
 			$("#btnApproveModal, #btnDenyModal, #btnSendModal, #btnForward").on('click', function(){
-				requestObj = {
-					"id" : objReturnRequestDetails.id ,
-					"update_date": objReturnRequestDetails.updateDate
+				requestObjArr = [];
+				var requestObj = {
+					"id" : dataReturnRequest.id ,
+					"update_date": dataReturnRequest.updateDate
 				}
 				if ($(this).attr('id') == 'btnApproveModal') {
 					$('#confirmMsg').text("Are you sure want to APPROVE this request ?");
@@ -136,51 +120,48 @@
 					$('#confirmMsg').text("Are you sure want to SEND MESSAGE to this request ?");
 					requestObj['status'] = 4;
 				} else if ($(this).attr('id') == 'btnForward') {
-					$('#confirmMsg').text("Are you sure want to FORWARD this request to " + objReturnRequestDetails.forwardName + " ?");
+					$('#confirmMsg').text("Are you sure want to FORWARD this request to " + dataReturnRequest.forwardName + " ?");
 					requestObj['recipient_id'] = $("#forward").val();
 				}
+				
 				requestObj['response_message'] = $('#responseMessage').val();
+				requestObjArr.push(requestObj);
 				$('#confirmModal').modal('show');
 			});
 			
-			$('#requestTable').on('click', '#checkbox', function() {
+			$("#btnApprove, #btnDeny").on('click', function() {
+				requestObjArr = [];
+				var status = $(this).attr('id') == 'btnApprove' ? 2 : 3;
+				var action = $(this).attr('id') == 'btnApprove' ? 'APPROVE' : 'DENY';
 				if($('#requestTable input[type="checkbox"]:checked').length > 0){
-					$('#btnApprove').show();
-					$('#btnDeny').show();
-					
-					$("#btnApprove, #btnDeny").on('click', function() {
-						buttonIsClicked = $(this).attr('id');
-						var numberOfRequest = $('#requestTable input[type="checkbox"]:checked').length;
-						if (buttonIsClicked == 'btnApprove') {
-							if(numberOfRequest == 1){
-								$('#confirmMsg').text("Are you sure want to APPROVE this request ?");
-							} else {
-								$('#confirmMsg').text("Are you sure want to APPROVE "+ numberOfRequest + " requests ?");
-							}
-						} else if (buttonIsClicked == 'btnDeny') {
-							if(numberOfRequest == 1){
-								$('#confirmMsg').text("Are you sure want to DENY this request ?");
-							} else {
-								$('#confirmMsg').text("Are you sure want to DENY "+ numberOfRequest + " requests ?");
-							}
-						}
-						var status = $(this).attr('id') == 'btnApprove' ? 2 : 3;
-						requestObj = {
-							"status" : status
-						}
-						
-						$('#confirmModal').modal('show');
+					var numberOfRequest = $('#requestTable input[type="checkbox"]:checked').length;
+					if(numberOfRequest == 1){
+						$('#confirmMsg').text("Are you sure want to " + action + " this request ?");
+					} else {
+						$('#confirmMsg').text("Are you sure want to " + action + " "+ numberOfRequest + " requests ?");
+					}
+					$('#requestTable input[type="checkbox"]:checked').each(function(){
+						var table = $('#requestTable').DataTable();
+						var rowData = table.row($(this).parent()).data();
+						var requestObj = {};
+						requestObj['id'] = rowData.id;
+						requestObj['update_date'] = rowData.updateDate;
+						requestObj['status'] = status;
+						requestObjArr.push(requestObj);
 					});
+					
+					$('#confirmModal').modal('show');
 				} else {
-					$('#btnApprove').hide();
-					$('#btnDeny').hide();
+					$('#alertModal').modal('show');
+					$('#alertMsg').text("You must select at least 1 request before click this button!").attr('class', 'alert alert-warning').show();
 				}
 			});
 			
 			$('#requestTable').on('click', '.btnApprove, .btnDeny', function () {
+				requestObjArr = [];
 				var table = $('#requestTable').DataTable();
 				var rowData = table.row($(this).parent()).data();
-				requestObj = {
+				var requestObj = {
 					"id" : rowData.id ,
 					"update_date": rowData.updateDate
 				}
@@ -191,26 +172,18 @@
 					$('#confirmMsg').text("Are you sure want to DENY this request ?");
 					requestObj["status"] = 3;
 				}
-				
+				requestObjArr.push(requestObj);
 				$('#confirmModal').modal('show');
 			});
 			
 			$('#btnYes').on("click", function(){
-				if(buttonIsClicked == "btnApprove" || buttonIsClicked == "btnDeny"){
-					$('#requestTable input[type="checkbox"]:checked').each(function(){
-						var table = $('#requestTable').DataTable();
-						var rowData = table.row($(this).parent()).data();
-						
-						requestObj.id = rowData.id;
-						requestObj.update_date = rowData.updateDate;
-						updateRequest(requestObj);
-					});
-					$('#btnApprove').hide();
-					$('#btnDeny').hide();
-					buttonIsClicked = 0;
-				} else {
-					updateRequest(requestObj);
-				}
+				var length = requestObjArr.length;
+				$.each(requestObjArr, function(index, object) {
+					if (index == length - 1)
+						updateRequest(object, true);
+					else 
+						updateRequest(object, false);
+				});
 			});
 			
 			$('#employee').typeahead({
@@ -245,7 +218,7 @@
 			
 		});
 		
-		function updateRequest(requestObj) {
+		function updateRequest(requestObj, isLoadTable) {
 			$.ajax({
 				type : "POST",
 				contentType : "application/json",
@@ -256,7 +229,10 @@
 					if (resultData.status_info.status == 0) {
 						$('#modalDetails').modal('hide');
 						var loadTable = $('#requestTable').DataTable();
-						loadTable.ajax.reload();
+						if (typeof isLoadTable == 'undefined')
+							isLoadTable = false;
+						if (isLoadTable)
+							loadTable.ajax.reload();
 					} else {
 						$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
 					}
@@ -292,7 +268,6 @@
 				destroy: true,
 				searching: false,
 				order: [[ 1, "desc" ]],
-				//data: listRequest,
 				columns: [
 					{
 						data: 'status',
@@ -336,16 +311,16 @@
 			<form id="requestForm" class="form-input">
 				<div class="form-group">
 					<label class="control-label">Employee: </label>
-					<input class="form-control" type="text" name="name" id="employee" placeholder="Input name" value=""></input>
+					<input class="form-control" type="text" name="name" id="employee" value=""></input>
 				</div>
 						
 				<div class="form-group">
 					<label class="control-label">Request Status: </label>
 					<select name="status" id="status" value="" class="form-control">
-						<option value=""></option>
+						<option value="5">Waiting</option>
 						<option value="2">Approved</option>
 						<option value="3">Denied</option>
-						<option value="5">Waiting</option>
+						<option value="">All Requests</option>
 					</select>
 				</div>
 						
@@ -499,11 +474,30 @@
 						<h2 class="modal-title">Confirm</h2>
 					</div>
 					<div class="modal-body">
-						<h4 id="confirmMsg">Are you sure?</h4>
+						<h4 id="confirmMsg"></h4>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-danger" data-dismiss="modal" id="btnYes">Yes</button>
 						<button type="button" class="btn btn-default" data-dismiss="modal" id="btnNo">No</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+		
+		<div class="modal fade" id="alertModal" role="dialog">
+			<div class="modal-dialog">
+
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h2 class="modal-title"><span class="glyphicon glyphicon-alert"></span> Warning</h2>
+					</div>
+					<div class="modal-body">
+						<h4 id="alertMsg"></h4>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-warning" data-dismiss="modal" id="btnConfirm">Got it</button>
 					</div>
 				</div>
 

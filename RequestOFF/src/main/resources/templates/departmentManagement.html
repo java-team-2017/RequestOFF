@@ -7,263 +7,254 @@
 
 <script th:inline="javascript">
 	/*<![CDATA[*/
-	var employeeLoginId;
-	var tableData;
-		$(function() {
-			var rowDataRequest;
-			var listRequest;
-			
-			$('#btnSearch').on('click', function(){
-				search();
-			});
-			
-			$("#requestForm select").keydown(function(e){
-				if(e.keyCode == 13) {
-					this.blur();
-				}
-			});
-			
-			$(document).keypress(function(e) {
-				if(e.which == 13) {
-					search();
-				}
-			});
-			
-			$('#departmentTable').on('click', 'td', function () {
-				var table = $('#departmentTable').DataTable();
-				var rowData = table.row($(this).parent()).data();
-				var position = $(this).index();
-				if(position != 3 && position != 4){
-					$('#departmentDetails').val(rowData.name);
-					$('#managerDetails').val(rowData.manager.name);
-					$('#modalDetails').modal('show');
-				}
-				
-				$('#teamDetails').DataTable( {
-					ajax: {
-						type: "POST",
-						contentType: "application/json",
-						url : /*[[@{/team/search}]]*/,
-						dataType : 'json',
-						data: function () {
-							return JSON.stringify({'department_id': rowData.id});
-						},
-						dataSrc: 'teams'
-					},
-					destroy: true,
-					searching: false,
-					columns: [
-						{ data: 'id' },
-						{ data: 'name' },
-						{ data: 'leader.name' }
-					]
-				});
-			});
-			
-			$('body').on('click', '#btnAdd, .glyphiconEdit', function () {
-				var table = $('#departmentTable').DataTable();
-				rowDataRequest = table.row($(this).parent()).data();
-				$('#editModal').modal('show');
-				$('#btnSave').hide();
-				$('#btnCreate').hide();
-				$('#editMsg').hide();
-				var isAdd;
-				if ($(this).attr("id") == 'btnAdd') {
-					isAdd = 1;
-					$('#editDepartment').val("");
-					$('#editModalName').text("Add Department");
-				} else {
-					isAdd = 0;
-					$('#editDepartment').val(rowDataRequest.name);
-					$('#editModalName').text("Edit Department");
-					$('#btnSave').show();
-				}
-				
-				$.ajax({
-					type : "POST",
-					contentType : "application/json",
-					url : /*[[@{/department/departmentInfo}]]*/,
-					dataType : 'json',
-					data : JSON.stringify({}),
-					success : function(resultData) {
-						if (resultData.status_info.status == 0) {
-							$('#editManager').empty();
-							if (isAdd == false) {
-								$('#editManager').append('<option value="' + rowDataRequest.manager.id + '" selected="true">' + rowDataRequest.manager.name + '</option>');
-							} else {
-								if (resultData.listManagerNotInDepartment.length > 0) {
-									$('#btnCreate').show();
-								} else {
-									$('#editMsg').html("No manager found").attr('class', 'alert alert-danger').show();
-								}
-							}
-							
-							$.each(resultData.listManagerNotInDepartment, function(index, manager) {
-								$('#editManager').append('<option value="' + manager.id + '">' + manager.name + '</option>');
-							});
-						} else {
-							$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
-						}
-					},
-					error : function(e) {
-						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-					}
-				});
-			});
-			
-			$('#btnSave, #btnCreate').on('click', function(){
-				var isAdd;
-				var requestData = {
-					"name" : $('#editDepartment').val(),
-					"manager_id" : $('#editManager').val()
-				}
-				
-				if($('#editDepartment').val() == ""){
-					$('#editMsg').html("Please fill in department field").attr('class', 'alert alert-danger').show();
-					return;
-				}
-				
-				if ($(this).attr("id") == 'btnCreate') {
-					isAdd = true;
-					requestData.valid_flag = 1;
-				} else {
-					isAdd = false;
-					requestData.id = rowDataRequest.id;
-					requestData.update_date = rowDataRequest.updateDate;
-				}
-				
-				$.ajax({
-					type : "POST",
-					contentType : "application/json",
-					url : /*[[@{/department/regist}]]*/,
-					dataType : 'json',
-					data : JSON.stringify(requestData),
-					success : function(resultData) {
-						if (resultData.status_info.status == 0) {
-							$('#editModal').modal('hide');
-							var loadTable = $('#departmentTable').DataTable();
-							loadTable.ajax.reload();
-							if (isAdd) {
-								$('#alertMessage').html("Create Department Successfully").attr('class', 'alert alert-success').show();
-							} else {
-								$('#alertMessage').html("Edit Department Successfully").attr('class', 'alert alert-success').show();
-							}
-							
-						} else {
-							$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
-						}
-					},
-					error : function(e) {
-						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-					}
-				});
-			});
-			
-			$('#departmentTable').on('click', '#btnDelete', function () {
-				var button = $(this);
-				$(this).confirmation({
-					placement: 'left',
-					onConfirm: function() {
-						var table = $('#departmentTable').DataTable();
-						rowDataRequest = table.row(button.parent()).data();
-						var deleteRequets = {
-							"department_id" : rowDataRequest.id
-						}
-						$.ajax({
-							type : "POST",
-							contentType : "application/json",
-							url : /*[[@{/department/delete}]]*/,
-							dataType : 'json',
-							data : JSON.stringify(deleteRequets),
-							success : function(resultData) {
-								if (resultData.status_info.status == 0) {
-									var loadTable = $('#departmentTable').DataTable();
-									loadTable.ajax.reload();
-									$('#alertMessage').html("Delete Department Successfully").attr('class', 'alert alert-success').show();
-								} else {
-									$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
-								}
-							},
-							error : function(e) {
-								$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-							}
-						});
-					}
-				});
-				$(this).confirmation("show");
-			});
-			
-			$('#department').typeahead({
-				name: 'suggest-employee',
-				limit: 100,
-				hint: false,
-				remote: {
-					rateLimitWait: 1000,
-					url: /*[[@{/department/search}]]*/,
-					replace: function (url, uriEncodedQuery){
-						return url + "#" + uriEncodedQuery;
-					},
-					beforeSend: function (jqXhr, settings) {
-						jqXhr.setRequestHeader('Content-Type','application/json');
-						settings.type = 'POST';
-						settings.hasContent = true;
-						settings.data = JSON.stringify({"name": $('#department').val(), "name_match_status": "0"});
-					},
-					filter: function (data) {
-						var result = data.listDepartment;
-						var sourceArr = [];
-						$.each(result, function(index, object) {
-							sourceArr.push(object.name);
-						});
-						return sourceArr;
-					}
-				}
-			}).bind('typeahead:selected', function(obj, selected, name) {
-				$(this).typeahead('setQuery', $("<div/>").html(selected.value).text());
-				return false;
-			});
-			
+	$(function() {
+		var rowDataRequest;
+		
+		$('#btnSearch').on('click', function(){
+			search();
 		});
 		
-		function search(){
-			var requestData = $('#requestForm').serializeJSON();
-			var requestSearch = {
-				"id" : requestData.id,
-				"name" : requestData.name,
-				"manager_id" : requestData.manager_id,
-				"name_of_employee" : requestData.name_of_employee
-			};
-			$('#departmentTable').DataTable( {
+		$("#departmentForm").keypress(function(e) {
+			if(e.which == 13) {
+				search();
+			}
+		});
+		
+		$('#departmentTable').on('click', 'td', function () {
+			var table = $('#departmentTable').DataTable();
+			var rowData = table.row($(this).parent()).data();
+			var lastChild = $(this).is(':last-child') || $(this).is(':nth-last-child(2)') ;
+			if(!lastChild){
+				$('#departmentDetails').val(rowData.name);
+				$('#managerDetails').val(rowData.manager.name);
+				$('#modalDetails').modal('show');
+			}
+			
+			$('#teamDetails').DataTable( {
 				ajax: {
 					type: "POST",
 					contentType: "application/json",
-					url : /*[[@{/department/search}]]*/,
+					url : /*[[@{/team/search}]]*/,
 					dataType : 'json',
 					data: function () {
-						return JSON.stringify(requestSearch);
+						return JSON.stringify({'department_id': rowData.id});
 					},
-					dataSrc: 'listDepartment'
+					dataSrc: 'teams'
 				},
 				destroy: true,
 				searching: false,
-// 				order: [[ 1, "desc" ]],
 				columns: [
 					{ data: 'id' },
 					{ data: 'name' },
-					{ data: 'manager.name' },
-					{
-						render: function (index) {
-								return '<a class="glyphiconEdit"><span class="glyphicon glyphicon-pencil" value="' + index + '"></span></a>';
-						},
-					},
-					{
-						render: function (index) {
-								return '<a id="btnDelete"><span class="glyphicon glyphicon-trash" value="' + index + '"></span></a>';
-						},
-					}
+					{ data: 'leader.name' }
 				]
 			});
-		}
+		});
+		
+		$('body').on('click', '#btnCreate, .glyphiconEdit', function () {
+			var table = $('#departmentTable').DataTable();
+			rowDataRequest = table.row($(this).parent()).data();
+			$('#editModal').modal('show');
+			$('#editMsg').hide();
+			var isCreate;
+			if ($(this).attr("id") == 'btnCreate') {
+				isCreate = true;
+				$('#editDepartment').val("");
+				$('#editModalName').text("Add Department");
+				$('#btnSave').hide();
+			} else {
+				isCreate = false;
+				$('#editDepartment').val(rowDataRequest.name);
+				$('#editModalName').text("Edit Department");
+				$('#btnCreateModal').hide();
+				$('#btnSave').show();
+			}
+			
+			$.ajax({
+				type : "POST",
+				contentType : "application/json",
+				url : /*[[@{/department/departmentInfo}]]*/,
+				dataType : 'json',
+				data : JSON.stringify({}),
+				success : function(resultData) {
+					if (resultData.status_info.status == 0) {
+						$('#editManager').empty();
+						if (isCreate == false) {
+							$('#editManager').append('<option value="' + rowDataRequest.manager.id + '" selected="true">' + rowDataRequest.manager.name + '</option>');
+						} else {
+							if (resultData.listManagerNotInDepartment.length > 0) {
+								$('#btnCreateModal').show();
+							} else {
+								$('#btnCreateModal').hide();
+								$('#editMsg').html("No manager found").attr('class', 'alert alert-danger').show();
+							}
+						}
+						
+						$.each(resultData.listManagerNotInDepartment, function(index, manager) {
+							$('#editManager').append('<option value="' + manager.id + '">' + manager.name + '</option>');
+						});
+					} else {
+						$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
+					}
+				},
+				error : function(e) {
+					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+				}
+			});
+		});
+		
+		$('#btnSave, #btnCreateModal').on('click', function(){
+			var isAdd;
+			var requestData = {
+				"name" : $('#editDepartment').val(),
+				"manager_id" : $('#editManager').val()
+			}
+			
+			if($('#editDepartment').val() == ""){
+				$('#editMsg').html("Please fill in department field").attr('class', 'alert alert-danger').show();
+				return;
+			}
+			
+			if ($(this).attr("id") == 'btnCreateModal') {
+				isAdd = true;
+				requestData.valid_flag = 1;
+			} else {
+				isAdd = false;
+				requestData.id = rowDataRequest.id;
+				requestData.update_date = rowDataRequest.updateDate;
+			}
+			
+			$.ajax({
+				type : "POST",
+				contentType : "application/json",
+				url : /*[[@{/department/regist}]]*/,
+				dataType : 'json',
+				data : JSON.stringify(requestData),
+				success : function(resultData) {
+					if (resultData.status_info.status == 0) {
+						$('#editModal').modal('hide');
+						var loadTable = $('#departmentTable').DataTable();
+						loadTable.ajax.reload();
+						if (isAdd) {
+							$('#alertMessage').html("Create Department Successfully").attr('class', 'alert alert-success').show();
+						} else {
+							$('#alertMessage').html("Edit Department Successfully").attr('class', 'alert alert-success').show();
+						}
+						
+					} else {
+						$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
+					}
+				},
+				error : function(e) {
+					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+				}
+			});
+		});
+		
+		$('#departmentTable').on('click', '#btnDelete', function () {
+			var button = $(this);
+			$(this).confirmation({
+				placement: 'left',
+				onConfirm: function() {
+					var table = $('#departmentTable').DataTable();
+					rowDataRequest = table.row(button.parent()).data();
+					var deleteRequets = {
+						"department_id" : rowDataRequest.id
+					}
+					$.ajax({
+						type : "POST",
+						contentType : "application/json",
+						url : /*[[@{/department/delete}]]*/,
+						dataType : 'json',
+						data : JSON.stringify(deleteRequets),
+						success : function(resultData) {
+							if (resultData.status_info.status == 0) {
+								var loadTable = $('#departmentTable').DataTable();
+								loadTable.ajax.reload();
+								$('#alertMessage').html("Delete Department Successfully").attr('class', 'alert alert-success').show();
+							} else {
+								$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
+							}
+						},
+						error : function(e) {
+							$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+						}
+					});
+				}
+			});
+			$(this).confirmation("show");
+		});
+		
+		$('#department').typeahead({
+			name: 'suggest-employee',
+			limit: 100,
+			hint: false,
+			remote: {
+				rateLimitWait: 1000,
+				url: /*[[@{/department/search}]]*/,
+				replace: function (url, uriEncodedQuery){
+					return url + "#" + uriEncodedQuery;
+				},
+				beforeSend: function (jqXhr, settings) {
+					jqXhr.setRequestHeader('Content-Type','application/json');
+					settings.type = 'POST';
+					settings.hasContent = true;
+					settings.data = JSON.stringify({"name": $('#department').val(), "name_match_status": "0"});
+				},
+				filter: function (data) {
+					var result = data.listDepartment;
+					var sourceArr = [];
+					$.each(result, function(index, object) {
+						sourceArr.push(object.name);
+					});
+					return sourceArr;
+				}
+			}
+		}).bind('typeahead:selected', function(obj, selected, name) {
+			$(this).typeahead('setQuery', $("<div/>").html(selected.value).text());
+			return false;
+		});
+		
+	});
+		
+	function search(){
+		var requestData = $('#departmentForm').serializeJSON();
+		var requestSearch = {
+			"id" : requestData.id,
+			"name" : requestData.name,
+			"manager_id" : requestData.manager_id,
+			"name_of_employee" : requestData.name_of_employee
+		};
+		$('#departmentTable').DataTable( {
+			ajax: {
+				type: "POST",
+				contentType: "application/json",
+				url : /*[[@{/department/search}]]*/,
+				dataType : 'json',
+				data: function () {
+					return JSON.stringify(requestSearch);
+				},
+				dataSrc: 'listDepartment'
+			},
+			destroy: true,
+			searching: false,
+			columns: [
+				{ data: 'id' },
+				{ data: 'name' },
+				{ data: 'manager.name' },
+				{
+					render: function (index) {
+							return '<a class="glyphiconEdit"><span class="glyphicon glyphicon-pencil" value="' + index + '"></span></a>';
+					},
+				},
+				{
+					render: function (index) {
+							return '<a id="btnDelete"><span class="glyphicon glyphicon-trash" value="' + index + '"></span></a>';
+					},
+				}
+			]
+		});
+	}
 	/*]]>*/
 </script>
 
@@ -274,7 +265,7 @@
 	<div class="requestOffContentBody">			
 		<h2>Department Management</h2>
 		<div id="alertMessage" class="alert" style="display:none;"></div>
-			<form id="requestForm" class="form-input">
+			<form id="departmentForm" class="form-input">
 				<div class="form-group">
 					<label class="control-label">Department: </label>
 					<input class="form-control" type="text" name="name" id="department" value=""></input>
@@ -287,7 +278,7 @@
 				
 				<p>
 					<button id="btnSearch" type="button" class="btn btn-primary" style="width:76px;">Search</button>&nbsp;&nbsp;
-					<button id="btnAdd" type="button" class="btn btn-primary" style="width:76px;">Add</button>&nbsp;&nbsp;
+					<button id="btnCreate" type="button" class="btn btn-primary" style="width:76px;">Create</button>&nbsp;&nbsp;
 					<button type="reset" class="btn btn-primary" style="width:76px;">Clear</button>
 				</p>
 			</form>
@@ -377,8 +368,8 @@
 								</div>&nbsp;
 								
 								<p align="center">
-									<button type="button" class="btn btn-default" id="btnCreate" style="width:76px;">Create</button>&nbsp;
-									<button type="button" class="btn btn-default" id="btnSave" style="width:76px;" data-dismiss="modal">Save</button>&nbsp;
+									<button type="button" class="btn btn-default" id="btnCreateModal" style="width:76px;">Create</button>&nbsp;
+									<button type="button" class="btn btn-default" id="btnSave" style="width:76px;">Save</button>&nbsp;
 									<button type="button" class="btn btn-default" style="width:76px;" data-dismiss="modal">Cancel</button>
 								</p>
 							</form>
