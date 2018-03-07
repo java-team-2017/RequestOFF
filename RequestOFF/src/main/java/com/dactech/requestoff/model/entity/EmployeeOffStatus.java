@@ -13,31 +13,13 @@ public class EmployeeOffStatus {
 	private long yearId;
 	@Id
 	private long employeeId;
-	private long remainHours;
-	private long totalHours;
+	private double remainHours;
+	private double totalHours;
 	private int validFlag;
 	private String insertDate;
 	private long insertOperator;
 	private String updateDate;
 	private long updateOperator;
-
-	public EmployeeOffStatus() {
-		super();
-	}
-
-	public EmployeeOffStatus(long yearId, long employeeId, long remainHours, long totalHours, int validFlag,
-			String insertDate, long insertOperator, String updateDate, long updateOperator) {
-		super();
-		this.yearId = yearId;
-		this.employeeId = employeeId;
-		this.remainHours = remainHours;
-		this.totalHours = totalHours;
-		this.validFlag = validFlag;
-		this.insertDate = insertDate;
-		this.insertOperator = insertOperator;
-		this.updateDate = updateDate;
-		this.updateOperator = updateOperator;
-	}
 
 	public long getYearId() {
 		return yearId;
@@ -55,19 +37,19 @@ public class EmployeeOffStatus {
 		this.employeeId = employeeId;
 	}
 
-	public long getRemainHours() {
+	public double getRemainHours() {
 		return remainHours;
 	}
 
-	public void setRemainHours(long remainHours) {
+	public void setRemainHours(double remainHours) {
 		this.remainHours = remainHours;
 	}
 
-	public long getTotalHours() {
+	public double getTotalHours() {
 		return totalHours;
 	}
 
-	public void setTotalHours(long totalHours) {
+	public void setTotalHours(double totalHours) {
 		this.totalHours = totalHours;
 	}
 
@@ -109,6 +91,25 @@ public class EmployeeOffStatus {
 
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
+	}
+
+	public EmployeeOffStatus(long yearId, long employeeId, double remainHours, double totalHours, int validFlag,
+			String insertDate, long insertOperator, String updateDate, long updateOperator) {
+		super();
+		this.yearId = yearId;
+		this.employeeId = employeeId;
+		this.remainHours = remainHours;
+		this.totalHours = totalHours;
+		this.validFlag = validFlag;
+		this.insertDate = insertDate;
+		this.insertOperator = insertOperator;
+		this.updateDate = updateDate;
+		this.updateOperator = updateOperator;
+	}
+
+	public EmployeeOffStatus() {
+		super();
+		// TODO Auto-generated constructor stub
 	}
 
 	@SuppressWarnings("serial")

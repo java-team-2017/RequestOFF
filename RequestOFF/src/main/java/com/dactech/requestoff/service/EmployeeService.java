@@ -28,7 +28,7 @@ public interface EmployeeService {
 	
 	public List<GetUserResponse.IdName> getListRecipients(long employeeId) throws Exception;
 	
-	public long getRemainHours(long employeeId);
+	public double getRemainHours(long employeeId);
 	
 	public String getTeamName(long employeeId);
 	

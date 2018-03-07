@@ -11,11 +11,11 @@ import javax.persistence.Transient;
 
 @Entity
 public class Request {
-	public static final long REQUEST_STATUS_SAVED = 1;
-	public static final long REQUEST_STATUS_APPROVED = 2;
-	public static final long REQUEST_STATUS_DENIED = 3;
-	public static final long REQUEST_STATUS_RESPONDED = 4;
-	public static final long REQUEST_STATUS_WAITING = 5;
+	public static final int REQUEST_STATUS_SAVED = 1;
+	public static final int REQUEST_STATUS_APPROVED = 2;
+	public static final int REQUEST_STATUS_DENIED = 3;
+	public static final int REQUEST_STATUS_RESPONDED = 4;
+	public static final int REQUEST_STATUS_WAITING = 5;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -25,9 +25,9 @@ public class Request {
 	private Employee employee;
 	private String fromTime;
 	private String toTime;
-	private long totalTime;
+	private double totalTime;
 	private String reason;
-	private long status;
+	private int status;
 	private String responseMessage;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "day_off_type_id")
@@ -48,12 +48,14 @@ public class Request {
 
 	public Request() {
 		super();
+		// TODO Auto-generated constructor stub
 	}
 
-	public Request(long id, Employee employee, String fromTime, String toTime, long totalTime, String reason,
-			long status, String responseMessage, DayOffType dayOffType, long recipientId, int validFlag,
+	public Request(long id, Employee employee, String fromTime, String toTime, double totalTime, String reason,
+			int status, String responseMessage, DayOffType dayOffType, long recipientId, int validFlag,
 			String insertDate, long insertOperator, String updateDate, long updateOperator, String recipientName,
 			long forwardId, String forwardName) {
+		super();
 		this.id = id;
 		this.employee = employee;
 		this.fromTime = fromTime;
@@ -106,11 +108,11 @@ public class Request {
 		this.toTime = toTime;
 	}
 
-	public long getTotalTime() {
+	public double getTotalTime() {
 		return totalTime;
 	}
 
-	public void setTotalTime(long totalTime) {
+	public void setTotalTime(double totalTime) {
 		this.totalTime = totalTime;
 	}
 
@@ -122,11 +124,11 @@ public class Request {
 		this.reason = reason;
 	}
 
-	public long getStatus() {
+	public int getStatus() {
 		return status;
 	}
 
-	public void setStatus(long status) {
+	public void setStatus(int status) {
 		this.status = status;
 	}
 
@@ -218,23 +220,23 @@ public class Request {
 		this.forwardName = forwardName;
 	}
 
-	public static long getRequestStatusSaved() {
+	public static int getRequestStatusSaved() {
 		return REQUEST_STATUS_SAVED;
 	}
 
-	public static long getRequestStatusApproved() {
+	public static int getRequestStatusApproved() {
 		return REQUEST_STATUS_APPROVED;
 	}
 
-	public static long getRequestStatusDenied() {
+	public static int getRequestStatusDenied() {
 		return REQUEST_STATUS_DENIED;
 	}
 
-	public static long getRequestStatusResponded() {
+	public static int getRequestStatusResponded() {
 		return REQUEST_STATUS_RESPONDED;
 	}
 
-	public static long getRequestStatusWaiting() {
+	public static int getRequestStatusWaiting() {
 		return REQUEST_STATUS_WAITING;
 	}
 

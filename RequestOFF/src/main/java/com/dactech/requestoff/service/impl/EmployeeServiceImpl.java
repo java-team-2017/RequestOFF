@@ -374,8 +374,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 				} else if (colData.equals("timeOffWithoutPaying")) {
 					returnNumber = (int) (dir * (o1.getTimeOffWithoutPaying() - o2.getTimeOffWithoutPaying()));
 				} else if (colData.equals("employee.employeeOffStatus.remainHours")) {
-					long remainHours1 = o1.getEmployee().getEmployeeOffStatus().getRemainHours();
-					long remainHours2 = o2.getEmployee().getEmployeeOffStatus().getRemainHours();
+					double remainHours1 = o1.getEmployee().getEmployeeOffStatus().getRemainHours();
+					double remainHours2 = o2.getEmployee().getEmployeeOffStatus().getRemainHours();
 					returnNumber = (int) (dir * (remainHours1 - remainHours2));
 				} else { // sort by id is default
 					returnNumber = (int) (dir * (o1.getEmployee().getId() - o2.getEmployee().getId()));
@@ -468,9 +468,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 	
 	@Override
-	public long getRemainHours(long employeeId) {
+	public double getRemainHours(long employeeId) {
 		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-		long remainHours = employeeOffStatusRepository.findById(currentYear, employeeId).getRemainHours();
+		double remainHours = employeeOffStatusRepository.findById(currentYear, employeeId).getRemainHours();
 		return remainHours;
 	}
 	

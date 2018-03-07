@@ -36,24 +36,25 @@ public class RequestServiceImpl implements RequestService{
 	
 	@Override
 	public RequestRegistResponse regist(RequestRegistRequest requestRegistRequest) throws Exception{
-		long offHours, newRemainHours, employeeId;
+		double offHours, newRemainHours;
+		long employeeId;
 		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
 		if(StringUtil.isEmpty(requestRegistRequest.getId())) {	//create new request
 			employeeId = Long.parseLong(requestRegistRequest.getEmployeeId());
-			long remainHours = employeeOffStatusRepository.findById(currentYear, employeeId).getRemainHours();
-			offHours = Long.parseLong(requestRegistRequest.getTotalTime());
+			double remainHours = employeeOffStatusRepository.findById(currentYear, employeeId).getRemainHours();
+			offHours = Double.parseDouble(requestRegistRequest.getTotalTime());
 			newRemainHours = remainHours - offHours;
 		}
 		else {	//update or delete request
 			Request request = requestRepository.findById(Long.parseLong(requestRegistRequest.getId()));
 			employeeId = request.getEmployee().getId();
-			long remainHours = employeeOffStatusRepository.findById(currentYear, employeeId).getRemainHours();
-			long oldOffHours = request.getTotalTime();
-			long oldStatus = request.getStatus();
+			double remainHours = employeeOffStatusRepository.findById(currentYear, employeeId).getRemainHours();
+			double oldOffHours = request.getTotalTime();
+			int oldStatus = request.getStatus();
 			
 			if(StringUtil.isNotEmpty(requestRegistRequest.getTotalTime()) && StringUtil.isEmpty(requestRegistRequest.getValidFlag())
 					&& StringUtil.isEmpty(requestRegistRequest.getStatus())) {
-				offHours = Long.parseLong(requestRegistRequest.getTotalTime());
+				offHours = Double.parseDouble(requestRegistRequest.getTotalTime());
 				newRemainHours = remainHours + oldOffHours - offHours;
 			}
 			else if(StringUtil.isEmpty(requestRegistRequest.getTotalTime()) && StringUtil.isNotEmpty(requestRegistRequest.getValidFlag())
@@ -78,7 +79,7 @@ public class RequestServiceImpl implements RequestService{
 			else if(StringUtil.isNotEmpty(requestRegistRequest.getTotalTime()) && StringUtil.isEmpty(requestRegistRequest.getValidFlag())
 					&& StringUtil.isNotEmpty(requestRegistRequest.getStatus())) {
 				if(oldStatus == 1 || oldStatus == 4) {
-					offHours = Long.parseLong(requestRegistRequest.getTotalTime());
+					offHours = Double.parseDouble(requestRegistRequest.getTotalTime());
 					newRemainHours = remainHours + oldOffHours - offHours;
 				}
 				else {
@@ -109,7 +110,7 @@ public class RequestServiceImpl implements RequestService{
 			
 			request.setFromTime(requestRegistRequest.getFromTime());
 			request.setToTime(requestRegistRequest.getToTime());
-			request.setTotalTime(Long.parseLong(requestRegistRequest.getTotalTime()));
+			request.setTotalTime(Double.parseDouble(requestRegistRequest.getTotalTime()));
 			request.setReason(requestRegistRequest.getReason());
 			if(employeeRepository.findById(employeeId).getPosition().getId() == Position.POSITION_PROJECT_MANAGER 
 					&& requestRegistRequest.getStatus().equals("5")) {
@@ -145,7 +146,7 @@ public class RequestServiceImpl implements RequestService{
 					request.setToTime(requestRegistRequest.getToTime());
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getTotalTime())) {
-					request.setTotalTime(Long.parseLong(requestRegistRequest.getTotalTime()));
+					request.setTotalTime(Double.parseDouble(requestRegistRequest.getTotalTime()));
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getReason())) {
 					request.setReason(requestRegistRequest.getReason());

@@ -10,7 +10,7 @@ public class GetUserResponse extends Common {
 	Employee user;
 	List<IdName> listForward;
 	List<IdName> listRecipients;
-	long remainHours;
+	double remainHours;
 
 	public Employee getUser() {
 		return user;
@@ -36,15 +36,15 @@ public class GetUserResponse extends Common {
 		this.listRecipients = listRecipients;
 	}
 
-	public long getRemainHours() {
+	public double getRemainHours() {
 		return remainHours;
 	}
 
-	public void setRemainHours(long remainHours) {
+	public void setRemainHours(double remainHours) {
 		this.remainHours = remainHours;
 	}
 
-	public GetUserResponse(Employee user, List<IdName> listForward, List<IdName> listRecipients, long remainHours) {
+	public GetUserResponse(Employee user, List<IdName> listForward, List<IdName> listRecipients, double remainHours) {
 		super();
 		this.user = user;
 		this.listForward = listForward;

@@ -38,6 +38,7 @@
 						remainHours = returnData.remainHours;
 						listRecipient = returnData.listRecipients;
 						
+						renderDayOffSelect(remainHours, 'modalOffDays');
 						renderRemainHours(returnData.remainHours, 'remainHours');
 						renderRecipientSelect(listRecipient, 'modalRecipient');
 						
@@ -101,8 +102,10 @@
 							var toTimeStr = toStr[1].split(":");
 							$("#modalHourTo").val(toTimeStr[0]);
 							$("#modalMinuteTo").val(toTimeStr[1]);
-							$("#modalOffDays").val(parseInt(parseInt(rowData.totalTime) / 8));
-							$("#modalOffHours").val(parseInt(rowData.totalTime) % 8);
+							var days = parseInt(rowData.totalTime / 8);
+							var hours = rowData.totalTime - (days * 8);
+							$("#modalOffDays").val(days);
+							$("#modalOffHours").val(hours);
 							$("#modalReason").val(rowData.reason);
 							$("#modalDayOffType").val(rowData.dayOffType.id);
 							
@@ -235,7 +238,7 @@
 					var editRequestData = $('#modalForm').serializeJSON();
 					
 					//validate
-					var complete = 1, valid = 1, roundHours = 1, exceed = 0, offHoursEqual0 = 0;
+					var complete = 1, valid = 1, exceed = 0, offHoursEqual0 = 0;
 					var listInput = $("#modalForm").find(':input').not("#modalResponseMessage");
 					$.each(listInput, function() {
 						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
@@ -243,12 +246,12 @@
 						}
 					});
 					
-					var offHours = parseInt(editRequestData.offDays) * 8 + parseInt(editRequestData.offHours);
+					var offHours = parseInt(editRequestData.offDays) * 8 + parseFloat(editRequestData.offHours);
 					if(offHours == 0){
 						offHoursEqual0 = 1;
 					}
 					else {
-						if(parseInt(offHours) > parseInt(remainHours)) {
+						if(parseFloat(offHours) > parseFloat(remainHours)) {
 							exceed = 1;
 						}
 					}
@@ -261,9 +264,6 @@
 					toDate = toDate.substr(6, 4) + "-" + toDate.substr(0, 2) + "-" + toDate.substr(3, 2);
 					var toTime = editRequestData.hourTo_modalForm + ":" + editRequestData.minuteTo_modalForm + ":00.0";
 					var to = toDate + " " + toTime;
-					if(editRequestData.minuteFrom_modalForm.localeCompare(editRequestData.minuteTo_modalForm) != 0) {
-						roundHours = 0;
-					}
 					if(from.localeCompare(to) >= 0) {
 						valid = 0;
 					}
@@ -271,9 +271,6 @@
 					
 					if(complete == 0) {
 						$('#alertMessage_edit').html(errors['incompleteFields']).attr('class', 'alert alert-danger').show();
-					}
-					else if(roundHours == 0) {
-						$('#alertMessage_edit').html(errors['roundHour']).attr('class', 'alert alert-danger').show();
 					}
 					else if(valid == 0) {
 						$('#alertMessage_edit').html(errors['DateError']).attr('class', 'alert alert-danger').show();
@@ -403,42 +400,32 @@
 							},
 							{
 								"targets": [ 1 ],
-								"data": 'insertDate'
+								"data": 'insertDate',
+								"render": function(data, type, full, meta) {
+									return data.substr(0, data.length - 2);
+								}
 							},
 							{
 								"targets": [ 2 ],
-								"data": 'fromTime'
+								"data": 'fromTime',
+								"render": function(data, type, full, meta) {
+									return data.substr(0, data.length - 5);
+								}
 							},
 							{
 								"targets": [ 3 ],
-								"data": 'toTime'
+								"data": 'toTime',
+								"render": function(data, type, full, meta) {
+									return data.substr(0, data.length - 5);
+								}
 							},
 							{
 								"targets": [ 4 ],
 								"data": 'totalTime',
 								"render": function(data, type, full, meta) {
-									var offDays = parseInt(parseInt(data) / 8);
-									var offHours = parseInt(parseInt(data) % 8);
-									var returnStr = "";
-									if(offDays >= 2) {
-										returnStr = offDays + " days and ";
-										if(offHours >= 2) {
-											returnStr += offHours + " hours";
-										}
-										else {
-											returnStr += offHours + " hour";
-										}
-									}
-									else {
-										returnStr = offDays + " day and ";
-										if(offHours >= 2) {
-											returnStr += offHours + " hours";
-										}
-										else {
-											returnStr += offHours + " hour";
-										}
-									}
-									return returnStr;
+									var offDays = parseInt(parseFloat(data) / 8);
+									var offHours = parseFloat(data) - (offDays * 8);
+									return offDays + "d " + offHours + "h";;
 								}
 							},
 							{
@@ -569,27 +556,27 @@
 									<div id="alertMessage_edit" class="alert" style="display:none;"></div>
 									<form id="modalForm">
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Request ID: </label>
+											<label class="control-label col-sm-3">ID </label>
 											<label class="control-label col-sm-9" style="text-align: left;" id="modalRequestId"></label>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Status: </label>
+											<label class="control-label col-sm-3">Status </label>
 											<label class="control-label col-sm-9" id="modalStatus"></label>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Employee: </label>
+											<label class="control-label col-sm-3">Employee </label>
 											<label class="control-label col-sm-9" style="text-align: left;" id="modalName"></label>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Position: </label>
+											<label class="control-label col-sm-3">Position </label>
 											<label class="control-label col-sm-9" id="modalPosition"></label>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Team: </label>
+											<label class="control-label col-sm-3">Team </label>
 											<label class="control-label col-sm-9" id="modalTeam"></label>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Department: </label>
+											<label class="control-label col-sm-3">Department </label>
 											<label class="control-label col-sm-9" id="modalDepartment"></label>
 										</div>
 										<div class="form-group row">
@@ -678,29 +665,24 @@
 											<label class="control-label col-sm-3">Off hours * : </label>
 											<div class="form-inline">
 												<select class="form-control" name="offDays" id="modalOffDays" style="width:100px;">
-													<option value="0">0</option>
-													<option value="1">1</option>
-													<option value="2">2</option>
-													<option value="3">3</option>
-													<option value="4">4</option>
-													<option value="5">5</option>
-													<option value="6">6</option>
-													<option value="7">7</option>
-													<option value="8">8</option>
-													<option value="9">9</option>
-													<option value="10">10</option>
-													<option value="11">11</option>
 												</select>&nbsp;day(s)&nbsp;
 												<select class="form-control" name="offHours" id="modalOffHours" style="width:100px;">
 													<option value="0">0</option>
+													<option value="0.5">0.5</option>
 													<option value="1">1</option>
+													<option value="1.5">1.5</option>
 													<option value="2">2</option>
+													<option value="2.5">2.5</option>
 													<option value="3">3</option>
+													<option value="3.5">3.5</option>
 													<option value="4">4</option>
+													<option value="4.5">4.5</option>
 													<option value="5">5</option>
+													<option value="5.5">5.5</option>
 													<option value="6">6</option>
+													<option value="6.5">6.5</option>
 													<option value="7">7</option>
-													<option value="8">8</option>
+													<option value="7.5">7.5</option>
 												</select>&nbsp;hour(s)
 											</div>
 										</div>

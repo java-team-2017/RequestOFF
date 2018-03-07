@@ -5,8 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dactech.requestoff.model.entity.CompanyYearOff;
-import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.EmployeeOffStatus;
 import com.dactech.requestoff.model.request.EmployeeOffStatusDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatusRegistRequest;
@@ -43,8 +41,8 @@ public class EmployeeOffStatusServiceImpl implements EmployeeOffStatusService {
 
 			employeeOffStatus.setEmployeeId(employeeId);
 
-			employeeOffStatus.setRemainHours(Long.parseLong(eOSRRequest.getRemainHours()));
-			employeeOffStatus.setTotalHours(Long.parseLong(eOSRRequest.getTotalHours()));
+			employeeOffStatus.setRemainHours(Double.parseDouble(eOSRRequest.getRemainHours()));
+			employeeOffStatus.setTotalHours(Double.parseDouble(eOSRRequest.getTotalHours()));
 			employeeOffStatus.setValidFlag(Integer.parseInt(eOSRRequest.getValidFlag()));
 
 		} else { // update
@@ -55,10 +53,10 @@ public class EmployeeOffStatusServiceImpl implements EmployeeOffStatusService {
 			}
 
 			if (StringUtil.isNotEmpty(eOSRRequest.getRemainHours())) {
-				employeeOffStatus.setRemainHours(Long.parseLong(eOSRRequest.getRemainHours()));
+				employeeOffStatus.setRemainHours(Double.parseDouble(eOSRRequest.getRemainHours()));
 			}
 			if (StringUtil.isNotEmpty(eOSRRequest.getTotalHours())) {
-				employeeOffStatus.setTotalHours(Long.parseLong(eOSRRequest.getTotalHours()));
+				employeeOffStatus.setTotalHours(Double.parseDouble(eOSRRequest.getTotalHours()));
 			}
 			if (StringUtil.isNotEmpty(eOSRRequest.getValidFlag())) {
 				employeeOffStatus.setValidFlag(Integer.parseInt(eOSRRequest.getValidFlag()));

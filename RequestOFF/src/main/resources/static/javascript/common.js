@@ -216,6 +216,13 @@ function renderRoleSelect(selectBoxId, dataHandler) {
 	});
 }
 
+function renderDayOffSelect (remainHours, selectBoxId) {
+	var days = parseInt(parseFloat(remainHours) / 8);
+	for(var i = 0; i <= days; i++) {
+		$('#' + selectBoxId).append('<option value="' + i + '">' + i + '</option>');
+	}
+}
+
 function getTeamId(listTeam, teamName) {
 	var teamId = 0;
 	$.each(listTeam, function(i, element) {

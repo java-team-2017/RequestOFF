@@ -131,7 +131,7 @@ public class EmployeeController {
 			List<GetUserResponse.IdName> recipients = employeeService.getListRecipients((user.getId()));
 			response.setListRecipients(recipients);
 			
-			long remainHours = employeeService.getRemainHours(user.getId());
+			double remainHours = employeeService.getRemainHours(user.getId());
 			response.setRemainHours(remainHours);
 			
 			response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
