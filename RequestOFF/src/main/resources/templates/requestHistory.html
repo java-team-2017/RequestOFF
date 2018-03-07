@@ -114,9 +114,15 @@
 								}
 							});
 							if(check == 0) { //recipient is old manager or old leader
-								$("#modalRecipientDiv").hide();
-								$("#hiddenRecipientName").html(rowData.recipientName);
-								$("#hiddenRecipientDiv").show();
+								if(rowData.status != 1 && rowData.status != 4) {
+									$("#modalRecipientDiv").hide();
+									$("#hiddenRecipientName").html(rowData.recipientName);
+									$("#hiddenRecipientDiv").show();
+								}
+								else {
+									$("#modalRecipientDiv").show();
+									$("#hiddenRecipientDiv").hide();
+								}
 							} else {
 								$("#hiddenRecipientDiv").hide();
 								$("#modalRecipient").val(rowData.recipientId);
@@ -125,7 +131,6 @@
 							
 							
 							
-							$("#modalResponseMessage").empty();
 							$("#modalResponseMessage").val(rowData.responseMessage);
 							$("#modalUpdateDate").val(rowData.updateDate);
 						
@@ -685,7 +690,6 @@
 													<option value="9">9</option>
 													<option value="10">10</option>
 													<option value="11">11</option>
-													<option value="12">12</option>
 												</select>&nbsp;day(s)&nbsp;
 												<select class="form-control" name="offHours" id="modalOffHours" style="width:100px;">
 													<option value="0">0</option>
