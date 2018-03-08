@@ -1,11 +1,9 @@
 package com.dactech.requestoff.service.impl;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +21,9 @@ import com.dactech.requestoff.model.entity.Team;
 import com.dactech.requestoff.model.entity.TeamEmployee;
 import com.dactech.requestoff.model.request.EmployeeDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatisticsPagingRequest;
+import com.dactech.requestoff.model.request.EmployeeOffStatusSearchRequest;
 import com.dactech.requestoff.model.request.EmployeeRegistRequest;
 import com.dactech.requestoff.model.request.EmployeeSearchRequest;
-import com.dactech.requestoff.model.request.RequestSearchRequest;
 import com.dactech.requestoff.model.response.EmployeeDetailsResponse;
 import com.dactech.requestoff.model.response.EmployeeOffStatisticsPagingResponse;
 import com.dactech.requestoff.model.response.EmployeeRegistResponse;
@@ -39,7 +37,6 @@ import com.dactech.requestoff.repository.RoleRepository;
 import com.dactech.requestoff.repository.TeamEmployeeRepository;
 import com.dactech.requestoff.repository.TeamRepository;
 import com.dactech.requestoff.service.EmployeeService;
-import com.dactech.requestoff.util.DateUtils;
 import com.dactech.requestoff.util.StringUtil;
 
 @Service
@@ -548,6 +545,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public boolean delete(long employeeId) throws Exception {
 		Employee employee = employeeRepository.findById(employeeId);
+		
+		EmployeeOffStatusSearchRequest eosRequest = new EmployeeOffStatusSearchRequest("", employeeId + "", "", "", "");
+		List<EmployeeOffStatus>  listEos = employeeOffStatusRepository.search(eosRequest);
+		for(EmployeeOffStatus eos : listEos) {
+			employeeOffStatusRepository.delete(eos);
+		}
+		
 		if (employee == null) {
 			throw new Exception("can not find employee with id " + employeeId);
 		}

@@ -76,6 +76,8 @@
 				});
 				
 				$('#requestHistoryTable tbody').on('click', 'td', function() {
+					$('#alertMessage_edit').hide();
+					
 					var index = $(this).index();
 					if(index <= 7) {
 						table = $('#requestHistoryTable').DataTable();
@@ -117,9 +119,18 @@
 								}
 							});
 							if(check == 0) { //recipient is old manager or old leader
-								$("#modalRecipientDiv").hide();
-								$("#hiddenRecipientName").html(rowData.recipientName);
-								$("#hiddenRecipientDiv").show();
+								console.log(rowData.status + "----");
+								if(parseInt(rowData.status) != 1 && parseInt(rowData.status) != 4) {
+									console.log(rowData.status + "----");
+									$("#modalRecipientDiv").hide();
+									$("#hiddenRecipientName").html(rowData.recipientName);
+									$("#hiddenRecipientDiv").show();
+								}
+								else {
+									console.log(rowData.status + "====--");
+									$('#alertMessage_edit').html(rowData.recipientName + " who is the recipient of this request is no longer your leader/manager. "
+																	+ "Please choose another recipient").attr('class', 'alert alert-warning').show();
+								}
 							} else {
 								$("#hiddenRecipientDiv").hide();
 								$("#modalRecipient").val(rowData.recipientId);
@@ -138,7 +149,6 @@
 								$("#modalForm :input").prop('disabled', true);
 								$("#btnSave_modal, #btnSend_modal").hide();
 							}
-							$('#alertMessage_edit').hide();
 							$('#requestDetailsModal').modal('show');
 						}
 					}
