@@ -8,6 +8,7 @@ public class CompanyYearOff {
 	@Id
 	private long id;
 	private int dayOffResetFlag;
+	private int numberDayOff;
 	private int currentYearFlag;
 	private int validFlag;
 	private String insertDate;
@@ -17,13 +18,15 @@ public class CompanyYearOff {
 
 	public CompanyYearOff() {
 		super();
+		// TODO Auto-generated constructor stub
 	}
 
-	public CompanyYearOff(long id, int dayOffResetFlag, int currentYearFlag, int validFlag, String insertDate,
-			long insertOperator, String updateDate, long updateOperator) {
+	public CompanyYearOff(long id, int dayOffResetFlag, int numberDayOff, int currentYearFlag, int validFlag,
+			String insertDate, long insertOperator, String updateDate, long updateOperator) {
 		super();
 		this.id = id;
 		this.dayOffResetFlag = dayOffResetFlag;
+		this.numberDayOff = numberDayOff;
 		this.currentYearFlag = currentYearFlag;
 		this.validFlag = validFlag;
 		this.insertDate = insertDate;
@@ -46,6 +49,14 @@ public class CompanyYearOff {
 
 	public void setDayOffResetFlag(int dayOffResetFlag) {
 		this.dayOffResetFlag = dayOffResetFlag;
+	}
+
+	public int getNumberDayOff() {
+		return numberDayOff;
+	}
+
+	public void setNumberDayOff(int numberDayOff) {
+		this.numberDayOff = numberDayOff;
 	}
 
 	public int getCurrentYearFlag() {
