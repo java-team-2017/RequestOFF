@@ -78,12 +78,7 @@
 					
 					$('#forward').empty();
 					if(rowData.status != 5){
-						$('#btnApproveModal').prop('disabled', true);
-						$('#btnDenyModal').prop('disabled', true);
-						$('#btnSendModal').prop('disabled', true);
-						$('#btnForward').prop('disabled', true);
-						$('#forward').prop('disabled', true);
-						$('#responseMessage').prop('disabled', true);
+						$('#btnApproveModal, #btnDenyModal, #btnSendModal, #btnForward, #responseMessage').prop('disabled', true);
 					} else {
 						if (rowData.recipientId == userData.user.id) {
 							if (rowData.forwardId != 0 && rowData.forwardName != null) {
@@ -93,11 +88,7 @@
 								$('#btnForward').prop('disabled', true);
 							}
 						}
-						$('#btnApproveModal').prop('disabled', false);
-						$('#btnDenyModal').prop('disabled', false);
-						$('#btnSendModal').prop('disabled', false);
-						$('#forward').prop('disabled', false);
-						$('#responseMessage').prop('disabled', false);
+						$('#btnApproveModal, #btnDenyModal, #btnSendModal, #forward, #responseMessage').prop('disabled', false);
 					}
 					
 					$('#modalDetails').modal('show');
@@ -153,7 +144,7 @@
 					$('#confirmModal').modal('show');
 				} else {
 					$('#alertModal').modal('show');
-					$('#alertMsg').text("You must select at least 1 request before click this button!").attr('class', 'alert alert-warning').show();
+					$('#alertMsg').text("You must select at least 1 request before clicking this button!").attr('class', 'alert alert-warning').show();
 				}
 			});
 			

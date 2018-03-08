@@ -19,7 +19,12 @@ public class EmployeeOffStatusRepositoryImpl implements EmployeeOffStatusReposit
 	@Override
 	public List<EmployeeOffStatus> search(EmployeeOffStatusSearchRequest employeeOffStatusSearchRequest) {
 		boolean whereClause = true;
-		StringBuilder sqlQuery = new StringBuilder("SELECT * FROM employee_off_status ");
+		StringBuilder sqlQuery = new StringBuilder("SELECT * FROM employee_off_status eOS INNER JOIN employee e ON eOS.employee_id = e.id ");
+		if (StringUtil.isNotEmpty(employeeOffStatusSearchRequest.getEmployeeName())) {
+			sqlQuery.append(" WHERE e.name like '%" + employeeOffStatusSearchRequest.getEmployeeName() + "%'");
+			whereClause = false;
+		}
+		
 		if (StringUtil.isNotEmpty(employeeOffStatusSearchRequest.getYearId())) {
 			sqlQuery.append(" WHERE year_id = '" + employeeOffStatusSearchRequest.getYearId() + "'");
 			whereClause = false;

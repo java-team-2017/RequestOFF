@@ -80,7 +80,7 @@
 					if (resultData.status_info.status == 0) {
 						$('#editManager').empty();
 						if (isCreate == false) {
-							$('#editManager').append('<option value="' + rowDataRequest.manager.id + '" selected="true">' + rowDataRequest.manager.name + '</option>');
+							$('#editManager').append('<option style="font-weight:bold;" value="' + rowDataRequest.manager.id + '" selected="true">' + rowDataRequest.manager.name + '</option>');
 						} else {
 							if (resultData.listManagerNotInDepartment.length > 0) {
 								$('#btnCreateModal').show();
@@ -111,7 +111,7 @@
 			}
 			
 			if($('#editDepartment').val() == ""){
-				$('#editMsg').html("Please fill in department field").attr('class', 'alert alert-danger').show();
+				$('#editMsg').html("Please fill in Department field").attr('class', 'alert alert-danger').show();
 				return;
 			}
 			
@@ -140,9 +140,8 @@
 						} else {
 							$('#alertMessage').html("Edit Department Successfully").attr('class', 'alert alert-success').show();
 						}
-						
 					} else {
-						$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
+						$('#editMsg').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
 					}
 				},
 				error : function(e) {
@@ -262,7 +261,7 @@
 	<div th:replace="fragments/header"></div>
 	<div th:replace="menu"></div>
 	
-	<div class="requestOffContentBody">			
+	<div class="requestOffContentBody">
 		<h2>Department Management</h2>
 		<div id="alertMessage" class="alert" style="display:none;"></div>
 			<form id="departmentForm" class="form-input">
@@ -364,7 +363,7 @@
 			
 								<label class="col-md-3 control-label">Manager:</label>
 								<div class="col-md-9">
-									<select id="editManager" class="form-control"></select>
+									<select style="font-weight:bold" id="editManager" class="form-control"></select>
 								</div>&nbsp;
 								
 								<p align="center">

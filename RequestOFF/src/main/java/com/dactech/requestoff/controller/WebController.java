@@ -81,4 +81,9 @@ public class WebController {
 	public String companyYearOffManagement() {
 		return "companyYearOffManagement";
 	}
+	
+	@GetMapping("/employeeOffStatusManagement")
+	public String employeeOffStatusManagement() {
+		return "employeeOffStatusManagement";
+	}
 }

@@ -13,17 +13,20 @@ public class EmployeeOffStatusSearchRequest {
 	private String totalHours;
 	@JsonProperty("valid_flag")
 	private String validFlag;
+	@JsonProperty("name")
+	private String employeeName;
 
 	public EmployeeOffStatusSearchRequest() {
 	}
 
 	public EmployeeOffStatusSearchRequest(String yearId, String employeeId, String remainHours, String totalHours,
-			String validFlag) {
+			String validFlag, String employeeName) {
 		this.yearId = yearId;
 		this.employeeId = employeeId;
 		this.remainHours = remainHours;
 		this.totalHours = totalHours;
 		this.validFlag = validFlag;
+		this.employeeName = employeeName;
 	}
 
 	public String getYearId() {
@@ -64,6 +67,14 @@ public class EmployeeOffStatusSearchRequest {
 
 	public void setValidFlag(String validFlag) {
 		this.validFlag = validFlag;
+	}
+
+	public String getEmployeeName() {
+		return employeeName;
+	}
+
+	public void setEmployeeName(String employeeName) {
+		this.employeeName = employeeName;
 	}
 
 }
