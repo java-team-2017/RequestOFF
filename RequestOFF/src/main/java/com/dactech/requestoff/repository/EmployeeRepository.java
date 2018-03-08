@@ -13,6 +13,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, Emplo
 	public Employee findById(long id);
 	public Employee findByEmail(String email);
 	
+	@Query(value = "SELECT * FROM employee WHERE name like %?1% ", nativeQuery = true)
+	public List<Employee> findByNameLike(String name);
+	
 	@Query(value = "SELECT * FROM employee WHERE position_id = " + Position.POSITION_EMPLOYEE + " AND "
 			+ "id NOT IN (SELECT DISTINCT employee_id from team_employee WHERE valid_flag = 1) AND "
 			+ "valid_flag = 1", nativeQuery = true)

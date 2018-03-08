@@ -237,24 +237,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public EmployeeOffStatisticsPagingResponse employeeOffStatisticsPaging(
 			EmployeeOffStatisticsPagingRequest eospRequest) throws Exception {
-//*
-		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy HH");
-		
-		String requestFromTimeStr = eospRequest.getFromTime().equals("") ? "01/01/2000 08"
-				: eospRequest.getFromTime();
-		Date requestFromTime = formatter.parse(requestFromTimeStr + " 08");
-		
-		Date requestToTime;
-		if (eospRequest.getToTime().equals("")) {
-			Calendar cal = Calendar.getInstance();
-			cal.set(Calendar.HOUR_OF_DAY, 17);
-			requestToTime = cal.getTime();
-		} else {
-			requestToTime = formatter.parse(eospRequest.getToTime() + " 17");
-		}
-		
-		System.out.println(requestFromTime);
-		System.out.println(requestToTime);
+	
+		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+		String fromTimeStr = currentYear + "-01-01 00:00:00";
+		String toTimeStr = currentYear + "-12-31 23:59:59";
 		
 		// get list employee from database with name, team and department
 		EmployeeSearchRequest ESRequest = new EmployeeSearchRequest();
@@ -268,6 +254,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		List<EmployeeOffStatisticsPagingResponse.EmployeeStatistics> lEStatistics = new ArrayList<EmployeeOffStatisticsPagingResponse.EmployeeStatistics>(
 				listEmployee.size());
 		for (Employee employee : listEmployee) {
+			// assign department for manager and team for leader
 			EmployeeOffStatisticsPagingResponse.EmployeeStatistics eStatistics = new EmployeeOffStatisticsPagingResponse.EmployeeStatistics();
 			if (employee.getPosition().getId() == Position.POSITION_PROJECT_MANAGER) {
 				Department dept = departmentRepository.findByManagerId(employee.getId());
@@ -279,45 +266,29 @@ public class EmployeeServiceImpl implements EmployeeService {
 			} else if (employee.getPosition().getId() == Position.POSITION_LEADER) {
 				Team team = teamRepository.findByLeaderId(employee.getId());
 				if (team != null) {
+					employee.setDepartmentName(team.getDepartment().getName());
 					employee.setTeamName(team.getName());
 				} else {
 					employee.setTeamName("No Team");
+					employee.setDepartmentName("No Department");
 				}
 			}
 			
-			EmployeeOffStatus eos = EOSRepository.findById(Calendar.getInstance().get(Calendar.YEAR), employee.getId());
+			EmployeeOffStatus eos = EOSRepository.findById(currentYear, employee.getId());
 			employee.setEmployeeOffStatus(eos);
-			
 			eStatistics.setEmployee(employee);
 
-			// classify request according to payment_flag
-			// calculate total off time of each class
-			formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-			RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
-			requestSearchRequest.setEmployeeId(Long.toString(employee.getId()));
-			requestSearchRequest.setFromTime(formatter.format(requestFromTime));
-			requestSearchRequest.setToTime(formatter.format(requestToTime));
-			requestSearchRequest.setStatus(Long.toString(Request.REQUEST_STATUS_APPROVED));
-			requestSearchRequest.setValidFlag("1");
-			List<Request> listRequest = requestRepository.searchRequest(requestSearchRequest);
+			// get list request of user
+			List<Request> listRequest = requestRepository.findByEmpoyeeIdAndTime(employee.getId(), fromTimeStr, toTimeStr);
 			
 			List<Request> listRequestWithPaying = new ArrayList<Request>(listRequest.size());
 			List<Request> listRequestWithoutPaying = new ArrayList<Request>(listRequest.size());
-			long timeOffWithPaying = 0;
-			long timeOffWithoutPaying = 0;
+			double timeOffWithPaying = 0;
+			double timeOffWithoutPaying = 0;
 
-			formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 			for (Request request : listRequest) {
-				// get the offTime within StatisticsRequestTime
-				// (the range of Request off time may be over the range of
-				// StatisticsRequestTime)
-				Date fromTime = formatter.parse(request.getFromTime());
-				Date toTime = formatter.parse(request.getToTime());
-				Date startTime = fromTime.after(requestFromTime) ? fromTime : requestFromTime;
-				Date endTime = toTime.before(requestToTime) ? toTime : requestToTime;
-
 				// calculate amount of off time in working time
-				long timeOff = DateUtils.diffHours(startTime, endTime);
+				double timeOff = request.getTotalTime();
 
 				if (request.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING) {
 					timeOffWithPaying += timeOff;

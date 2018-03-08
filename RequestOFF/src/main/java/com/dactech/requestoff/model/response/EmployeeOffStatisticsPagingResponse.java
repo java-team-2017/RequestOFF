@@ -70,15 +70,15 @@ public class EmployeeOffStatisticsPagingResponse {
 		private Employee employee;
 		private List<Request> listRequestWithPaying;
 		private List<Request> listRequestWithoutPaying;
-		private long timeOffWithPaying;
-		private long timeOffWithoutPaying;
+		private double timeOffWithPaying;
+		private double timeOffWithoutPaying;
 
 		public EmployeeStatistics() {
 			super();
 		}
 
 		public EmployeeStatistics(Employee employee, List<Request> listRequestWithPaying,
-				List<Request> listRequestWithoutPaying, long timeOffWithPaying, long timeOffWithoutPaying) {
+				List<Request> listRequestWithoutPaying, double timeOffWithPaying, double timeOffWithoutPaying) {
 			super();
 			this.employee = employee;
 			this.listRequestWithPaying = listRequestWithPaying;
@@ -111,19 +111,19 @@ public class EmployeeOffStatisticsPagingResponse {
 			this.listRequestWithoutPaying = listRequestWithoutPaying;
 		}
 
-		public long getTimeOffWithPaying() {
+		public double getTimeOffWithPaying() {
 			return timeOffWithPaying;
 		}
 
-		public void setTimeOffWithPaying(long timeOffWithPaying) {
+		public void setTimeOffWithPaying(double timeOffWithPaying) {
 			this.timeOffWithPaying = timeOffWithPaying;
 		}
 
-		public long getTimeOffWithoutPaying() {
+		public double getTimeOffWithoutPaying() {
 			return timeOffWithoutPaying;
 		}
 
-		public void setTimeOffWithoutPaying(long timeOffWithoutPaying) {
+		public void setTimeOffWithoutPaying(double timeOffWithoutPaying) {
 			this.timeOffWithoutPaying = timeOffWithoutPaying;
 		}
 

@@ -1,6 +1,7 @@
 package com.dactech.requestoff.util;
 
 import java.text.Normalizer;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 public class StringUtil {
@@ -28,5 +29,19 @@ public class StringUtil {
 		returnStr = returnStr.toLowerCase().replace("\t", "").replace("\n", "").replace(" ", "").replace("_", "").replace(".", "");
 		System.out.println(returnStr);
 		return returnStr;
+	}
+	
+	// function standardize the name (remove redundant white space)
+	public static String standardizeName(String name) {
+		StringTokenizer tokenizer = new StringTokenizer(name, " \t-_");
+		StringBuilder standardizedName = new StringBuilder();
+		if (tokenizer.countTokens() > 0) {
+			standardizedName.append(tokenizer.nextToken());
+			while (tokenizer.hasMoreTokens()) {
+				standardizedName.append(' ');
+				standardizedName.append(tokenizer.nextToken());
+			}
+		}
+		return standardizedName.toString();
 	}
 }

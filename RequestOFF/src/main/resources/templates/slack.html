@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<title>Slack Request Management</title>
 	<div th:replace="library"></div>
 	<link rel="stylesheet" type="text/css" href="css/slackStyle.css" />
 </head>
@@ -8,18 +9,19 @@
 <script th:inline="javascript">
 /*<![CDATA[*/
 	var rowData; // data of selected row of table
+	var row;
 	
 	$(function() {
 		$('#editHours').empty();
-		for (var i = 0; i < 8 ; i++) {
+		for (var i = 0; i < 8 ; i = i + 0.5) {
 			$('#detailTotalHour').append('<option value="' + i + '">' + i + '</option>');
 		}
-		
 		
 		$('#searchBtn').on('click', function() {
 			$('#alertMessage').hide();
 			var searchData = {
-				is_valid_msg: $('#validStatus').val()
+				is_valid_msg: $('#validStatus').val(),
+				process_flag: $('#processStatus').val()
 			}
 			var fromTime = new Date($('#from').val());
 			var toTime = new Date($('#to').val());
@@ -67,6 +69,7 @@
 						}
 					},
 					{ data: 'name' },
+					{ data: 'msgContent' },
 					{ data: 'dayOffFrom' },
 					{ data: 'dayOffTo' },
 					{
@@ -74,20 +77,42 @@
 						render: function (data, type, row){
 							if (type == 'display' || type == 'filter') { // for display and search
 								if (data == "") data = 0;
-								return Math.floor(data/8) + " day " + (data % 8) + " h";
+								return Math.floor(data/8) + " d " + (data % 8) + " h";
 							} else { // for sort and type detection
 								if (data == "") return 0;
 								return data;
 							}
 						}
 					},
+					{ data: 'errMsg' },
+					{
+						data: null,
+						render: function (data, type, row){
+							if(row.isValidMsg != 1 && row.processFlag != 1) {
+								return "<a class='btnDeny'><span class='glyphicon glyphicon-remove' style='cursor: pointer;'></span></a>";
+							}
+							else {
+								return "<a class='btnDeny not-active'><span class='glyphicon glyphicon-remove' style='opacity: 0.5;'></span></a>";
+							}
+						}
+					}
 				]
 			});
 		});
-		
 		$('#slackRequestTable tbody').on('click', 'td', function() {
+			var index = $(this).index();
+			if(index > 7) return;
+			row = $('#slackRequestTable').DataTable().row(this);
 			rowData = $('#slackRequestTable').DataTable().row(this).data();
-			console.log(rowData);
+			$('#modalMsg').hide();
+			if (rowData.processFlag == 1 || (rowData.processFlag == 0 && rowData.isValidMsg == 1)) {
+				$('#modalSaveBtn, #modalDenyBtn, #modalApproveBtn').hide();
+				$('#detailModal .modal-input').prop('disabled', true);
+			} else {
+				$('#modalSaveBtn, #modalDenyBtn, #modalApproveBtn').show();
+				$('#detailModal .modal-input').prop('disabled', false);
+			}
+			
 			
 			$('#detailId').val(rowData.id);
 			var m = new Date(rowData.msgTime);
@@ -95,20 +120,146 @@
 			$('#detailMsgTime').val(dateString);
 			$('#detailName').val(rowData.name);
 			$('#detailMsgContent').val(rowData.msgContent);
-			$('#detailFrom').val(rowData.dayOffFrom);
-			$('#detailTo').val(rowData.dayOffTo);
-			$('#detailValidStatus').val(rowData.isValidMsg);
-			$('#detailProcessFlag').val(rowData.processFlag);
+			if (rowData.dayOffFrom != null) {
+				var dayOffFrom = new Date(rowData.dayOffFrom);
+				if (dayOffFrom != 'Invalid Date') {
+					$('#detailFrom').val((dayOffFrom.getMonth()+1) +"/"+ dayOffFrom.getDate() +"/"+ dayOffFrom.getFullYear());				
+				} else {
+					$('#detailFrom').val("");
+				}
+			} else {
+				$('#detailFrom').val("");
+			}
+			
+			if (rowData.dayOffTo != null) {
+				var dayOffTo = new Date(rowData.dayOffTo);
+				if (dayOffTo != 'Invalid Date') {
+					$('#detailTo').val((dayOffTo.getMonth()+1) +"/"+ dayOffTo.getDate() +"/"+ dayOffTo.getFullYear());
+				} else {
+					$('#detailTo').val("");
+				}
+			} else {
+				$('#detailTo').val("");
+			}
+			
+			if (rowData.isValidMsg == 1) {
+				$('#detailValidStatus').attr('class', 'glyphicon glyphicon-ok');
+			} else {
+				$('#detailValidStatus').attr('class', 'glyphicon glyphicon-remove');
+			}
+			if (rowData.processFlag == 1) {
+				$('#detailProcessFlag').attr('class', 'glyphicon glyphicon-ok');
+			}else {
+				$('#detailProcessFlag').attr('class', 'glyphicon glyphicon-remove');
+			}
 			$('#detailTotalDay').val( Math.floor(rowData.totalHours/8));
 			$('#detailTotalHour').val(rowData.totalHours % 8);
 
 			$('#detailModal').modal('show');
 		});
-		$('#detailModal').modal('show');
-		$('#modalSaveBtn').on('click', function() {
-// 			if (isNaN(parseInt(days)) || parseInt(days) != parseFloat(days) || parseInt(days) < 0) {
-// 				$('#editMsg').html("number of days must be a positive integer").show();
-// 			}
+		
+		
+		$('body').on('click', '#modalSaveBtn, #modalDenyBtn, #modalApproveBtn, #slackRequestTable .btnDeny', function() {
+			rowData = row.data();
+			var updateData = {};
+			var action = "";
+			if ($(this).attr('id') == 'modalSaveBtn') {
+				action = 'modal save';
+			} else if ($(this).attr('id') == 'modalApproveBtn') {
+				action = 'modal approve';
+			} else if ($(this).attr('id') == 'modalDenyBtn') {
+				action = 'modal deny';
+			} else if ($(this).hasClass('btnDeny')) {
+				action = 'table deny';
+			}
+			
+			if (action == 'modal save' || action == 'modal approve') { // click save or approve button on detail modal
+				$('#detailModal .modal-input').each(function() {
+					if ($(this).val() == "") {
+						$('#modalMsg').html("Please fill all field").attr('class', 'alert alert-danger').show();
+						return;
+					}
+				})
+				
+				var fromTime = new Date($('#detailFrom').val());
+				var toTime = new Date($('#detailTo').val());
+				var days = $('#detailTotalDay').val();
+				var hours = $('#detailTotalHour').val();
+				if (toTime < fromTime) {
+					$('#modalMsg').html("To time must be after from time").attr('class', 'alert alert-danger').show();
+					return;
+				}
+				if (isNaN(parseInt(days)) || parseInt(days) != parseFloat(days) || parseInt(days) < 0) {
+					$('#modalMsg').html("number of days must be a positive integer").show();
+					return;
+				}
+				var totalTime = parseFloat(days) * 8 + parseFloat(hours);
+				if (totalTime == 0) {
+					$('#modalMsg').html("Time off must be greater than 0").show();
+					return;
+				}
+				
+				var fromTimeString = fromTime.getFullYear() +"-"+ (fromTime.getMonth()+1) +"-"+ fromTime.getDate();
+				var toTimeString = toTime.getFullYear() +"-"+ (toTime.getMonth()+1) +"-"+ toTime.getDate();
+				updateData = {
+					id: rowData.id,
+					update_date: rowData.updateDate,
+					name: $('#detailName').val(),
+					day_off_from: fromTimeString,
+					day_off_to: toTimeString,
+					total_hours: totalTime
+				}
+				if (action == 'modal approve') {
+					updateData.is_valid_msg = 1;
+					updateData.process_flag = 1;
+				}
+			} else if (action == 'modal deny') { // click deny button on detail modal
+				updateData = {
+					id: rowData.id,
+					update_date: rowData.updateDate,
+					process_flag: 1
+				}
+				
+			} else if (action == 'table deny') { // click deny sign on table
+				rowData = $('#slackRequestTable').DataTable().row($(this).parent()).data();
+				updateData = {
+					id: rowData.id,
+					update_date: rowData.updateDate,
+					process_flag: 1
+				}
+			}
+			console.log("update data");
+			console.log(updateData);
+			$.ajax({
+				url : /*[[@{/slack/regist}]]*/,
+				type : "post",
+				dataType :"json",
+				contentType : "application/json",
+				data : JSON.stringify(updateData),
+				success : function (response){
+					$('#slackRequestTable').DataTable().ajax.reload();
+					if (response.status_info.status != 0) {
+						if (action == 'modal approve') {
+							$('#modalMsg').html(errors['APIResponseError'](response.status_info.error)).attr('class', 'alert alert-danger').show();
+						} else {
+							$('#modalMsg').html(errors['APIResponseError'](response.status_info.error)).attr('class', 'alert alert-danger').show();
+						}
+					} else {
+						if (action == 'modal approve') {
+							$('#alertMessage').html("Approve successully").attr('class', 'alert alert-success').show();
+						} else if (action == 'modal deny' || action == 'table deny') {
+							$('#alertMessage').html("Deny successully").attr('class', 'alert alert-success').show();
+						} else if (action == 'modal save') {
+							$('#alertMessage').html("Edit successully").attr('class', 'alert alert-success').show();
+						}
+						$('#detailModal').modal('hide');
+					}
+					
+				},
+				error : function(e) {
+					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+				}
+			});
 		});
 		
 	});
@@ -141,7 +292,13 @@
 					</div>
 				</div>
 			</div>
-			
+			<div class="form-group">
+				<label class="control-label">Process status:</label>
+					<select id="processStatus" name="process_flag" class="form-control">
+						<option value = "0">unprocessed</option>
+						<option value = "1">processed</option>
+					</select>
+			</div>
 			<div class="form-group">
 				<label class="control-label">Message valid status:</label>
 					<select id="validStatus" name="is_valid_msg" class="form-control">
@@ -157,14 +314,26 @@
 				
 		<div class="table-responsive" style="margin-top:3em;"> 
 			<table class="table table-bordered table-striped table-hover" id="slackRequestTable">
+					<col width="3%"/>
+	 				<col width="10%"/>
+	 				<col width="12%"/>
+	 				<col width="44%"/>
+	 				<col width="7%"/>
+	 				<col width="7%"/>
+	 				<col width="5%"/>
+	 				<col width="20%"/>
+	 				<col width="2%"/>
 				<thead>
 					<tr>
 						<th class="text-center" style="width: 40px;">Id</th>
 						<th class="text-center">Message Time</th>
 						<th class="text-center">Name</th>
+						<th class="text-center" style="width: 500px;">Msg content</th>
 						<th class="text-center">From</th>
 						<th class="text-center">To</th>
 						<th class="text-center">Total Time</th>
+						<th class="text-center">Error</th>
+						<th class="text-center"></th>
 					</tr>
 				</thead>
 				<tbody class="text-center">
@@ -200,15 +369,14 @@
 						<div class="row">
 							<label class="col-sm-4 col-form-label">Employee Name</label>
 							<div class="col-sm-8">
-								<input id="detailName" class="col-sm-3 form-control" type="text"></input>
+								<input id="detailName" class="col-sm-3 form-control modal-input" type="text"></input>
 							</div>
 						</div>
 						<div class="row">
 							<label class="col-sm-4 col-form-label">From</label>
 							<div class="col-sm-8">
-<!-- 								<input id="detailFrom" class="col-sm-3 form-control" type="text"></input> -->
 								<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
-									<input type="text" class="form-control" name="fromTime" id="detailFrom" />
+									<input type="text" class="form-control modal-input" name="fromTime" id="detailFrom" />
 									<div class="input-group-addon">
 										<span class="glyphicon glyphicon-th"></span>
 									</div>
@@ -218,9 +386,8 @@
 						<div class="row">
 							<label class="col-sm-4 col-form-label">To</label>
 							<div class="col-sm-8">
-<!-- 								<input id="detailTo" class="col-sm-3 form-control" type="text"></input> -->
 								<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
-									<input type="text" class="form-control" name="fromTime" id="detailTo" />
+									<input type="text" class="form-control modal-input" name="fromTime" id="detailTo" />
 									<div class="input-group-addon">
 										<span class="glyphicon glyphicon-th"></span>
 									</div>
@@ -230,12 +397,12 @@
 						<div class="row">
 							<label class="col-sm-4 col-form-label">Total Time</label>
 							<div class="col-sm-2">
-								<input id="detailTotalDay" class="col-sm-3 form-control" type="text"></input>
+								<input id="detailTotalDay" class="col-sm-3 form-control modal-input" type="text"></input>
 							</div>
 							<label class="col-sm-1" style="padding-top: 5px">Days</label>
 							<div class="col-sm-1"></div>
 							<div class="col-sm-2">
-								<select id="detailTotalHour" class="form-control"></select>
+								<select id="detailTotalHour" class="form-control modal-input"></select>
 							</div>
 							<label class="col-sm-1 col-form-label" style="padding-top: 5px">Hours</label>
 						</div>
@@ -246,15 +413,15 @@
 							</div>
 						</div>
 						<div class="row">
-							<label class="col-sm-4 col-form-label">Valid Message Flag</label>
+							<label class="col-sm-4 col-form-label">Valid Message</label>
 							<div class="col-sm-8">
-								<input id="detailValidStatus" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
+								<span id="detailValidStatus"></span>
 							</div>
 						</div>
 						<div class="row">
-							<label class="col-sm-4 col-form-label">Process Flag</label>
+							<label class="col-sm-4 col-form-label">Processed</label>
 							<div class="col-sm-8">
-								<input id="detailProcessFlag" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
+								<span id="detailProcessFlag"></span>
 							</div>
 						</div>
 					</div>
