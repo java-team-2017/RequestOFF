@@ -79,22 +79,21 @@
 		
 		// edit remain off time modal
 		$('#editHours').empty();
-		for (var i = 0; i < 8 ; i++) {
+		for (var i = 0; i < 8 ; i += 0.5) {
 			$('#editHours').append('<option value="' + i + '">' + i + '</option>');
 		}
+		
+		// year select box
+		var currentYear = (new Date()).getFullYear();
+		for (var i = currentYear; i >= 2010 ; i--) {
+			$('#year').append('<option value="' + i + '">' + i + '</option>');
+		}
+		search();
 		//=====================================================================
 		// # Button even handler
 		//=====================================================================
 		function search() {
 			var searchParam = $('#searchForm').serializeJSON();
-			if (searchParam.from_time != "" && searchParam.to_time != "") {
-				var fromTime = new Date(searchParam.from_time);
-				var toTime = new Date(searchParam.to_time);
-				if (toTime < fromTime) {
-					$('#alertMessage').html(errors['DateError']).attr('class', 'alert alert-danger').show();
-					return;
-				}
-			}
 			$('#alertMessage').hide();
 			
 			$('#statisticsTable').DataTable({
@@ -102,7 +101,6 @@
 				processing: true,
 				serverSide: true,
 				searching: false,
-//				pageLength: 2,
 				ajax: {
 					'url' : /*[[@{/employee/statisticsPaging}]]*/,
 					'type': "POST",
@@ -136,10 +134,8 @@
 						}
 					},
 					{ data: 'employee.position.name' },
-					{ data: 'timeOffWithPaying' },
-					{ data: 'timeOffWithoutPaying' },
 					{
-						data: 'employee.employeeOffStatus.remainHours',
+						data: 'timeOffWithPaying',
 						render: function (data, type, row){
 							if (type == 'display' || type == 'filter') { // for display and search
 								if (data == "") data = 0;
@@ -151,8 +147,43 @@
 						}
 					},
 					{
+						data: 'timeOffWithoutPaying',
+						render: function (data, type, row){
+							if (type == 'display' || type == 'filter') { // for display and search
+								if (data == "") data = 0;
+								return Math.floor(data/8) + " day " + (data % 8) + " h";
+							} else { // for sort and type detection
+								if (data == "") return 0;
+								return data;
+							}
+						}
+						
+					},
+					{
+						data: 'employee.employeeOffStatus.remainHours',
+						render: function (data, type, row){
+							
+							if (type == 'display' || type == 'filter') { // for display and search
+								if (row.employee.employeeOffStatus == null ) {
+									return "No Data";
+								}
+								if (data == "") data = 0;
+								return Math.floor(data/8) + " day " + (data % 8) + " h";
+							} else { // for sort and type detection
+								if (row.employee.employeeOffStatus == null) {
+									data = 0;
+								}
+								return data;
+							}
+						}
+					},
+					{
 						render: function (){
-							return '<a class="editRemainHours"><span class="glyphicon glyphicon-edit"></span></a>';
+							if (searchParam.year == (new Date()).getFullYear()) {
+								return '<a class="editRemainHours"><span class="glyphicon glyphicon-edit"></span></a>';
+							} else {
+								return '<a class="editRemainHours not-active"><span class="glyphicon glyphicon-edit" style="opacity: 0.5;"></span></a>';
+							}
 						}
 					}
 				]
@@ -181,8 +212,6 @@
 			if($(this).index() >= 8) return;
 			var statisticsTable = $('#statisticsTable').DataTable();
 			var statisticsObj = statisticsTable.row(this).data();
-// 			console.log("row data:");
-// 			console.log(statisticsObj);
 			
 			$('#detailEmployee').val(statisticsObj.employee.name);
 			$('#detailPosition').val(statisticsObj.employee.position.name);
@@ -195,12 +224,22 @@
 				$('#detailTeam').val(statisticsObj.employee.listTeam[0].name);
 			}
 			
-			$('#detailWithPaying').val(statisticsObj.timeOffWithPaying);
-			$('#detailWithoutPaying').val(statisticsObj.timeOffWithoutPaying);
+			var payingTime = Math.floor(statisticsObj.timeOffWithPaying/8) + " day " + (statisticsObj.timeOffWithPaying % 8) + " h";
+			var notPayingTime = Math.floor(statisticsObj.timeOffWithoutPaying/8) + " day " + (statisticsObj.timeOffWithoutPaying % 8) + " h";
+			$('#detailWithPaying').val(payingTime);
+			$('#detailWithoutPaying').val(notPayingTime);
 			
-			var remainHours = statisticsObj.employee.employeeOffStatus.remainHours;
-			$('#detailRemainDay').val(Math.floor(remainHours/8) + " day " + (remainHours % 8) + " h");
 			
+			var remainHours;
+			if (statisticsObj.employee.employeeOffStatus == null) {
+				$('#detailRemainDay').val("No Data");
+			} else {
+				remainHours = statisticsObj.employee.employeeOffStatus.remainHours;
+				$('#detailRemainDay').val(Math.floor(remainHours/8) + " day " + (remainHours % 8) + " h");
+			}
+			
+			
+			console.log(statisticsObj.listRequestWithPaying[0]);
 			$('#withPayingTable').DataTable({
 				destroy: true,
 				searching: false,
@@ -211,8 +250,30 @@
 // 				"scrollCollapse": true,
 				data: statisticsObj.listRequestWithPaying,
 				columns: [
-					{ data: 'fromTime' },
-					{ data: 'toTime' },
+					{
+						data: 'fromTime' ,
+						render: function (data, type, row){
+							return data.substr(0, data.length - 5);
+						}
+					},
+					{
+						data: 'toTime' ,
+						render: function (data, type, row){
+							return data.substr(0, data.length - 5);
+						}
+					},
+					{
+						data: 'totalTime' ,
+						render: function (data, type, row){
+							if (type == 'display' || type == 'filter') { // for display and search
+								if (data == "") data = 0;
+								return Math.floor(data/8) + " day " + (data % 8) + " h";
+							} else { // for sort and type detection
+								if (data == "") return 0;
+								return data;
+							}
+						}
+					}
 				]
 			});
 			
@@ -224,8 +285,30 @@
 				paging: false,
 				data: statisticsObj.listRequestWithoutPaying,
 				columns: [
-					{ data: 'fromTime' },
-					{ data: 'toTime' },
+					{
+						data: 'fromTime' ,
+						render: function (data, type, row) {
+							return data.substr(0, data.length - 5);
+						}
+					},
+					{
+						data: 'toTime' ,
+						render: function (data, type, row) {
+							return data.substr(0, data.length - 5);
+						}
+					},
+					{
+						data: 'totalTime' ,
+						render: function (data, type, row) {
+							if (type == 'display' || type == 'filter') { // for display and search
+								if (data == "") data = 0;
+								return Math.floor(data/8) + " day " + (data % 8) + " h";
+							} else { // for sort and type detection
+								if (data == "") return 0;
+								return data;
+							}
+						}
+					}
 				]
 			});
 			
@@ -251,8 +334,8 @@
 		});
 		
 		$("#editOk").on('click', function() {
-			var days = parseInt($('#editDays').val());
-			var hours = parseInt($('#editHours').val());
+			var days = parseFloat($('#editDays').val());
+			var hours = parseFloat($('#editHours').val());
 			console.log("day " + days + " hours : " + hours);
 			if (isNaN(parseInt(days)) || parseInt(days) != parseFloat(days) || parseInt(days) < 0) {
 				$('#editMsg').html("number of days must be a positive integer").show();
@@ -310,23 +393,8 @@
 		<div id="alertMessage" class="alert" style="display:none;"></div>
 		<form id="searchForm" class="form-input">
 			<div class="form-group">
-				<label>From</label>
-				<div class="input-group date datepicker" data-provide="datepicker">
-					<input id="fromTime" name="from_time" type="text" class="form-control" />
-					<div class="input-group-addon">
-						<span class="glyphicon glyphicon-th"></span>
-					</div>
-				</div>
-			</div>
-			
-			<div class="form-group">
-				<label>To</label>
-				<div class="input-group date datepicker" data-provide="datepicker">
-					<input id="toTime" name="to_time" type="text" class="form-control" />
-					<div class="input-group-addon">
-						<span class="glyphicon glyphicon-th"></span>
-					</div>
-				</div>
+				<label>Year</label>
+				<select id="year" name="year" class="form-control"></select>
 			</div>
 			
 			<div class="form-group">
@@ -430,6 +498,7 @@
 										<tr>
 											<th class="col-md-6 text-center">From</th>
 											<th class="col-md-6 text-center">To</th>
+											<th class="col-md-6 text-center">Total Time</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -443,6 +512,7 @@
 										<tr>
 											<th class="col-md-6 text-center">From</th>
 											<th class="col-md-6 text-center">To</th>
+											<th class="col-md-6 text-center">Total Time</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -492,7 +562,6 @@
 							<div class="col-sm-1"></div>
 							<div class="col-sm-2">
 								<select id="editHours" class="form-control"></select>
-<!-- 								<input id="editHours" class="form-control" type="text"></input> -->
 							</div>
 							<label class="col-sm-1 col-form-label">Hours</label>
 						</div>

@@ -17,8 +17,7 @@ public class EmployeeOffStatisticsPagingRequest {
 	List<PagingColumn> columns;
 	List<PagingOrder> orders;
 
-	private String fromTime;
-	private String toTime;
+	private String year;
 	private String departmentId;
 	private String teamId;
 	private String employee;
@@ -50,8 +49,7 @@ public class EmployeeOffStatisticsPagingRequest {
 		}
 		this.setOrders(orders);
 
-		this.setFromTime(request.getParameter("from_time"));
-		this.setToTime(request.getParameter("to_time"));
+		this.setYear(request.getParameter("year"));
 		this.setDepartmentId(request.getParameter("department_id"));
 		this.setTeamId(request.getParameter("team_id"));
 
@@ -59,8 +57,8 @@ public class EmployeeOffStatisticsPagingRequest {
 	}
 
 	public EmployeeOffStatisticsPagingRequest(String draw, int start, int length, String searchValue,
-			boolean searchRegex, List<PagingColumn> columns, List<PagingOrder> orders, String fromTime, String toTime,
-			String departmentId, String teamId, String employee) {
+			boolean searchRegex, List<PagingColumn> columns, List<PagingOrder> orders, String year, String departmentId,
+			String teamId, String employee) {
 		super();
 		this.draw = draw;
 		this.start = start;
@@ -69,8 +67,7 @@ public class EmployeeOffStatisticsPagingRequest {
 		this.searchRegex = searchRegex;
 		this.columns = columns;
 		this.orders = orders;
-		this.fromTime = fromTime;
-		this.toTime = toTime;
+		this.year = year;
 		this.departmentId = departmentId;
 		this.teamId = teamId;
 		this.employee = employee;
@@ -132,20 +129,12 @@ public class EmployeeOffStatisticsPagingRequest {
 		this.orders = orders;
 	}
 
-	public String getFromTime() {
-		return fromTime;
+	public String getYear() {
+		return year;
 	}
 
-	public void setFromTime(String fromTime) {
-		this.fromTime = fromTime;
-	}
-
-	public String getToTime() {
-		return toTime;
-	}
-
-	public void setToTime(String toTime) {
-		this.toTime = toTime;
+	public void setYear(String year) {
+		this.year = year;
 	}
 
 	public String getDepartmentId() {

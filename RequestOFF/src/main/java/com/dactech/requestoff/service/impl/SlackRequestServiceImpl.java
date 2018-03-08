@@ -112,7 +112,7 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 			throw new Exception("The message is not a Request");
 		}
 		Request request = new Request();
-		List<Employee> employees = employeeRepository.findByNameLike(slackRequest.getName());
+		List<Employee> employees = employeeRepository.findByNameLike(StringUtil.standardizeName(slackRequest.getName()));
 		if (employees == null || employees.size() == 0) {
 			throw new Exception("Employee not found");
 		}
@@ -215,17 +215,28 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 						try {
 							Request requestOff = convertSlackRequest(slackRequest);
 							
+							int year = 0;
 							int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-							double newRemainHours;
-							Employee e = requestOff.getEmployee();
-							EmployeeOffStatus eos = employeeOffStatusRepository.findById(currentYear, e.getId());
-							newRemainHours = eos.getRemainHours() - requestOff.getTotalTime();
-							if (newRemainHours < 0) {
-								throw new Exception("Time off (" + requestOff.getTotalTime() + ") Greater than remain hours (" + eos.getRemainHours() + ")");
+							try {
+								String from = request.getDayOffFrom();
+								year = Integer.parseInt(from.substring(0, 4)); // yyyy-MM-dd
+							} catch (Exception ex) {
+								System.err.println("Warning: do not update remain hours");
 							}
-							eos.setRemainHours(newRemainHours);
 							
-							employeeOffStatusRepository.save(eos);
+							if (year != currentYear) {
+								System.err.println("Warning: do not update remain hours");
+							} else {
+								double newRemainHours;
+								Employee e = requestOff.getEmployee();
+								EmployeeOffStatus eos = employeeOffStatusRepository.findById(year, e.getId());
+								newRemainHours = eos.getRemainHours() - requestOff.getTotalTime();
+								if (newRemainHours < 0) {
+									throw new Exception("Time off (" + requestOff.getTotalTime() + ") Greater than remain hours (" + eos.getRemainHours() + ")");
+								}
+								eos.setRemainHours(newRemainHours);
+								employeeOffStatusRepository.save(eos);
+							}
 							
 							requestRepository.save(requestOff);
 							slackRequest.setProcessFlag(SlackRequest.PROCESSED);
@@ -262,17 +273,29 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 					Request request = convertSlackRequest(slackRequest);
 					
 					// update remain time
+					int year = 0;
 					int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-					double newRemainHours;
-					Employee e = request.getEmployee();
-					EmployeeOffStatus eos = employeeOffStatusRepository.findById(currentYear, e.getId());
-					newRemainHours = eos.getRemainHours() - request.getTotalTime();
-					if (newRemainHours < 0) {
-						throw new Exception("Time off (" + request.getTotalTime() + ") Greater than remain hours (" + eos.getRemainHours() + ")");
+					try {
+						String from = request.getFromTime();
+						year = Integer.parseInt(from.substring(0, 4)); // yyyy-MM-dd
+					} catch (Exception ex) {
+						System.err.println("Warning: do not update remain hours");
 					}
-					eos.setRemainHours(newRemainHours);
 					
-					employeeOffStatusRepository.save(eos);
+					if (year != currentYear) {
+						System.err.println("Warning: do not update remain hours");
+					} else {
+						double newRemainHours;
+						Employee e = request.getEmployee();
+						EmployeeOffStatus eos = employeeOffStatusRepository.findById(year, e.getId());
+						newRemainHours = eos.getRemainHours() - request.getTotalTime();
+						if (newRemainHours < 0) {
+							throw new Exception("Time off (" + request.getTotalTime() + ") Greater than remain hours (" + eos.getRemainHours() + ")");
+						}
+						eos.setRemainHours(newRemainHours);
+						employeeOffStatusRepository.save(eos);
+					}
+					
 					requestRepository.save(request);
 					slackRequest.setProcessFlag(SlackRequest.PROCESSED);
 				}

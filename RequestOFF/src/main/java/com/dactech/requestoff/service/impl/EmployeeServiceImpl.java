@@ -235,9 +235,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public EmployeeOffStatisticsPagingResponse employeeOffStatisticsPaging(
 			EmployeeOffStatisticsPagingRequest eospRequest) throws Exception {
 	
-		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-		String fromTimeStr = currentYear + "-01-01 00:00:00";
-		String toTimeStr = currentYear + "-12-31 23:59:59";
+		int year;
+		
+		try {
+			year = Integer.parseInt(eospRequest.getYear());
+		} catch(Exception e) {
+			year = Calendar.getInstance().get(Calendar.YEAR);
+		}
+		
+		String fromTimeStr = year + "-01-01 00:00:00";
+		String toTimeStr = year + "-12-31 23:59:59";
 		
 		// get list employee from database with name, team and department
 		EmployeeSearchRequest ESRequest = new EmployeeSearchRequest();
@@ -271,7 +278,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 				}
 			}
 			
-			EmployeeOffStatus eos = EOSRepository.findById(currentYear, employee.getId());
+			EmployeeOffStatus eos = EOSRepository.findById(year, employee.getId());
 			employee.setEmployeeOffStatus(eos);
 			eStatistics.setEmployee(employee);
 

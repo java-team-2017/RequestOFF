@@ -17,7 +17,8 @@
 			$('#detailTotalHour').append('<option value="' + i + '">' + i + '</option>');
 		}
 		
-		$('#searchBtn').on('click', function() {
+		search();
+		function search() {
 			$('#alertMessage').hide();
 			var searchData = {
 				is_valid_msg: $('#validStatus').val(),
@@ -98,6 +99,9 @@
 					}
 				]
 			});
+		}
+		$('#searchBtn').on('click', function() {
+			search();
 		});
 		$('#slackRequestTable tbody').on('click', 'td', function() {
 			var index = $(this).index();
