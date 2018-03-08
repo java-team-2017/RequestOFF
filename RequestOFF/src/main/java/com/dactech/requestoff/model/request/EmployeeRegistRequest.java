@@ -26,6 +26,11 @@ public class EmployeeRegistRequest {
 	@JsonProperty("role_ids")
 	private List<String> roleIds;
 
+	@JsonProperty("total_off_hours")
+	private String totalOffHours;
+	@JsonProperty("remain_hours")
+	private String remainHours;
+
 	public EmployeeRegistRequest() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -33,7 +38,7 @@ public class EmployeeRegistRequest {
 
 	public EmployeeRegistRequest(String id, String name, String gender, String birthday, String positionId,
 			String email, String password, String phone, String startWorkingDate, String officialWorkingDate,
-			String updateDate, String validFlag, List<String> roleIds) {
+			String updateDate, String validFlag, List<String> roleIds, String totalOffHours, String remainHours) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -48,6 +53,8 @@ public class EmployeeRegistRequest {
 		this.updateDate = updateDate;
 		this.validFlag = validFlag;
 		this.roleIds = roleIds;
+		this.totalOffHours = totalOffHours;
+		this.remainHours = remainHours;
 	}
 
 	public String getId() {
@@ -152,6 +159,22 @@ public class EmployeeRegistRequest {
 
 	public void setRoleIds(List<String> roleIds) {
 		this.roleIds = roleIds;
+	}
+
+	public String getTotalOffHours() {
+		return totalOffHours;
+	}
+
+	public void setTotalOffHours(String totalOffHours) {
+		this.totalOffHours = totalOffHours;
+	}
+
+	public String getRemainHours() {
+		return remainHours;
+	}
+
+	public void setRemainHours(String remainHours) {
+		this.remainHours = remainHours;
 	}
 
 }

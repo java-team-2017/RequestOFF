@@ -131,7 +131,8 @@
 							console.log(e.role);
 							$("#roleModalDetailsId option[value='" + e.id + "']").prop("selected", true);
 						});
-						
+						$("#totalOffHoursModalDetailsId").val(rowData.employeeOffStatus.totalHours);
+						$("#remainHoursModalDetailsId").val(rowData.employeeOffStatus.remainHours);
 						$('#alertMessage_modalDetails').hide();
 						$('#employeeDetailsModal').modal('show');
 					}
@@ -189,7 +190,7 @@
 					var addData = $('#modalAddForm').serializeJSON();
 					
 					//-----------validate------------
-					var complete = 1, valid = 1;
+					var complete = 1, valid = 1, isNumber = 1;
 					var listInput = $("#modalAddForm").find(':input');
 					$.each(listInput, function() {
 						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
@@ -202,6 +203,13 @@
 					if((addData.phoneModalAdd).length > 20) {
 						valid = 0;
 					}
+					if(isNaN(addData.totalOffHoursModalAdd) == true) {
+						isNumber = 0;
+					}
+					if(isNaN(addData.remainHoursModalAdd) == true) {
+						isNumber = 0;
+					}
+
 					//----------end validate---------
 					
 					if(complete == 0) {
@@ -209,6 +217,9 @@
 					}
 					else if(valid == 0) {
 						$('#alertMessage_modalAdd').html(errors['stringExceedLimit']).attr('class', 'alert alert-danger').show();
+					}
+					else if(isNumber == 0) {
+						$('#alertMessage_modalAdd').html(errors['notNumber']).attr('class', 'alert alert-danger').show();
 					}
 					else {
 						var birthday = addData.birthdayModalAdd;
@@ -232,7 +243,9 @@
 							"official_working_date" : officialWorkingDate,
 							"valid_flag" : "1",
 //	 						"team_id" : addData.teamModalAdd,
-							"role_ids" : $("#roleModalAddId").val()
+							"role_ids" : $("#roleModalAddId").val(),
+							"total_off_hours" : addData.totalOffHoursModalAdd,
+							"remain_hours" : addData.remainHoursModalAdd
 						};
 						console.log(employeeRegistRequest);
 						
@@ -264,7 +277,7 @@
 					var updateData = $('#modalDetailsForm').serializeJSON();
 					
 					//---------validate------------
-					var complete = 1, valid = 1;
+					var complete = 1, valid = 1, isNumber = 1;
 					var listInput = $("#modalDetailsForm").find(':input').not("#teamModalDetailsId, #departmentModalDetailsId");
 					$.each(listInput, function() {
 						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
@@ -277,6 +290,12 @@
 					if((updateData.phoneModalDetails).length > 20) {
 						valid = 0;
 					}
+					if(isNaN(updateData.totalOffHoursModalDetails) == true) {
+						isNumber = 0;
+					}
+					if(isNaN(updateData.remainHoursModalDetails) == true) {
+						isNumber = 0;
+					}
 					//---------end validate----------
 					
 					if(complete == 0) {
@@ -284,6 +303,9 @@
 					}
 					else if(valid == 0) {
 						$('#alertMessage_modalDetails').html(errors['stringExceedLimit']).attr('class', 'alert alert-danger').show();
+					}
+					else if(isNumber == 0) {
+						$('#alertMessage_modalDetails').html(errors['notNumber']).attr('class', 'alert alert-danger').show();
 					}
 					else {
 						var id = $("#idModalDetailsId").html();
@@ -307,7 +329,9 @@
 							"official_working_date" : officialWorkingDate,
 							"update_date" : updateData.updateDateModalDetails,
 	// 						"team_id" : updateData.teamModalDetails,
-							"role_ids" : $("#roleModalDetailsId").val()
+							"role_ids" : $("#roleModalDetailsId").val(),
+							"total_off_hours" : updateData.totalOffHoursModalDetails,
+							"remain_hours" : updateData.remainHoursModalDetails
 						};
 						console.log(employeeRegistRequest);
 						$.ajax({
@@ -623,6 +647,18 @@
 												</select>
 											</div>
 										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Total off hours * </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<input type="text" class="form-control" name="totalOffHoursModalDetails" id="totalOffHoursModalDetailsId" />
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Remain hours * </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<input type="text" class="form-control" name="remainHoursModalDetails" id="remainHoursModalDetailsId" />
+											</div>
+										</div>
 										<input type="hidden" name="updateDateModalDetails" id="updateDateModalDetailsId" />
 									</form>
 								</div>
@@ -737,6 +773,18 @@
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<select multiple="multiple" class="form-control" name="roleModalAdd" id="roleModalAddId">
 												</select>
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Total off hours * </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<input type="text" class="form-control" name="totalOffHoursModalAdd" id="totalOffHoursModalAddId" />
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Remain hours * </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<input type="text" class="form-control" name="remainHoursModalAdd" id="remainHoursModalAddId" />
 											</div>
 										</div>
 									</form>

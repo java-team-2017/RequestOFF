@@ -64,7 +64,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getRecipientId())) {
-			whereClause.append(" AND recipient_id = '" + requestSearchRequest.getRecipientId() + "' AND status != 1");
+			whereClause.append(" AND recipient_id = '" + requestSearchRequest.getRecipientId() + "'");
 		}
 
 		if (StringUtil.isNotEmpty(requestSearchRequest.getFromTime())) {
@@ -141,22 +141,24 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 			request.setRecipientName(recipient.getName());
 			
 			// set forward ID and name
-			if (recipient.getPosition().getId() == Position.POSITION_LEADER) {
-				String queryStr = "SELECT * FROM employee e INNER JOIN department d ON e.id = d.manager_id "
-						+ " INNER JOIN team t ON t.department_id = d.id"
-						+ " WHERE t.leader_id = " + recipient.getId();
-				Query queryObj = entityManager.createNativeQuery(queryStr.toString(), Employee.class);
-				Employee manager = (Employee) queryObj.getSingleResult();
-				request.setForwardId(manager.getId());
-				request.setForwardName(manager.getName());
-			} else if (recipient.getPosition().getId() == Position.POSITION_PROJECT_MANAGER) {
-				if (sender.getPosition().getId() != Position.POSITION_LEADER && sender.getPosition().getId() != Position.POSITION_PROJECT_MANAGER) {
-					String queryStr = "SELECT * from employee e INNER JOIN team t on e.id = t.leader_id INNER JOIN team_employee te ON t.id = te.team_id "
-							+ "WHERE te.employee_id = " + request.getEmployee().getId();
+			if(request.getStatus() == Request.REQUEST_STATUS_WAITING) {
+				if (recipient.getPosition().getId() == Position.POSITION_LEADER) {
+					String queryStr = "SELECT * FROM employee e INNER JOIN department d ON e.id = d.manager_id "
+							+ " INNER JOIN team t ON t.department_id = d.id"
+							+ " WHERE t.leader_id = " + recipient.getId();
 					Query queryObj = entityManager.createNativeQuery(queryStr.toString(), Employee.class);
-					Employee leader = (Employee) queryObj.getSingleResult();
-					request.setForwardId(leader.getId());
-					request.setForwardName(leader.getName());
+					Employee manager = (Employee) queryObj.getSingleResult();
+					request.setForwardId(manager.getId());
+					request.setForwardName(manager.getName());
+				} else if (recipient.getPosition().getId() == Position.POSITION_PROJECT_MANAGER) {
+					if (sender.getPosition().getId() != Position.POSITION_LEADER && sender.getPosition().getId() != Position.POSITION_PROJECT_MANAGER) {
+						String queryStr = "SELECT * from employee e INNER JOIN team t on e.id = t.leader_id INNER JOIN team_employee te ON t.id = te.team_id "
+								+ "WHERE te.employee_id = " + request.getEmployee().getId();
+						Query queryObj = entityManager.createNativeQuery(queryStr.toString(), Employee.class);
+						Employee leader = (Employee) queryObj.getSingleResult();
+						request.setForwardId(leader.getId());
+						request.setForwardName(leader.getName());
+					}
 				}
 			}
 			

@@ -7,6 +7,7 @@ var errors = {
 	'roundHour': 'Your hours of off time must be round',
 	'weekend': 'Your choosen hours are belong to weekends',
 	'stringExceedLimit': 'Values exceed the limit',
+	'notNumber' : 'value of number textbox is not a number',
 	'APIResponseError': function (errMsg) {
 		return errMsg;
 	}

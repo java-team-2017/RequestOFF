@@ -309,17 +309,16 @@
 				data : JSON.stringify(teamData),
 				success : function (response){
 					if (response.status_info.status != 0) {
-						$('#alertMessage').html(errors['APIResponseError'](response.status_info.error)).attr('class', 'alert alert-danger').show();
+						$('#teamEditMsg').html(errors['APIResponseError'](response.status_info.error)).attr('class', 'alert alert-danger').show();
 					} else {
 						if (isCreate == false) {
 							$('#alertMessage').html("Edit Successfully").attr('class', 'alert alert-success').show();
 						} else {
 							$('#alertMessage').html("Create Successfully").attr('class', 'alert alert-success').show();
 						}
-						
+						$('#teamEditModal').modal('hide');
 						reloadPage();
 					}
-					$('#teamEditModal').modal('hide');
 				},
 				error : function(e) {
 					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();

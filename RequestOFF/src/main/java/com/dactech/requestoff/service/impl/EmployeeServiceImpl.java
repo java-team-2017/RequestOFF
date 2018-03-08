@@ -183,8 +183,25 @@ public class EmployeeServiceImpl implements EmployeeService {
 				employee.setValidFlag(Integer.parseInt(erRequest.getValidFlag()));
 			}
 		}
-
 		employeeRepository.save(employee);
+		
+		EmployeeOffStatus eos;
+		long currentYear = Calendar.getInstance().get(Calendar.YEAR);
+		if (StringUtil.isEmpty(erRequest.getId())) {
+			eos = new EmployeeOffStatus();
+			eos.setEmployeeId(employee.getId());
+			eos.setYearId(currentYear);
+			eos.setRemainHours(Double.parseDouble(erRequest.getRemainHours()));
+			eos.setTotalHours(Double.parseDouble(erRequest.getTotalOffHours()));
+			eos.setValidFlag(1);
+		}
+		else {
+			eos = employeeOffStatusRepository.findById(currentYear, employee.getId());
+			eos.setRemainHours(Double.parseDouble(erRequest.getRemainHours()));
+			eos.setTotalHours(Double.parseDouble(erRequest.getTotalOffHours()));
+		}
+		employeeOffStatusRepository.save(eos);
+		
 		return new EmployeeRegistResponse(employee.getId());
 	}
 
@@ -199,6 +216,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 			String departmentName = getDepartmentName(e.getId());
 			e.setDepartmentName(departmentName);
 			listEmployee.set(i, e);
+			
+			long currentYear = Calendar.getInstance().get(Calendar.YEAR);
+			EmployeeOffStatus eos = employeeOffStatusRepository.findById(currentYear, e.getId());
+			e.setEmployeeOffStatus(eos);
 		}
 		
 		EmployeeSearchResponse response = new EmployeeSearchResponse();
@@ -470,7 +491,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public double getRemainHours(long employeeId) {
 		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-		double remainHours = employeeOffStatusRepository.findById(currentYear, employeeId).getRemainHours();
+		double remainHours;
+		EmployeeOffStatus eos = employeeOffStatusRepository.findById(currentYear, employeeId);
+		if(eos != null) {
+			remainHours = eos.getRemainHours();
+		}
+		else {
+			remainHours = 0;
+		}
 		return remainHours;
 	}
 	

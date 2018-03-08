@@ -7,17 +7,20 @@ import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
+import com.dactech.requestoff.model.entity.Request;
 import com.dactech.requestoff.model.entity.Team;
 import com.dactech.requestoff.model.request.DepartmentDetailsRequest;
 import com.dactech.requestoff.model.request.DepartmentInfoRequest;
 import com.dactech.requestoff.model.request.DepartmentRegistRequest;
 import com.dactech.requestoff.model.request.DepartmentSearchRequest;
+import com.dactech.requestoff.model.request.RequestSearchRequest;
 import com.dactech.requestoff.model.response.DepartmentDetailsResponse;
 import com.dactech.requestoff.model.response.DepartmentInfoResponse;
 import com.dactech.requestoff.model.response.DepartmentRegistResponse;
 import com.dactech.requestoff.model.response.DepartmentSearchResponse;
 import com.dactech.requestoff.repository.DepartmentRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
+import com.dactech.requestoff.repository.RequestRepository;
 import com.dactech.requestoff.repository.TeamRepository;
 import com.dactech.requestoff.service.DepartmentService;
 import com.dactech.requestoff.util.StringUtil;
@@ -30,6 +33,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 	EmployeeRepository employeeRepository;
 	@Autowired
 	TeamRepository teamRepository;
+	@Autowired
+	RequestRepository requestRepository;
 	
 	public DepartmentRegistResponse registDepartment(DepartmentRegistRequest departmentRegistRequest) throws Exception {
 		Department department;
@@ -57,9 +62,27 @@ public class DepartmentServiceImpl implements DepartmentService {
 					department.setName(departmentRegistRequest.getName());
 				}
 				if(StringUtil.isNotEmpty(departmentRegistRequest.getManagerId())) {
-					Employee manager = new Employee();
-					manager.setId(Long.parseLong(departmentRegistRequest.getManagerId()));
-					department.setManager(manager);
+					long oldManagerId = department.getManager().getId();
+					RequestSearchRequest requestSearchRequest = new RequestSearchRequest("", "", "", "", "", "", (Request.REQUEST_STATUS_WAITING + ""),
+																							"", "", (oldManagerId + ""), (1 + ""), "");
+					List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
+//					requestSearchRequest.setStatus(Request.REQUEST_STATUS_SAVED + "");
+//					requests.addAll(requestRepository.searchRequest(requestSearchRequest));
+//					requestSearchRequest.setStatus(Request.REQUEST_STATUS_RESPONDED + "");
+//					requests.addAll(requestRepository.searchRequest(requestSearchRequest));
+//					for(int i = 0; i < requests.size(); i++) {
+//						Request r = requests.get(i);
+//						r.setRecipientId(Long.parseLong(departmentRegistRequest.getManagerId()));
+//					}
+					if(requests.size() > 0) {
+						throw new Exception(department.getManager().getName()
+											+ " has requests waiting for him to process. Please let him process them before changing to new manager");
+					}
+					else {
+						Employee manager = new Employee();
+						manager.setId(Long.parseLong(departmentRegistRequest.getManagerId()));
+						department.setManager(manager);
+					}
 				}
 				if(StringUtil.isNotEmpty(departmentRegistRequest.getValidFlag())) {
 					department.setValidFlag(Integer.parseInt(departmentRegistRequest.getValidFlag()));

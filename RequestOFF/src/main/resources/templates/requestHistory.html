@@ -117,15 +117,9 @@
 								}
 							});
 							if(check == 0) { //recipient is old manager or old leader
-								if(rowData.status != 1 && rowData.status != 4) {
-									$("#modalRecipientDiv").hide();
-									$("#hiddenRecipientName").html(rowData.recipientName);
-									$("#hiddenRecipientDiv").show();
-								}
-								else {
-									$("#modalRecipientDiv").show();
-									$("#hiddenRecipientDiv").hide();
-								}
+								$("#modalRecipientDiv").hide();
+								$("#hiddenRecipientName").html(rowData.recipientName);
+								$("#hiddenRecipientDiv").show();
 							} else {
 								$("#hiddenRecipientDiv").hide();
 								$("#modalRecipient").val(rowData.recipientId);

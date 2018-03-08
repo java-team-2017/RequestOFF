@@ -8,8 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
+import com.dactech.requestoff.model.entity.Request;
 import com.dactech.requestoff.model.entity.Team;
 import com.dactech.requestoff.model.entity.TeamEmployee;
+import com.dactech.requestoff.model.request.RequestSearchRequest;
 import com.dactech.requestoff.model.request.TeamDetailsRequest;
 import com.dactech.requestoff.model.request.TeamEditInfoRequest;
 import com.dactech.requestoff.model.request.TeamRegistRequest;
@@ -20,6 +22,7 @@ import com.dactech.requestoff.model.response.TeamRegistResponse;
 import com.dactech.requestoff.model.response.TeamSearchResponse;
 import com.dactech.requestoff.repository.DepartmentRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
+import com.dactech.requestoff.repository.RequestRepository;
 import com.dactech.requestoff.repository.TeamEmployeeRepository;
 import com.dactech.requestoff.repository.TeamRepository;
 import com.dactech.requestoff.service.TeamService;
@@ -39,6 +42,8 @@ public class TeamServiceImpl implements TeamService {
 	EmployeeRepository employeeRepository;
 	@Autowired
 	DepartmentRepository departmentRepository;
+	@Autowired
+	RequestRepository requestRepository;
 
 	@Override
 	@Transactional
@@ -74,9 +79,27 @@ public class TeamServiceImpl implements TeamService {
 			}
 			
 			if (StringUtil.isNotEmpty(teamRegistRequest.getLeaderId())) {
-				Employee leader = new Employee();
-				leader.setId(Long.parseLong(teamRegistRequest.getLeaderId()));
-				team.setLeader(leader);
+				long oldLeaderId = team.getLeader().getId();
+				RequestSearchRequest requestSearchRequest = new RequestSearchRequest("", "", "", "", "", "", (Request.REQUEST_STATUS_WAITING + ""),
+						"", "", (oldLeaderId + ""), (1 + ""), "");
+				List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
+//				requestSearchRequest.setStatus(Request.REQUEST_STATUS_SAVED + "");
+//				requests.addAll(requestRepository.searchRequest(requestSearchRequest));
+//				requestSearchRequest.setStatus(Request.REQUEST_STATUS_RESPONDED + "");
+//				requests.addAll(requestRepository.searchRequest(requestSearchRequest));
+//				for(int i = 0; i < requests.size(); i++) {
+//					Request r = requests.get(i);
+//					r.setRecipientId(Long.parseLong(teamRegistRequest.getLeaderId()));
+//				}
+				if(requests.size() > 0) {
+					throw new Exception(team.getLeader().getName()
+										+ " has requests waiting for him to process. Please let him process them before changing to new leader");
+				}
+				else {
+					Employee leader = new Employee();
+					leader.setId(Long.parseLong(teamRegistRequest.getLeaderId()));
+					team.setLeader(leader);
+				}
 			}
 			
 			if (StringUtil.isNotEmpty(teamRegistRequest.getDepartmentId())) {

@@ -38,6 +38,12 @@
 						renderRemainHours(returnData.remainHours, 'remainHours');
 						renderDayOffTypeSelect('id_dayOffType');
 						renderRecipientSelect(returnData.listRecipients, 'id_recipient');
+						
+						if(returnData.listRecipients.length == 0) {
+							$('#alertMessage').html("You do not belong to any team so you can not create a request!").attr('class', 'alert alert-danger').show();
+							$("#btnSave, #btnSend").prop('disabled', true);
+						}
+// 						console.log(listRecipients.length + "-----");
 					},
 					error : function(e) {
 						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
