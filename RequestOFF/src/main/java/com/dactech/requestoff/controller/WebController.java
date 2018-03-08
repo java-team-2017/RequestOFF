@@ -76,4 +76,9 @@ public class WebController {
 	String slack() {
 		return "slack";
 	}
+	
+	@GetMapping("/companyYearOffManagement")
+	public String companyYearOffManagement() {
+		return "companyYearOffManagement";
+	}
 }
