@@ -9,8 +9,8 @@ public class EmployeeSearchRequest {
 	private String nameMatchStatus;
 	private String gender;
 	private String birthday;
-	@JsonProperty("position_id")
-	private String positionId;
+	@JsonProperty("position_code")
+	private String positionCode;
 	private String email;
 	private String phone;
 	@JsonProperty("start_working_date")
@@ -25,7 +25,7 @@ public class EmployeeSearchRequest {
 	private String departmentId;
 	@JsonProperty("team_dept_flag")
 	private String teamDeptFlag; // 1: search by team and department (eliminate employee not in team or dept)
-								 // 0: other
+									// 0: other
 
 	public EmployeeSearchRequest() {
 		super();
@@ -33,7 +33,7 @@ public class EmployeeSearchRequest {
 	}
 
 	public EmployeeSearchRequest(String id, String name, String nameMatchStatus, String gender, String birthday,
-			String positionId, String email, String phone, String startWorkingDate, String officalWorkingDate,
+			String positionCode, String email, String phone, String startWorkingDate, String officalWorkingDate,
 			String validFlag, String teamId, String departmentId, String teamDeptFlag) {
 		super();
 		this.id = id;
@@ -41,7 +41,7 @@ public class EmployeeSearchRequest {
 		this.nameMatchStatus = nameMatchStatus;
 		this.gender = gender;
 		this.birthday = birthday;
-		this.positionId = positionId;
+		this.positionCode = positionCode;
 		this.email = email;
 		this.phone = phone;
 		this.startWorkingDate = startWorkingDate;
@@ -92,12 +92,12 @@ public class EmployeeSearchRequest {
 		this.birthday = birthday;
 	}
 
-	public String getPositionId() {
-		return positionId;
+	public String getPositionCode() {
+		return positionCode;
 	}
 
-	public void setPositionId(String positionId) {
-		this.positionId = positionId;
+	public void setPositionCode(String positionCode) {
+		this.positionCode = positionCode;
 	}
 
 	public String getEmail() {
