@@ -264,12 +264,12 @@
 								table = $('#employeeTable').DataTable();
 								console.log(table);
 								table.ajax.reload();
+								$('#employeeAddModal').modal('hide');
 							},
 							error : function(e) {
 								$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 							}
 						});
-						$('#employeeAddModal').modal('hide');
 					}
 				});
 				

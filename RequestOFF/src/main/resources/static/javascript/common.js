@@ -219,6 +219,7 @@ function renderRoleSelect(selectBoxId, dataHandler) {
 
 function renderDayOffSelect (remainHours, selectBoxId) {
 	var days = parseInt(parseFloat(remainHours) / 8);
+	$('#' + selectBoxId).empty();
 	for(var i = 0; i <= days; i++) {
 		$('#' + selectBoxId).append('<option value="' + i + '">' + i + '</option>');
 	}

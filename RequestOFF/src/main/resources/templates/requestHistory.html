@@ -38,7 +38,7 @@
 						remainHours = returnData.remainHours;
 						listRecipient = returnData.listRecipients;
 						
-						renderDayOffSelect(remainHours, 'modalOffDays');
+// 						renderDayOffSelect(remainHours, 'modalOffDays');
 						renderRemainHours(returnData.remainHours, 'remainHours');
 						renderRecipientSelect(listRecipient, 'modalRecipient');
 						
@@ -141,6 +141,9 @@
 							
 							$("#modalResponseMessage").val(rowData.responseMessage);
 							$("#modalUpdateDate").val(rowData.updateDate);
+							$("#modalTotalTime").val(rowData.totalTime);
+							var totalHours = parseFloat(remainHours + rowData.totalTime);
+							renderDayOffSelect(totalHours, 'modalOffDays');
 						
 							if(rowData.status == "1" || rowData.status == "4") {
 								$("#modalForm :input").prop('disabled', false);
@@ -251,11 +254,17 @@
 					});
 					
 					var offHours = parseInt(editRequestData.offDays) * 8 + parseFloat(editRequestData.offHours);
+					var oldOffHours = parseFloat(editRequestData.totalTime_modalForm);
+					console.log("old: " + oldOffHours);
 					if(offHours == 0){
 						offHoursEqual0 = 1;
 					}
 					else {
-						if(parseFloat(offHours) > parseFloat(remainHours)) {
+						console.log("remainHours + oldOffHours");
+						console.log(remainHours + oldOffHours);
+						console.log("offHours");
+						console.log(offHours);
+						if(parseFloat(offHours) > parseFloat(remainHours + oldOffHours)) {
 							exceed = 1;
 						}
 					}
@@ -721,6 +730,7 @@
 											</div>
 										</div>
 										<input type="hidden" name="updateDate_modalForm" id="modalUpdateDate" />
+										<input type="hidden" name="totalTime_modalForm" id="modalTotalTime" />
 									</form>
 								</div>
 								<div class="modal-footer">
