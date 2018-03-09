@@ -67,11 +67,9 @@
 						$('#departmentDetails').val(rowData.employee.listTeam[0].department.name);
 					}
 					$('#recipientDetails').val(rowData.recipientName);
-					$('#fromTimeDetails').val(rowData.fromTime);
-					$('#toTimeDetails').val(rowData.toTime);
-					var days = (rowData.totalTime)/8 > 1 ? "s " : " ";
-					var hours = (rowData.totalTime)%8 > 1 ? "s " : "";
-					$('#totalTimeDetails').val(Math.floor((rowData.totalTime)/8) + " day" + days + ((rowData.totalTime) % 8) + " hour"+hours);
+					$('#fromTimeDetails').val((rowData.fromTime).substr(0, rowData.fromTime.length - 5));
+					$('#toTimeDetails').val((rowData.toTime).substr(0, rowData.toTime.length - 5));
+					$('#totalTimeDetails').val(Math.floor((rowData.totalTime)/8) + " d " + ((rowData.totalTime) % 8) + " h");
 					$('#reasonDetails').val(rowData.reason);
 					$('#statusDetails').val(requestStatus[rowData.status]);
 					$('#dayOffTypeDetails').val(rowData.dayOffType.name);
@@ -272,14 +270,22 @@
 					},
 					{ data: 'id' },
 					{ data: 'employee.name' },
-					{ data: 'fromTime' },
-					{ data: 'toTime' },
+					{ 
+						data: 'fromTime' ,
+						render: function (data, type, row){
+							return data.substr(0, data.length - 5);
+						}
+					},
+					{ 
+						data: 'toTime',
+						render: function (data, type, row){
+							return data.substr(0, data.length - 5);
+						}
+					},
 					{ 
 						data: 'totalTime',
 						render: function (data, type, row){
-							var days = (row.totalTime)/8 > 1 ? "s " : " ";
-							var hours = (row.totalTime)%8 > 1 ? "s " : "";
-							return Math.floor((row.totalTime)/8) + " day" + days + ((row.totalTime) % 8) + " hour"+hours;
+							return Math.floor((row.totalTime)/8) + " d " + ((row.totalTime) % 8) + " h";
 						}
 					},
 					
