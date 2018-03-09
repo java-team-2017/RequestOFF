@@ -48,12 +48,26 @@ var notification = {
 //}
 
 function renderRemainHours(remainHours, containerId) {
-	if(parseInt(remainHours) < 2) {
-		$("#" + containerId).html(remainHours + " hour");
+	var days = parseInt(parseFloat(remainHours) / 8);
+	var hours = parseFloat(remainHours) - (days * 8);
+	htmlStr = "";
+	if(days < 2) {
+		htmlStr = days + " day and ";
+		if(hours < 2) {
+			htmlStr += hours + " hour";
+		} else {
+			htmlStr += hours + " hours";
+		}
 	}
 	else {
-		$("#" + containerId).html(remainHours + " hours");
+		htmlStr = days + " days and ";
+		if(hours < 2) {
+			htmlStr += hours + " hour";
+		} else {
+			htmlStr += hours + " hours";
+		}
 	}
+	$("#" + containerId).html(htmlStr);
 }
 
 function renderDayOffTypeSelect(containerId) {
@@ -215,14 +229,6 @@ function renderRoleSelect(selectBoxId, dataHandler) {
 			console.log("error");
 		}
 	});
-}
-
-function renderDayOffSelect (remainHours, selectBoxId) {
-	var days = parseInt(parseFloat(remainHours) / 8);
-	$('#' + selectBoxId).empty();
-	for(var i = 0; i <= days; i++) {
-		$('#' + selectBoxId).append('<option value="' + i + '">' + i + '</option>');
-	}
 }
 
 function getTeamId(listTeam, teamName) {

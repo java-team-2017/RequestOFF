@@ -38,7 +38,6 @@
 						remainHours = returnData.remainHours;
 						listRecipient = returnData.listRecipients;
 						
-// 						renderDayOffSelect(remainHours, 'modalOffDays');
 						renderRemainHours(returnData.remainHours, 'remainHours');
 						renderRecipientSelect(listRecipient, 'modalRecipient');
 						
@@ -61,6 +60,12 @@
 								console.log(html(errors['APIResponseError'](e)));
 							}
 						});
+						
+						//set default value for searching request
+						var date = new Date();
+						var from = "01/01/" + date.getFullYear();
+						$("#fromTimeId").val(from);
+						$("#requestTypeId").val('4');
 						
 						var requestSearchRequest = getRequestSearchRequest();
 						console.log(requestSearchRequest);
@@ -142,8 +147,6 @@
 							$("#modalResponseMessage").val(rowData.responseMessage);
 							$("#modalUpdateDate").val(rowData.updateDate);
 							$("#modalTotalTime").val(rowData.totalTime);
-							var totalHours = parseFloat(remainHours + rowData.totalTime);
-							renderDayOffSelect(totalHours, 'modalOffDays');
 						
 							if(rowData.status == "1" || rowData.status == "4") {
 								$("#modalForm :input").prop('disabled', false);
@@ -260,10 +263,6 @@
 						offHoursEqual0 = 1;
 					}
 					else {
-						console.log("remainHours + oldOffHours");
-						console.log(remainHours + oldOffHours);
-						console.log("offHours");
-						console.log(offHours);
 						if(parseFloat(offHours) > parseFloat(remainHours + oldOffHours)) {
 							exceed = 1;
 						}
@@ -348,28 +347,28 @@
 				var searchData = $('#requestHistoryForm').serializeJSON();
 				var from = searchData.fromTime;
 				var to = searchData.toTime;
-				var date = new Date();
+// 				var date = new Date();
 				if(from != "") {
 					from = from.substr(6, 4) + "-" + from.substr(0, 2) + "-" + from.substr(3, 2);
 				}
-				else {
-					if(to == ""){
-						from = date.getFullYear() + "-01-01";
-					}
-					else {
-						from = "2000-01-01";
-					}
-				}
+// 				else {
+// 					if(to == ""){
+// 						from = date.getFullYear() + "-01-01";
+// 					}
+// 					else {
+// 						from = "2000-01-01";
+// 					}
+// 				}
 				
 				if(to != "") {
 					to = to.substr(6, 4) + "-" + to.substr(0, 2) + "-" + to.substr(3, 2);
 				}
-				else {
-					var month = String("00" + (date.getMonth() + 1)).slice(-2);
-					var day = String("00" + (date.getDate())).slice(-2);
-					to = (date.getFullYear() + 1) + "-" + month + "-" + day;
-				}
-				
+// 				else {
+// 					var month = String("00" + (date.getMonth() + 1)).slice(-2);
+// 					var day = String("00" + (date.getDate())).slice(-2);
+// 					to = (date.getFullYear() + 1) + "-" + month + "-" + day;
+// 				}
+
 				var requestSearchRequest = {
 					"id" : "",
 					"employee_id" : employeeId,
@@ -387,102 +386,95 @@
 			}
 			
 			function search(requestSearchRequest) {
-				if(requestSearchRequest.from_time.localeCompare(requestSearchRequest.to_time) > 0) {
-					$('#alertMessage_search').html(errors['DateError']).attr('class', 'alert alert-danger').show();
-				}
-				else {
-					$('#alertMessage_search').hide();
-					$('#requestHistoryTable').DataTable({
-						ajax: {
-							type : "POST",
-							contentType : "application/json",
-							url : /*[[@{/request/search}]]*/,
-							dataType : 'json',
-							data : function() {
-								return JSON.stringify(requestSearchRequest);
-							},
-							dataSrc: 'requests'
+				$('#alertMessage_search').hide();
+				$('#requestHistoryTable').DataTable({
+					ajax: {
+						type : "POST",
+						contentType : "application/json",
+						url : /*[[@{/request/search}]]*/,
+						dataType : 'json',
+						data : function() {
+							return JSON.stringify(requestSearchRequest);
 						},
-						destroy: true,
-						searching: false,
-						order: [[ 1, "desc" ]],
-						columnDefs: [
-							{
-								"targets": [ 0 ],
-								"data": 'id'
-							},
-							{
-								"targets": [ 1 ],
-								"data": 'insertDate',
-								"render": function(data, type, full, meta) {
-									return data.substr(0, data.length - 2);
+						dataSrc: 'requests'
+					},
+					destroy: true,
+					searching: false,
+					order: [[ 1, "desc" ]],
+					columnDefs: [
+						{
+							"targets": [ 0 ],
+							"data": 'id'
+						},
+						{
+							"targets": [ 1 ],
+							"data": 'insertDate',
+							"render": function(data, type, full, meta) {
+								return data.substr(0, data.length - 2);
+							}
+						},
+						{
+							"targets": [ 2 ],
+							"data": 'fromTime',
+							"render": function(data, type, full, meta) {
+								return data.substr(0, data.length - 5);
+							}
+						},
+						{
+							"targets": [ 3 ],
+							"data": 'toTime',
+							"render": function(data, type, full, meta) {
+								return data.substr(0, data.length - 5);
+							}
+						},
+						{
+							"targets": [ 4 ],
+							"data": 'totalTime',
+							"render": function(data, type, full, meta) {
+								var offDays = parseInt(parseFloat(data) / 8);
+								var offHours = parseFloat(data) - (offDays * 8);
+								return offDays + "d " + offHours + "h";;
+							}
+						},
+						{
+							"targets": [ 5 ],
+							"data": 'reason'
+						},
+						{
+							"targets": [ 6 ],
+							"data": 'status',
+							"render": function(data, type, full, meta) {
+								return getStatus[data];
+							}
+						},
+						{
+							"targets": [ 7 ],
+							"className": "text-center",
+							"data": null,
+							"render": function(data, type, row) {
+								if(row.status == 1 || row.status == 4) {
+									return "<a><span class='glyphicon glyphicon-pencil' style='cursor: pointer;'></span></a>";
 								}
-							},
-							{
-								"targets": [ 2 ],
-								"data": 'fromTime',
-								"render": function(data, type, full, meta) {
-									return data.substr(0, data.length - 5);
-								}
-							},
-							{
-								"targets": [ 3 ],
-								"data": 'toTime',
-								"render": function(data, type, full, meta) {
-									return data.substr(0, data.length - 5);
-								}
-							},
-							{
-								"targets": [ 4 ],
-								"data": 'totalTime',
-								"render": function(data, type, full, meta) {
-									var offDays = parseInt(parseFloat(data) / 8);
-									var offHours = parseFloat(data) - (offDays * 8);
-									return offDays + "d " + offHours + "h";;
-								}
-							},
-							{
-								"targets": [ 5 ],
-								"data": 'reason'
-							},
-							{
-								"targets": [ 6 ],
-								"data": 'status',
-								"render": function(data, type, full, meta) {
-									return getStatus[data];
-								}
-							},
-							{
-								"targets": [ 7 ],
-								"className": "text-center",
-								"data": null,
-// 								"defaultContent": "<a href='#'><span class='glyphicon glyphicon-pencil'></span></a>",
-								"render": function(data, type, row) {
-									if(row.status == 1 || row.status == 4) {
-										return "<a><span class='glyphicon glyphicon-pencil' style='cursor: pointer;'></span></a>";
-									}
-									else {
-										return "<a class='not-active'><span class='glyphicon glyphicon-pencil' style='opacity: 0.5;'></span></a>";
-									}
-								}
-							},
-							{
-								"targets": [ 8 ],
-								"className": "text-center",
-								"data": null,
-// 								"defaultContent": "<a href='#' class='btnDelete'><span class='glyphicon glyphicon-remove'></span></a>",
-								"render": function(data, type, row) {
-									if(row.status == 1 || row.status == 4) {
-										return "<a class='btnDelete'><span class='glyphicon glyphicon-remove' style='cursor: pointer;'></span></a>";
-									}
-									else {
-										return "<a class='btnDelete not-active'><span class='glyphicon glyphicon-remove' style='opacity: 0.5;'></span></a>";
-									}
+								else {
+									return "<a class='not-active'><span class='glyphicon glyphicon-pencil' style='opacity: 0.5;'></span></a>";
 								}
 							}
-						]
-					});
-				}
+						},
+						{
+							"targets": [ 8 ],
+							"className": "text-center",
+							"data": null,
+							"render": function(data, type, row) {
+								if(row.status == 1 || row.status == 4) {
+									return "<a class='btnDelete'><span class='glyphicon glyphicon-remove' style='cursor: pointer;'></span></a>";
+								}
+								else {
+									return "<a class='btnDelete not-active'><span class='glyphicon glyphicon-remove' style='opacity: 0.5;'></span></a>";
+								}
+							}
+						}
+					]
+				});
 			}
 			
 		/*]]>*/
@@ -520,7 +512,7 @@
 	
 						<div class="form-group">
 							<label for="requestType">Request Type</label>
-							<select class="form-control" name="requestType">
+							<select class="form-control" name="requestType" id="requestTypeId">
 								<option value=""></option>
 								<option value="1">Saved</option>
 								<option value="2">Approved</option>
@@ -677,26 +669,8 @@
 										<div class="form-group row">
 											<label class="control-label col-sm-3">Off hours * : </label>
 											<div class="form-inline">
-												<select class="form-control" name="offDays" id="modalOffDays" style="width:100px;">
-												</select>&nbsp;day(s)&nbsp;
-												<select class="form-control" name="offHours" id="modalOffHours" style="width:100px;">
-													<option value="0">0</option>
-													<option value="0.5">0.5</option>
-													<option value="1">1</option>
-													<option value="1.5">1.5</option>
-													<option value="2">2</option>
-													<option value="2.5">2.5</option>
-													<option value="3">3</option>
-													<option value="3.5">3.5</option>
-													<option value="4">4</option>
-													<option value="4.5">4.5</option>
-													<option value="5">5</option>
-													<option value="5.5">5.5</option>
-													<option value="6">6</option>
-													<option value="6.5">6.5</option>
-													<option value="7">7</option>
-													<option value="7.5">7.5</option>
-												</select>&nbsp;hour(s)
+												<input type="text" class="form-control" name="offDays" id="modalOffDays" style="width:100px;"/>&nbsp;day(s)&nbsp;
+												<input type="text" class="form-control" name="offHours" id="modalOffHours" style="width:100px;"/>&nbsp;hour(s)
 											</div>
 										</div>
 										<div class="form-group row">
