@@ -553,7 +553,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public boolean delete(long employeeId) throws Exception {
 		Employee employee = employeeRepository.findById(employeeId);
 		
-		EmployeeOffStatusSearchRequest eosRequest = new EmployeeOffStatusSearchRequest("", employeeId + "", "", "", "", "");
+		EmployeeOffStatusSearchRequest eosRequest = new EmployeeOffStatusSearchRequest("", employeeId + "", "", "", "");
 		List<EmployeeOffStatus>  listEos = employeeOffStatusRepository.search(eosRequest);
 		for(EmployeeOffStatus eos : listEos) {
 			employeeOffStatusRepository.delete(eos);
