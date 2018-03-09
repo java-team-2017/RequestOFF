@@ -72,6 +72,10 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 			whereClause.append(" AND p.code = '" + employeeSearchRequest.getPositionCode() + "'");
 		}
 		
+		if(StringUtil.isNotEmpty(employeeSearchRequest.getPositionId())) {
+			whereClause.append(" AND p.id = '" + employeeSearchRequest.getPositionId() + "'");
+		}
+		
 		if(StringUtil.isNotEmpty(employeeSearchRequest.getEmail())) {
 			whereClause.append(" AND email = '" + employeeSearchRequest.getEmail() + "'");
 		}

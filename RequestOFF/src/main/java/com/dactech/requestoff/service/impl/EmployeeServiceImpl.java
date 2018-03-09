@@ -138,7 +138,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 				}
 				else if((oldPosition.getCode() == Position.CODE_MANAGER 
 						&& newPosition.getCode() != Position.CODE_MANAGER)
-						|| (oldPosition.getCode() == Position.CODE_MANAGER 
+						|| (oldPosition.getCode() == Position.CODE_HR_MANAGER 
 						&& newPosition.getCode() != Position.CODE_HR_MANAGER)) {
 					Department dept = departmentRepository.findByManagerId(EmployeeId);
 					if(dept != null) {
