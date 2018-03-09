@@ -24,6 +24,7 @@ import com.dactech.requestoff.model.request.EmployeeOffStatisticsPagingRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatusSearchRequest;
 import com.dactech.requestoff.model.request.EmployeeRegistRequest;
 import com.dactech.requestoff.model.request.EmployeeSearchRequest;
+import com.dactech.requestoff.model.request.RequestSearchRequest;
 import com.dactech.requestoff.model.response.EmployeeDetailsResponse;
 import com.dactech.requestoff.model.response.EmployeeOffStatisticsPagingResponse;
 import com.dactech.requestoff.model.response.EmployeeRegistResponse;
@@ -119,21 +120,27 @@ public class EmployeeServiceImpl implements EmployeeService {
 				Position newPosition = positionRepository.findById(Long.parseLong(erRequest.getPositionId()));
 				if((oldPosition.getCode() == Position.CODE_EMPLOYEE && newPosition.getCode() != Position.CODE_EMPLOYEE)
 					|| (oldPosition.getCode() == Position.CODE_HR && newPosition.getCode() != Position.CODE_HR)) {
-					if(employee.getListTeam() != null && employee.getListTeam().size() > 0) {
-						Team team = employee.getListTeam().get(0);
-						if(team != null) {
-							TeamEmployee teamEmployee = teamEmployeeRepository.findByTeamIdAndEmployeeId(team.getId(), EmployeeId);
-							if(teamEmployee != null) {
-								teamEmployeeRepository.delete(teamEmployee);
+					if(requestRepository.getNumberOfRequestInProcessing(employee.getId()) == 0) {
+						if(employee.getListTeam() != null && employee.getListTeam().size() > 0) {
+							Team team = employee.getListTeam().get(0);
+							if(team != null) {
+								TeamEmployee teamEmployee = teamEmployeeRepository.findByTeamIdAndEmployeeId(team.getId(), EmployeeId);
+								if(teamEmployee != null) {
+									teamEmployeeRepository.delete(teamEmployee);
+								}
 							}
 						}
+					} else {
+						throw new Exception(employee.getName() + " has requests in processing. Please let these requests processed before changing position");
 					}
 				}
 				else if(oldPosition.getCode() == Position.CODE_LEADER && newPosition.getCode() != Position.CODE_LEADER) {
 					Team team = teamRepository.findByLeaderId(EmployeeId);
 					if (team != null) {
 						throw new Exception(employee.getName() + " is currently the leader of " + team.getName() + ". Please remove " + employee.getName() 
-											+ " from " + team.getName() + " first!");
+											+ " from " + team.getName() + " changing position");
+					} else if(requestRepository.getNumberOfRequestInProcessing(employee.getId()) > 0) {
+						throw new Exception(employee.getName() + " has requests in processing. Please let these requests processed before changing position");
 					}
 				}
 				else if((oldPosition.getCode() == Position.CODE_MANAGER 
@@ -144,6 +151,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 					if(dept != null) {
 						throw new Exception(employee.getName() + " is currently the manager of " + dept.getName() + ". Please remove " + employee.getName() 
 											+ " from " + dept.getName() + " first!");
+					} else if(requestRepository.getNumberOfRequestInProcessing(employee.getId()) > 0) {
+						throw new Exception(employee.getName() + " has requests in processing. Please let these requests processed before changing position");
 					}
 				}
 				
