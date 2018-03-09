@@ -79,25 +79,23 @@ public class TeamServiceImpl implements TeamService {
 			}
 			
 			if (StringUtil.isNotEmpty(teamRegistRequest.getLeaderId())) {
+				long newLeaderId = Long.parseLong(teamRegistRequest.getLeaderId());
 				long oldLeaderId = team.getLeader().getId();
-				RequestSearchRequest requestSearchRequest = new RequestSearchRequest("", "", "", "", "", "", (Request.REQUEST_STATUS_WAITING + ""),
-						"", "", (oldLeaderId + ""), (1 + ""), "");
-				List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
-//				requestSearchRequest.setStatus(Request.REQUEST_STATUS_SAVED + "");
-//				requests.addAll(requestRepository.searchRequest(requestSearchRequest));
-//				requestSearchRequest.setStatus(Request.REQUEST_STATUS_RESPONDED + "");
-//				requests.addAll(requestRepository.searchRequest(requestSearchRequest));
-//				for(int i = 0; i < requests.size(); i++) {
-//					Request r = requests.get(i);
-//					r.setRecipientId(Long.parseLong(teamRegistRequest.getLeaderId()));
-//				}
-				if(requests.size() > 0) {
-					throw new Exception(team.getLeader().getName()
-										+ " has requests waiting for him to process. Please let him process them before changing to new leader");
-				}
-				else {
+				if (oldLeaderId != newLeaderId) { // change leader
+					// check whether old leader has wating requests which need to process
+					RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
+					requestSearchRequest.setStatus(Integer.toString(Request.REQUEST_STATUS_WAITING));
+					requestSearchRequest.setRecipientId(Long.toString(oldLeaderId));
+					requestSearchRequest.setValidFlag("1");
+					
+					List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
+					
+					if (requests != null && requests.size() >0) {
+						throw new Exception(team.getLeader().getName()
+							+ " has requests waiting for him to process. <br/>Please let him process them before changing to new leader");
+					}
 					Employee leader = new Employee();
-					leader.setId(Long.parseLong(teamRegistRequest.getLeaderId()));
+					leader.setId(newLeaderId);
 					team.setLeader(leader);
 				}
 			}
@@ -116,7 +114,7 @@ public class TeamServiceImpl implements TeamService {
 		teamRepository.save(team);
 		if (teamRegistRequest.getListMember() != null) {
 			long teamId = team.getId();
-			List<TeamEmployee> TEmployees = TERepository.findByTeamId(teamId); 
+			List<TeamEmployee> TEmployees = TERepository.findByTeamId(teamId); // old member list of team
 			for (String member : teamRegistRequest.getListMember()) {
 				long memberId = Long.parseLong(member);
 				TeamEmployee te = TERepository.findByTeamIdAndEmployeeId(teamId, memberId);
@@ -131,6 +129,12 @@ public class TeamServiceImpl implements TeamService {
 				}
 			}
 			for (TeamEmployee te : TEmployees) {
+				int requestInProcessing = requestRepository.getNumberOfRequestInProcessing(te.getEmployeeId());
+				if (requestInProcessing > 0) { // employee has requests which are in processing
+					Employee em = employeeRepository.findById(te.getEmployeeId());
+					throw new Exception (em.getName() + " has requests which are in processing. <br/>"
+							+ "Please delete or process all those requests before remove");
+				}
 				TERepository.delete(te);
 			}
 		}

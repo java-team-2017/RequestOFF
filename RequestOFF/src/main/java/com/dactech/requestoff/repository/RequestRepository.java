@@ -15,4 +15,10 @@ public interface RequestRepository extends JpaRepository<Request, Long>, Request
 			+ "AND status = 2 " // approved
 			+ "AND valid_flag = 1", nativeQuery = true)
 	public List<Request> findByEmpoyeeIdAndTime(long empoyeeId, String from, String to);
+	
+	@Query(value = "SELECT count(*) FROM request WHERE employee_id = ?1 "
+			+ "AND status in (" + Request.REQUEST_STATUS_RESPONDED 
+			+ ", " + Request.REQUEST_STATUS_SAVED
+			+ ", " + Request.REQUEST_STATUS_WAITING + ")", nativeQuery = true)
+	public int getNumberOfRequestInProcessing(long employeeId);
 }

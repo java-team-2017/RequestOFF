@@ -63,22 +63,17 @@ public class DepartmentServiceImpl implements DepartmentService {
 				}
 				if(StringUtil.isNotEmpty(departmentRegistRequest.getManagerId())) {
 					long oldManagerId = department.getManager().getId();
-					RequestSearchRequest requestSearchRequest = new RequestSearchRequest("", "", "", "", "", "", (Request.REQUEST_STATUS_WAITING + ""),
-																							"", "", (oldManagerId + ""), (1 + ""), "");
+					long newManagerId = Long.parseLong(departmentRegistRequest.getManagerId());
+					
+					RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
+					requestSearchRequest.setStatus(Integer.toString(Request.REQUEST_STATUS_WAITING));
+					requestSearchRequest.setRecipientId(Long.toString(oldManagerId));
+					requestSearchRequest.setValidFlag("1");
 					List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
-//					requestSearchRequest.setStatus(Request.REQUEST_STATUS_SAVED + "");
-//					requests.addAll(requestRepository.searchRequest(requestSearchRequest));
-//					requestSearchRequest.setStatus(Request.REQUEST_STATUS_RESPONDED + "");
-//					requests.addAll(requestRepository.searchRequest(requestSearchRequest));
-//					for(int i = 0; i < requests.size(); i++) {
-//						Request r = requests.get(i);
-//						r.setRecipientId(Long.parseLong(departmentRegistRequest.getManagerId()));
-//					}
-					if(requests.size() > 0) {
+					if(requests != null && requests.size() > 0) {
 						throw new Exception(department.getManager().getName()
 											+ " has requests waiting for him to process. Please let him process them before changing to new manager");
-					}
-					else {
+					} else {
 						Employee manager = new Employee();
 						manager.setId(Long.parseLong(departmentRegistRequest.getManagerId()));
 						department.setManager(manager);
