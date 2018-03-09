@@ -29,6 +29,7 @@
 				success : function(data) {
 					userData = data;
 					employeeLoginId = data.user.id;
+					search();
 				},
 				error : function(e) {
 					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
@@ -60,10 +61,10 @@
 					console.log("rowData" + rowData);
 					$('#nameDetails').val(rowData.employee.name);
 					$('#positionDetails').val(rowData.employee.position.name);
-					if(rowData.employee.position.id == 2 || rowData.employee.position.id == 3){
+					if(rowData.employee.position.code == 2 || rowData.employee.position.code == 3){
 						$('#teamDetails').val(rowData.employee.teamName);
 						$('#departmentDetails').val(rowData.employee.departmentName);
-					} else if(rowData.employee.position.id == 1){
+					} else if(rowData.employee.position.code == 1){
 						$('#teamDetails').val(rowData.employee.listTeam[0].name);
 						$('#departmentDetails').val(rowData.employee.listTeam[0].department.name);
 					}
@@ -244,7 +245,6 @@
 				"status" : requestData.status,
 				"name": requestData.name
 			};
-			console.log(requestSearch);
 			$('#requestTable').DataTable( {
 				ajax: {
 					type: "POST",
