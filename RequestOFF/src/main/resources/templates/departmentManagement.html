@@ -43,6 +43,9 @@
 				},
 				destroy: true,
 				searching: false,
+				info: false,
+				lengthChange: false,
+				paging: false,
 				columns: [
 					{ data: 'id' },
 					{ data: 'name' },
@@ -221,9 +224,9 @@
 		var requestSearch = {
 			"id" : requestData.id,
 			"name" : requestData.name,
-			"manager_id" : requestData.manager_id,
 			"name_of_employee" : requestData.name_of_employee
 		};
+		console.log(requestSearch);
 		$('#departmentTable').DataTable( {
 			ajax: {
 				type: "POST",

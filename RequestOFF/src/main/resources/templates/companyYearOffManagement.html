@@ -8,7 +8,45 @@
 	<body class="content-body">
 		<script th:inline="javascript">
 		/*<![CDATA[*/
-			
+			var dayOffResetStatus = {
+				'0' : 'Not Reset',
+				'1' : 'Reset'
+			}
+			$(function(){
+				search();
+			});
+			function search(){
+				var requestData = $('#companyYearOffForm').serializeJSON();
+				var requestSearch = {
+					"id" : requestData.id,
+					"day_off_reset_flag" : requestData.name,
+					"number_day_off" : requestData.number_day_off
+				};
+				$('#companyYearOffTable').DataTable( {
+					ajax: {
+						type: "POST",
+						contentType: "application/json",
+						url : /*[[@{/companyYearOff/search}]]*/,
+						dataType : 'json',
+						data: function () {
+							return JSON.stringify(requestSearch);
+						},
+						dataSrc: 'listCompanyYearOff'
+					},
+					destroy: true,
+					searching: false,
+					columns: [
+						{ data: 'id' },
+						{ 
+							data: 'dayOffResetFlag',
+							render: function(data, type, row){
+								return dayOffResetStatus[data];
+							}
+						},
+						{ data: 'numberDayOff' }
+					]
+				});
+			}
 		/*]]>*/
 		</script>
 		
@@ -21,10 +59,11 @@
 				<div>
 					<div id="alertMessage_search" class="alert" style="display:none;"></div>
 					
-					<form class="form-input" id="cyoForm">
+					<form class="form-input" id="companyYearOffForm">
 						<div class="form-group">
 							<label for="name">Number of day off in year</label>
-							<input type="text" class="form-control" name="name" id="nameId" />
+							<input type="text" class="form-control" name="name" id="nameId"/>
+							<input type="hidden" class="form-control" name="number_day_off"/>
 						</div>
 						<div class="form-group">
 							<label>Reset day off</label>
@@ -50,6 +89,21 @@
 							<button type="button" class="btn btn-primary" id="btnClear">Clear</button>
 						</div>
 					</form>
+					
+					<div class="table-responsive" style="margin-top: 3em;">
+						<table class="table table-bordered table-striped table-hover"
+							id="companyYearOffTable">
+							<thead>
+								<tr>
+									<th class="text-center">Year</th>
+									<th class="text-center">Day Off Reset</th>
+									<th class="text-center">Number Of Day Off</th>
+								</tr>
+							</thead>
+							<tbody class="text-center">
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
 			<div th:replace="fragments/footer"></div>
