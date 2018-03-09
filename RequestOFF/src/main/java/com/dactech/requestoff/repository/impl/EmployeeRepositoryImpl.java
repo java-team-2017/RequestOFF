@@ -19,7 +19,7 @@ public class EmployeeRepositoryImpl implements EmployeeRepositoryCustom {
 	@Override
 	public List<Employee> search(EmployeeSearchRequest employeeSearchRequest) {
 		Query query = null;
-		StringBuilder queryString = new StringBuilder("SELECT * FROM employee e INNER position p ON e.position_id = p.id ");
+		StringBuilder queryString = new StringBuilder("SELECT * FROM employee e INNER JOIN position p ON e.position_id = p.id ");
 		StringBuilder joinClause = new StringBuilder(" INNER JOIN team_employee te ON e.id = te.employee_id INNER JOIN team t ON te.team_id = t.id ");
 		StringBuilder whereClause = new StringBuilder("");
 		
