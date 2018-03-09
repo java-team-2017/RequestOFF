@@ -112,7 +112,7 @@ public class RequestServiceImpl implements RequestService{
 			request.setToTime(requestRegistRequest.getToTime());
 			request.setTotalTime(Double.parseDouble(requestRegistRequest.getTotalTime()));
 			request.setReason(requestRegistRequest.getReason());
-			if(employeeRepository.findById(employeeId).getPosition().getId() == Position.POSITION_PROJECT_MANAGER 
+			if(employeeRepository.findById(employeeId).getPosition().getCode() == Position.CODE_MANAGER 
 					&& requestRegistRequest.getStatus().equals("5")) {
 				request.setStatus(Request.REQUEST_STATUS_APPROVED);
 			}
@@ -152,7 +152,7 @@ public class RequestServiceImpl implements RequestService{
 					request.setReason(requestRegistRequest.getReason());
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getStatus())) {
-					if(employeeRepository.findById(employeeId).getPosition().getId() == Position.POSITION_PROJECT_MANAGER 
+					if(employeeRepository.findById(employeeId).getPosition().getCode() == Position.CODE_MANAGER 
 						&& requestRegistRequest.getStatus().equals("5")) {
 						request.setStatus(Request.REQUEST_STATUS_APPROVED);
 					}

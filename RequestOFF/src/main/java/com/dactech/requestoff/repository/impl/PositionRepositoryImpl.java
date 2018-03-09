@@ -44,6 +44,12 @@ public class PositionRepositoryImpl implements PositionRepositoryCustom {
 			sqlQuery.append(sqlString + " valid_flag = '" + positionSearchRequest.getValidFlag() + "'");
 			whereClause = false;
 		}
+		
+		if (StringUtil.isNotEmpty(positionSearchRequest.getCode())) {
+			String sqlString = whereClause ? " WHERE " : " AND ";
+			sqlQuery.append(sqlString + " code = '" + positionSearchRequest.getCode() + "'");
+			whereClause = false;
+		}
 
 		Query query = entityManager.createNativeQuery(sqlQuery.toString(), Position.class);
 		return query.getResultList();

@@ -97,9 +97,9 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 	public List<Request> browseRequest(RequestBrowsingRequest requests) {
 		Employee user = employeeRepository.findById(Long.parseLong(requests.getUserId()));
 		StringBuilder queryString = new StringBuilder("SELECT * FROM request INNER JOIN employee ON request.employee_id = employee.id WHERE ");
-		if (user.getPosition().getId() == Position.POSITION_LEADER) {
+		if (user.getPosition().getCode() == Position.CODE_LEADER) {
 			queryString.append(" (employee_id IN (SELECT employee_id from team t INNER JOIN team_employee te ON t.id = te.team_id WHERE t.leader_id = " + requests.getUserId() + ")) ");
-		} else if (user.getPosition().getId() == Position.POSITION_PROJECT_MANAGER) {
+		} else if (user.getPosition().getCode() == Position.CODE_MANAGER) {
 			queryString.append(" (employee_id IN (SELECT employee_id from team_employee te INNER JOIN team t ON t.id=te.team_id INNER JOIN department d ON d.id=t.department_id WHERE manager_id= " + requests.getUserId() + ") "
 					+ "OR employee_id IN (SELECT leader_id FROM team t INNER JOIN department d ON t.department_id=d.id WHERE manager_id= " + requests.getUserId() + " )) ");
 		}
@@ -142,7 +142,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 			
 			// set forward ID and name
 			if(request.getStatus() == Request.REQUEST_STATUS_WAITING) {
-				if (recipient.getPosition().getId() == Position.POSITION_LEADER) {
+				if (recipient.getPosition().getCode() == Position.CODE_LEADER) {
 					String queryStr = "SELECT * FROM employee e INNER JOIN department d ON e.id = d.manager_id "
 							+ " INNER JOIN team t ON t.department_id = d.id"
 							+ " WHERE t.leader_id = " + recipient.getId();
@@ -150,8 +150,8 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 					Employee manager = (Employee) queryObj.getSingleResult();
 					request.setForwardId(manager.getId());
 					request.setForwardName(manager.getName());
-				} else if (recipient.getPosition().getId() == Position.POSITION_PROJECT_MANAGER) {
-					if (sender.getPosition().getId() != Position.POSITION_LEADER && sender.getPosition().getId() != Position.POSITION_PROJECT_MANAGER) {
+				} else if (recipient.getPosition().getCode() == Position.CODE_MANAGER) {
+					if (sender.getPosition().getCode() != Position.CODE_LEADER && sender.getPosition().getCode() != Position.CODE_MANAGER) {
 						String queryStr = "SELECT * from employee e INNER JOIN team t on e.id = t.leader_id INNER JOIN team_employee te ON t.id = te.team_id "
 								+ "WHERE te.employee_id = " + request.getEmployee().getId();
 						Query queryObj = entityManager.createNativeQuery(queryStr.toString(), Employee.class);
@@ -164,7 +164,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 			
 			// set department name and team name for request sender
 			
-			if (sender.getPosition().getId() == Position.POSITION_LEADER) {
+			if (sender.getPosition().getCode() == Position.CODE_LEADER) {
 				Team team = teamRepository.findByLeaderId(sender.getId());
 				if (team != null) {
 					sender.setTeamName(team.getName());
@@ -172,7 +172,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 				} else {
 					sender.setTeamName("No Team");
 				}
-			} else if (sender.getPosition().getId() == Position.POSITION_PROJECT_MANAGER) {
+			} else if (sender.getPosition().getCode() == Position.CODE_MANAGER) {
 				Department dept = departmentRepository.findByManagerId(sender.getId());
 				if (dept != null) {
 					sender.setTeamName("");
@@ -180,7 +180,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 				} else {
 					sender.setDepartmentName("No Department");
 				}
-			} else if(sender.getPosition().getId() == Position.POSITION_EMPLOYEE) {
+			} else if(sender.getPosition().getCode() == Position.CODE_EMPLOYEE) {
 				Employee employee = employeeRepository.findById(sender.getId());
 				if(employee != null) {
 					sender.setTeamName(employee.getTeamName());

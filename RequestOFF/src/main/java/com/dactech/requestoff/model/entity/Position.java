@@ -7,16 +7,17 @@ import javax.persistence.Id;
 
 @Entity
 public class Position {
-	public static final long POSITION_EMPLOYEE = 1;
-	public static final long POSITION_LEADER = 2;
-	public static final long POSITION_PROJECT_MANAGER = 3;
-	public static final long POSITION_HR = 4;
-	public static final long POSITION_HR_MANAGER = 5;
-	
+	public static final long CODE_EMPLOYEE = 1;
+	public static final long CODE_LEADER = 2;
+	public static final long CODE_MANAGER = 3;
+	public static final long CODE_HR = 4;
+	public static final long CODE_HR_MANAGER = 5;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	private String name;
+	private int code;
 	private int validFlag;
 	private String insertDate;
 	private long insertOperator;
@@ -26,11 +27,12 @@ public class Position {
 	public Position() {
 	}
 
-	public Position(long id, String name, int validFlag, String insertDate, long insertOperator, String updateDate,
-			long updateOperator) {
+	public Position(long id, String name, int code, int validFlag, String insertDate, long insertOperator,
+			String updateDate, long updateOperator) {
 		super();
 		this.id = id;
 		this.name = name;
+		this.code = code;
 		this.validFlag = validFlag;
 		this.insertDate = insertDate;
 		this.insertOperator = insertOperator;
@@ -52,6 +54,14 @@ public class Position {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public int getCode() {
+		return code;
+	}
+
+	public void setCode(int code) {
+		this.code = code;
 	}
 
 	public int getValidFlag() {
@@ -92,6 +102,26 @@ public class Position {
 
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
+	}
+
+	public static long getCodeEmployee() {
+		return CODE_EMPLOYEE;
+	}
+
+	public static long getCodeLeader() {
+		return CODE_LEADER;
+	}
+
+	public static long getCodeManager() {
+		return CODE_MANAGER;
+	}
+
+	public static long getCodeHr() {
+		return CODE_HR;
+	}
+
+	public static long getCodeHrManager() {
+		return CODE_HR_MANAGER;
 	}
 
 }

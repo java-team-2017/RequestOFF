@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PositionRegistRequest {
 	private String id;
+	private String code;
 	private String name;
 	@JsonProperty("valid_flag")
 	private String validFlag;
@@ -13,8 +14,10 @@ public class PositionRegistRequest {
 	public PositionRegistRequest() {
 	}
 
-	public PositionRegistRequest(String id, String name, String validFlag, String updateDate) {
+	public PositionRegistRequest(String id, String code, String name, String validFlag, String updateDate) {
+		super();
 		this.id = id;
+		this.code = code;
 		this.name = name;
 		this.validFlag = validFlag;
 		this.updateDate = updateDate;
@@ -26,6 +29,14 @@ public class PositionRegistRequest {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public String getName() {

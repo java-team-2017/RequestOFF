@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PositionSearchRequest {
 	private String id;
+	private String code;
 	private String name;
 	@JsonProperty("name_match_status")
 	private String nameMatchStatus;
@@ -14,8 +15,10 @@ public class PositionSearchRequest {
 	public PositionSearchRequest() {
 	}
 
-	public PositionSearchRequest(String id, String name, String nameMatchStatus, String validFlag) {
+	public PositionSearchRequest(String id, String code, String name, String nameMatchStatus, String validFlag) {
+		super();
 		this.id = id;
+		this.code = code;
 		this.name = name;
 		this.nameMatchStatus = nameMatchStatus;
 		this.validFlag = validFlag;
@@ -27,6 +30,14 @@ public class PositionSearchRequest {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public String getName() {

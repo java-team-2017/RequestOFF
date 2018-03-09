@@ -28,6 +28,7 @@ public class PositionServiceImpl implements PositionService {
 		if (StringUtil.isEmpty(request.getId())) { // create new PositionRegistResponse
 			position = new Position();
 			
+			position.setCode(Integer.parseInt(request.getCode()));
 			position.setName(request.getName());
 			position.setValidFlag(Integer.parseInt(request.getValidFlag()));
 			
@@ -41,6 +42,10 @@ public class PositionServiceImpl implements PositionService {
 			if (!position.getUpdateDate().equals(request.getUpdateDate())) {
 				throw new Exception("Someone updated position with id " + position.getId() + " at "
 						+ position.getUpdateDate());
+			}
+			
+			if (StringUtil.isNotEmpty(request.getCode())) {
+				position.setCode(Integer.parseInt(request.getCode()));
 			}
 
 			if (StringUtil.isNotEmpty(request.getName())) {
