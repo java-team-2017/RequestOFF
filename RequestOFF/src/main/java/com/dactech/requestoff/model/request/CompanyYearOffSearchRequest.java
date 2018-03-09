@@ -8,6 +8,8 @@ public class CompanyYearOffSearchRequest {
 	private String dayOffResetFlag;
 	@JsonProperty("current_year_flag")
 	private String currentYearFlag;
+	@JsonProperty("number_day_off")
+	private String numberDayOff;
 	@JsonProperty("valid_flag")
 	private String validFlag;
 
@@ -15,11 +17,12 @@ public class CompanyYearOffSearchRequest {
 		super();
 	}
 
-	public CompanyYearOffSearchRequest(String id, String dayOffResetFlag, String currentYearFlag, String validFlag) {
-		super();
+	public CompanyYearOffSearchRequest(String id, String dayOffResetFlag, String currentYearFlag, String numberDayOff,
+			String validFlag) {
 		this.id = id;
 		this.dayOffResetFlag = dayOffResetFlag;
 		this.currentYearFlag = currentYearFlag;
+		this.numberDayOff = numberDayOff;
 		this.validFlag = validFlag;
 	}
 
@@ -45,6 +48,14 @@ public class CompanyYearOffSearchRequest {
 
 	public void setCurrentYearFlag(String currentYearFlag) {
 		this.currentYearFlag = currentYearFlag;
+	}
+
+	public String getNumberDayOff() {
+		return numberDayOff;
+	}
+
+	public void setNumberDayOff(String numberDayOff) {
+		this.numberDayOff = numberDayOff;
 	}
 
 	public String getValidFlag() {

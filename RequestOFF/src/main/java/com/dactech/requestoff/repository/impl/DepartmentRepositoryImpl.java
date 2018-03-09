@@ -31,10 +31,10 @@ public class DepartmentRepositoryImpl implements DepartmentRepositoryCustom {
 		if(StringUtil.isNotEmpty(departmentSearchRequest.getName())) {
 			if(StringUtil.isNotEmpty(departmentSearchRequest.getNameMatchStatus()) 
 					&& departmentSearchRequest.getNameMatchStatus().equals("1")) {
-				sqlQuery += " AND name = '" + departmentSearchRequest.getName() + "'";
+				sqlQuery += " AND d.name = '" + departmentSearchRequest.getName() + "'";
 			}
 			else {
-				sqlQuery += " AND name like '%" + departmentSearchRequest.getName() + "%'";
+				sqlQuery += " AND d.name like '%" + departmentSearchRequest.getName() + "%'";
 			}
 		}
 		
