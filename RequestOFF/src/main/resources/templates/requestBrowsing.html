@@ -91,6 +91,7 @@
 					}
 					
 					$('#modalDetails').modal('show');
+					$('#modalDetailsMessage').hide();
 				}
 			});
 			
@@ -100,6 +101,7 @@
 					"id" : dataReturnRequest.id ,
 					"update_date": dataReturnRequest.updateDate
 				}
+				var isNotSend = true;
 				if ($(this).attr('id') == 'btnApproveModal') {
 					$('#confirmMsg').text("Are you sure want to APPROVE this request ?");
 					requestObj['status'] = 2;
@@ -107,16 +109,24 @@
 					$('#confirmMsg').text("Are you sure want to DENY this request ?");
 					requestObj['status'] = 3;
 				} else if ($(this).attr('id') == 'btnSendModal') {
-					$('#confirmMsg').text("Are you sure want to SEND MESSAGE to this request ?");
-					requestObj['status'] = 4;
+					if($('#responseMessage').val() == ""){
+						$('#modalDetailsMessage').text("You must write message before sending this request !").attr('class', 'alert alert-danger').show();
+						isNotSend = false;
+					} else{
+						$('#confirmMsg').text("Are you sure want to SEND MESSAGE to this request ?");
+						requestObj['status'] = 4;
+					}
 				} else if ($(this).attr('id') == 'btnForward') {
 					$('#confirmMsg').text("Are you sure want to FORWARD this request to " + dataReturnRequest.forwardName + " ?");
 					requestObj['recipient_id'] = $("#forward").val();
 				}
-				
+				if(isNotSend == true){
+					$('#confirmModal').modal('show');
+				} else {
+					$('#confirmModal').modal('hide');
+				}
 				requestObj['response_message'] = $('#responseMessage').val();
 				requestObjArr.push(requestObj);
-				$('#confirmModal').modal('show');
 			});
 			
 			$("#btnApprove, #btnDeny").on('click', function() {
@@ -383,6 +393,7 @@
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 							<h4 class="modal-title">Details</h4>
+							<div id="modalDetailsMessage" class="alert" style="display:none;"></div>
 						</div>
 						
 						<div class="modal-body">
@@ -461,7 +472,7 @@
 								</label>
 								
 								<button type="button" class="btn btn-default btn-sm" id="btnForward">
-									<span class="glyphicon glyphicon-share-alt"></span>Forward
+									<span class="glyphicon glyphicon-share-alt"></span> Forward
 								</button>
 								
 							</form>

@@ -243,12 +243,12 @@
 				{ data: 'manager.name' },
 				{
 					render: function (index) {
-							return '<a class="glyphiconEdit"><span class="glyphicon glyphicon-pencil" value="' + index + '"></span></a>';
+							return '<a class="glyphiconEdit"><span class="glyphicon glyphicon-pencil" style="cursor: pointer;" value="' + index + '"></span></a>';
 					},
 				},
 				{
 					render: function (index) {
-							return '<a id="btnDelete"><span class="glyphicon glyphicon-trash" value="' + index + '"></span></a>';
+							return '<a id="btnDelete"><span class="glyphicon glyphicon-trash" style="cursor: pointer;" value="' + index + '"></span></a>';
 					},
 				}
 			]
@@ -286,14 +286,14 @@
 				<table class="table table-bordered table-striped table-hover" id="departmentTable">
 					<thead>
 						<tr>
-							<th class="text-center" name="id" id="id" style="width: 40px;"><span>ID</span></th>
-							<th class="text-center" name="department"><span>Department</span></th>
-							<th class="text-center" name="manager"><span>Manager</span></th>
-							<th class="text-center" name="edit" style="width: 40px;"><span>Edit</span></th>
-							<th class="text-center" name="delete" style="width: 40px;"><span>Delete</span></th>
+							<th class="text-center" style="width: 40px;">ID</th>
+							<th class="text-center">Department</th>
+							<th class="text-center">Manager</th>
+							<th class="text-center" style="width: 40px;">Edit</th>
+							<th class="text-center" style="width: 40px;">Delete</th>
 						</tr>
 					</thead>
-					<tbody class="text-center">
+					<tbody class="text-center" style="cursor: pointer;">
 					</tbody>
 				</table>
 			</div>
