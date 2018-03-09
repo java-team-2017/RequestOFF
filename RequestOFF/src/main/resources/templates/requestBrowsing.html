@@ -69,7 +69,9 @@
 					$('#recipientDetails').val(rowData.recipientName);
 					$('#fromTimeDetails').val(rowData.fromTime);
 					$('#toTimeDetails').val(rowData.toTime);
-					$('#totalTimeDetails').val(rowData.totalTime);
+					var days = (rowData.totalTime)/8 > 1 ? "s " : " ";
+					var hours = (rowData.totalTime)%8 > 1 ? "s " : "";
+					$('#totalTimeDetails').val(Math.floor((rowData.totalTime)/8) + " day" + days + ((rowData.totalTime) % 8) + " hour"+hours);
 					$('#reasonDetails').val(rowData.reason);
 					$('#statusDetails').val(requestStatus[rowData.status]);
 					$('#dayOffTypeDetails').val(rowData.dayOffType.name);
@@ -272,13 +274,21 @@
 					{ data: 'employee.name' },
 					{ data: 'fromTime' },
 					{ data: 'toTime' },
-					{ data: 'totalTime' },
+					{ 
+						data: 'totalTime',
+						render: function (data, type, row){
+							var days = (row.totalTime)/8 > 1 ? "s " : " ";
+							var hours = (row.totalTime)%8 > 1 ? "s " : "";
+							return Math.floor((row.totalTime)/8) + " day" + days + ((row.totalTime) % 8) + " hour"+hours;
+						}
+					},
+					
 					{ data: 'reason' },
 					{
 						data: 'status',
 						render: function (data, type, row) {
 							if(row.status == 5) {
-								return '<a data-toggle="tooltip" title="Approve" class="btnApprove"><span class="glyphicon glyphicon-ok">&nbsp;&nbsp;<a data-toggle="tooltip" title="Deny" class="btnDeny"><span class="glyphicon glyphicon-remove"></span></a></a>';
+								return '<a data-toggle="tooltip" title="Approve" class="btnApprove"><span class="glyphicon glyphicon-ok" style="cursor: pointer;">&nbsp;&nbsp;<a data-toggle="tooltip" title="Deny" class="btnDeny"><span class="glyphicon glyphicon-remove" style="cursor: pointer;"></span></a></a>';
 							} else {
 								return requestStatus[data];
 							}
@@ -343,24 +353,24 @@
 				<table class="table table-bordered table-striped table-hover" id="requestTable">
 					<thead>
 						<tr>
-							<th class="text-center" name="select" style="width: 40px;">Select</th>
-							<th class="text-center" name="id" id="id" style="width: 40px;">ID</th>
-							<th class="text-center" name="name">Employee</th>
-							<th class="text-center" name="from">From</th>
-							<th class="text-center" name="to">To</th>
-							<th class="text-center" name="totalTime">Total Time</th>
-							<th class="text-center" name="reason">Reason</th>
-							<th class="text-center" name="approve">Status</th>
+							<th class="text-center" style="width: 40px;">Select</th>
+							<th class="text-center" style="width: 40px;">ID</th>
+							<th class="text-center">Employee</th>
+							<th class="text-center">From</th>
+							<th class="text-center">To</th>
+							<th class="text-center">Total Time</th>
+							<th class="text-center">Reason</th>
+							<th class="text-center">Status</th>
 						</tr>
 					</thead>
-					<tbody class="text-center">
+					<tbody class="text-center" style="cursor: pointer;">
 					</tbody>
 				</table>
 			</div>
 				
 			<button type="button" class="btn btn-primary" id="btnApprove" >Approve</button>&nbsp;&nbsp;
-			<button type="button" class="btn btn-primary" style="width:76px;" id="btnDeny">Deny</button>
-				
+			<button type="button" class="btn btn-primary" style="width:76px;" id="btnDeny">Deny</button><br></br>
+			
 			<div class="modal fade" id="modalDetails" role="dialog">
 				<div class="modal-dialog">
 					<div class="modal-content">
