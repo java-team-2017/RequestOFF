@@ -69,15 +69,23 @@ public class DepartmentServiceImpl implements DepartmentService {
 					requestSearchRequest.setStatus(Integer.toString(Request.REQUEST_STATUS_WAITING));
 					requestSearchRequest.setRecipientId(Long.toString(oldManagerId));
 					requestSearchRequest.setValidFlag("1");
+					
+					int requestInProcessing = requestRepository.getNumberOfRequestInProcessing(oldManagerId);
+					if (requestInProcessing > 0) { // employee has requests which are in processing
+						Employee em = employeeRepository.findById(oldManagerId);
+						throw new Exception (em.getName() + " has requests which are in processing. <br/>"
+							+ "Please delete or process all those requests before remove");
+					}
 					List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
+					
 					if(requests != null && requests.size() > 0) {
 						throw new Exception(department.getManager().getName()
-											+ " has requests waiting for him to process. Please let him process them before changing to new manager");
-					} else {
-						Employee manager = new Employee();
-						manager.setId(Long.parseLong(departmentRegistRequest.getManagerId()));
-						department.setManager(manager);
+							+ " has requests waiting for him to process. Please let him process them before changing to new manager");
 					}
+					
+					Employee manager = new Employee();
+					manager.setId(Long.parseLong(departmentRegistRequest.getManagerId()));
+					department.setManager(manager);
 				}
 				if(StringUtil.isNotEmpty(departmentRegistRequest.getValidFlag())) {
 					department.setValidFlag(Integer.parseInt(departmentRegistRequest.getValidFlag()));

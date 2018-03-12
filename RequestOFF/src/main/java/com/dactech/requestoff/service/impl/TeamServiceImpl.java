@@ -89,10 +89,16 @@ public class TeamServiceImpl implements TeamService {
 					requestSearchRequest.setValidFlag("1");
 					
 					List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
-					
 					if (requests != null && requests.size() >0) {
 						throw new Exception(team.getLeader().getName()
 							+ " has requests waiting for him to process. <br/>Please let him process them before changing to new leader");
+					}
+					
+					int requestInProcessing = requestRepository.getNumberOfRequestInProcessing(oldLeaderId);
+					if (requestInProcessing > 0) { // employee has requests which are in processing
+						Employee em = employeeRepository.findById(oldLeaderId);
+						throw new Exception (em.getName() + " has requests which are in processing. <br/>"
+								+ "Please delete or process all those requests before remove");
 					}
 					Employee leader = new Employee();
 					leader.setId(newLeaderId);
