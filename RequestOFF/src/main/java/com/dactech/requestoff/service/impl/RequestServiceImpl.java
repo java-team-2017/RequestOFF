@@ -43,8 +43,21 @@ public class RequestServiceImpl implements RequestService{
 		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
 		if(StringUtil.isEmpty(requestRegistRequest.getId())) {	//create new request
 			request = new Request();
-			
 			Employee employee = employeeRepository.findById(Long.parseLong(requestRegistRequest.getEmployeeId()));
+			DayOffType dayOffType = dayOffTypeRepository.findById(Long.parseLong(requestRegistRequest.getDayOffTypeId()));
+			
+			if(dayOffType.getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING) {
+				EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employee.getId());
+				double remainHours = employeeOffStatus.getRemainHours();
+				double newRemainHours = remainHours - Double.parseDouble(requestRegistRequest.getTotalTime());
+				if(newRemainHours >= 0) {
+					employeeOffStatus.setRemainHours(newRemainHours);
+					employeeOffStatusRepository.save(employeeOffStatus);
+				} else {
+					throw new Exception("Off hours exceed remain hours");
+				}
+			}
+			
 			request.setEmployee(employee);
 			
 			request.setFromTime(requestRegistRequest.getFromTime());
@@ -58,22 +71,11 @@ public class RequestServiceImpl implements RequestService{
 				request.setStatus(Integer.parseInt(requestRegistRequest.getStatus()));
 			}
 			request.setResponseMessage(requestRegistRequest.getResponseMessage());
-			
-			DayOffType dayOffType = dayOffTypeRepository.findById(Long.parseLong(requestRegistRequest.getDayOffTypeId()));
 			request.setDayOffType(dayOffType);
-			
 			request.setRecipientId(Long.parseLong(requestRegistRequest.getRecipientId()));
 			request.setValidFlag(Integer.parseInt(requestRegistRequest.getValidFlag()));
 			
 			requestRepository.save(request);
-			
-			if(dayOffType.getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING) {
-				EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employee.getId());
-				double remainHours = employeeOffStatus.getRemainHours();
-				double newRemainHours = remainHours - Double.parseDouble(requestRegistRequest.getTotalTime());
-				employeeOffStatus.setRemainHours(newRemainHours);
-				employeeOffStatusRepository.save(employeeOffStatus);
-			}
 		} else {	//update request
 			long id = Long.parseLong(requestRegistRequest.getId());
 			request = requestRepository.findById(id);
@@ -85,7 +87,6 @@ public class RequestServiceImpl implements RequestService{
 			}
 			else {
 				Employee employee = employeeRepository.findById(request.getEmployee().getId());
-				
 				EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employee.getId());
 				double remainHours = employeeOffStatus.getRemainHours();
 				double newRemainHours = remainHours;
@@ -118,14 +119,18 @@ public class RequestServiceImpl implements RequestService{
 						&& StringUtil.isEmpty(requestRegistRequest.getStatus())) {
 					if(requestRegistRequest.getValidFlag().equals("0") && request.getValidFlag() == 1
 							&& (oldStatus == Request.REQUEST_STATUS_SAVED || oldStatus == Request.REQUEST_STATUS_RESPONDED)) { //delete request
-						newRemainHours = remainHours + oldOffHours;
+						if(oldPaymentFlag == DayOffType.PAYMENT_FLAG_PAYING) {
+							newRemainHours = remainHours + oldOffHours;
+						}
 					}
 				}
 				else if(StringUtil.isEmpty(requestRegistRequest.getTotalTime()) && StringUtil.isEmpty(requestRegistRequest.getValidFlag())
 						&& StringUtil.isNotEmpty(requestRegistRequest.getStatus())) {
 					if(Integer.parseInt(requestRegistRequest.getStatus()) == Request.REQUEST_STATUS_DENIED
 						&& oldStatus == Request.REQUEST_STATUS_WAITING) { //deny request
-						newRemainHours = remainHours + oldOffHours;
+						if(oldPaymentFlag == DayOffType.PAYMENT_FLAG_PAYING) {
+							newRemainHours = remainHours + oldOffHours;
+						}
 					}
 				}
 				else if(StringUtil.isNotEmpty(requestRegistRequest.getTotalTime()) && StringUtil.isEmpty(requestRegistRequest.getValidFlag())
@@ -148,8 +153,12 @@ public class RequestServiceImpl implements RequestService{
 				else {
 					throw new Exception("RequestRegistRequest parameter is invalid");
 				}
-				employeeOffStatus.setRemainHours(newRemainHours);
-				employeeOffStatusRepository.save(employeeOffStatus);
+				if(newRemainHours >= 0) {
+					employeeOffStatus.setRemainHours(newRemainHours);
+					employeeOffStatusRepository.save(employeeOffStatus);
+				} else {
+					throw new Exception("Off hours exceed remain hours");
+				}
 				
 				if(StringUtil.isNotEmpty(requestRegistRequest.getFromTime())) {
 					request.setFromTime(requestRegistRequest.getFromTime());

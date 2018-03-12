@@ -213,22 +213,31 @@
 							"update_date" : $("#updateDate_confirmModalId").val()
 						}),
 						success : function(returnData) {
-							table = $('#requestHistoryTable').DataTable();
-							table.ajax.reload();
-							$.ajax({
-								type : "POST",
-								contentType : "application/json",
-								url : /*[[@{/employee/getUser}]]*/,
-								dataType : 'json',
-								data : JSON.stringify({}),
-								success : function(returnData) {
-									remainHours = returnData.remainHours;
-									renderRemainHours(returnData.remainHours, 'remainHours');
-								},
-								error : function(e) {
-									$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-								}
-							});
+							if(returnData.status_info.status == 1) {
+								$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+							} else {
+								table = $('#requestHistoryTable').DataTable();
+								table.ajax.reload();
+								$.ajax({
+									type : "POST",
+									contentType : "application/json",
+									url : /*[[@{/employee/getUser}]]*/,
+									dataType : 'json',
+									data : JSON.stringify({}),
+									success : function(returnData) {
+										if(returnData.status_info.status == 1) {
+											$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+										} else {
+											remainHours = returnData.remainHours;
+											renderRemainHours(returnData.remainHours, 'remainHours');
+										}
+									},
+									error : function(e) {
+										$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+									}
+								});
+								$('#alertMessage_search').html("Delete successfully!").attr('class', 'alert alert-success').show();
+							}
 						},
 						error : function(e) {
 							$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
@@ -238,17 +247,20 @@
 				
 				$('#btnSave_modal, #btnSend_modal').on('click', function() {
 					var status;
-					if( $(this).attr('id') == 'btnSave_modal' ) {
+					var notifyStr;
+					if($(this).attr('id') == 'btnSave_modal') {
 						status = 1;
+						notifyStr = "Your request has been saved";
 					}
 					else {
 						status = 5;
+						notifyStr = "Your request has been sent";
 					}
 					
 					var editRequestData = $('#modalForm').serializeJSON();
 					
 					//validate
-					var complete = 1, valid = 1, exceed = 0, offHoursEqual0 = 0;
+					var complete = 1, valid = 1, exceed = 0, offHoursEqual0 = 0, isNumber = 1;
 					var listInput = $("#modalForm").find(':input').not("#modalResponseMessage");
 					$.each(listInput, function() {
 						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
@@ -259,13 +271,11 @@
 					var offHours = parseInt(editRequestData.offDays) * 8 + parseFloat(editRequestData.offHours);
 					var oldOffHours = parseFloat(editRequestData.totalTime_modalForm);
 					console.log("old: " + oldOffHours);
-					if(offHours == 0){
-						offHoursEqual0 = 1;
+					if(isNaN(editRequestData.offDays) == true) {
+						isNumber = 0;
 					}
-					else {
-						if(parseFloat(offHours) > parseFloat(remainHours + oldOffHours)) {
-							exceed = 1;
-						}
+					if(offHours <= 0){
+						offHoursEqual0 = 1;
 					}
 					
 					var fromDate = editRequestData.from_modalForm;
@@ -287,11 +297,11 @@
 					else if(valid == 0) {
 						$('#alertMessage_edit').html(errors['DateError']).attr('class', 'alert alert-danger').show();
 					}
+					else if(isNumber == 0) {
+						$('#alertMessage_edit').html(errors['notNumber']).attr('class', 'alert alert-danger').show();
+					}
 					else if(offHoursEqual0 == 1) {
 						$('#alertMessage_edit').html(errors['offHoursEqual0']).attr('class', 'alert alert-danger').show();
-					}
-					else if(exceed == 1) {
-						$('#alertMessage_edit').html(errors['exceedTime']).attr('class', 'alert alert-danger').show();
 					}
 					else {
 						//update request
@@ -316,29 +326,37 @@
 							dataType : 'json',
 							data : JSON.stringify(requestRegistRequest),
 							success : function(returnData) {
-								table = $('#requestHistoryTable').DataTable();
-								table.ajax.reload();
-								$.ajax({
-									type : "POST",
-									contentType : "application/json",
-									url : /*[[@{/employee/getUser}]]*/,
-									dataType : 'json',
-									data : JSON.stringify({}),
-									success : function(returnData) {
-										remainHours = returnData.remainHours;
-										renderRemainHours(returnData.remainHours, 'remainHours');
-									},
-									error : function(e) {
-										$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-									}
-								});
+								if(returnData.status_info.status == 1) {
+									$('#alertMessage_edit').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+								} else {
+									table = $('#requestHistoryTable').DataTable();
+									table.ajax.reload();
+									$.ajax({
+										type : "POST",
+										contentType : "application/json",
+										url : /*[[@{/employee/getUser}]]*/,
+										dataType : 'json',
+										data : JSON.stringify({}),
+										success : function(returnData) {
+											if(returnData.status_info.status == 1) {
+												$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+											} else {
+												remainHours = returnData.remainHours;
+												renderRemainHours(returnData.remainHours, 'remainHours');
+											}
+										},
+										error : function(e) {
+											$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+										}
+									});
+									$('#requestDetailsModal').modal('hide');
+									$('#alertMessage_search').html(notifyStr).attr('class', 'alert alert-success').show();
+								}
 							},
 							error : function(e) {
 								$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 							}
 						});
-								
-						$('#requestDetailsModal').modal('hide');
 					}
 				});
 			});
@@ -347,27 +365,13 @@
 				var searchData = $('#requestHistoryForm').serializeJSON();
 				var from = searchData.fromTime;
 				var to = searchData.toTime;
-// 				var date = new Date();
 				if(from != "") {
 					from = from.substr(6, 4) + "-" + from.substr(0, 2) + "-" + from.substr(3, 2);
 				}
-// 				else {
-// 					if(to == ""){
-// 						from = date.getFullYear() + "-01-01";
-// 					}
-// 					else {
-// 						from = "2000-01-01";
-// 					}
-// 				}
 				
 				if(to != "") {
 					to = to.substr(6, 4) + "-" + to.substr(0, 2) + "-" + to.substr(3, 2);
 				}
-// 				else {
-// 					var month = String("00" + (date.getMonth() + 1)).slice(-2);
-// 					var day = String("00" + (date.getDate())).slice(-2);
-// 					to = (date.getFullYear() + 1) + "-" + month + "-" + day;
-// 				}
 
 				var requestSearchRequest = {
 					"id" : "",
@@ -667,7 +671,7 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Off hours * : </label>
+											<label class="control-label col-sm-3">Off time * : </label>
 											<div class="form-inline">
 												<input type="text" class="form-control" name="offDays" id="modalOffDays" style="width:100px;"/>&nbsp;day(s)&nbsp;
 												<select class="form-control" name="offHours" id="modalOffHours" style="width:100px;">

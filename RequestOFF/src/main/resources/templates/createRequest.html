@@ -69,7 +69,7 @@
 					}
 					
 					//validate
-					var complete = 1, valid = 1, exceed = 0, offHoursEqual0 = 0;
+					var complete = 1, valid = 1, exceed = 0, offHoursEqual0 = 0, isNumber = 1;
 					var listInput = $('#createRequestForm').find(':input').not("button");
 					$.each(listInput, function() {
 						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
@@ -79,13 +79,13 @@
 					
 					var createRequestData = $('#createRequestForm').serializeJSON();
 					var offHours = parseInt(createRequestData.offDays) * 8 + parseFloat(createRequestData.offHours);
-					if(offHours == 0){
-						offHoursEqual0 = 1;
+					console.log(offHours);
+					
+					if(isNaN(createRequestData.offDays) == true) {
+						isNumber = 0;
 					}
-					else {
-						if(parseInt(offHours) > parseInt(remainHours)) {
-							exceed = 1;
-						}
+					if(offHours <= 0){
+						offHoursEqual0 = 1;
 					}
 					
 					var fromDate = createRequestData.from;
@@ -108,11 +108,11 @@
 					else if(valid == 0) {
 						$('#alertMessage').html(errors['DateError']).attr('class', 'alert alert-danger').show();
 					}
+					else if(isNumber == 0) {
+						$('#alertMessage').html(errors['notNumber']).attr('class', 'alert alert-danger').show();
+					}
 					else if(offHoursEqual0 == 1) {
 						$('#alertMessage').html(errors['offHoursEqual0']).attr('class', 'alert alert-danger').show();
-					}
-					else if(exceed == 1) {
-						$('#alertMessage').html(errors['exceedTime']).attr('class', 'alert alert-danger').show();
 					}
 					else {
 						var requestRegistRequest = {
@@ -137,24 +137,31 @@
 							dataType : 'json',
 							data : JSON.stringify(requestRegistRequest),
 							success : function(returnData) {
-								//get current user
-								$.ajax({
-									type : "POST",
-									contentType : "application/json",
-									url : /*[[@{/employee/getUser}]]*/,
-									dataType : 'json',
-									data : JSON.stringify({}),
-									success : function(returnData) {
-										renderRemainHours(returnData.remainHours, 'remainHours');
-									},
-									error : function(e) {
-										$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-									}
-								});
-								
-								$("#createRequestForm :input").not("button, select").val("");
-								$("#createRequestForm select").prop('selectedIndex', 0);
-								$('#alertMessage').html(alertStr).attr('class', 'alert alert-success').show();
+								if(returnData.status_info.status == 1) {
+									$('#alertMessage').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+								} else {
+									//get current user
+									$.ajax({
+										type : "POST",
+										contentType : "application/json",
+										url : /*[[@{/employee/getUser}]]*/,
+										dataType : 'json',
+										data : JSON.stringify({}),
+										success : function(returnData) {
+											if(returnData.status_info.status == 1) {
+												$('#alertMessage').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+											} else {
+												renderRemainHours(returnData.remainHours, 'remainHours');
+											}
+										},
+										error : function(e) {
+											$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+										}
+									});
+									$('#alertMessage').html(alertStr).attr('class', 'alert alert-success').show();
+									$("#createRequestForm :input").not("button, select").val("");
+									$("#createRequestForm select").prop('selectedIndex', 0);
+								}
 							},
 							error : function(e) {
 								$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();

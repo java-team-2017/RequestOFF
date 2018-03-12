@@ -24,7 +24,6 @@ import com.dactech.requestoff.model.request.EmployeeOffStatisticsPagingRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatusSearchRequest;
 import com.dactech.requestoff.model.request.EmployeeRegistRequest;
 import com.dactech.requestoff.model.request.EmployeeSearchRequest;
-import com.dactech.requestoff.model.request.RequestSearchRequest;
 import com.dactech.requestoff.model.response.EmployeeDetailsResponse;
 import com.dactech.requestoff.model.response.EmployeeOffStatisticsPagingResponse;
 import com.dactech.requestoff.model.response.EmployeeRegistResponse;
@@ -138,7 +137,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 					Team team = teamRepository.findByLeaderId(EmployeeId);
 					if (team != null) {
 						throw new Exception(employee.getName() + " is currently the leader of " + team.getName() + ". Please remove " + employee.getName() 
-											+ " from " + team.getName() + " changing position");
+											+ " from " + team.getName() + " before changing position");
 					} else if(requestRepository.getNumberOfRequestInProcessing(employee.getId()) > 0) {
 						throw new Exception(employee.getName() + " has requests in processing. Please let these requests processed before changing position");
 					}
@@ -150,7 +149,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 					Department dept = departmentRepository.findByManagerId(EmployeeId);
 					if(dept != null) {
 						throw new Exception(employee.getName() + " is currently the manager of " + dept.getName() + ". Please remove " + employee.getName() 
-											+ " from " + dept.getName() + " first!");
+											+ " from " + dept.getName() + " before changing position");
 					} else if(requestRepository.getNumberOfRequestInProcessing(employee.getId()) > 0) {
 						throw new Exception(employee.getName() + " has requests in processing. Please let these requests processed before changing position");
 					}

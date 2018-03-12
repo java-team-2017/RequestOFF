@@ -265,6 +265,7 @@
 								console.log(table);
 								table.ajax.reload();
 								$('#employeeAddModal').modal('hide');
+								$('#alertMessage_search').html("Add successfully!").attr('class', 'alert alert-success').show();
 							},
 							error : function(e) {
 								$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
@@ -278,7 +279,7 @@
 					
 					//---------validate------------
 					var complete = 1, valid = 1, isNumber = 1;
-					var listInput = $("#modalDetailsForm").find(':input').not("#teamModalDetailsId, #departmentModalDetailsId");
+					var listInput = $("#modalDetailsForm").find(':input').not("#teamModalDetailsId, #departmentModalDetailsId, #passwordModalDetailsId");
 					$.each(listInput, function() {
 						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
 							complete = 0;
@@ -323,7 +324,7 @@
 							"birthday" : birthday,
 							"position_id" : updateData.positionModalDetails,
 							"email" : updateData.emailModalDetails,
-							"password" : "",
+							"password" : updateData.passwordModalDetails,
 							"phone" : updateData.phoneModalDetails,
 							"start_working_date" : startWorkingDate,
 							"official_working_date" : officialWorkingDate,
@@ -347,6 +348,7 @@
 									table = $('#employeeTable').DataTable();
 									table.ajax.reload();
 									$('#employeeDetailsModal').modal('hide');
+									$('#alertMessage_search').html("Update successfully!").attr('class', 'alert alert-success').show();
 								}
 							},
 							error : function(e) {
@@ -381,6 +383,7 @@
 							else {
 								table = $('#employeeTable').DataTable();
 								table.ajax.reload();
+								$('#alertMessage_search').html("Delete successfully!").attr('class', 'alert alert-success').show();
 							}
 						},
 						error : function(e) {
@@ -589,6 +592,12 @@
 											<label class="control-label col-sm-3">Email * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<input type="text" class="form-control" name="emailModalDetails" id="emailModalDetailsId" />
+											</div>
+										</div>
+										<div class="form-group row">
+											<label class="control-label col-sm-3">Password </label>
+											<div class="input-group col-sm-9" style="padding-right:15px;">
+												<input type="text" class="form-control" name="passwordModalDetails" id="passwordModalDetailsId" />
 											</div>
 										</div>
 										<div class="form-group row">
