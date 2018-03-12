@@ -28,14 +28,14 @@ public class Team {
 	private String updateDate;
 	private long updateOperator;
 	@Transient
-	private String leaderName;
+	private Employee leader;
 
 	public Team() {
 		super();
 	}
 
 	public Team(long id, String name, long leaderId, Department department, int validFlag, String insertDate,
-			long insertOperator, String updateDate, long updateOperator, String leaderName) {
+			long insertOperator, String updateDate, long updateOperator, Employee leader) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -46,7 +46,7 @@ public class Team {
 		this.insertOperator = insertOperator;
 		this.updateDate = updateDate;
 		this.updateOperator = updateOperator;
-		this.leaderName = leaderName;
+		this.leader = leader;
 	}
 
 	public long getId() {
@@ -121,12 +121,12 @@ public class Team {
 		this.updateOperator = updateOperator;
 	}
 
-	public String getLeaderName() {
-		return leaderName;
+	public Employee getLeader() {
+		return leader;
 	}
 
-	public void setLeaderName(String leaderName) {
-		this.leaderName = leaderName;
+	public void setLeader(Employee leader) {
+		this.leader = leader;
 	}
 
 }

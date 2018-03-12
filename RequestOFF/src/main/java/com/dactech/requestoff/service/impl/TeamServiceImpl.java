@@ -149,7 +149,7 @@ public class TeamServiceImpl implements TeamService {
 		List<Team> teams = teamRepository.searchTeam(teamSearchRequest);
 		for (Team team : teams) {
 			Employee leader = employeeRepository.findById(team.getLeaderId());
-			team.setLeaderName(leader.getName());
+			team.setLeader(new Employee(leader.getId(), leader.getName()));
 		}
 		return new TeamSearchResponse(teams);
 	}
@@ -158,7 +158,7 @@ public class TeamServiceImpl implements TeamService {
 	public TeamDetailsResponse teamDetails(TeamDetailsRequest teamDetailsRequest) {
 		Team team = teamRepository.findById(Long.parseLong(teamDetailsRequest.getId()));
 		Employee leader = employeeRepository.findById(team.getLeaderId());
-		team.setLeaderName(leader.getName());
+		team.setLeader(new Employee(leader.getId(), leader.getName()));
 		TeamDetailsResponse response = new TeamDetailsResponse(team);
 		return response;
 	}

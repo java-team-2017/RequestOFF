@@ -56,6 +56,12 @@ public class Employee {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	
+	public Employee(long id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
 
 	public Employee(long id, String name, String gender, String birthday, Position position, String email,
 			String password, String phone, String startWorkingDate, String officialWorkingDate, int validFlag,
