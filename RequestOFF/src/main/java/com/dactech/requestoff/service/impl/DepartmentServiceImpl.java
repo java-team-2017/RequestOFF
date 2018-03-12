@@ -138,4 +138,9 @@ public class DepartmentServiceImpl implements DepartmentService {
 		}
 		return true;
 	}
+
+	@Override
+	public Department findByManagerId(long managerId) {
+		return departmentRepository.findByManagerId(managerId);
+	}
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dactech.requestoff.model.common.StatusInfo;
+import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.Position;
 import com.dactech.requestoff.model.request.EmployeeDeleteRequest;
@@ -27,6 +28,7 @@ import com.dactech.requestoff.model.response.EmployeeOffStatisticsPagingResponse
 import com.dactech.requestoff.model.response.EmployeeRegistResponse;
 import com.dactech.requestoff.model.response.EmployeeSearchResponse;
 import com.dactech.requestoff.model.response.GetUserResponse;
+import com.dactech.requestoff.service.DepartmentService;
 import com.dactech.requestoff.service.EmployeeService;
 import com.dactech.requestoff.util.AuthenticationUtil;
 
@@ -34,6 +36,8 @@ import com.dactech.requestoff.util.AuthenticationUtil;
 public class EmployeeController {
 	@Autowired
 	EmployeeService employeeService;
+	@Autowired
+	DepartmentService departmentService;
 
 	@RequestMapping(value = "/employee/regist", method = RequestMethod.POST)
 	EmployeeRegistResponse employeeRegist(@RequestBody EmployeeRegistRequest employeeRegistRequest) {
@@ -119,10 +123,8 @@ public class EmployeeController {
 				throw new Exception("Anonymous user");
 			}
 			
-			String teamName = employeeService.getTeamName(user.getId());
-			user.setTeamName(teamName);
-			String departmentName = employeeService.getDepartmentName(user.getId());
-			user.setDepartmentName(departmentName);
+			user.setTeamName(employeeService.getTeamName(user.getId()));
+			user.setDepartmentName(employeeService.getDepartmentName(user.getId()));
 			
 			response.setUser(user);
 			

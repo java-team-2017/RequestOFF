@@ -22,4 +22,6 @@ public interface DepartmentService {
 	public DepartmentInfoResponse departmentInfo(DepartmentInfoRequest departmentInfoRequest);
 	
 	boolean departmentDelete(long departmentId) throws Exception;
+	
+	public Department findByManagerId(long managerId);
 }

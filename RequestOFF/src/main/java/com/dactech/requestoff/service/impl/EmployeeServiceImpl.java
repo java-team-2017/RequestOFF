@@ -398,7 +398,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		List<GetUserResponse.IdName> forwards = new ArrayList<GetUserResponse.IdName>(10);
 		Employee user = employeeRepository.findById(employeeId);
 		if(user != null) {
-			if (user.getPosition().getCode() == Position.CODE_LEADER) {
+			if (isLeader(employeeId)) {
 				Team t = teamRepository.findByLeaderId(user.getId());
 				if(t != null) {
 					Department dept = t.getDepartment();
@@ -431,7 +431,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		List<GetUserResponse.IdName> listRecipients = new ArrayList<GetUserResponse.IdName>();
 		Employee e = employeeRepository.findById(employeeId);
 		if(e != null) {
-			if(e.getPosition().getCode() == Position.CODE_LEADER) {
+			if(isLeader(employeeId)) {
 				Team team = teamRepository.findByLeaderId(employeeId);
 				if(team != null) {
 					Department dept = team.getDepartment();
@@ -482,24 +482,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public String getTeamName(long employeeId) {
 		String teamName;
 		Employee e = employeeRepository.findById(employeeId);
-		if(e.getPosition().getCode() == Position.CODE_LEADER) {
-			Team team = teamRepository.findByLeaderId(employeeId);
-			if(team != null) {
-				teamName = team.getName();
-			}
-			else {
-				teamName = "";
-			}
-		}
-		else if(e.getPosition().getCode() == Position.CODE_EMPLOYEE || e.getPosition().getCode() == Position.CODE_HR) {
-			if(e.getListTeam().size() > 0) {
-				teamName = e.getListTeam().get(0).getName();
-			}
-			else {
-				teamName = "";
-			}
-		}
-		else {
+		if (e.getListTeam() != null && e.getListTeam().size() > 0) {
+			return e.getListTeam().get(0).getName();
+		} else {
 			teamName = "";
 		}
 		return teamName;
@@ -508,44 +493,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public String getDepartmentName(long employeeId) {
 		String departmentName;
-		Employee e = employeeRepository.findById(employeeId);
-		if(e.getPosition().getCode() == Position.CODE_LEADER) {
-			Team team = teamRepository.findByLeaderId(employeeId);
-			if(team != null) {
-				Department department = team.getDepartment();
-				if(department != null) {
-					departmentName = department.getName();
-				}
-				else {
-					departmentName = "";
-				}
-			}
-			else {
-				departmentName = "";
-			}
-		}
-		else if(e.getPosition().getCode() == Position.CODE_EMPLOYEE || e.getPosition().getCode() == Position.CODE_HR) {
-			if(e.getListTeam().size() > 0) {
-				Department department = e.getListTeam().get(0).getDepartment();
-				if(department != null) {
-					departmentName = department.getName();
-				}
-				else {
-					departmentName = "";
-				}
-			}
-			else {
-				departmentName = "";
-			}
-		}
-		else {
-			Department department = departmentRepository.findByManagerId(employeeId);
-			if(department != null) {
-				departmentName = department.getName();
-			}
-			else {
-				departmentName = "";
-			}
+		Employee user = employeeRepository.findById(employeeId);
+		if (user.getListTeam() != null && user.getListTeam().size() > 0) {
+			departmentName = user.getListTeam().get(0).getDepartment().getName();
+		} else {
+			Department dept = departmentRepository.findByManagerId(user.getId());
+			departmentName = dept.getName();
 		}
 		return departmentName;
 	}
@@ -564,7 +517,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			throw new Exception("can not find employee with id " + employeeId);
 		}
 		
-		if (employee.getPosition().getCode() == Position.CODE_EMPLOYEE || employee.getPosition().getCode() == Position.CODE_HR) {
+		if (employee.getPosition().getCode() == Position.CODE_EMPLOYEE) {
 			if (employee.getListTeam() != null && employee.getListTeam().size() > 0 && employee.getListTeam().get(0)!= null) {
 				throw new Exception(employee.getName() + " is currently a member of team : " + employee.getListTeam().get(0).getName()
 									+ ". Please remove " + employee.getName() + " from " + employee.getListTeam().get(0).getName() + " first!");
@@ -575,7 +528,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 				throw new Exception(employee.getName() + " is currently the manager of department : " + dept.getName() + ". Please remove "
 									+ employee.getName() + " from " + dept.getName() + " first!");
 			}
-		} else if (employee.getPosition().getCode() == Position.CODE_LEADER) {
+		} else if (isLeader(employeeId)) {
 			Team team = teamRepository.findByLeaderId(employeeId);
 			if (team != null) {
 				throw new Exception(employee.getName() + " is currently the leader of team : " + team.getName() + ". Please remove "
