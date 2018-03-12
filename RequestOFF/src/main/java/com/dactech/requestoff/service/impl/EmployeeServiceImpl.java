@@ -117,8 +117,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			if (StringUtil.isNotEmpty(erRequest.getPositionId())) {
 				Position oldPosition = employee.getPosition();
 				Position newPosition = positionRepository.findById(Long.parseLong(erRequest.getPositionId()));
-				if((oldPosition.getCode() == Position.CODE_EMPLOYEE && newPosition.getCode() != Position.CODE_EMPLOYEE)
-					|| (oldPosition.getCode() == Position.CODE_HR && newPosition.getCode() != Position.CODE_HR)) {
+				if((oldPosition.getCode() == Position.CODE_EMPLOYEE && newPosition.getCode() != Position.CODE_EMPLOYEE)) {
 					if(requestRepository.getNumberOfRequestInProcessing(employee.getId()) == 0) {
 						if(employee.getListTeam() != null && employee.getListTeam().size() > 0) {
 							Team team = employee.getListTeam().get(0);
@@ -133,19 +132,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 						throw new Exception(employee.getName() + " has requests in processing. Please let these requests processed before changing position");
 					}
 				}
-				else if(oldPosition.getCode() == Position.CODE_LEADER && newPosition.getCode() != Position.CODE_LEADER) {
-					Team team = teamRepository.findByLeaderId(EmployeeId);
-					if (team != null) {
-						throw new Exception(employee.getName() + " is currently the leader of " + team.getName() + ". Please remove " + employee.getName() 
-											+ " from " + team.getName() + " before changing position");
-					} else if(requestRepository.getNumberOfRequestInProcessing(employee.getId()) > 0) {
-						throw new Exception(employee.getName() + " has requests in processing. Please let these requests processed before changing position");
-					}
-				}
+//				else if(oldPosition.getCode() == Position.CODE_LEADER && newPosition.getCode() != Position.CODE_LEADER) {
+//					Team team = teamRepository.findByLeaderId(EmployeeId);
+//					if (team != null) {
+//						throw new Exception(employee.getName() + " is currently the leader of " + team.getName() + ". Please remove " + employee.getName() 
+//											+ " from " + team.getName() + " before changing position");
+//					} else if(requestRepository.getNumberOfRequestInProcessing(employee.getId()) > 0) {
+//						throw new Exception(employee.getName() + " has requests in processing. Please let these requests processed before changing position");
+//					}
+//				}
 				else if((oldPosition.getCode() == Position.CODE_MANAGER 
-						&& newPosition.getCode() != Position.CODE_MANAGER)
-						|| (oldPosition.getCode() == Position.CODE_HR_MANAGER 
-						&& newPosition.getCode() != Position.CODE_HR_MANAGER)) {
+						&& newPosition.getCode() != Position.CODE_MANAGER)) {
 					Department dept = departmentRepository.findByManagerId(EmployeeId);
 					if(dept != null) {
 						throw new Exception(employee.getName() + " is currently the manager of " + dept.getName() + ". Please remove " + employee.getName() 
@@ -246,7 +243,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public EmployeeOffStatisticsPagingResponse employeeOffStatisticsPaging(
 			EmployeeOffStatisticsPagingRequest eospRequest) throws Exception {
-	
+/*	
 		int year;
 		
 		try {
@@ -396,7 +393,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		response.setListEmployeeStatistics(truncatedList);
 		return response;
 //*/
-//		return null;
+		return null;
 	}
 
 	@Override
@@ -598,5 +595,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 		employeeRepository.delete(employee);
 		return true;
+	}
+	
+	@Override
+	public boolean isLeader(long employeeId) {
+		TeamEmployee teamEmployee = teamEmployeeRepository.findByEmployeeId(employeeId);
+		if (teamEmployee.getLeaderFlag() == 1) {
+			return true;
+		}
+		return false;
 	}
 }

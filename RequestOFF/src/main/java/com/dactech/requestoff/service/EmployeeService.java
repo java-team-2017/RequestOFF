@@ -35,4 +35,6 @@ public interface EmployeeService {
 	public String getDepartmentName(long employeeId);
 	
 	public boolean delete(long employeeId) throws Exception;
+	
+	public boolean isLeader(long employeeId);
 }
