@@ -243,7 +243,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public EmployeeOffStatisticsPagingResponse employeeOffStatisticsPaging(
 			EmployeeOffStatisticsPagingRequest eospRequest) throws Exception {
-/*	
+//*	
 		int year;
 		
 		try {
@@ -267,23 +267,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 		List<EmployeeOffStatisticsPagingResponse.EmployeeStatistics> lEStatistics = new ArrayList<EmployeeOffStatisticsPagingResponse.EmployeeStatistics>(
 				listEmployee.size());
 		for (Employee employee : listEmployee) {
-			// assign department for manager and team for leader
+			// assign department for manager
 			EmployeeOffStatisticsPagingResponse.EmployeeStatistics eStatistics = new EmployeeOffStatisticsPagingResponse.EmployeeStatistics();
 			if (employee.getPosition().getCode() == Position.CODE_MANAGER) {
 				Department dept = departmentRepository.findByManagerId(employee.getId());
 				if (dept != null) {
 					employee.setDepartmentName(dept.getName());
+					employee.setTeamName("");
 				} else {
 					employee.setDepartmentName("No Department");
-				}
-			} else if (employee.getPosition().getCode() == Position.CODE_LEADER) {
-				Team team = teamRepository.findByLeaderId(employee.getId());
-				if (team != null) {
-					employee.setDepartmentName(team.getDepartment().getName());
-					employee.setTeamName(team.getName());
-				} else {
-					employee.setTeamName("No Team");
-					employee.setDepartmentName("No Department");
+					employee.setTeamName("");
 				}
 			}
 			
@@ -393,7 +386,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 		response.setListEmployeeStatistics(truncatedList);
 		return response;
 //*/
-		return null;
 	}
 
 	@Override
