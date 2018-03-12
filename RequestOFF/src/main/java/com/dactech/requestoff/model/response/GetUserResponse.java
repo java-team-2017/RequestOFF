@@ -7,10 +7,11 @@ import com.dactech.requestoff.model.common.StatusInfo;
 import com.dactech.requestoff.model.entity.Employee;
 
 public class GetUserResponse extends Common {
-	Employee user;
-	List<IdName> listForward;
-	List<IdName> listRecipients;
-	double remainHours;
+	private Employee user;
+	private List<IdName> listForward;
+	private List<IdName> listRecipients;
+	private double remainHours;
+	private int leaderFlag;
 
 	public Employee getUser() {
 		return user;
@@ -44,12 +45,22 @@ public class GetUserResponse extends Common {
 		this.remainHours = remainHours;
 	}
 
-	public GetUserResponse(Employee user, List<IdName> listForward, List<IdName> listRecipients, double remainHours) {
+	public int getLeaderFlag() {
+		return leaderFlag;
+	}
+
+	public void setLeaderFlag(int leaderFlag) {
+		this.leaderFlag = leaderFlag;
+	}
+
+	public GetUserResponse(Employee user, List<IdName> listForward, List<IdName> listRecipients, double remainHours,
+			int leaderFlag) {
 		super();
 		this.user = user;
 		this.listForward = listForward;
 		this.listRecipients = listRecipients;
 		this.remainHours = remainHours;
+		this.leaderFlag = leaderFlag;
 	}
 
 	public GetUserResponse() {

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dactech.requestoff.model.common.StatusInfo;
 import com.dactech.requestoff.model.entity.Employee;
+import com.dactech.requestoff.model.entity.Position;
 import com.dactech.requestoff.model.request.EmployeeDeleteRequest;
 import com.dactech.requestoff.model.request.EmployeeDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatisticsPagingRequest;
@@ -124,6 +125,12 @@ public class EmployeeController {
 			user.setDepartmentName(departmentName);
 			
 			response.setUser(user);
+			
+			if (user.getPosition().getCode() == Position.CODE_EMPLOYEE && user.getListTeam().get(0).getLeaderId() == user.getId()) {
+				response.setLeaderFlag(1);
+			} else {
+				response.setLeaderFlag(0);
+			}
 			
 			List<GetUserResponse.IdName> forwards = employeeService.findForwardList(user.getId());
 			response.setListForward(forwards);

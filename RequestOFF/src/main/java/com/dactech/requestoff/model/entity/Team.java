@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -16,10 +17,7 @@ public class Team {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	private String name;
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "leader_id")
-	@JsonIgnoreProperties("listTeam")
-	private Employee leader;
+	private long leaderId;
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "department_id")
 	@JsonIgnoreProperties("listTeam")
@@ -29,23 +27,26 @@ public class Team {
 	private long insertOperator;
 	private String updateDate;
 	private long updateOperator;
+	@Transient
+	private String leaderName;
 
 	public Team() {
 		super();
 	}
 
-	public Team(long id, String name, Employee leader, Department department, int validFlag, String insertDate,
-			long insertOperator, String updateDate, long updateOperator) {
+	public Team(long id, String name, long leaderId, Department department, int validFlag, String insertDate,
+			long insertOperator, String updateDate, long updateOperator, String leaderName) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.leader = leader;
+		this.leaderId = leaderId;
 		this.department = department;
 		this.validFlag = validFlag;
 		this.insertDate = insertDate;
 		this.insertOperator = insertOperator;
 		this.updateDate = updateDate;
 		this.updateOperator = updateOperator;
+		this.leaderName = leaderName;
 	}
 
 	public long getId() {
@@ -64,12 +65,12 @@ public class Team {
 		this.name = name;
 	}
 
-	public Employee getLeader() {
-		return leader;
+	public long getLeaderId() {
+		return leaderId;
 	}
 
-	public void setLeader(Employee leader) {
-		this.leader = leader;
+	public void setLeaderId(long leaderId) {
+		this.leaderId = leaderId;
 	}
 
 	public Department getDepartment() {
@@ -118,6 +119,14 @@ public class Team {
 
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
+	}
+
+	public String getLeaderName() {
+		return leaderName;
+	}
+
+	public void setLeaderName(String leaderName) {
+		this.leaderName = leaderName;
 	}
 
 }

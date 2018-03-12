@@ -424,7 +424,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 					List<Team> teams = teamRepository.findByDepartmentId(d.getId());
 					if(teams != null && teams.size() > 0) {
 						for(Team team : teams) {
-							Employee leader = team.getLeader();
+							Employee leader = employeeRepository.findById(team.getLeaderId());
 							forwards.add(new GetUserResponse.IdName(leader.getId(), leader.getName()));
 						}
 					}
@@ -454,7 +454,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			}
 			else if(e.getPosition().getCode() == Position.CODE_EMPLOYEE) {
 				if(e.getListTeam() != null && e.getListTeam().size() > 0) {
-					Employee leader = e.getListTeam().get(0).getLeader();
+					Employee leader = employeeRepository.findById(e.getListTeam().get(0).getLeaderId());
 					if(leader != null) {
 						listRecipients.add(new GetUserResponse.IdName(leader.getId(), leader.getName()));
 						Department dept = e.getListTeam().get(0).getDepartment();

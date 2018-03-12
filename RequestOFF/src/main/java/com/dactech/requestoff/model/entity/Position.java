@@ -8,10 +8,7 @@ import javax.persistence.Id;
 @Entity
 public class Position {
 	public static final long CODE_EMPLOYEE = 1;
-	public static final long CODE_LEADER = 2;
-	public static final long CODE_MANAGER = 3;
-	public static final long CODE_HR = 4;
-	public static final long CODE_HR_MANAGER = 5;
+	public static final long CODE_MANAGER = 2;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -102,26 +99,6 @@ public class Position {
 
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
-	}
-
-	public static long getCodeEmployee() {
-		return CODE_EMPLOYEE;
-	}
-
-	public static long getCodeLeader() {
-		return CODE_LEADER;
-	}
-
-	public static long getCodeManager() {
-		return CODE_MANAGER;
-	}
-
-	public static long getCodeHr() {
-		return CODE_HR;
-	}
-
-	public static long getCodeHrManager() {
-		return CODE_HR_MANAGER;
 	}
 
 }

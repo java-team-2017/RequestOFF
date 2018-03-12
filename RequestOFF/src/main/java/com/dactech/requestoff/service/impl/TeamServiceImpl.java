@@ -54,10 +54,7 @@ public class TeamServiceImpl implements TeamService {
 			
 			team.setName(teamRegistRequest.getName());
 			
-			Employee leader = new Employee();
-			leader.setId(Long.parseLong(teamRegistRequest.getLeaderId()));
-			team.setLeader(leader);
-			
+			team.setLeaderId(Long.parseLong(teamRegistRequest.getLeaderId()));
 			Department department = new Department();
 			department.setId(Long.parseLong(teamRegistRequest.getDepartmentId()));
 			team.setDepartment(department);
@@ -80,7 +77,7 @@ public class TeamServiceImpl implements TeamService {
 			
 			if (StringUtil.isNotEmpty(teamRegistRequest.getLeaderId())) {
 				long newLeaderId = Long.parseLong(teamRegistRequest.getLeaderId());
-				long oldLeaderId = team.getLeader().getId();
+				long oldLeaderId = team.getLeaderId();
 				if (oldLeaderId != newLeaderId) { // change leader
 					// check whether old leader has wating requests which need to process
 					RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
@@ -90,7 +87,8 @@ public class TeamServiceImpl implements TeamService {
 					
 					List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
 					if (requests != null && requests.size() >0) {
-						throw new Exception(team.getLeader().getName()
+						Employee leader = employeeRepository.findById(oldLeaderId);
+						throw new Exception(leader.getName()
 							+ " has requests waiting for him to process. <br/>Please let him process them before changing to new leader");
 					}
 					
@@ -100,9 +98,7 @@ public class TeamServiceImpl implements TeamService {
 						throw new Exception (em.getName() + " has requests which are in processing. <br/>"
 								+ "Please delete or process all those requests before remove");
 					}
-					Employee leader = new Employee();
-					leader.setId(newLeaderId);
-					team.setLeader(leader);
+					team.setLeaderId(newLeaderId);
 				}
 			}
 			
@@ -151,12 +147,18 @@ public class TeamServiceImpl implements TeamService {
 	@Override
 	public TeamSearchResponse teamSearch(TeamSearchRequest teamSearchRequest) {
 		List<Team> teams = teamRepository.searchTeam(teamSearchRequest);
+		for (Team team : teams) {
+			Employee leader = employeeRepository.findById(team.getLeaderId());
+			team.setLeaderName(leader.getName());
+		}
 		return new TeamSearchResponse(teams);
 	}
 
 	@Override
 	public TeamDetailsResponse teamDetails(TeamDetailsRequest teamDetailsRequest) {
 		Team team = teamRepository.findById(Long.parseLong(teamDetailsRequest.getId()));
+		Employee leader = employeeRepository.findById(team.getLeaderId());
+		team.setLeaderName(leader.getName());
 		TeamDetailsResponse response = new TeamDetailsResponse(team);
 		return response;
 	}

@@ -16,6 +16,7 @@ public class TeamEmployee {
 	@Id
 	@Column(name = "employee_id")
 	private long employeeId;
+	private int leaderFlag;
 	private int validFlag;
 	private String insertDate;
 	private long insertOperator;
@@ -36,6 +37,14 @@ public class TeamEmployee {
 
 	public void setEmployeeId(long employeeId) {
 		this.employeeId = employeeId;
+	}
+
+	public int getLeaderFlag() {
+		return leaderFlag;
+	}
+
+	public void setLeaderFlag(int leaderFlag) {
+		this.leaderFlag = leaderFlag;
 	}
 
 	public int getValidFlag() {
@@ -78,11 +87,12 @@ public class TeamEmployee {
 		this.updateOperator = updateOperator;
 	}
 
-	public TeamEmployee(long teamId, long employeeId, int validFlag, String insertDate, long insertOperator,
-			String updateDate, long updateOperator) {
+	public TeamEmployee(long teamId, long employeeId, int leaderFlag, int validFlag, String insertDate,
+			long insertOperator, String updateDate, long updateOperator) {
 		super();
 		this.teamId = teamId;
 		this.employeeId = employeeId;
+		this.leaderFlag = leaderFlag;
 		this.validFlag = validFlag;
 		this.insertDate = insertDate;
 		this.insertOperator = insertOperator;
