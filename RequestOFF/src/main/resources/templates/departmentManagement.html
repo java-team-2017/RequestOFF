@@ -10,6 +10,8 @@
 	$(function() {
 		var rowDataRequest;
 		
+		search();
+		
 		$('#btnSearch').on('click', function(){
 			search();
 		});
@@ -135,17 +137,27 @@
 				data : JSON.stringify(requestData),
 				success : function(resultData) {
 					if (resultData.status_info.status == 0) {
-						$('#editModal').modal('hide');
-						var loadTable = $('#departmentTable').DataTable();
-						loadTable.ajax.reload();
 						if (isAdd) {
 							$('#alertMessage').html("Create Department Successfully").attr('class', 'alert alert-success').show();
 						} else {
-							$('#alertMessage').html("Edit Department Successfully").attr('class', 'alert alert-success').show();
+							if($('#editManager').val() == rowDataRequest.manager.id){
+								$('#alertMessage').html("No manager is changed").attr('class', 'alert alert-warning').show();
+							}
+							else{
+								$('#alertMessage').html("Edit Department Successfully").attr('class', 'alert alert-success').show();
+							}
 						}
+						$('#editModal').modal('hide');
 					} else {
-						$('#editMsg').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
+						if($('#editManager').val() == rowDataRequest.manager.id){
+							$('#alertMessage').html("No manager is changed").attr('class', 'alert alert-warning').show();
+							$('#editModal').modal('hide');
+						} else{
+							$('#editMsg').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
+						}
 					}
+					var loadTable = $('#departmentTable').DataTable();
+					loadTable.ajax.reload();
 				},
 				error : function(e) {
 					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();

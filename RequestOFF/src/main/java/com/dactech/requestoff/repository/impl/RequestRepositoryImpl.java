@@ -13,10 +13,12 @@ import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.Position;
 import com.dactech.requestoff.model.entity.Request;
 import com.dactech.requestoff.model.entity.Team;
+import com.dactech.requestoff.model.entity.TeamEmployee;
 import com.dactech.requestoff.model.request.RequestBrowsingRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
 import com.dactech.requestoff.repository.DepartmentRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
+import com.dactech.requestoff.repository.TeamEmployeeRepository;
 import com.dactech.requestoff.repository.TeamRepository;
 import com.dactech.requestoff.repository.custom.RequestRepositoryCustom;
 import com.dactech.requestoff.util.StringUtil;
@@ -30,6 +32,8 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 	TeamRepository teamRepository;
 	@Autowired
 	DepartmentRepository departmentRepository;
+	@Autowired
+	TeamEmployeeRepository teamEmployeeRepository; 
 	@Override
 	public List<Request> searchRequest(RequestSearchRequest requestSearchRequest) {
 		StringBuilder queryString = new StringBuilder("SELECT * FROM request INNER JOIN employee ON request.employee_id = employee.id ");
@@ -93,16 +97,32 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		return requests;
 	}
 
+	@SuppressWarnings("null")
 	@Override
-	public List<Request> browseRequest(RequestBrowsingRequest requests) {
+	public List<Request> browseRequest(RequestBrowsingRequest requests) throws Exception {
 		Employee user = employeeRepository.findById(Long.parseLong(requests.getUserId()));
+		if (user == null) {
+			throw new Exception("User " + user.getName() + " is not found");
+		}
 		StringBuilder queryString = new StringBuilder("SELECT * FROM request INNER JOIN employee ON request.employee_id = employee.id WHERE ");
-		if (user.getPosition().getCode() != 0) { //uncorrect
-			queryString.append(" (employee_id IN (SELECT employee_id from team t INNER JOIN team_employee te ON t.id = te.team_id WHERE t.leader_id = " + requests.getUserId() + ")) ");
+		if (user.getPosition().getCode() == Position.CODE_EMPLOYEE) {
+			TeamEmployee teamEmployee = teamEmployeeRepository.findByEmployeeId(Long.parseLong(requests.getUserId()));
+			if (teamEmployee == null) {
+				throw new Exception("User " + user.getName() + " does not belong to any team");
+			}
+			if (teamEmployee.getLeaderFlag() == 1) { //leader
+				queryString.append(" (employee_id IN (SELECT employee_id from team t INNER JOIN team_employee te ON t.id = te.team_id WHERE t.leader_id = " + requests.getUserId() + ")) ");
+			} else {
+				throw new Exception("User " + user.getName() + " is just a member of team");
+			}
 		} else if (user.getPosition().getCode() == Position.CODE_MANAGER) {
 			queryString.append(" (employee_id IN (SELECT employee_id from team_employee te INNER JOIN team t ON t.id=te.team_id INNER JOIN department d ON d.id=t.department_id WHERE manager_id= " + requests.getUserId() + ") "
 					+ "OR employee_id IN (SELECT leader_id FROM team t INNER JOIN department d ON t.department_id=d.id WHERE manager_id= " + requests.getUserId() + " )) ");
 		}
+//		if (user.getTeamEmployee().getLeaderFlag() == 1) { //leader
+//			System.out.println("leader_flag: "+ user.getTeamEmployee().getLeaderFlag());
+//			queryString.append(" (employee_id IN (SELECT employee_id from team t INNER JOIN team_employee te ON t.id = te.team_id WHERE t.leader_id = " + requests.getUserId() + ")) ");
+//		}
 		
 		if (StringUtil.isNotEmpty(requests.getStatus())) {
 			if (requests.getStatus().equals("5")) {
@@ -137,40 +157,53 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		for (Request request : listRequests) {
 			Employee recipient = employeeRepository.findById(request.getRecipientId());
 			Employee sender = request.getEmployee();
+			TeamEmployee teamEmployee = teamEmployeeRepository.findByEmployeeId((request.getRecipientId()));
 			// set recipient Name
 			request.setRecipientName(recipient.getName());
 			
 			// set forward ID and name
 			if(request.getStatus() == Request.REQUEST_STATUS_WAITING) {
-				if (recipient.getPosition().getCode() != 0) {//uncorrect
-					String queryStr = "SELECT * FROM employee e INNER JOIN department d ON e.id = d.manager_id "
-							+ " INNER JOIN team t ON t.department_id = d.id"
-							+ " WHERE t.leader_id = " + recipient.getId();
-					Query queryObj = entityManager.createNativeQuery(queryStr.toString(), Employee.class);
-					Employee manager = (Employee) queryObj.getSingleResult();
-					request.setForwardId(manager.getId());
-					request.setForwardName(manager.getName());
-				} else if (recipient.getPosition().getCode() == Position.CODE_MANAGER) {
-					if (sender.getPosition().getCode() != 0 /* uncorrect */ && sender.getPosition().getCode() != Position.CODE_MANAGER) {
-						String queryStr = "SELECT * from employee e INNER JOIN team t on e.id = t.leader_id INNER JOIN team_employee te ON t.id = te.team_id "
-								+ "WHERE te.employee_id = " + request.getEmployee().getId();
+				if (recipient.getPosition().getCode() == Position.CODE_EMPLOYEE) {
+					if(teamEmployee.getLeaderFlag() == 1) {
+						String queryStr = "SELECT * FROM employee e INNER JOIN department d ON e.id = d.manager_id "
+								+ " INNER JOIN team t ON t.department_id = d.id"
+								+ " WHERE t.leader_id = " + recipient.getId();
 						Query queryObj = entityManager.createNativeQuery(queryStr.toString(), Employee.class);
-						Employee leader = (Employee) queryObj.getSingleResult();
-						request.setForwardId(leader.getId());
-						request.setForwardName(leader.getName());
+						List<Employee> managers = queryObj.getResultList();
+						if (managers != null && managers.size() > 0) {
+							request.setForwardId(managers.get(0).getId());
+							request.setForwardName(managers.get(0).getName());
+						}
+					}
+					else {
+						throw new Exception("user with id " + request.getRecipientId() + " is just a member of team");
+					}
+				} else if (recipient.getPosition().getCode() == Position.CODE_MANAGER) {
+					if (sender.getPosition().getCode() == Position.CODE_EMPLOYEE) {
+						if(teamEmployee.getLeaderFlag() != 1 && sender.getPosition().getCode() != Position.CODE_MANAGER) {
+							String queryStr = "SELECT * from employee e INNER JOIN team t on e.id = t.leader_id INNER JOIN team_employee te ON t.id = te.team_id "
+									+ "WHERE te.employee_id = " + request.getEmployee().getId();
+							Query queryObj = entityManager.createNativeQuery(queryStr.toString(), Employee.class);
+							List<Employee> leader = queryObj.getResultList();
+							if(leader != null && leader.size() > 0) {
+								request.setForwardId(leader.get(0).getId());
+								request.setForwardName(leader.get(0).getName());
+							}
+						}
 					}
 				}
 			}
 			
 			// set department name and team name for request sender
-			
-			if (sender.getPosition().getCode() != 0) { //uncorrect
-				Team team = teamRepository.findByLeaderId(sender.getId());
-				if (team != null) {
-					sender.setTeamName(team.getName());
-					sender.setDepartmentName(team.getDepartment().getName());
-				} else {
-					sender.setTeamName("No Team");
+			if(sender.getPosition().getCode() == Position.CODE_EMPLOYEE) {
+				if(teamEmployee.getValidFlag() == 1) {
+					Team team = teamRepository.findByLeaderId(sender.getId());
+					if (team != null) {
+						sender.setTeamName(team.getName());
+						sender.setDepartmentName(team.getDepartment().getName());
+					} else {
+						sender.setTeamName("No Team");
+					}
 				}
 			} else if (sender.getPosition().getCode() == Position.CODE_MANAGER) {
 				Department dept = departmentRepository.findByManagerId(sender.getId());
@@ -180,7 +213,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 				} else {
 					sender.setDepartmentName("No Department");
 				}
-			} else if(sender.getPosition().getCode() == Position.CODE_EMPLOYEE) {
+			} else {
 				Employee employee = employeeRepository.findById(sender.getId());
 				if(employee != null) {
 					sender.setTeamName(employee.getTeamName());

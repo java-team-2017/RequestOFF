@@ -16,5 +16,5 @@ public interface RequestService {
 	
 	public RequestDetailsResponse details(RequestDetailsRequest requestDetailsRequest);
 	
-	public RequestBrowsingResponse requestBrowsing(RequestBrowsingRequest request);
+	public RequestBrowsingResponse requestBrowsing(RequestBrowsingRequest request) throws Exception;
 }

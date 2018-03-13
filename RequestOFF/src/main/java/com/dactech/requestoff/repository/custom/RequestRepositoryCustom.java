@@ -9,5 +9,5 @@ import com.dactech.requestoff.model.request.RequestSearchRequest;
 public interface RequestRepositoryCustom {
 	public List<Request> searchRequest(RequestSearchRequest requestSearchRequest);
 	
-	public List<Request> browseRequest(RequestBrowsingRequest request);
+	public List<Request> browseRequest(RequestBrowsingRequest request) throws Exception;
 }

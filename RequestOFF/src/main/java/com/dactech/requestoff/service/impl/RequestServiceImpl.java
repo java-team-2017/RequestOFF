@@ -233,7 +233,7 @@ public class RequestServiceImpl implements RequestService{
 	}
 
 	@Override
-	public RequestBrowsingResponse requestBrowsing(RequestBrowsingRequest request) {
+	public RequestBrowsingResponse requestBrowsing(RequestBrowsingRequest request) throws Exception {
 		List<Request> requests = requestRepository.browseRequest(request);
 		RequestBrowsingResponse response = new RequestBrowsingResponse();
 		response.setRequests(requests);
