@@ -221,21 +221,21 @@
 						$('#editLeader').empty();
 						$('#editMemberInTeam').empty();
 						if (isCreateEvent == false) { // update
-							$('#editLeader').append('<option value="' + selectedRow.leader.id + '" selected="true">' + selectedRow.leader.name + '</option>');
 							$.each(response.listMember, function(index, member) {
 								$('#editMemberInTeam').append('<option value="' + member.id + '">' + member.name + '</option>');
 							});
+							$.each(response.listMember, function(index, leader) {
+								$('#editLeader').append('<option value="' + leader.id + '">' + leader.name + '</option>');
+							});
+							$('#editLeader').val(response.currentLeaderId);
+							
 						} else { // for create event
-							if (response.listLeader.length == 0) {
-								$('#teamEditMsg').html("No leader found").attr('class', 'alert alert-danger').show();
+							if (response.listMemberNotInTeam.length == 0) {
+								$('#teamEditMsg').html('There are no member for creating the team').attr('class', 'alert alert-danger').show();
 							} else {
 								$('#createBtn').show();
 							}
 						}
-						
-						$.each(response.listLeader, function(index, leader) {
-							$('#editLeader').append('<option value="' + leader.id + '">' + leader.name + '</option>');
-						});
 						
 						$('#editMemberNotInTeam').empty();
 						$.each(response.listMemberNotInTeam, function(index, member) {
@@ -254,6 +254,7 @@
 		$('#teamToNotTeam').on('click', function() {
 			$('#editMemberInTeam > option:selected').each(function() {
 				$('#editMemberNotInTeam').append('<option value="' + $(this).val() + '">' + $(this).text() + '</option>');
+				$('#editLeader > option[value="' + $(this).val() + '"]').remove();
 				$(this).remove();
 			});
 		});
@@ -261,6 +262,7 @@
 		$('#notTeamToTeam').on('click', function() {
 			$('#editMemberNotInTeam > option:selected').each(function() {
 				$('#editMemberInTeam').append('<option value="' + $(this).val() + '">' + $(this).text() + '</option>');
+				$('#editLeader').append('<option value="' + $(this).val() + '">' + $(this).text() + '</option>');
 				$(this).remove();
 			});
 		});
@@ -272,11 +274,11 @@
 				members.push($(this).val());
 			});
 			
-			// validate form
-// 			if (members.length == 0) {
-// 				$('#teamEditMsg').html("Team must have at least 1 member").attr('class', 'alert alert-danger').show();
-// 				return;
-// 			}
+// 			validate form
+			if (members.length == 0) {
+				$('#teamEditMsg').html("Team must have at least 1 member").attr('class', 'alert alert-danger').show();
+				return;
+			}
 			
 			if ($('#editTeam').val() == "") {
 				$('#teamEditMsg').html("Please fill all field in form").attr('class', 'alert alert-danger').show();

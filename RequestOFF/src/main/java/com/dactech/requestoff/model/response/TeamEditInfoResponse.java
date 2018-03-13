@@ -7,11 +7,11 @@ import com.dactech.requestoff.model.common.StatusInfo;
 import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
 
-public class TeamEditInfoResponse extends Common{
+public class TeamEditInfoResponse extends Common {
 	private List<Employee> listMember;
 	private List<Employee> listMemberNotInTeam;
-	private List<Employee> listLeader;
 	private List<Department> listDepartment;
+	private long currentLeaderId;
 
 	public TeamEditInfoResponse() {
 		super();
@@ -24,12 +24,12 @@ public class TeamEditInfoResponse extends Common{
 	}
 
 	public TeamEditInfoResponse(List<Employee> listMember, List<Employee> listMemberNotInTeam,
-			List<Employee> listLeader, List<Department> listDepartment) {
+			List<Department> listDepartment, long currentLeaderId) {
 		super();
 		this.listMember = listMember;
 		this.listMemberNotInTeam = listMemberNotInTeam;
-		this.listLeader = listLeader;
 		this.listDepartment = listDepartment;
+		this.currentLeaderId = currentLeaderId;
 	}
 
 	public List<Employee> getListMember() {
@@ -48,20 +48,20 @@ public class TeamEditInfoResponse extends Common{
 		this.listMemberNotInTeam = listMemberNotInTeam;
 	}
 
-	public List<Employee> getListLeader() {
-		return listLeader;
-	}
-
-	public void setListLeader(List<Employee> listLeader) {
-		this.listLeader = listLeader;
-	}
-
 	public List<Department> getListDepartment() {
 		return listDepartment;
 	}
 
 	public void setListDepartment(List<Department> listDepartment) {
 		this.listDepartment = listDepartment;
+	}
+
+	public long getCurrentLeaderId() {
+		return currentLeaderId;
+	}
+
+	public void setCurrentLeaderId(long currentLeaderId) {
+		this.currentLeaderId = currentLeaderId;
 	}
 
 }

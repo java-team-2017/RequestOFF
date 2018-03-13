@@ -80,13 +80,16 @@ public class TeamServiceImpl implements TeamService {
 				long oldLeaderId = team.getLeaderId();
 				if (oldLeaderId != newLeaderId) { // change leader
 					// check whether old leader has wating requests which need to process
-					RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
-					requestSearchRequest.setStatus(Integer.toString(Request.REQUEST_STATUS_WAITING));
-					requestSearchRequest.setRecipientId(Long.toString(oldLeaderId));
-					requestSearchRequest.setValidFlag("1");
 					
-					List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
-					if (requests != null && requests.size() >0) {
+//					RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
+//					requestSearchRequest.setStatus(Integer.toString(Request.REQUEST_STATUS_WAITING));
+//					requestSearchRequest.setRecipientId(Long.toString(oldLeaderId));
+//					requestSearchRequest.setValidFlag("1");
+//					
+//					List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
+//					if (requests != null && requests.size() >0) {
+					int numOfRequest = requestRepository.getNumberOfRequestReceivedInProcessing(oldLeaderId);
+					if (numOfRequest > 0) {
 						Employee leader = employeeRepository.findById(oldLeaderId);
 						throw new Exception(leader.getName()
 							+ " has requests waiting for him to process. <br/>Please let him process them before changing to new leader");
@@ -167,10 +170,12 @@ public class TeamServiceImpl implements TeamService {
 	public TeamEditInfoResponse teamEditInfo(TeamEditInfoRequest request) {
 		TeamEditInfoResponse response = new TeamEditInfoResponse();
 		if (StringUtil.isNotEmpty(request.getTeamId())) {
-			List<Employee> listMember = employeeRepository.findByTeamId(Long.parseLong(request.getTeamId())); 
+			long teamId = Long.parseLong(request.getTeamId());
+			Team team = teamRepository.findById(teamId);
+			response.setCurrentLeaderId(team.getLeaderId());
+			List<Employee> listMember = employeeRepository.findByTeamId(teamId); 
 			response.setListMember(listMember);
 		}
-//		response.setListLeader(employeeRepository.findLeaderNotInTeam());
 		response.setListMemberNotInTeam(employeeRepository.findEmployeeNotInTeam());
 		response.setListDepartment(departmentRepository.findAll());
 		
