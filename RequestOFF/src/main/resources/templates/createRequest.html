@@ -59,17 +59,12 @@
 						alertStr = "Your request has been saved";
 					}
 					else {
-						if(employee.position.code == "3") {
-							status = 2;
-						}
-						else {
-							status = 5;
-						}
+						status = 5;
 						alertStr = "Your request has been sent";
 					}
 					
 					//validate
-					var complete = 1, valid = 1, exceed = 0, offHoursEqual0 = 0, isNumber = 1;
+					var complete = 1, dateError = 0, exceed = 0, offHoursEqual0 = 0, isNotNagativeInteger = 1;
 					var listInput = $('#createRequestForm').find(':input').not("button");
 					$.each(listInput, function() {
 						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
@@ -81,8 +76,9 @@
 					var offHours = parseInt(createRequestData.offDays) * 8 + parseFloat(createRequestData.offHours);
 					console.log(offHours);
 					
-					if(isNaN(createRequestData.offDays) == true) {
-						isNumber = 0;
+					if(isNaN(createRequestData.offDays) == true || (parseFloat(createRequestData.offDays) % 1) !== 0
+							|| parseFloat(createRequestData.offDays) < 0) {
+						isNotNagativeInteger = 0;
 					}
 					if(offHours <= 0){
 						offHoursEqual0 = 1;
@@ -98,18 +94,18 @@
 					var to = toDate + " " + toTime;
 					
 					if(from.localeCompare(to) >= 0) {
-						valid = 0;
+						dateError = 1;
 					}
 					//end validate
 					
 					if(complete == 0) {
 						$('#alertMessage').html(errors['incompleteFields']).attr('class', 'alert alert-danger').show();
 					}
-					else if(valid == 0) {
+					else if(dateError == 1) {
 						$('#alertMessage').html(errors['DateError']).attr('class', 'alert alert-danger').show();
 					}
-					else if(isNumber == 0) {
-						$('#alertMessage').html(errors['notNumber']).attr('class', 'alert alert-danger').show();
+					else if(isNotNagativeInteger == 0) {
+						$('#alertMessage').html("Value of off days must be a not negative integer").attr('class', 'alert alert-danger').show();
 					}
 					else if(offHoursEqual0 == 1) {
 						$('#alertMessage').html(errors['offHoursEqual0']).attr('class', 'alert alert-danger').show();

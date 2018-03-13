@@ -497,8 +497,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 		if (user.getListTeam() != null && user.getListTeam().size() > 0) {
 			departmentName = user.getListTeam().get(0).getDepartment().getName();
 		} else {
-			Department dept = departmentRepository.findByManagerId(user.getId());
-			if (dept != null) {
+			Department dept = departmentRepository.findByManagerId(employeeId);
+			if(dept != null) {
 				departmentName = dept.getName();
 			} else {
 				departmentName = "";
@@ -549,8 +549,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public boolean isLeader(long employeeId) {
 		TeamEmployee teamEmployee = teamEmployeeRepository.findByEmployeeId(employeeId);
-		if (teamEmployee.getLeaderFlag() == 1) {
-			return true;
+		if(teamEmployee != null) {
+			if (teamEmployee.getLeaderFlag() == 1) {
+				return true;
+			}
+			return false;
 		}
 		return false;
 	}
