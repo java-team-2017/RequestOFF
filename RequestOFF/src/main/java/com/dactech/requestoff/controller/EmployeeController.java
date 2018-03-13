@@ -128,10 +128,22 @@ public class EmployeeController {
 			
 			response.setUser(user);
 			
-			if (user.getPosition().getCode() == Position.CODE_EMPLOYEE && user.getListTeam().get(0).getLeaderId() == user.getId()) {
-				response.setLeaderFlag(1);
-			} else {
-				response.setLeaderFlag(0);
+//			if (user.getPosition().getCode() == Position.CODE_EMPLOYEE && user.getListTeam().get(0).getLeaderId() == user.getId()) {
+//				response.setLeaderFlag(1);
+//			} else {
+//				response.setLeaderFlag(0);
+//			}
+			
+			if (user.getPosition().getCode() == Position.CODE_EMPLOYEE) {
+				if(user.getListTeam() != null && user.getListTeam().size() > 0) {
+					if(user.getListTeam().get(0).getLeaderId() == user.getId()) {
+						response.setLeaderFlag(1);
+					} else {
+						response.setLeaderFlag(0);
+					}
+				} else {
+					response.setLeaderFlag(0);
+				}
 			}
 			
 			List<GetUserResponse.IdName> forwards = employeeService.findForwardList(user.getId());
