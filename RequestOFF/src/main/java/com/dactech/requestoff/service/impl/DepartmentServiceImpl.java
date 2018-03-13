@@ -80,7 +80,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 					
 					if(requests != null && requests.size() > 0) {
 						throw new Exception(department.getManager().getName()
-							+ " has requests waiting for him to process. Please let him process them before changing to new manager");
+							+ " has requests waiting for him/her to process. Please let him/her process them before changing to new manager");
 					}
 					
 					Employee manager = new Employee();
@@ -129,12 +129,19 @@ public class DepartmentServiceImpl implements DepartmentService {
 		if(department == null) {
 			throw new Exception("Can not find department!");
 		}
-		
 		List<Team> teams = teamRepository.findByDepartmentId(departmentId);
-		if(teams.size() == 0) {
+		long managerId = department.getManager().getId();
+		int requestInProcessing = requestRepository.getNumberOfRequestReceivedInProcessing(managerId);
+		if(teams.size() > 0) {
+			throw new Exception(department.getManager().getName() + " are managing teams that belong to " + department.getName() + " Department. Please remove all teams before deleting Department.");
+		} 
+		else if(requestInProcessing > 0) {
+			Employee em = employeeRepository.findById(managerId);
+			throw new Exception (em.getName() + " has requests which are in processing. <br/>"
+					+ "Please delete or process all those requests before remove");
+		} 
+		else {
 			departmentRepository.delete(department);
-		} else {
-			throw new Exception("Please remove all team before delete department");
 		}
 		return true;
 	}
