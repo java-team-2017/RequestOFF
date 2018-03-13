@@ -194,31 +194,31 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 			}
 			
 			// set department name and team name for request sender
-//			if(sender.getPosition().getCode() == Position.CODE_EMPLOYEE) {
-//				if(teamEmployee.getValidFlag() == 1) {
-//					Team team = teamRepository.findByLeaderId(sender.getId());
-//					if (team != null) {
-//						sender.setTeamName(team.getName());
-//						sender.setDepartmentName(team.getDepartment().getName());
-//					} else {
-//						sender.setTeamName("No Team");
-//					}
-//				}
-//			} else if (sender.getPosition().getCode() == Position.CODE_MANAGER) {
-//				Department dept = departmentRepository.findByManagerId(sender.getId());
-//				if (dept != null) {
-//					sender.setTeamName("");
-//					sender.setDepartmentName(dept.getName());
-//				} else {
-//					sender.setDepartmentName("No Department");
-//				}
-//			} else {
-//				Employee employee = employeeRepository.findById(sender.getId());
-//				if(employee != null) {
-//					sender.setTeamName(employee.getTeamName());
-//					sender.setDepartmentName(employee.getDepartmentName());
-//				}
-//			}
+			if(sender.getPosition().getCode() == Position.CODE_EMPLOYEE) {
+				if(employeeId.getValidFlag() == 1) {
+					Team team = teamRepository.findByLeaderId(sender.getId());
+					if (team != null) {
+						sender.setTeamName(team.getName());
+						sender.setDepartmentName(team.getDepartment().getName());
+					} else {
+						sender.setTeamName("No Team");
+					}
+				}
+			} else if (sender.getPosition().getCode() == Position.CODE_MANAGER) {
+				Department dept = departmentRepository.findByManagerId(sender.getId());
+				if (dept != null) {
+					sender.setTeamName("");
+					sender.setDepartmentName(dept.getName());
+				} else {
+					sender.setDepartmentName("No Department");
+				}
+			} else {
+				Employee employee = employeeRepository.findById(sender.getId());
+				if(employee != null) {
+					sender.setTeamName(employee.getTeamName());
+					sender.setDepartmentName(employee.getDepartmentName());
+				}
+			}
 		}
 		return listRequests;
 	}
