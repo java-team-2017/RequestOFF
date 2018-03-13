@@ -18,5 +18,5 @@ public interface TeamService {
 	
 	TeamEditInfoResponse teamEditInfo(TeamEditInfoRequest request);
 	
-	boolean teamDelete(long teamId);
+	boolean teamDelete(long teamId) throws Exception;
 }

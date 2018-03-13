@@ -195,7 +195,7 @@ public class TeamServiceImpl implements TeamService {
 
 	@Override
 	@Transactional
-	public boolean teamDelete(long teamId) {
+	public boolean teamDelete(long teamId) throws Exception{
 		Team team = teamRepository.findById(teamId);
 		if (team == null) {
 			return false;
@@ -203,11 +203,26 @@ public class TeamServiceImpl implements TeamService {
 		
 		List<TeamEmployee> listTE = TERepository.findByTeamId(teamId);
 		for (TeamEmployee te : listTE) {
+			
+			Employee employee = employeeRepository.findById(te.getEmployeeId());
+			if (employee != null ) {
+				int requestInProcessing = requestRepository.getNumberOfRequestInProcessing(te.getEmployeeId());
+				if (requestInProcessing > 0) {
+					throw new Exception (employee.getName() + " has requests which are in processing. <br/>"
+							+ "Please delete or process all those requests before remove");
+				}
+				if (te.getLeaderFlag() == 1) { // employee is a leader
+					int numOfRequest = requestRepository.getNumberOfRequestReceivedInProcessing(te.getEmployeeId());
+					if (numOfRequest > 0) {
+						throw new Exception(employee.getName() + " has requests waiting for him to process. <br/>"
+								+ "Please let him process them before changing to new leader");
+					}
+				}
+			}
 			TERepository.delete(te);
 		}
 		
 		teamRepository.delete(team);
 		return true;
 	}
-
 }
