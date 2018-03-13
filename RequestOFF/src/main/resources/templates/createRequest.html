@@ -106,7 +106,7 @@
 						$('#alertMessage').html(errors['DateError']).attr('class', 'alert alert-danger').show();
 					}
 					else if(isNotNagativeInteger == 0) {
-						$('#alertMessage').html("Value of off days must be a not negative integer").attr('class', 'alert alert-danger').show();
+						$('#alertMessage').html("Value of off days must be a non-negative integer").attr('class', 'alert alert-danger').show();
 					}
 					else if(offHoursEqual0 == 1) {
 						$('#alertMessage').html(errors['offHoursEqual0']).attr('class', 'alert alert-danger').show();
