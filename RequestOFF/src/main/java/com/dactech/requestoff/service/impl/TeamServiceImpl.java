@@ -128,9 +128,20 @@ public class TeamServiceImpl implements TeamService {
 					teamEmployee.setTeamId(teamId);
 					teamEmployee.setEmployeeId(memberId);
 					teamEmployee.setValidFlag(1);
+					if (memberId == team.getLeaderId()) {
+						teamEmployee.setLeaderFlag(1);
+					} else {
+						teamEmployee.setLeaderFlag(0);
+					}
 					TERepository.save(teamEmployee);
 				} else {
 					TEmployees.remove(te);
+					if (memberId == team.getLeaderId()) {
+						te.setLeaderFlag(1);
+					} else {
+						te.setLeaderFlag(0);
+					}
+					TERepository.save(te);
 				}
 			}
 			for (TeamEmployee te : TEmployees) {
