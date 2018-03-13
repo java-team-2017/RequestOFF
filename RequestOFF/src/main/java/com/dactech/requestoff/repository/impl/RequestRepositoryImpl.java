@@ -97,7 +97,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		return requests;
 	}
 
-	@SuppressWarnings("null")
+	@SuppressWarnings({ "unchecked", "null" })
 	@Override
 	public List<Request> browseRequest(RequestBrowsingRequest requests) throws Exception {
 		Employee user = employeeRepository.findById(Long.parseLong(requests.getUserId()));
@@ -110,7 +110,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 			if (teamEmployee == null) {
 				throw new Exception("User " + user.getName() + " does not belong to any team");
 			}
-			if (teamEmployee.getLeaderFlag() == 1) { //leader
+			if (teamEmployee.getLeaderFlag() == 1) { //user is a leader
 				queryString.append(" (employee_id IN (SELECT employee_id from team t INNER JOIN team_employee te ON t.id = te.team_id WHERE t.leader_id = " + requests.getUserId() + ")) ");
 			} else {
 				throw new Exception("User " + user.getName() + " is just a member of team");
@@ -119,10 +119,6 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 			queryString.append(" (employee_id IN (SELECT employee_id from team_employee te INNER JOIN team t ON t.id=te.team_id INNER JOIN department d ON d.id=t.department_id WHERE manager_id= " + requests.getUserId() + ") "
 					+ "OR employee_id IN (SELECT leader_id FROM team t INNER JOIN department d ON t.department_id=d.id WHERE manager_id= " + requests.getUserId() + " )) ");
 		}
-//		if (user.getTeamEmployee().getLeaderFlag() == 1) { //leader
-//			System.out.println("leader_flag: "+ user.getTeamEmployee().getLeaderFlag());
-//			queryString.append(" (employee_id IN (SELECT employee_id from team t INNER JOIN team_employee te ON t.id = te.team_id WHERE t.leader_id = " + requests.getUserId() + ")) ");
-//		}
 		
 		if (StringUtil.isNotEmpty(requests.getStatus())) {
 			if (requests.getStatus().equals("5")) {
@@ -151,20 +147,20 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		queryString.append(" AND request.valid_flag = '1'");
 	
 		Query query = entityManager.createNativeQuery(queryString.toString(), Request.class);
-		@SuppressWarnings("unchecked")
 		List<Request> listRequests = query.getResultList();
 		
 		for (Request request : listRequests) {
 			Employee recipient = employeeRepository.findById(request.getRecipientId());
 			Employee sender = request.getEmployee();
 			TeamEmployee teamEmployee = teamEmployeeRepository.findByEmployeeId((request.getRecipientId()));
+			TeamEmployee employeeId = teamEmployeeRepository.findByEmployeeId((request.getEmployee().getId()));
 			// set recipient Name
 			request.setRecipientName(recipient.getName());
 			
 			// set forward ID and name
 			if(request.getStatus() == Request.REQUEST_STATUS_WAITING) {
 				if (recipient.getPosition().getCode() == Position.CODE_EMPLOYEE) {
-					if(teamEmployee.getLeaderFlag() == 1) {
+					if(teamEmployee.getLeaderFlag() == 1) {// recipient is a leader, forward to manager
 						String queryStr = "SELECT * FROM employee e INNER JOIN department d ON e.id = d.manager_id "
 								+ " INNER JOIN team t ON t.department_id = d.id"
 								+ " WHERE t.leader_id = " + recipient.getId();
@@ -176,11 +172,11 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 						}
 					}
 					else {
-						throw new Exception("user with id " + request.getRecipientId() + " is just a member of team");
+						throw new Exception("User with id " + request.getRecipientId() + " is just a member of team");
 					}
 				} else if (recipient.getPosition().getCode() == Position.CODE_MANAGER) {
 					if (sender.getPosition().getCode() == Position.CODE_EMPLOYEE) {
-						if(teamEmployee.getLeaderFlag() != 1 && sender.getPosition().getCode() != Position.CODE_MANAGER) {
+						if(employeeId.getLeaderFlag() != 1 && sender.getPosition().getCode() != Position.CODE_MANAGER) {
 							String queryStr = "SELECT * from employee e INNER JOIN team t on e.id = t.leader_id INNER JOIN team_employee te ON t.id = te.team_id "
 									+ "WHERE te.employee_id = " + request.getEmployee().getId();
 							Query queryObj = entityManager.createNativeQuery(queryStr.toString(), Employee.class);
@@ -190,36 +186,39 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 								request.setForwardName(leader.get(0).getName());
 							}
 						}
+					} 
+					else {
+						System.out.println("error");
 					}
 				}
 			}
 			
 			// set department name and team name for request sender
-			if(sender.getPosition().getCode() == Position.CODE_EMPLOYEE) {
-				if(teamEmployee.getValidFlag() == 1) {
-					Team team = teamRepository.findByLeaderId(sender.getId());
-					if (team != null) {
-						sender.setTeamName(team.getName());
-						sender.setDepartmentName(team.getDepartment().getName());
-					} else {
-						sender.setTeamName("No Team");
-					}
-				}
-			} else if (sender.getPosition().getCode() == Position.CODE_MANAGER) {
-				Department dept = departmentRepository.findByManagerId(sender.getId());
-				if (dept != null) {
-					sender.setTeamName("");
-					sender.setDepartmentName(dept.getName());
-				} else {
-					sender.setDepartmentName("No Department");
-				}
-			} else {
-				Employee employee = employeeRepository.findById(sender.getId());
-				if(employee != null) {
-					sender.setTeamName(employee.getTeamName());
-					sender.setDepartmentName(employee.getDepartmentName());
-				}
-			}
+//			if(sender.getPosition().getCode() == Position.CODE_EMPLOYEE) {
+//				if(teamEmployee.getValidFlag() == 1) {
+//					Team team = teamRepository.findByLeaderId(sender.getId());
+//					if (team != null) {
+//						sender.setTeamName(team.getName());
+//						sender.setDepartmentName(team.getDepartment().getName());
+//					} else {
+//						sender.setTeamName("No Team");
+//					}
+//				}
+//			} else if (sender.getPosition().getCode() == Position.CODE_MANAGER) {
+//				Department dept = departmentRepository.findByManagerId(sender.getId());
+//				if (dept != null) {
+//					sender.setTeamName("");
+//					sender.setDepartmentName(dept.getName());
+//				} else {
+//					sender.setDepartmentName("No Department");
+//				}
+//			} else {
+//				Employee employee = employeeRepository.findById(sender.getId());
+//				if(employee != null) {
+//					sender.setTeamName(employee.getTeamName());
+//					sender.setDepartmentName(employee.getDepartmentName());
+//				}
+//			}
 		}
 		return listRequests;
 	}
