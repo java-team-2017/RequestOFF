@@ -23,6 +23,26 @@
 			};
 			
 			$(function() {
+				//render day off type select
+				$.ajax({
+					type : "POST",
+					contentType : "application/json",
+					url : /*[[@{/dayOffType/search}]]*/,
+					dataType : 'json',
+					data : JSON.stringify({"valid_flag_id" : "1"}),
+					success : function(returnData) {
+						listDayOffType = returnData.listDayOffType;
+						var option = "";
+						$.each(returnData.listDayOffType, function(i, element){
+							option += "<option value='" + element.id + "'>" + element.name + "</option>"; 
+						});
+						$("#modalDayOffType").append(option);
+					},
+					error : function(e) {
+						console.log(html(errors['APIResponseError'](e)));
+					}
+				});
+				
 				//get current user
 				$.ajax({
 					type : "POST",
@@ -40,26 +60,6 @@
 						
 						renderRemainHours(returnData.remainHours, 'remainHours');
 						renderRecipientSelect(listRecipient, 'modalRecipient');
-						
-						//render day off type select
-						$.ajax({
-							type : "POST",
-							contentType : "application/json",
-							url : /*[[@{/dayOffType/search}]]*/,
-							dataType : 'json',
-							data : JSON.stringify({"valid_flag_id" : "1"}),
-							success : function(returnData) {
-								listDayOffType = returnData.listDayOffType;
-								var option = "";
-								$.each(returnData.listDayOffType, function(i, element){
-									option += "<option value='" + element.id + "'>" + element.name + "</option>"; 
-								});
-								$("#modalDayOffType").append(option);
-							},
-							error : function(e) {
-								console.log(html(errors['APIResponseError'](e)));
-							}
-						});
 						
 						//set default value for searching request
 						var date = new Date();
@@ -260,7 +260,7 @@
 					var editRequestData = $('#modalForm').serializeJSON();
 					
 					//validate
-					var complete = 1, valid = 1, exceed = 0, offHoursEqual0 = 0, isNumber = 1;
+					var complete = 1, valid = 1, exceed = 0, offHoursEqual0 = 0, isNotNagativeInteger = 1;
 					var listInput = $("#modalForm").find(':input').not("#modalResponseMessage");
 					$.each(listInput, function() {
 						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
@@ -271,8 +271,9 @@
 					var offHours = parseInt(editRequestData.offDays) * 8 + parseFloat(editRequestData.offHours);
 					var oldOffHours = parseFloat(editRequestData.totalTime_modalForm);
 					console.log("old: " + oldOffHours);
-					if(isNaN(editRequestData.offDays) == true) {
-						isNumber = 0;
+					if(isNaN(editRequestData.offDays) == true || (parseFloat(editRequestData.offDays) % 1) !== 0
+							|| parseFloat(editRequestData.offDays) < 0) {
+						isNotNagativeInteger = 0;
 					}
 					if(offHours <= 0){
 						offHoursEqual0 = 1;
@@ -297,8 +298,8 @@
 					else if(valid == 0) {
 						$('#alertMessage_edit').html(errors['DateError']).attr('class', 'alert alert-danger').show();
 					}
-					else if(isNumber == 0) {
-						$('#alertMessage_edit').html(errors['notNumber']).attr('class', 'alert alert-danger').show();
+					else if(isNotNagativeInteger == 0) {
+						$('#alertMessage_edit').html("Value of off days must be a not negative integer").attr('class', 'alert alert-danger').show();
 					}
 					else if(offHoursEqual0 == 1) {
 						$('#alertMessage_edit').html(errors['offHoursEqual0']).attr('class', 'alert alert-danger').show();

@@ -21,6 +21,8 @@
 					'5': 'waiting'
 				};
 				
+				renderDayOffTypeSelect('id_dayOffType');
+				
 				//get current user
 				$.ajax({
 					type : "POST",
@@ -35,7 +37,6 @@
 						remainHours = returnData.remainHours;
 						
 						renderRemainHours(returnData.remainHours, 'remainHours');
-						renderDayOffTypeSelect('id_dayOffType');
 						renderRecipientSelect(returnData.listRecipients, 'id_recipient');
 						
 						if(returnData.listRecipients.length == 0) {
