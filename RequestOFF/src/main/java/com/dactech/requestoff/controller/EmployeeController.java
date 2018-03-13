@@ -128,7 +128,10 @@ public class EmployeeController {
 			
 			response.setUser(user);
 			
-			if (user.getPosition().getCode() == Position.CODE_EMPLOYEE && user.getListTeam().get(0).getLeaderId() == user.getId()) {
+			if (user.getPosition().getCode() == Position.CODE_EMPLOYEE 
+					&& user.getListTeam() != null
+					&& user.getListTeam().size() >0
+					&& user.getListTeam().get(0).getLeaderId() == user.getId()) {
 				response.setLeaderFlag(1);
 			} else {
 				response.setLeaderFlag(0);

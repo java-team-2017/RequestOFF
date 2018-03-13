@@ -498,7 +498,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 			departmentName = user.getListTeam().get(0).getDepartment().getName();
 		} else {
 			Department dept = departmentRepository.findByManagerId(user.getId());
-			departmentName = dept.getName();
+			if (dept != null) {
+				departmentName = dept.getName();
+			} else {
+				departmentName = "";
+			}
 		}
 		return departmentName;
 	}
