@@ -81,26 +81,19 @@ public class TeamServiceImpl implements TeamService {
 				if (oldLeaderId != newLeaderId) { // change leader
 					// check whether old leader has wating requests which need to process
 					
-//					RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
-//					requestSearchRequest.setStatus(Integer.toString(Request.REQUEST_STATUS_WAITING));
-//					requestSearchRequest.setRecipientId(Long.toString(oldLeaderId));
-//					requestSearchRequest.setValidFlag("1");
-//					
-//					List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
-//					if (requests != null && requests.size() >0) {
-					int numOfRequest = requestRepository.getNumberOfRequestReceivedInProcessing(oldLeaderId);
+					int numOfRequest = requestRepository.countRequestReceivedInProcessingInTeam(oldLeaderId, teamId);
 					if (numOfRequest > 0) {
 						Employee leader = employeeRepository.findById(oldLeaderId);
 						throw new Exception(leader.getName()
 							+ " has requests waiting for him to process. <br/>Please let him process them before changing to new leader");
 					}
 					
-					int requestInProcessing = requestRepository.getNumberOfRequestInProcessing(oldLeaderId);
-					if (requestInProcessing > 0) { // employee has requests which are in processing
-						Employee em = employeeRepository.findById(oldLeaderId);
-						throw new Exception (em.getName() + " has requests which are in processing. <br/>"
-								+ "Please delete or process all those requests before remove");
-					}
+//					int requestInProcessing = requestRepository.getNumberOfRequestInProcessing(oldLeaderId);
+//					if (requestInProcessing > 0) { // employee has requests which are in processing
+//						Employee em = employeeRepository.findById(oldLeaderId);
+//						throw new Exception (em.getName() + " has requests which are in processing. <br/>"
+//								+ "Please delete or process all those requests before remove");
+//					}
 					team.setLeaderId(newLeaderId);
 				}
 			}

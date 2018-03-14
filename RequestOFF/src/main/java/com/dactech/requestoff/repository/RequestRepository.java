@@ -26,4 +26,9 @@ public interface RequestRepository extends JpaRepository<Request, Long>, Request
 			+ "AND status in ( " + Request.REQUEST_STATUS_WAITING + " ) AND valid_flag = 1", nativeQuery = true)
 	public int getNumberOfRequestReceivedInProcessing(long recipientId);
 	
+	@Query(value = "SELECT count(*) FROM request WHERE recipient_id = ?1 "
+			+ " AND employee_id IN (SELECT employee_id FROM team_employee WHERE team_id = ?2) "
+			+ " AND status in ( " + Request.REQUEST_STATUS_WAITING + " ) AND valid_flag = 1", nativeQuery = true)
+	public int countRequestReceivedInProcessingInTeam(long recipientId, long teamId);
+	
 }
