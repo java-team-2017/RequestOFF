@@ -20,13 +20,12 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, Emplo
 			+ "WHERE code = " + Position.CODE_EMPLOYEE + " AND "
 			+ "e.id NOT IN (SELECT DISTINCT employee_id from team_employee WHERE valid_flag = 1) AND "
 			+ "e.valid_flag = 1", nativeQuery = true)
-	public List<Employee> findEmployeeNotInTeam();
+	public List<Employee> findEmployeeNotInTeam(); // only employee, not manager
 	
-//	@Query(value = "SELECT * FROM employee e INNER JOIN position p ON e.position_id = p.id "
-//			+ "WHERE code = " + Position.CODE_LEADER + " AND "
-//			+ "e.id NOT IN (SELECT DISTINCT leader_id from team WHERE valid_flag = 1) AND "
-//			+ "e.valid_flag = 1", nativeQuery = true)
-//	public List<Employee> findLeaderNotInTeam();
+	@Query(value = "SELECT * FROM employee e INNER JOIN position p ON e.position_id = p.id "
+			+ "WHERE e.id NOT IN (SELECT DISTINCT employee_id from team_employee WHERE valid_flag = 1) AND "
+			+ "e.valid_flag = 1", nativeQuery = true)
+	public List<Employee> findAllEmployeeNotInTeam(); // include manager
 	
 	@Query(value = "SELECT * FROM employee e INNER JOIN position p ON e.position_id = p.id "
 			+ "WHERE code = " + Position.CODE_MANAGER + " AND "

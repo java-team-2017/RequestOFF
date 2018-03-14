@@ -187,7 +187,7 @@ public class TeamServiceImpl implements TeamService {
 			List<Employee> listMember = employeeRepository.findByTeamId(teamId); 
 			response.setListMember(listMember);
 		}
-		response.setListMemberNotInTeam(employeeRepository.findEmployeeNotInTeam());
+		response.setListMemberNotInTeam(employeeRepository.findAllEmployeeNotInTeam());
 		response.setListDepartment(departmentRepository.findAll());
 		
 		return response;
