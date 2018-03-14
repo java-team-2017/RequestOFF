@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -19,30 +20,32 @@ public class Department {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	private String name;
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "manager_id")
-	private Employee manager;
+	private long managerId;
 	private int validFlag;
 	private String insertDate;
 	private long insertOperator;
 	private String updateDate;
 	private long updateOperator;
 
+	@Transient
+	private Employee manager;
+	
 	public Department() {
 		super();
 	}
 
-	public Department(long id, String name, Employee manager, int validFlag, String insertDate, long insertOperator,
-			String updateDate, long updateOperator) {
+	public Department(long id, String name, long managerId, int validFlag, String insertDate, long insertOperator,
+			String updateDate, long updateOperator, Employee manager) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.manager = manager;
+		this.managerId = managerId;
 		this.validFlag = validFlag;
 		this.insertDate = insertDate;
 		this.insertOperator = insertOperator;
 		this.updateDate = updateDate;
 		this.updateOperator = updateOperator;
+		this.manager = manager;
 	}
 
 	public long getId() {
@@ -61,12 +64,12 @@ public class Department {
 		this.name = name;
 	}
 
-	public Employee getManager() {
-		return manager;
+	public long getManagerId() {
+		return managerId;
 	}
 
-	public void setManager(Employee manager) {
-		this.manager = manager;
+	public void setManagerId(long managerId) {
+		this.managerId = managerId;
 	}
 
 	public int getValidFlag() {
@@ -107,6 +110,14 @@ public class Department {
 
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
+	}
+
+	public Employee getManager() {
+		return manager;
+	}
+
+	public void setManager(Employee manager) {
+		this.manager = manager;
 	}
 
 }

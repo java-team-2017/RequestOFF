@@ -261,7 +261,15 @@
 					data: function () {
 						return JSON.stringify(requestSearch);
 					},
-					dataSrc: 'requests'
+					dataSrc: function (data) {
+						if (data.status_info.status != 0) {
+							$('#alertMessage').html(errors['APIResponseError'](data.status_info.error)).attr('class', 'alert alert-danger').show();
+							return [];
+						}
+						return data.requests;
+					}
+					
+					
 				},
 				destroy: true,
 				searching: false,

@@ -410,7 +410,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 				if(t != null) {
 					Department dept = t.getDepartment();
 					if(dept != null) {
-						Employee manager = dept.getManager();
+						Employee manager = employeeRepository.findById(dept.getManagerId());
 						forwards.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
 					}
 				}
@@ -443,7 +443,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 				if(team != null) {
 					Department dept = team.getDepartment();
 					if(dept != null) {
-						Employee manager = dept.getManager();
+						Employee manager = employeeRepository.findById(dept.getManagerId());
 						listRecipients.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
 					}
 				}
@@ -455,7 +455,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 						listRecipients.add(new GetUserResponse.IdName(leader.getId(), leader.getName()));
 						Department dept = e.getListTeam().get(0).getDepartment();
 						if(dept != null) {
-							Employee manager = dept.getManager();
+							Employee manager = employeeRepository.findById(dept.getManagerId());
 							listRecipients.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
 						}
 					}
