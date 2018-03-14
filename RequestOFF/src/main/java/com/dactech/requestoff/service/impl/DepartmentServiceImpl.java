@@ -43,9 +43,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 			department = new Department();
 			department.setName(departmentRegistRequest.getName());
 			
-			Employee manager = new Employee();
-			manager.setId(Long.parseLong(departmentRegistRequest.getManagerId()));
-			department.setManager(manager);
+			department.setManagerId(Long.parseLong(departmentRegistRequest.getManagerId()));
 			
 			department.setValidFlag(Integer.parseInt(departmentRegistRequest.getValidFlag()));
 		}
@@ -62,7 +60,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 					department.setName(departmentRegistRequest.getName());
 				}
 				if(StringUtil.isNotEmpty(departmentRegistRequest.getManagerId())) {
-					long oldManagerId = department.getManager().getId();
+					long oldManagerId = department.getManagerId();
 					long newManagerId = Long.parseLong(departmentRegistRequest.getManagerId());
 					
 					RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
@@ -79,13 +77,12 @@ public class DepartmentServiceImpl implements DepartmentService {
 					List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
 					
 					if(requests != null && requests.size() > 0) {
-						throw new Exception(department.getManager().getName()
+						Employee manager = employeeRepository.findById(department.getManagerId());
+						throw new Exception(manager.getName()
 							+ " has requests waiting for him/her to process. Please let him/her process them before changing to new manager");
 					}
 					
-					Employee manager = new Employee();
-					manager.setId(Long.parseLong(departmentRegistRequest.getManagerId()));
-					department.setManager(manager);
+					department.setManagerId(Long.parseLong(departmentRegistRequest.getManagerId()));
 				}
 				if(StringUtil.isNotEmpty(departmentRegistRequest.getValidFlag())) {
 					department.setValidFlag(Integer.parseInt(departmentRegistRequest.getValidFlag()));
@@ -105,6 +102,10 @@ public class DepartmentServiceImpl implements DepartmentService {
 	
 	public DepartmentSearchResponse search(DepartmentSearchRequest departmentSearchRequest) {
 		List<Department> listDepartment = departmentRepository.search(departmentSearchRequest);
+		for (Department dept : listDepartment) {
+			Employee manager = employeeRepository.findById(dept.getManagerId());
+			dept.setManager(new Employee(manager.getId(), manager.getName()));
+		}
 		DepartmentSearchResponse departmentSearchResponse = new DepartmentSearchResponse(listDepartment);
 		return departmentSearchResponse;
 	}
@@ -112,6 +113,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 	@Override
 	public DepartmentDetailsResponse details(DepartmentDetailsRequest departmentDetailsRequest) {
 		Department department = departmentRepository.findById(Long.parseLong(departmentDetailsRequest.getId()));
+		Employee manager = employeeRepository.findById(department.getManagerId());
+		department.setManager(new Employee(manager.getId(), manager.getName()));
 		DepartmentDetailsResponse departmentDetailsResponse = new DepartmentDetailsResponse(department);
 		return departmentDetailsResponse;
 	}
@@ -130,10 +133,11 @@ public class DepartmentServiceImpl implements DepartmentService {
 			throw new Exception("Can not find department!");
 		}
 		List<Team> teams = teamRepository.findByDepartmentId(departmentId);
-		long managerId = department.getManager().getId();
+		long managerId = department.getManagerId();
 		int requestInProcessing = requestRepository.getNumberOfRequestReceivedInProcessing(managerId);
 		if(teams.size() > 0) {
-			throw new Exception(department.getManager().getName() + " are managing teams that belong to " + department.getName() + " Department. Please remove all teams before deleting Department.");
+			Employee manager = employeeRepository.findById(department.getManagerId());
+			throw new Exception(manager.getName() + " are managing teams that belong to " + department.getName() + " Department. Please remove all teams before deleting Department.");
 		} 
 		else if(requestInProcessing > 0) {
 			Employee em = employeeRepository.findById(managerId);
