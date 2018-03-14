@@ -456,7 +456,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 						Department dept = e.getListTeam().get(0).getDepartment();
 						if(dept != null) {
 							Employee manager = employeeRepository.findById(dept.getManagerId());
-							listRecipients.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
+							if(manager.getId() != leader.getId()) {
+								listRecipients.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
+							}
 						}
 					}
 				}
