@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import com.dactech.requestoff.model.entity.DayOffType;
 import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.EmployeeOffStatus;
+import com.dactech.requestoff.model.entity.EmployeeRole;
 import com.dactech.requestoff.model.entity.Position;
 import com.dactech.requestoff.model.entity.Request;
 import com.dactech.requestoff.model.entity.Role;
@@ -24,6 +27,7 @@ import com.dactech.requestoff.model.request.EmployeeOffStatisticsPagingRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatusSearchRequest;
 import com.dactech.requestoff.model.request.EmployeeRegistRequest;
 import com.dactech.requestoff.model.request.EmployeeSearchRequest;
+import com.dactech.requestoff.model.request.RequestSearchRequest;
 import com.dactech.requestoff.model.response.EmployeeDetailsResponse;
 import com.dactech.requestoff.model.response.EmployeeOffStatisticsPagingResponse;
 import com.dactech.requestoff.model.response.EmployeeRegistResponse;
@@ -32,6 +36,7 @@ import com.dactech.requestoff.model.response.GetUserResponse;
 import com.dactech.requestoff.repository.DepartmentRepository;
 import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
+import com.dactech.requestoff.repository.EmployeeRoleRepository;
 import com.dactech.requestoff.repository.PositionRepository;
 import com.dactech.requestoff.repository.RequestRepository;
 import com.dactech.requestoff.repository.RoleRepository;
@@ -62,6 +67,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 	private TeamEmployeeRepository teamEmployeeRepository;
 	@Autowired
 	private PositionRepository positionRepository;
+	@Autowired
+	private EmployeeRoleRepository employeeRoleRepository;
 
 	@Override
 	public EmployeeRegistResponse employeeRegist(EmployeeRegistRequest erRequest) throws Exception {
@@ -508,14 +515,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 	
 	@Override
+	@Transactional
 	public boolean delete(long employeeId) throws Exception {
 		Employee employee = employeeRepository.findById(employeeId);
-		
-		EmployeeOffStatusSearchRequest eosRequest = new EmployeeOffStatusSearchRequest("", employeeId + "", "", "", "");
-		List<EmployeeOffStatus>  listEos = employeeOffStatusRepository.search(eosRequest);
-		for(EmployeeOffStatus eos : listEos) {
-			employeeOffStatusRepository.delete(eos);
-		}
 		
 		if (employee == null) {
 			throw new Exception("can not find employee with id " + employeeId);
@@ -531,6 +533,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 			if (employee.getListTeam() != null && employee.getListTeam().size() > 0 && employee.getListTeam().get(0)!= null) {
 				throw new Exception(employee.getName() + " is currently a member of team : " + employee.getListTeam().get(0).getName()
 									+ ". Please remove " + employee.getName() + " from " + employee.getListTeam().get(0).getName() + " first!");
+			} else if(requestRepository.getNumberOfRequestInProcessing(employeeId) > 0) {
+				throw new Exception(employee.getName() + " has requests in processing. Please let these requests processed before delete");
 			}
 		} else if (employee.getPosition().getCode() == Position.CODE_MANAGER) {
 			Department dept = departmentRepository.findByManagerId(employeeId);
@@ -541,8 +545,33 @@ public class EmployeeServiceImpl implements EmployeeService {
 		} else {
 			throw new Exception("Unsolved ");
 		}
+		
+		EmployeeOffStatusSearchRequest eosRequest = new EmployeeOffStatusSearchRequest("", employeeId + "", "", "", "");
+		List<EmployeeOffStatus>  listEos = employeeOffStatusRepository.search(eosRequest);
+		for(EmployeeOffStatus eos : listEos) {
+			eos.setValidFlag(0);
+			employeeOffStatusRepository.save(eos);
+		}
+		
+		List<EmployeeRole> listEmployeeRole = employeeRoleRepository.findByEmployeeId(employeeId);
+		for(EmployeeRole er : listEmployeeRole) {
+			er.setValidFlag(0);
+			employeeRoleRepository.save(er);
+		}
+		
+		RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
+		requestSearchRequest.setEmployeeId(employeeId + "");
+		requestSearchRequest.setStatus(2 + "");
+		List<Request> listRequest = requestRepository.searchRequest(requestSearchRequest);
+		requestSearchRequest.setStatus(3 + "");
+		listRequest.addAll(requestRepository.searchRequest(requestSearchRequest));
+		for(Request request : listRequest) {
+			request.setValidFlag(0);
+			requestRepository.save(request);
+		}
 
-		employeeRepository.delete(employee);
+		employee.setValidFlag(0);
+		employeeRepository.save(employee);
 		return true;
 	}
 	
