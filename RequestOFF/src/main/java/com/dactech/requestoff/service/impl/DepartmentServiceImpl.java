@@ -62,27 +62,28 @@ public class DepartmentServiceImpl implements DepartmentService {
 				if(StringUtil.isNotEmpty(departmentRegistRequest.getManagerId())) {
 					long oldManagerId = department.getManagerId();
 					long newManagerId = Long.parseLong(departmentRegistRequest.getManagerId());
-					
-					RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
-					requestSearchRequest.setStatus(Integer.toString(Request.REQUEST_STATUS_WAITING));
-					requestSearchRequest.setRecipientId(Long.toString(oldManagerId));
-					requestSearchRequest.setValidFlag("1");
-					
-					int requestInProcessing = requestRepository.getNumberOfRequestInProcessing(oldManagerId);
-					if (requestInProcessing > 0) { // employee has requests which are in processing
-						Employee em = employeeRepository.findById(oldManagerId);
-						throw new Exception (em.getName() + " has requests which are in processing. <br/>"
-							+ "Please delete or process all those requests before remove");
+					if (oldManagerId != newManagerId) {
+						RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
+						requestSearchRequest.setStatus(Integer.toString(Request.REQUEST_STATUS_WAITING));
+						requestSearchRequest.setRecipientId(Long.toString(oldManagerId));
+						requestSearchRequest.setValidFlag("1");
+						
+						int requestInProcessing = requestRepository.getNumberOfRequestInProcessing(oldManagerId);
+						if (requestInProcessing > 0) { // employee has requests which are in processing
+							Employee em = employeeRepository.findById(oldManagerId);
+							throw new Exception (em.getName() + " has requests which are in processing. <br/>"
+								+ "Please delete or process all those requests before remove");
+						}
+						List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
+						
+						if(requests != null && requests.size() > 0) {
+							Employee manager = employeeRepository.findById(department.getManagerId());
+							throw new Exception(manager.getName()
+								+ " has requests waiting for him/her to process. Please let him/her process them before changing to new manager");
+						}
+						
+						department.setManagerId(newManagerId);
 					}
-					List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
-					
-					if(requests != null && requests.size() > 0) {
-						Employee manager = employeeRepository.findById(department.getManagerId());
-						throw new Exception(manager.getName()
-							+ " has requests waiting for him/her to process. Please let him/her process them before changing to new manager");
-					}
-					
-					department.setManagerId(Long.parseLong(departmentRegistRequest.getManagerId()));
 				}
 				if(StringUtil.isNotEmpty(departmentRegistRequest.getValidFlag())) {
 					department.setValidFlag(Integer.parseInt(departmentRegistRequest.getValidFlag()));
