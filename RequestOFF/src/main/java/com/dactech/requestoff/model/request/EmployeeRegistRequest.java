@@ -23,6 +23,8 @@ public class EmployeeRegistRequest {
 	@JsonProperty("valid_flag")
 	private String validFlag;
 
+	// @JsonProperty("team_id")
+	// private String teamId;
 	@JsonProperty("role_ids")
 	private List<String> roleIds;
 
