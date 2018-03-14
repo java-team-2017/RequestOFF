@@ -28,6 +28,9 @@
 				renderTeamSelect("teamModalDetailsId", function(teams) {
 					listTeam = teams;
 				});
+// 				renderTeamSelect("teamModalAddId", function(teams) {
+// 					listTeam = teams;
+// 				});
 
 				renderDepartmentSelect("departmentId", function(departments) {
 					listDepartment = departments;
@@ -192,27 +195,38 @@
 				$('#btnAdd_modalAdd').on('click', function() {
 					var addData = $('#modalAddForm').serializeJSON();
 					
+					var birthday = addData.birthdayModalAdd;
+					birthday = birthday.substr(6, 4) + "-" + birthday.substr(0, 2) + "-" + birthday.substr(3, 2);
+					var startWorkingDate = addData.startWorkingModalAdd;
+					startWorkingDate = startWorkingDate.substr(6, 4) + "-" + startWorkingDate.substr(0, 2) + "-" + startWorkingDate.substr(3, 2);
+					var officialWorkingDate = addData.officialWorkingModalAdd;
+					officialWorkingDate = officialWorkingDate.substr(6, 4) + "-" + officialWorkingDate.substr(0, 2) + "-"
+											+ officialWorkingDate.substr(3, 2);
+					
+					var totalTime = parseInt(addData.totalDaysModalAdd) * 8 + parseFloat(addData.totalHoursModalAdd);
+					var remainTime = parseInt(addData.remainDaysModalAdd) * 8 + parseFloat(addData.remainHoursModalAdd);
+					
 					//-----------validate------------
-					var complete = 1, valid = 1, isNotNagativeInteger = 1;
+					var complete = 1, exceedLength = 0, isNotNagativeInteger = 1, dateError = 0, valid = 1;
 					var listInput = $("#modalAddForm").find(':input');
 					$.each(listInput, function() {
 						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
 							complete = 0;
 						}
 					});
-					if((addData.nameModalAdd).length > 200) {
-						valid = 0;
-					}
-					if((addData.phoneModalAdd).length > 20) {
-						valid = 0;
+					if((addData.nameModalAdd).length > 200 || (addData.phoneModalAdd).length > 20) {
+						exceedLength = 1;
 					}
 					if(isNaN(addData.totalDaysModalAdd) == true || (parseFloat(addData.totalDaysModalAdd) % 1) !== 0
-							|| parseFloat(addData.totalDaysModalAdd) < 0) {
+							|| parseFloat(addData.totalDaysModalAdd) < 0 || isNaN(addData.remainDaysModalAdd) == true
+							|| (parseFloat(addData.remainDaysModalAdd) % 1) !== 0 || parseFloat(addData.remainDaysModalAdd) < 0) {
 						isNotNagativeInteger = 0;
 					}
-					if(isNaN(addData.remainDaysModalAdd) == true || (parseFloat(addData.remainDaysModalAdd) % 1) !== 0
-							|| parseFloat(addData.remainDaysModalAdd) < 0) {
-						isNotNagativeInteger = 0;
+					if(birthday.localeCompare(startWorkingDate) >= 0 || startWorkingDate.localeCompare(officialWorkingDate) >= 0) {
+						dateError = 1;
+					}
+					if(totalTime < remainTime) {
+						valid = 0;
 					}
 
 					//----------end validate---------
@@ -220,24 +234,19 @@
 					if(complete == 0) {
 						$('#alertMessage_modalAdd').html(errors['incompleteFields']).attr('class', 'alert alert-danger').show();
 					}
-					else if(valid == 0) {
+					else if(exceedLength == 1) {
 						$('#alertMessage_modalAdd').html(errors['stringExceedLimit']).attr('class', 'alert alert-danger').show();
 					}
 					else if(isNotNagativeInteger == 0) {
 						$('#alertMessage_modalAdd').html("Values of total off days and remain off days must be non-negative integers").attr('class', 'alert alert-danger').show();
 					}
+					else if(dateError == 1) {
+						$('#alertMessage_modalAdd').html("time in Start working date field must be before Official working date field and after Birthday field").attr('class', 'alert alert-danger').show();
+					}
+					else if(valid == 0) {
+						$('#alertMessage_modalAdd').html("Total time must be equal or greater than remain time").attr('class', 'alert alert-danger').show();
+					}
 					else {
-						var birthday = addData.birthdayModalAdd;
-						birthday = birthday.substr(6, 4) + "-" + birthday.substr(0, 2) + "-" + birthday.substr(3, 2);
-						var startWorkingDate = addData.startWorkingModalAdd;
-						startWorkingDate = startWorkingDate.substr(6, 4) + "-" + startWorkingDate.substr(0, 2) + "-" + startWorkingDate.substr(3, 2);
-						var officialWorkingDate = addData.officialWorkingModalAdd;
-						officialWorkingDate = officialWorkingDate.substr(6, 4) + "-" + officialWorkingDate.substr(0, 2) + "-"
-												+ officialWorkingDate.substr(3, 2);
-						
-						var totalTime = parseInt(addData.totalDaysModalAdd) * 8 + parseFloat(addData.totalHoursModalAdd);
-						var remainTime = parseInt(addData.remainDaysModalAdd) * 8 + parseFloat(addData.remainHoursModalAdd);
-						
 						var employeeRegistRequest = {
 							"id" : "",
 							"name" : addData.nameModalAdd,
@@ -250,7 +259,7 @@
 							"start_working_date" : startWorkingDate,
 							"official_working_date" : officialWorkingDate,
 							"valid_flag" : "1",
-//	 						"team_id" : addData.teamModalAdd,
+// 	 						"team_id" : addData.teamModalAdd,
 							"role_ids" : $("#roleModalAddId").val(),
 							"total_off_hours" : totalTime,
 							"remain_hours" : remainTime
@@ -266,14 +275,16 @@
 							success : function(returnData) {
 								if(returnData.status_info.status == 1) {
 									$('#alertMessage_modalAdd').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+									console.log(returnData);
+								} else {
+									var employeeSearchRequest = getEmployeeSearchRequest();
+									search(employeeSearchRequest);
+									table = $('#employeeTable').DataTable();
+									console.log(table);
+									table.ajax.reload();
+									$('#employeeAddModal').modal('hide');
+									$('#alertMessage_search').html("Add successfully!").attr('class', 'alert alert-success').show();
 								}
-								var employeeSearchRequest = getEmployeeSearchRequest();
-								search(employeeSearchRequest);
-								table = $('#employeeTable').DataTable();
-								console.log(table);
-								table.ajax.reload();
-								$('#employeeAddModal').modal('hide');
-								$('#alertMessage_search').html("Add successfully!").attr('class', 'alert alert-success').show();
 							},
 							error : function(e) {
 								$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
@@ -285,56 +296,58 @@
 				$('#btnSave_modalDetails').on('click', function() {
 					var updateData = $('#modalDetailsForm').serializeJSON();
 					
+					var id = $("#idModalDetailsId").html();
+					var birthday = updateData.birthdayModalDetails;
+					birthday = birthday.substr(6, 4) + "-" + birthday.substr(0, 2) + "-" + birthday.substr(3, 2);
+					var startWorkingDate = updateData.startWorkingModalDetails;
+					startWorkingDate = startWorkingDate.substr(6, 4) + "-" + startWorkingDate.substr(0, 2) + "-" + startWorkingDate.substr(3, 2);
+					var officialWorkingDate = updateData.officialWorkingModalDetails;
+					officialWorkingDate = officialWorkingDate.substr(6, 4) + "-" + officialWorkingDate.substr(0, 2) + "-"
+											+ officialWorkingDate.substr(3, 2);
+					
+					var total = parseInt(updateData.totalDaysModalDetails) * 8 + parseFloat(updateData.totalHoursModalDetails);
+					var remain = parseInt(updateData.remainDaysModalDetails) * 8 + parseFloat(updateData.remainHoursModalDetails);
+					
 					//---------validate------------
-					var complete = 1, valid = 1, isNotNagativeInteger = 1;
+					var complete = 1, exceedLength = 0, isNotNagativeInteger = 1, dateError = 0, valid = 1;
 					var listInput = $("#modalDetailsForm").find(':input').not("#teamModalDetailsId, #departmentModalDetailsId, #passwordModalDetailsId");
 					$.each(listInput, function() {
 						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
 							complete = 0;
 						}
 					});
-					if((updateData.nameModalDetails).length > 200) {
-						valid = 0;
-					}
-					if((updateData.phoneModalDetails).length > 20) {
-						valid = 0;
+					if((updateData.nameModalDetails).length > 200 || (updateData.phoneModalDetails).length > 20) {
+						exceedLength = 1;
 					}
 					if(isNaN(updateData.totalDaysModalDetails) == true || (parseFloat(updateData.totalDaysModalDetails) % 1) !== 0
-							|| parseFloat(updateData.totalDaysModalDetails) < 0) {
+							|| parseFloat(updateData.totalDaysModalDetails) < 0 || isNaN(updateData.remainDaysModalDetails) == true
+							|| (parseFloat(updateData.remainDaysModalDetails) % 1) !== 0 || parseFloat(updateData.remainDaysModalDetails) < 0) {
 						isNotNagativeInteger = 0;
 					}
-					if(isNaN(updateData.remainDaysModalDetails) == true || (parseFloat(updateData.remainDaysModalDetails) % 1) !== 0
-							|| parseFloat(updateData.remainDaysModalDetails) < 0) {
-						isNotNagativeInteger = 0;
+					if(birthday.localeCompare(startWorkingDate) >= 0 || startWorkingDate.localeCompare(officialWorkingDate) >= 0) {
+						dateError = 1;
+					}
+					if(total < remain) {
+						valid = 0;
 					}
 					//---------end validate----------
 					
 					if(complete == 0) {
 						$('#alertMessage_modalDetails').html(errors['incompleteFields']).attr('class', 'alert alert-danger').show();
 					}
-					else if(valid == 0) {
+					else if(exceedLength == 1) {
 						$('#alertMessage_modalDetails').html(errors['stringExceedLimit']).attr('class', 'alert alert-danger').show();
 					}
 					else if(isNotNagativeInteger == 0) {
 						$('#alertMessage_modalDetails').html("Values of total off days and remain off days must be non-negative integers").attr('class', 'alert alert-danger').show();
 					}
+					else if(dateError == 1) {
+						$('#alertMessage_modalDetails').html("time in Start working date field must be before Official working date field and after Birthday field").attr('class', 'alert alert-danger').show();
+					}
+					else if(valid == 0) {
+						$('#alertMessage_modalDetails').html("Total time must be equal or greater than remain time").attr('class', 'alert alert-danger').show();
+					}
 					else {
-						var id = $("#idModalDetailsId").html();
-						var birthday = updateData.birthdayModalDetails;
-						birthday = birthday.substr(6, 4) + "-" + birthday.substr(0, 2) + "-" + birthday.substr(3, 2);
-						var startWorkingDate = updateData.startWorkingModalDetails;
-						startWorkingDate = startWorkingDate.substr(6, 4) + "-" + startWorkingDate.substr(0, 2) + "-" + startWorkingDate.substr(3, 2);
-						var officialWorkingDate = updateData.officialWorkingModalDetails;
-						officialWorkingDate = officialWorkingDate.substr(6, 4) + "-" + officialWorkingDate.substr(0, 2) + "-"
-												+ officialWorkingDate.substr(3, 2);
-						
-						var total = parseInt(updateData.totalDaysModalDetails) * 8 + parseFloat(updateData.totalHoursModalDetails);
-						var remain = parseInt(updateData.remainDaysModalDetails) * 8 + parseFloat(updateData.remainHoursModalDetails);
-						
-						
-						
-						
-						
 						var employeeRegistRequest = {
 							"id" : id,
 							"name" : updateData.nameModalDetails,
@@ -347,7 +360,6 @@
 							"start_working_date" : startWorkingDate,
 							"official_working_date" : officialWorkingDate,
 							"update_date" : updateData.updateDateModalDetails,
-	// 						"team_id" : updateData.teamModalDetails,
 							"role_ids" : $("#roleModalDetailsId").val(),
 							"total_off_hours" : total,
 							"remain_hours" : remain
@@ -817,6 +829,13 @@
 												</select>
 											</div>
 										</div>
+<!-- 										<div class="form-group row"> -->
+<!-- 											<label class="control-label col-sm-3">Team * </label> -->
+<!-- 											<div class="input-group col-sm-9" style="padding-right:15px;"> -->
+<!-- 												<select class="form-control" name="teamModalAdd" id="teamModalAddId"> -->
+<!-- 												</select> -->
+<!-- 											</div> -->
+<!-- 										</div> -->
 										<div class="form-group row">
 											<label class="control-label col-sm-3">Role * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
