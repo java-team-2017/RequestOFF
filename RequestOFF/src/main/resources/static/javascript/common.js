@@ -1,12 +1,12 @@
 var webRootPath = '/';
 var errors = {
-	'DateError': 'time of To field must be after From field',
+	'DateError': 'time in To field must be after From field',
 	'incompleteFields': 'Please fill in all required fields',
 	'offHoursEqual0': 'Off hours must be greater than 0',
 	'exceedTime': 'Off hours exceed remain hours',
 	'roundHour': 'Your hours of off time must be round',
 	'weekend': 'Your choosen hours are belong to weekends',
-	'stringExceedLimit': 'Values exceed the limit',
+	'stringExceedLimit': 'String length exceeds the limit',
 	'APIResponseError': function (errMsg) {
 		return errMsg;
 	}
@@ -73,7 +73,7 @@ function renderDayOffTypeSelect(containerId) {
 	$.ajax({
 		type : "POST",
 		contentType : "application/json",
-		url : "/dayOffType/search",
+		url : webRootPath + "dayOffType/search",
 //		url : /*[[@{/dayOffType/search}]]*/,
 		dataType : 'json',
 		data : JSON.stringify({"valid_flag_id" : "1"}),
