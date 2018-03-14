@@ -138,12 +138,13 @@ public class DepartmentServiceImpl implements DepartmentService {
 		int requestInProcessing = requestRepository.getNumberOfRequestReceivedInProcessing(managerId);
 		if(teams.size() > 0) {
 			Employee manager = employeeRepository.findById(department.getManagerId());
-			throw new Exception(manager.getName() + " are managing teams that belong to " + department.getName() + " Department. Please remove all teams before deleting Department.");
+			throw new Exception(manager.getName() + " are managing teams that belong to " + department.getName() + " Department.<br/>"
+					+ "Please delete all teams before deleting Department.");
 		} 
 		else if(requestInProcessing > 0) {
 			Employee em = employeeRepository.findById(managerId);
 			throw new Exception (em.getName() + " has requests which are in processing. <br/>"
-					+ "Please delete or process all those requests before remove");
+					+ "Please process all those requests before deleting");
 		} 
 		else {
 			departmentRepository.delete(department);

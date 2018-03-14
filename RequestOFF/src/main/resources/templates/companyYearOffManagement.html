@@ -12,106 +12,104 @@
 				'0' : 'Not Reset',
 				'1' : 'Reset'
 			}
-// 			$(function(){
-// 				search();
-// 			});
-// 			function search(){
-// 				var requestData = $('#companyYearOffForm').serializeJSON();
-// 				var requestSearch = {
-// 					"id" : requestData.id,
-// 					"day_off_reset_flag" : requestData.name,
-// 					"number_day_off" : requestData.number_day_off
-// 				};
-// 				$('#companyYearOffTable').DataTable( {
-// 					ajax: {
-// 						type: "POST",
-// 						contentType: "application/json",
-// 						url : /*[[@{/companyYearOff/search}]]*/,
-// 						dataType : 'json',
-// 						data: function () {
-// 							return JSON.stringify(requestSearch);
-// 						},
-// 						dataSrc: 'listCompanyYearOff'
-// 					},
-// 					destroy: true,
-// 					searching: false,
-// 					columns: [
-// 						{ data: 'id' },
-// 						{ 
-// 							data: 'dayOffResetFlag',
-// 							render: function(data, type, row){
-// 								return dayOffResetStatus[data];
-// 							}
-// 						},
-// 						{ data: 'numberDayOff' }
-// 					]
-// 				});
-// 			}
-
 			$(function(){
-				
+				search();
 			});
+			function search(){
+				var requestData = $('#companyYearOffForm').serializeJSON();
+				var requestSearch = {
+					"id" : requestData.id,
+					"day_off_reset_flag" : requestData.name,
+					"number_day_off" : requestData.number_day_off
+				};
+				$('#companyYearOffTable').DataTable( {
+					ajax: {
+						type: "POST",
+						contentType: "application/json",
+						url : /*[[@{/companyYearOff/search}]]*/,
+						dataType : 'json',
+						data: function () {
+							return JSON.stringify(requestSearch);
+						},
+						dataSrc: function (data) {
+							if (data.status_info.status != 0) {
+								$('#alertMessage').html(errors['APIResponseError'](data.status_info.error)).attr('class', 'alert alert-danger').show();
+								return [];
+							}
+							return data.listCompanyYearOff;
+						}
+					},
+					destroy: true,
+					searching: false,
+					columns: [
+						{ data: 'id' },
+						{ 
+							data: 'dayOffResetFlag',
+							render: function(data, type, row){
+								return dayOffResetStatus[data];
+							}
+						},
+						{ data: 'numberDayOff' }
+					]
+				});
+			}
 		/*]]>*/
 		</script>
+		<div th:replace="fragments/header"></div>
+		<div th:replace="menu"></div>
 		
-		<div>
-			<div th:replace="fragments/header"></div>
-			<div th:replace="menu"></div>
-			
-			<div class="requestOffContentBody">
-				<h2>Company Year Off Management</h2><br/>
-				<div>
-					<div id="alertMessage_search" class="alert" style="display:none;"></div>
-					
-					<form class="form-input" id="companyYearOffForm">
-						<div class="form-group">
-							<label for="name">Number of day off in year</label>
-							<input type="text" class="form-control" name="name" id="nameId"/>
-							<input type="hidden" class="form-control" name="number_day_off"/>
-						</div>
-						<div class="form-group">
-							<label>Reset day off</label>
-							<div class="row">
-								<div class="col-sm-2">
-									<input name="resetOrNot" type="radio" value="reset" /> Reset
-								</div>
-								<div class="col-sm-3">
-									<input name="resetOrNot" type="radio" value="reset" /> Not Reset
-								</div>
+		<div class="requestOffContentBody">
+			<h2>Company Year Off Management</h2><br/>
+			<div>
+				<div id="alertMessage" class="alert" style="display:none;"></div>
+				
+				<form class="form-input" id="companyYearOffForm">
+					<div class="form-group">
+						<label for="name">Number of day off in year</label>
+						<input type="text" class="form-control" name="name" id="nameId"/>
+						<input type="hidden" class="form-control" name="number_day_off"/>
+					</div>
+					<div class="form-group">
+						<label>Reset day off</label>
+						<div class="row">
+							<div class="col-sm-2">
+								<input name="resetOrNot" type="radio" value="reset" /> Reset
+							</div>
+							<div class="col-sm-3">
+								<input name="resetOrNot" type="radio" value="reset" /> Not Reset
 							</div>
 						</div>
-						<div class="form-group">
-							<label for="position">Setting for</label>
-							<select class="form-control" name="position" id="positionId">
-								<option value="current">Current year</option>
-								<option value="next">Next year</option>
-							</select>
-						</div>
-						<br/>
-						<div>
-							<button type="button" class="btn btn-primary" id="btnOk">OK</button>&nbsp;&nbsp;
-							<button type="button" class="btn btn-primary" id="btnClear">Clear</button>
-						</div>
-					</form>
-					
-					<div class="table-responsive" style="margin-top: 3em;">
-						<table class="table table-bordered table-striped table-hover"
-							id="companyYearOffTable">
-							<thead>
-								<tr>
-									<th class="text-center">Year</th>
-									<th class="text-center">Day Off Reset</th>
-									<th class="text-center">Number Of Day Off</th>
-								</tr>
-							</thead>
-							<tbody class="text-center">
-							</tbody>
-						</table>
 					</div>
+					<div class="form-group">
+						<label for="position">Setting for</label>
+						<select class="form-control" name="position" id="positionId">
+							<option value="current">Current year</option>
+							<option value="next">Next year</option>
+						</select>
+					</div>
+					<br/>
+					<div>
+						<button type="button" class="btn btn-primary" id="btnOk">OK</button>&nbsp;&nbsp;
+						<button type="button" class="btn btn-primary" id="btnClear">Clear</button>
+					</div>
+				</form>
+				
+				<div class="table-responsive" style="margin-top: 3em;">
+					<table class="table table-bordered table-striped table-hover"
+						id="companyYearOffTable">
+						<thead>
+							<tr>
+								<th class="text-center">Year</th>
+								<th class="text-center">Day Off Reset</th>
+								<th class="text-center">Number Of Day Off</th>
+							</tr>
+						</thead>
+						<tbody class="text-center">
+						</tbody>
+					</table>
 				</div>
 			</div>
-			<div th:replace="fragments/footer"></div>
 		</div>
-
+		<div th:replace="fragments/footer"></div>
 	</body>
 </html>

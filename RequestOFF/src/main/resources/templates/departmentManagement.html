@@ -41,7 +41,13 @@
 					data: function () {
 						return JSON.stringify({'department_id': rowData.id});
 					},
-					dataSrc: 'teams'
+					dataSrc: function (data) {
+						if (data.status_info.status != 0) {
+							$('#alertMessage').html(errors['APIResponseError'](data.status_info.error)).attr('class', 'alert alert-danger').show();
+							return [];
+						}
+						return data.teams;
+					}
 				},
 				destroy: true,
 				searching: false,
@@ -248,7 +254,13 @@
 				data: function () {
 					return JSON.stringify(requestSearch);
 				},
-				dataSrc: 'listDepartment'
+				dataSrc: function (data) {
+					if (data.status_info.status != 0) {
+						$('#alertMessage').html(errors['APIResponseError'](data.status_info.error)).attr('class', 'alert alert-danger').show();
+						return [];
+					}
+					return data.listDepartment;
+				}
 			},
 			destroy: true,
 			searching: false,

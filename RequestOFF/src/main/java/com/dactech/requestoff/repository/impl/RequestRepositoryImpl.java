@@ -187,9 +187,6 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 							}
 						}
 					} 
-					else {
-						System.out.println("error");
-					}
 				}
 			}
 			

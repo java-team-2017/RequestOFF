@@ -199,14 +199,14 @@ public class TeamServiceImpl implements TeamService {
 			if (employee != null ) {
 				int requestInProcessing = requestRepository.getNumberOfRequestInProcessing(te.getEmployeeId());
 				if (requestInProcessing > 0) {
-					throw new Exception (employee.getName() + " has requests which are in processing. <br/>"
-							+ "Please delete or process all those requests before remove");
+					throw new Exception (employee.getName() + " has requests which are in waiting to process. <br/>"
+							+ "Please process all those requests before deleting");
 				}
 				if (te.getLeaderFlag() == 1) { // employee is a leader
 					int numOfRequest = requestRepository.getNumberOfRequestReceivedInProcessing(te.getEmployeeId());
 					if (numOfRequest > 0) {
-						throw new Exception(employee.getName() + " has requests waiting for him to process. <br/>"
-								+ "Please let him process them before changing to new leader");
+						throw new Exception(employee.getName() + " has requests waiting for him/her to process. <br/>"
+								+ "Please let him/her process them before changing to new leader");
 					}
 				}
 			}

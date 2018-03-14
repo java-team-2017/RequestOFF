@@ -58,13 +58,10 @@
 					dataReturnRequest = rowData;
 					$('#nameDetails').val(rowData.employee.name);
 					$('#positionDetails').val(rowData.employee.position.name);
-					if(rowData.employee.position.code == 2 || rowData.employee.position.code == 3){
-						$('#teamDetails').val(rowData.employee.teamName);
-						$('#departmentDetails').val(rowData.employee.departmentName);
-					} else if(rowData.employee.position.code == 1){
-						$('#teamDetails').val(rowData.employee.listTeam[0].name);
-						$('#departmentDetails').val(rowData.employee.listTeam[0].department.name);
-					}
+					$('#teamDetails').val(rowData.employee.teamName);
+					$('#departmentDetails').val(rowData.employee.departmentName);
+					$('#teamDetails').val(rowData.employee.listTeam[0].name);
+					$('#departmentDetails').val(rowData.employee.listTeam[0].department.name);
 					$('#recipientDetails').val(rowData.recipientName);
 					$('#fromTimeDetails').val((rowData.fromTime).substr(0, rowData.fromTime.length - 5));
 					$('#toTimeDetails').val((rowData.toTime).substr(0, rowData.toTime.length - 5));
@@ -268,8 +265,6 @@
 						}
 						return data.requests;
 					}
-					
-					
 				},
 				destroy: true,
 				searching: false,
