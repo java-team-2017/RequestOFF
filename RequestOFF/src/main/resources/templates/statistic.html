@@ -101,6 +101,7 @@
 				processing: true,
 				serverSide: true,
 				searching: false,
+				pageLength: 50,
 				ajax: {
 					'url' : /*[[@{/employee/statisticsPaging}]]*/,
 					'type': "POST",
@@ -182,7 +183,7 @@
 							if (searchParam.year == (new Date()).getFullYear()) {
 								return '<a class="editRemainHours"><span class="glyphicon glyphicon-edit"></span></a>';
 							} else {
-								return '<a class="editRemainHours not-active"><span class="glyphicon glyphicon-edit" style="opacity: 0.5;"></span></a>';
+								return '<a class="editRemainHours not-active"><span class="glyphicon glyphicon-edit" style="opacity: 0.5;" disabled="true"></span></a>';
 							}
 						}
 					}
