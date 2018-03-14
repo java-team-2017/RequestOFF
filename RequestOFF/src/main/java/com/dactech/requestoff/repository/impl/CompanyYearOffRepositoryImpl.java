@@ -25,6 +25,9 @@ public class CompanyYearOffRepositoryImpl implements CompanyYearOffRepositoryCus
 		if(StringUtil.isNotEmpty(companyYearOffSearchRequest.getDayOffResetFlag())) {
 			sqlQuery += " AND day_off_reset_flag = " + companyYearOffSearchRequest.getDayOffResetFlag();
 		}
+		if(StringUtil.isNotEmpty(companyYearOffSearchRequest.getNumberDayOff())) {
+			sqlQuery += " AND number_day_off = " + companyYearOffSearchRequest.getNumberDayOff();
+		}
 		if(StringUtil.isNotEmpty(companyYearOffSearchRequest.getCurrentYearFlag())) {
 			sqlQuery += " AND current_year_flag = " + companyYearOffSearchRequest.getCurrentYearFlag();
 		}

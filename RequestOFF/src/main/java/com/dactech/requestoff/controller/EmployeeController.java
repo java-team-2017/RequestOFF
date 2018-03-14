@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dactech.requestoff.model.common.StatusInfo;
-import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.Position;
 import com.dactech.requestoff.model.request.EmployeeDeleteRequest;

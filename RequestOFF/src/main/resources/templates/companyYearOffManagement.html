@@ -12,41 +12,45 @@
 				'0' : 'Not Reset',
 				'1' : 'Reset'
 			}
+// 			$(function(){
+// 				search();
+// 			});
+// 			function search(){
+// 				var requestData = $('#companyYearOffForm').serializeJSON();
+// 				var requestSearch = {
+// 					"id" : requestData.id,
+// 					"day_off_reset_flag" : requestData.name,
+// 					"number_day_off" : requestData.number_day_off
+// 				};
+// 				$('#companyYearOffTable').DataTable( {
+// 					ajax: {
+// 						type: "POST",
+// 						contentType: "application/json",
+// 						url : /*[[@{/companyYearOff/search}]]*/,
+// 						dataType : 'json',
+// 						data: function () {
+// 							return JSON.stringify(requestSearch);
+// 						},
+// 						dataSrc: 'listCompanyYearOff'
+// 					},
+// 					destroy: true,
+// 					searching: false,
+// 					columns: [
+// 						{ data: 'id' },
+// 						{ 
+// 							data: 'dayOffResetFlag',
+// 							render: function(data, type, row){
+// 								return dayOffResetStatus[data];
+// 							}
+// 						},
+// 						{ data: 'numberDayOff' }
+// 					]
+// 				});
+// 			}
+
 			$(function(){
-				search();
+				
 			});
-			function search(){
-				var requestData = $('#companyYearOffForm').serializeJSON();
-				var requestSearch = {
-					"id" : requestData.id,
-					"day_off_reset_flag" : requestData.name,
-					"number_day_off" : requestData.number_day_off
-				};
-				$('#companyYearOffTable').DataTable( {
-					ajax: {
-						type: "POST",
-						contentType: "application/json",
-						url : /*[[@{/companyYearOff/search}]]*/,
-						dataType : 'json',
-						data: function () {
-							return JSON.stringify(requestSearch);
-						},
-						dataSrc: 'listCompanyYearOff'
-					},
-					destroy: true,
-					searching: false,
-					columns: [
-						{ data: 'id' },
-						{ 
-							data: 'dayOffResetFlag',
-							render: function(data, type, row){
-								return dayOffResetStatus[data];
-							}
-						},
-						{ data: 'numberDayOff' }
-					]
-				});
-			}
 		/*]]>*/
 		</script>
 		

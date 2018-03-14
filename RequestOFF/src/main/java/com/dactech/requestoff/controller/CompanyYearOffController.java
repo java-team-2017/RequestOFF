@@ -28,6 +28,7 @@ public class CompanyYearOffController {
 			companyYearOffRegistResponse = companyYearOffService.regist(companyYearOffRegistRequest);
 			statusInfo = new StatusInfo(StatusInfo.SUCCESS, null);
 		} catch (Exception e) {
+			e.printStackTrace();
 			statusInfo = new StatusInfo(StatusInfo.ERROR, e.getMessage());
 		}
 		companyYearOffRegistResponse.setStatusInfo(statusInfo);
