@@ -16,6 +16,7 @@
 		var listTeam;
 		
 		var editEmployee; // for editing remain hours of employee purpose
+		var searchParam;
 		
 		//Department combobox
 		renderDepartmentSelect("department", function(departments) {
@@ -93,7 +94,7 @@
 		// # Button even handler
 		//=====================================================================
 		function search() {
-			var searchParam = $('#searchForm').serializeJSON();
+			searchParam = $('#searchForm').serializeJSON();
 			$('#alertMessage').hide();
 			
 			$('#statisticsTable').DataTable({
@@ -185,7 +186,8 @@
 							} else {
 								return '<a class="editRemainHours not-active"><span class="glyphicon glyphicon-edit" style="opacity: 0.5;" disabled="true"></span></a>';
 							}
-						}
+						},
+						orderable: false
 					}
 				]
 			});
@@ -317,6 +319,9 @@
 		});
 		
 		$("#statisticsTable tbody").on('click', '.editRemainHours', function() {
+			if (searchParam.year != (new Date()).getFullYear()) {
+				return;
+			}
 			var statisticsTable = $('#statisticsTable').DataTable();
 			var statisticsObj = statisticsTable.row($(this).parent()).data();
 			
