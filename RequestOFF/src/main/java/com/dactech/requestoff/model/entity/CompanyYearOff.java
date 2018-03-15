@@ -5,6 +5,15 @@ import javax.persistence.Id;
 
 @Entity
 public class CompanyYearOff {
+	public static final int DAY_OFF_RESET = 1;
+	public static final int DAY_OFF_NOT_RESET = 0;
+	public static final int DEFAULT_DAY_OFF_RESET_FLAG = DAY_OFF_NOT_RESET;
+	public static final int DEFAULT_NUMBER_DAY_OFF = 12;
+	public static final int OLD_YEAR = 0;
+	public static final int LAST_YEAR = 2;
+	public static final int CURRENT_YEAR = 1;
+	public static final int NEXT_YEAR = 3;
+	
 	@Id
 	private long id;
 	private int dayOffResetFlag;
