@@ -20,6 +20,20 @@
 					'4': 'responded',
 					'5': 'waiting'
 				};
+				var requestRegistRequest = {
+					"id" : "",
+					"employee_id" : "",
+					"from_time" : "",
+					"to_time" : "",
+					"total_time" : "",
+					"reason" : "",
+					"status" : "",
+					"response_message" : "",
+					"day_off_type_id" : "",
+					"recipient_id" : "",
+					"valid_flag" : "",
+					"update_date" : ""
+				};
 				
 				renderDayOffTypeSelect('id_dayOffType');
 				
@@ -54,17 +68,6 @@
 				});
 				
 				$('#btnSave, #btnSend').on('click', function() {
-					var status, alertStr;
-					if($(this).attr('id') == 'btnSave') {
-						status = 1;
-						alertStr = "Your request has been saved";
-					}
-					else {
-// 						$("#confirmModal").modal('show');
-						status = 5;
-						alertStr = "Your request has been sent";
-					}
-					
 					//validate
 					var complete = 1, dateError = 0, exceed = 0, offHoursEqual0 = 0, isNotNagativeInteger = 1;
 					var listInput = $('#createRequestForm').find(':input').not("button");
@@ -113,59 +116,29 @@
 						$('#alertMessage').html(errors['offHoursEqual0']).attr('class', 'alert alert-danger').show();
 					}
 					else {
-						var requestRegistRequest = {
-							"id" : "",
-							"employee_id" : employeeId,
-							"from_time" : from,
-							"to_time" : to,
-							"total_time" : offHours,
-							"reason" : createRequestData.reason,
-							"status" : status,
-							"response_message" : "",
-							"day_off_type_id" : createRequestData.dayOffType,
-							"recipient_id" : createRequestData.recipient,
-							"valid_flag" : "1",
-							"update_date" : ""
-						};
-						console.log(requestRegistRequest);
-						$.ajax({
-							type : "POST",
-							contentType : "application/json",
-							url : /*[[@{/request/regist}]]*/,
-							dataType : 'json',
-							data : JSON.stringify(requestRegistRequest),
-							success : function(returnData) {
-								if(returnData.status_info.status == 1) {
-									$('#alertMessage').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
-								} else {
-									//get current user
-									$.ajax({
-										type : "POST",
-										contentType : "application/json",
-										url : /*[[@{/employee/getUser}]]*/,
-										dataType : 'json',
-										data : JSON.stringify({}),
-										success : function(returnData) {
-											if(returnData.status_info.status == 1) {
-												$('#alertMessage').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
-											} else {
-												renderRemainHours(returnData.remainHours, 'remainHours');
-											}
-										},
-										error : function(e) {
-											$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-										}
-									});
-									$('#alertMessage').html(alertStr).attr('class', 'alert alert-success').show();
-									$("#createRequestForm :input").not("button, select").val("");
-									$("#createRequestForm select").prop('selectedIndex', 0);
-								}
-							},
-							error : function(e) {
-								$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-							}
-						});
+						requestRegistRequest.employee_id = employeeId;
+						requestRegistRequest.from_time = from;
+						requestRegistRequest.to_time = to;
+						requestRegistRequest.total_time = offHours;
+						requestRegistRequest.reason = createRequestData.reason;
+						requestRegistRequest.day_off_type_id = createRequestData.dayOffType;
+						requestRegistRequest.recipient_id = createRequestData.recipient;
+						requestRegistRequest.valid_flag = "1";
+						
+						var notifyStr;
+						if($(this).attr('id') == 'btnSave') {
+							requestRegistRequest.status = "1";
+							registRequest(requestRegistRequest);
+						}
+						else {
+							$("#confirmModal").modal('show');
+						}
 					}
+				});
+				
+				$("#yesConfirm").on("click", function() {
+					requestRegistRequest.status = "5";
+					registRequest(requestRegistRequest);
 				});
 				
 				$('#btnClear').on('click', function() {
@@ -173,6 +146,54 @@
 					$("#createRequestForm select").prop('selectedIndex', 0);
 				});
 			});
+			
+			function registRequest(registData) {
+				var notifyStr;
+				if(registData.status == 1) {
+					notifyStr = "Your request has been saved";
+				} else {
+					notifyStr = "Your request has been sent";
+				}
+				
+				console.log(registData);
+				$.ajax({
+					type : "POST",
+					contentType : "application/json",
+					url : /*[[@{/request/regist}]]*/,
+					dataType : 'json',
+					data : JSON.stringify(registData),
+					success : function(returnData) {
+						if(returnData.status_info.status == 1) {
+							$('#alertMessage').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+						} else {
+							//get current user
+							$.ajax({
+								type : "POST",
+								contentType : "application/json",
+								url : /*[[@{/employee/getUser}]]*/,
+								dataType : 'json',
+								data : JSON.stringify({}),
+								success : function(returnData) {
+									if(returnData.status_info.status == 1) {
+										$('#alertMessage').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+									} else {
+										renderRemainHours(returnData.remainHours, 'remainHours');
+									}
+								},
+								error : function(e) {
+									$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+								}
+							});
+							$('#alertMessage').html(notifyStr).attr('class', 'alert alert-success').show();
+							$("#createRequestForm :input").not("button, select").val("");
+							$("#createRequestForm select").prop('selectedIndex', 0);
+						}
+					},
+					error : function(e) {
+						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+					}
+				});
+			}
 				
 		/*]]>*/
 		</script>
