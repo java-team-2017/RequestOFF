@@ -23,6 +23,20 @@
 			};
 			
 			$(function() {
+				var requestRegistRequest = {
+					"id" : "",
+					"from_time" : "",
+					"to_time" : "",
+					"total_time" : "",
+					"reason" : "",
+					"status" : "",
+					"response_message" : "",
+					"day_off_type_id" : "",
+					"recipient_id" : "",
+					"update_date" : ""
+				};
+				var deleteFlag = 0;
+				
 				//render day off type select
 				$.ajax({
 					type : "POST",
@@ -196,66 +210,62 @@
 					
 					$("#requestId_confirmModalId").val(id);
 					$("#updateDate_confirmModalId").val(updateDate);
+					$("#confirmMessage").html("Are you sure you want to delete this request?");
 					$("#confirmModal").modal('show');
+					deleteFlag = 1;
 				});
 				
 				$("#yesConfirm").on("click", function(e) {
-					//update request
-					$.ajax({
-						type : "POST",
-						contentType : "application/json",
-						url : /*[[@{/request/regist}]]*/,
-						dataType : 'json',
-						data : JSON.stringify({
-							"id" : $("#requestId_confirmModalId").val(),
-							"valid_flag" : "0",
-							"update_date" : $("#updateDate_confirmModalId").val()
-						}),
-						success : function(returnData) {
-							if(returnData.status_info.status == 1) {
-								$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
-							} else {
-								table = $('#requestHistoryTable').DataTable();
-								table.ajax.reload();
-								$.ajax({
-									type : "POST",
-									contentType : "application/json",
-									url : /*[[@{/employee/getUser}]]*/,
-									dataType : 'json',
-									data : JSON.stringify({}),
-									success : function(returnData) {
-										if(returnData.status_info.status == 1) {
-											$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
-										} else {
-											remainHours = returnData.remainHours;
-											renderRemainHours(returnData.remainHours, 'remainHours');
+					if(deleteFlag == 1) {
+						//update request
+						$.ajax({
+							type : "POST",
+							contentType : "application/json",
+							url : /*[[@{/request/regist}]]*/,
+							dataType : 'json',
+							data : JSON.stringify({
+								"id" : $("#requestId_confirmModalId").val(),
+								"valid_flag" : "0",
+								"update_date" : $("#updateDate_confirmModalId").val()
+							}),
+							success : function(returnData) {
+								if(returnData.status_info.status == 1) {
+									$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+								} else {
+									table = $('#requestHistoryTable').DataTable();
+									table.ajax.reload();
+									$.ajax({
+										type : "POST",
+										contentType : "application/json",
+										url : /*[[@{/employee/getUser}]]*/,
+										dataType : 'json',
+										data : JSON.stringify({}),
+										success : function(returnData) {
+											if(returnData.status_info.status == 1) {
+												$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+											} else {
+												remainHours = returnData.remainHours;
+												renderRemainHours(returnData.remainHours, 'remainHours');
+											}
+										},
+										error : function(e) {
+											$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 										}
-									},
-									error : function(e) {
-										$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-									}
-								});
-								$('#alertMessage_search').html("Delete successfully!").attr('class', 'alert alert-success').show();
+									});
+									$('#alertMessage_search').html("Delete successfully!").attr('class', 'alert alert-success').show();
+								}
+							},
+							error : function(e) {
+								$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 							}
-						},
-						error : function(e) {
-							$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-						}
-					});
+						});
+					} else {
+						requestRegistRequest.status = "5";
+						registRequest(requestRegistRequest);
+					}
 				});
 				
 				$('#btnSave_modal, #btnSend_modal').on('click', function() {
-					var status;
-					var notifyStr;
-					if($(this).attr('id') == 'btnSave_modal') {
-						status = 1;
-						notifyStr = "Your request has been saved";
-					}
-					else {
-						status = 5;
-						notifyStr = "Your request has been sent";
-					}
-					
 					var editRequestData = $('#modalForm').serializeJSON();
 					
 					//validate
@@ -306,57 +316,25 @@
 					else {
 						//update request
 						var requestId = $("#modalRequestId").html();
-						var requestRegistRequest = {
-							"id" : requestId,
-							"from_time" : from,
-							"to_time" : to,
-							"total_time" : offHours,
-							"reason" : editRequestData.reason_modalForm,
-							"status" : status,
-							"response_message" : editRequestData.responseMessage_modalForm,
-							"day_off_type_id" : editRequestData.dayOffType_modalForm,
-							"recipient_id" : editRequestData.recipient_modalForm,
-							"update_date" : editRequestData.updateDate_modalForm
-						};
-						console.log(requestRegistRequest);
-						$.ajax({
-							type : "POST",
-							contentType : "application/json",
-							url : /*[[@{/request/regist}]]*/,
-							dataType : 'json',
-							data : JSON.stringify(requestRegistRequest),
-							success : function(returnData) {
-								if(returnData.status_info.status == 1) {
-									$('#alertMessage_edit').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
-								} else {
-									table = $('#requestHistoryTable').DataTable();
-									table.ajax.reload();
-									$.ajax({
-										type : "POST",
-										contentType : "application/json",
-										url : /*[[@{/employee/getUser}]]*/,
-										dataType : 'json',
-										data : JSON.stringify({}),
-										success : function(returnData) {
-											if(returnData.status_info.status == 1) {
-												$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
-											} else {
-												remainHours = returnData.remainHours;
-												renderRemainHours(returnData.remainHours, 'remainHours');
-											}
-										},
-										error : function(e) {
-											$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-										}
-									});
-									$('#requestDetailsModal').modal('hide');
-									$('#alertMessage_search').html(notifyStr).attr('class', 'alert alert-success').show();
-								}
-							},
-							error : function(e) {
-								$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-							}
-						});
+						requestRegistRequest.id = requestId;
+						requestRegistRequest.from_time = from;
+						requestRegistRequest.to_time = to;
+						requestRegistRequest.total_time = offHours;
+						requestRegistRequest.reason = editRequestData.reason_modalForm;
+						requestRegistRequest.response_message = editRequestData.responseMessage_modalForm;
+						requestRegistRequest.day_off_type_id = editRequestData.dayOffType_modalForm;
+						requestRegistRequest.recipient_id = editRequestData.recipient_modalForm;
+						requestRegistRequest.update_date = editRequestData.updateDate_modalForm;
+						
+						if($(this).attr('id') == 'btnSave_modal') {
+							requestRegistRequest.status = "1";
+							registRequest(requestRegistRequest);
+						} else {
+							$("#confirmMessage").html("Are you sure you want to send this request?");
+							$("#confirmModal").modal('show');
+							deleteFlag = 0;
+						}
+						
 					}
 				});
 			});
@@ -478,6 +456,55 @@
 							}
 						}
 					]
+				});
+			}
+			
+			function registRequest(registData) {
+				var notifyStr;
+				if(registData.status == 1) {
+					notifyStr = "Your request has been saved";
+				} else {
+					notifyStr = "Your request has been sent";
+				}
+				
+				console.log(registData);
+				$.ajax({
+					type : "POST",
+					contentType : "application/json",
+					url : /*[[@{/request/regist}]]*/,
+					dataType : 'json',
+					data : JSON.stringify(registData),
+					success : function(returnData) {
+						if(returnData.status_info.status == 1) {
+							$('#alertMessage_edit').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+						} else {
+							table = $('#requestHistoryTable').DataTable();
+							table.ajax.reload();
+							$.ajax({
+								type : "POST",
+								contentType : "application/json",
+								url : /*[[@{/employee/getUser}]]*/,
+								dataType : 'json',
+								data : JSON.stringify({}),
+								success : function(returnData) {
+									if(returnData.status_info.status == 1) {
+										$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+									} else {
+										remainHours = returnData.remainHours;
+										renderRemainHours(returnData.remainHours, 'remainHours');
+									}
+								},
+								error : function(e) {
+									$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+								}
+							});
+							$('#requestDetailsModal').modal('hide');
+							$('#alertMessage_search').html(notifyStr).attr('class', 'alert alert-success').show();
+						}
+					},
+					error : function(e) {
+						$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+					}
 				});
 			}
 			
@@ -745,7 +772,7 @@
 									<h4 class="modal-title">Confirm delete</h4>
 								</div>
 								<div class="modal-body">
-									<p>Are you sure you want to delete this request?</p>
+									<p id="confirmMessage"></p>
 								</div>
 								<div class="modal-footer">
 									<button type="button" class="btn btn-default" data-dismiss="modal" id="yesConfirm">Yes</button>
