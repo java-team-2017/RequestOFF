@@ -148,6 +148,8 @@
 									console.log(rowData.status + "====--");
 									$('#alertMessage_edit').html(rowData.recipientName + " who is the recipient of this request is no longer your leader/manager. "
 																	+ "Please choose another recipient").attr('class', 'alert alert-warning').show();
+									$("#hiddenRecipientDiv").hide();
+									$("#modalRecipientDiv").show();
 								}
 							} else {
 								$("#hiddenRecipientDiv").hide();
@@ -269,21 +271,33 @@
 					var editRequestData = $('#modalForm').serializeJSON();
 					
 					//validate
-					var complete = 1, valid = 1, exceed = 0, offHoursEqual0 = 0, isNotNagativeInteger = 1;
-					var listInput = $("#modalForm").find(':input').not("#modalResponseMessage");
+					var complete = 1, valid = 1, exceedLength = 0, offHoursEqual0 = 0, isNotNagativeInteger = 1;
+					var listInput = $("#modalForm").find(':input').not("#modalResponseMessage, #modalOffDays");
 					$.each(listInput, function() {
 						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
 							complete = 0;
 						}
 					});
 					
+					if(editRequestData.offDays == "" || editRequestData.offDays === undefined || editRequestData.offDays === null) {
+						editRequestData.offDays = 0;
+					} else {
+						if(isNaN(editRequestData.offDays) == true || (parseFloat(editRequestData.offDays) % 1) !== 0
+								|| parseFloat(editRequestData.offDays) < 0) {
+							isNotNagativeInteger = 0;
+						}
+					}
+					
 					var offHours = parseInt(editRequestData.offDays) * 8 + parseFloat(editRequestData.offHours);
 					var oldOffHours = parseFloat(editRequestData.totalTime_modalForm);
 					console.log("old: " + oldOffHours);
-					if(isNaN(editRequestData.offDays) == true || (parseFloat(editRequestData.offDays) % 1) !== 0
-							|| parseFloat(editRequestData.offDays) < 0) {
-						isNotNagativeInteger = 0;
+					if((editRequestData.reason_modalForm).length > 300) {
+						exceedLength = 1;
 					}
+// 					if(isNaN(editRequestData.offDays) == true || (parseFloat(editRequestData.offDays) % 1) !== 0
+// 							|| parseFloat(editRequestData.offDays) < 0) {
+// 						isNotNagativeInteger = 0;
+// 					}
 					if(offHours <= 0){
 						offHoursEqual0 = 1;
 					}
@@ -303,6 +317,9 @@
 					
 					if(complete == 0) {
 						$('#alertMessage_edit').html(errors['incompleteFields']).attr('class', 'alert alert-danger').show();
+					}
+					else if(exceedLength == 1) {
+						$('#alertMessage_edit').html(errors['stringExceedLimit']).attr('class', 'alert alert-danger').show();
 					}
 					else if(valid == 0) {
 						$('#alertMessage_edit').html(errors['DateError']).attr('class', 'alert alert-danger').show();
@@ -334,7 +351,6 @@
 							$("#confirmModal").modal('show');
 							deleteFlag = 0;
 						}
-						
 					}
 				});
 			});

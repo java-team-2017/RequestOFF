@@ -69,8 +69,8 @@
 				
 				$('#btnSave, #btnSend').on('click', function() {
 					//validate
-					var complete = 1, dateError = 0, exceed = 0, offHoursEqual0 = 0, isNotNagativeInteger = 1;
-					var listInput = $('#createRequestForm').find(':input').not("button");
+					var complete = 1, exceedLength = 0, dateError = 0, exceed = 0, offHoursEqual0 = 0, isNotNagativeInteger = 1;
+					var listInput = $('#createRequestForm').find(':input').not("button, #offDaysId");
 					$.each(listInput, function() {
 						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
 							complete = 0;
@@ -78,12 +78,20 @@
 					});
 					
 					var createRequestData = $('#createRequestForm').serializeJSON();
+					if(createRequestData.offDays == "" || createRequestData.offDays === undefined || createRequestData.offDays === null) {
+						createRequestData.offDays = 0;
+					} else {
+						if(isNaN(createRequestData.offDays) == true || (parseFloat(createRequestData.offDays) % 1) !== 0
+								|| parseFloat(createRequestData.offDays) < 0) {
+							isNotNagativeInteger = 0;
+						}
+					}
+					
 					var offHours = parseInt(createRequestData.offDays) * 8 + parseFloat(createRequestData.offHours);
 					console.log(offHours);
 					
-					if(isNaN(createRequestData.offDays) == true || (parseFloat(createRequestData.offDays) % 1) !== 0
-							|| parseFloat(createRequestData.offDays) < 0) {
-						isNotNagativeInteger = 0;
+					if((createRequestData.reason).length > 300) {
+						exceedLength = 1;
 					}
 					if(offHours <= 0){
 						offHoursEqual0 = 1;
@@ -105,6 +113,9 @@
 					
 					if(complete == 0) {
 						$('#alertMessage').html(errors['incompleteFields']).attr('class', 'alert alert-danger').show();
+					}
+					else if(exceedLength == 1) {
+						$('#alertMessage').html(errors['stringExceedLimit']).attr('class', 'alert alert-danger').show();
 					}
 					else if(dateError == 1) {
 						$('#alertMessage').html(errors['DateError']).attr('class', 'alert alert-danger').show();

@@ -46,6 +46,11 @@
 					listRole = roles;
 				});
 				
+				var employeeSearchRequest = getEmployeeSearchRequest();
+				console.log("employeeSearchRequest:");
+				console.log(employeeSearchRequest);
+				search(employeeSearchRequest);
+				
 				//Employee text field type ahead
 				$('#nameId').typeahead({
 					name: 'suggest-employee',
@@ -204,7 +209,6 @@
 											+ officialWorkingDate.substr(3, 2);
 					
 					var totalTime = parseInt(addData.totalDaysModalAdd) * 8 + parseFloat(addData.totalHoursModalAdd);
-					var remainTime = parseInt(addData.remainDaysModalAdd) * 8 + parseFloat(addData.remainHoursModalAdd);
 					
 					//-----------validate------------
 					var complete = 1, exceedLength = 0, isNotNagativeInteger = 1, dateError = 0, valid = 1;
@@ -218,15 +222,11 @@
 						exceedLength = 1;
 					}
 					if(isNaN(addData.totalDaysModalAdd) == true || (parseFloat(addData.totalDaysModalAdd) % 1) !== 0
-							|| parseFloat(addData.totalDaysModalAdd) < 0 || isNaN(addData.remainDaysModalAdd) == true
-							|| (parseFloat(addData.remainDaysModalAdd) % 1) !== 0 || parseFloat(addData.remainDaysModalAdd) < 0) {
+							|| parseFloat(addData.totalDaysModalAdd) < 0) {
 						isNotNagativeInteger = 0;
 					}
 					if(birthday.localeCompare(startWorkingDate) >= 0 || startWorkingDate.localeCompare(officialWorkingDate) >= 0) {
 						dateError = 1;
-					}
-					if(totalTime < remainTime) {
-						valid = 0;
 					}
 
 					//----------end validate---------
@@ -262,7 +262,7 @@
 // 	 						"team_id" : addData.teamModalAdd,
 							"role_ids" : $("#roleModalAddId").val(),
 							"total_off_hours" : totalTime,
-							"remain_hours" : remainTime
+							"remain_hours" : totalTime
 						};
 						console.log(employeeRegistRequest);
 						
@@ -848,30 +848,6 @@
 											<div class="form-inline">
 												<input type="text" class="form-control" name="totalDaysModalAdd" id="totalDaysModalAddId" />&nbsp;day(s)&nbsp;
 												<select class="form-control" name="totalHoursModalAdd" id="totalHoursModalAddId">
-													<option value="0">0</option>
-													<option value="0.5">0.5</option>
-													<option value="1">1</option>
-													<option value="1.5">1.5</option>
-													<option value="2">2</option>
-													<option value="2.5">2.5</option>
-													<option value="3">3</option>
-													<option value="3.5">3.5</option>
-													<option value="4">4</option>
-													<option value="4.5">4.5</option>
-													<option value="5">5</option>
-													<option value="5.5">5.5</option>
-													<option value="6">6</option>
-													<option value="6.5">6.5</option>
-													<option value="7">7</option>
-													<option value="7.5">7.5</option>
-												</select>&nbsp;hour(s)
-											</div>
-										</div>
-										<div class="form-group row">
-											<label class="control-label col-sm-3">Remain time * : </label>
-											<div class="form-inline">
-												<input type="text" class="form-control" name="remainDaysModalAdd" id="remainDaysModalAddId" />&nbsp;day(s)&nbsp;
-												<select class="form-control" name="remainHoursModalAdd" id="remainHoursModalAddId">
 													<option value="0">0</option>
 													<option value="0.5">0.5</option>
 													<option value="1">1</option>
