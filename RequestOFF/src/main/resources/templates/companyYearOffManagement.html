@@ -3,56 +3,83 @@
 	<head>
 		<title>Company Year Off Management</title>
 		<div th:replace="library"></div>
-<!-- 		<link rel="stylesheet" type="text/css" href="css/companyYearOffManagementStyle.css" /> -->
 	</head>
 	<body class="content-body">
 		<script th:inline="javascript">
 		/*<![CDATA[*/
-			var dayOffResetStatus = {
-				'0' : 'Not Reset',
-				'1' : 'Reset'
-			}
-			$(function(){
-				search();
-			});
-			function search(){
-				var requestData = $('#companyYearOffForm').serializeJSON();
-				var requestSearch = {
-					"id" : requestData.id,
-					"day_off_reset_flag" : requestData.name,
-					"number_day_off" : requestData.number_day_off
+		var dayOffResetStatus = {
+			'0' : 'Not Reset',
+			'1' : 'Reset'
+		}
+		$(function(){
+			search();
+			
+			$('#btnOk').on('click', function(){
+				var dataRequest = {
+					"for_next_year" : $('#forNextYear').val(),
+					"day_off_reset_flag" : $('input[name=resetOrNot]:checked').val(),
+					"number_day_off" : $('#numberOfDay').val()
 				};
-				$('#companyYearOffTable').DataTable( {
-					ajax: {
-						type: "POST",
-						contentType: "application/json",
-						url : /*[[@{/companyYearOff/search}]]*/,
-						dataType : 'json',
-						data: function () {
-							return JSON.stringify(requestSearch);
-						},
-						dataSrc: function (data) {
-							if (data.status_info.status != 0) {
-								$('#alertMessage').html(errors['APIResponseError'](data.status_info.error)).attr('class', 'alert alert-danger').show();
-								return [];
-							}
-							return data.listCompanyYearOff;
+				$.ajax({
+					type : "POST",
+					contentType : "application/json",
+					url : /*[[@{/companyYearOff/regist}]]*/,
+					dataType : 'json',
+					data : JSON.stringify(dataRequest),
+					success : function(dataResult) {
+						if (dataResult.status_info.status == 0) {
+							$('#alertMessage').html("Setting Successfully").attr('class', 'alert alert-success').show();
+						} 
+ 						else {
+ 							$('#alertMessage').html("Setting failed !").attr('class', 'alert alert-danger').show();
+ 						}
+						var loadTable = $('#companyYearOffTable').DataTable();
+						loadTable.ajax.reload();
+					},
+					error : function(e) {
+						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+					}
+				});
+			});
+		});
+		function search(){
+			var requestData = $('#companyYearOffForm').serializeJSON();
+			var requestSearch = {
+				"id" : requestData.id,
+				"day_off_reset_flag" : requestData.name,
+				"number_day_off" : requestData.number_day_off
+			};
+			$('#companyYearOffTable').DataTable( {
+				ajax: {
+					type: "POST",
+					contentType: "application/json",
+					url : /*[[@{/companyYearOff/getCompanyYearOffCurrentAndNextYear}]]*/,
+					dataType : 'json',
+					data: function () {
+						return JSON.stringify(requestSearch);
+					},
+					dataSrc: function (data) {
+						if (data.status_info.status != 0) {
+							$('#alertMessage').html(errors['APIResponseError'](data.status_info.error)).attr('class', 'alert alert-danger').show();
+							return [];
+						}
+						return data.listCompanyYearOff;
+					}
+				},
+				destroy: true,
+				searching: false,
+				columns: [
+					{ data: 'id' },
+					{ 
+						data: 'dayOffResetFlag',
+						render: function(data, type, row){
+							return dayOffResetStatus[data];
 						}
 					},
-					destroy: true,
-					searching: false,
-					columns: [
-						{ data: 'id' },
-						{ 
-							data: 'dayOffResetFlag',
-							render: function(data, type, row){
-								return dayOffResetStatus[data];
-							}
-						},
-						{ data: 'numberDayOff' }
-					]
-				});
-			}
+					{ data: 'numberDayOff' }
+				]
+			});
+		}
 		/*]]>*/
 		</script>
 		<div th:replace="fragments/header"></div>
@@ -65,32 +92,32 @@
 				
 				<form class="form-input" id="companyYearOffForm">
 					<div class="form-group">
-						<label for="name">Number of day off in year</label>
-						<input type="text" class="form-control" name="name" id="nameId"/>
+						<label for="name">Number of day off in year *</label>
+						<input type="text" class="form-control" name="name" id="numberOfDay"/>
 						<input type="hidden" class="form-control" name="number_day_off"/>
 					</div>
 					<div class="form-group">
-						<label>Reset day off</label>
+						<label>Reset day off *</label>
 						<div class="row">
 							<div class="col-sm-2">
-								<input name="resetOrNot" type="radio" value="reset" /> Reset
+								<input name="resetOrNot" type="radio" value="1" id="reset"/> Reset
 							</div>
 							<div class="col-sm-3">
-								<input name="resetOrNot" type="radio" value="reset" /> Not Reset
+								<input name="resetOrNot" type="radio" value="0" id="notReset"/> Not Reset
 							</div>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="position">Setting for</label>
-						<select class="form-control" name="position" id="positionId">
-							<option value="current">Current year</option>
-							<option value="next">Next year</option>
+						<label for="position">Setting for *</label>
+						<select class="form-control" name="" id="forNextYear">
+							<option value="0">Current year</option>
+							<option value="1">Next year</option>
 						</select>
 					</div>
 					<br/>
 					<div>
 						<button type="button" class="btn btn-primary" id="btnOk">OK</button>&nbsp;&nbsp;
-						<button type="button" class="btn btn-primary" id="btnClear">Clear</button>
+						<button type="reset" class="btn btn-primary" id="btnClear">Clear</button>
 					</div>
 				</form>
 				

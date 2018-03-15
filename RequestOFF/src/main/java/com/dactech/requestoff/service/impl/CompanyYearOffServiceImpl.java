@@ -7,10 +7,12 @@ import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.CompanyYearOff;
 import com.dactech.requestoff.model.entity.EmployeeOffStatus;
+import com.dactech.requestoff.model.request.CompanyYearOffCurrentAndNextYearSearchRequest;
 import com.dactech.requestoff.model.request.CompanyYearOffDetailsRequest;
 import com.dactech.requestoff.model.request.CompanyYearOffRegistRequest;
 import com.dactech.requestoff.model.request.CompanyYearOffSearchRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatusSearchRequest;
+import com.dactech.requestoff.model.response.CompanyYearOffCurrentAndNextYearSearchResponse;
 import com.dactech.requestoff.model.response.CompanyYearOffDetailsResponse;
 import com.dactech.requestoff.model.response.CompanyYearOffRegistResponse;
 import com.dactech.requestoff.model.response.CompanyYearOffSearchResponse;
@@ -160,5 +162,13 @@ public class CompanyYearOffServiceImpl implements CompanyYearOffService{
 		CompanyYearOff companyYearOff = companyYearOffRepository.findById(Long.parseLong(companyYearOffDetailsRequest.getId()));
 		CompanyYearOffDetailsResponse companyYearOffDetailsResponse = new CompanyYearOffDetailsResponse(companyYearOff);
 		return companyYearOffDetailsResponse;
+	}
+
+	@Override
+	public CompanyYearOffCurrentAndNextYearSearchResponse search(
+			CompanyYearOffCurrentAndNextYearSearchRequest companyYearOffCurrentAndNextYearSearchRequest) {
+		List<CompanyYearOff> listCompanyYearOff = companyYearOffRepository.getCompanyYearOffOfCurrentYearAndNextYear(companyYearOffCurrentAndNextYearSearchRequest);
+		CompanyYearOffCurrentAndNextYearSearchResponse response = new CompanyYearOffCurrentAndNextYearSearchResponse(listCompanyYearOff);
+		return response;
 	}
 }
