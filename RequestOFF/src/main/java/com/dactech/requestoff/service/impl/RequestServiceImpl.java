@@ -1,6 +1,5 @@
 package com.dactech.requestoff.service.impl;
 
-import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +22,7 @@ import com.dactech.requestoff.repository.DayOffTypeRepository;
 import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
 import com.dactech.requestoff.repository.RequestRepository;
+import com.dactech.requestoff.service.CompanyYearOffService;
 import com.dactech.requestoff.service.RequestService;
 import com.dactech.requestoff.util.StringUtil;
 
@@ -36,11 +36,14 @@ public class RequestServiceImpl implements RequestService{
 	EmployeeRepository employeeRepository;
 	@Autowired
 	DayOffTypeRepository dayOffTypeRepository;
+	@Autowired
+	CompanyYearOffService companyYearOffService;
 	
 	@Override
 	public RequestRegistResponse regist(RequestRegistRequest requestRegistRequest) throws Exception {
 		Request request;
-		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+//		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+		long currentYear = companyYearOffService.getCurrentYear();
 		if(StringUtil.isEmpty(requestRegistRequest.getId())) {	//create new request
 			request = new Request();
 			Employee employee = employeeRepository.findById(Long.parseLong(requestRegistRequest.getEmployeeId()));

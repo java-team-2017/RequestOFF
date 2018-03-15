@@ -519,46 +519,55 @@
 				<div>
 					<div id="alertMessage_search" class="alert" style="display:none;"></div>
 					
-					<form class="form-input" id="employeeForm">
-						<div class="form-group">
-							<label for="name">Name</label>
-							<input type="text" class="form-control" name="name" id="nameId" />
+					<fieldset class="filter-fieldset">
+						<legend>
+							<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Search Filter</a>
+						</legend>
+						<div class="filter-collapse collapse">
+							<form class="form-input" id="employeeForm">
+								<div class="form-group">
+									<label for="name">Name</label>
+									<input type="text" class="form-control" name="name" id="nameId" />
+								</div>
+								<div class="form-group">
+									<label for="gender">Gender</label>
+									<select class="form-control" name="gender">
+										<option value=""></option>
+										<option value="male">Male</option>
+										<option value="female">Female</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<label for="position">Position</label>
+									<select class="form-control" name="position" id="positionId">
+										<option value=""></option>
+									</select>
+								</div>
+								<div class="form-group">
+									<label for="team">Team</label>
+									<select class="form-control" name="team" id="teamId">
+										<option value=""></option>
+									</select>
+								</div>
+								<div class="form-group">
+									<label for="department">Department</label>
+									<select class="form-control" name="department" id="departmentId">
+										<option value=""></option>
+									</select>
+								</div>
+								<br/>
+								<div>
+									<button type="button" class="btn btn-primary" id="btnSearch">Search</button>&nbsp;&nbsp;
+									
+									<button type="button" class="btn btn-primary" id="btnClear">Clear</button>
+								</div>
+							</form><br/>
 						</div>
-						<div class="form-group">
-							<label for="gender">Gender</label>
-							<select class="form-control" name="gender">
-								<option value=""></option>
-								<option value="male">Male</option>
-								<option value="female">Female</option>
-							</select>
-						</div>
-						<div class="form-group">
-							<label for="position">Position</label>
-							<select class="form-control" name="position" id="positionId">
-								<option value=""></option>
-							</select>
-						</div>
-						<div class="form-group">
-							<label for="team">Team</label>
-							<select class="form-control" name="team" id="teamId">
-								<option value=""></option>
-							</select>
-						</div>
-						<div class="form-group">
-							<label for="department">Department</label>
-							<select class="form-control" name="department" id="departmentId">
-								<option value=""></option>
-							</select>
-						</div>
-						<br/>
-						<div>
-							<button type="button" class="btn btn-primary" id="btnSearch">Search</button>&nbsp;&nbsp;
-							<button type="button" class="btn btn-primary" id="btnAdd">Add</button>&nbsp;&nbsp;
-							<button type="button" class="btn btn-primary" id="btnClear">Clear</button>
-						</div>
-					</form>
-					<br/>
+					</fieldset>
 					
+					<br/>
+					<button type="button" class="btn btn-primary" id="btnAdd">Add</button>&nbsp;&nbsp;
+					<br/><br/>
 					<table class="display table table-bordered" cellspacing="0" width="100%" id="employeeTable">
 						<thead>
 							<tr>

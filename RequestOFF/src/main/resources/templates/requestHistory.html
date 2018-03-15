@@ -536,46 +536,54 @@
 				<div>
 					<div id="alertMessage_search" class="alert" style="display:none;"></div>
 					<h4>You have <span id="remainHours" style="font-weight: bold;"></span> of off time with payment left</h4>
-					<form class="form-input" id="requestHistoryForm">
-						<div class="form-group">
-							<label for="fromTime">From</label>
-							<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
-								<input type="text" class="form-control" name="fromTime" id="fromTimeId" />
-								<div class="input-group-addon">
-									<span class="glyphicon glyphicon-th"></span>
+					<fieldset class="filter-fieldset">
+						<legend>
+							<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Search Filter</a>
+						</legend>
+						<div class="filter-collapse collapse">
+							<form class="form-input" id="requestHistoryForm">
+								<div class="form-group">
+									<label for="fromTime">From</label>
+									<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
+										<input type="text" class="form-control" name="fromTime" id="fromTimeId" />
+										<div class="input-group-addon">
+											<span class="glyphicon glyphicon-th"></span>
+										</div>
+									</div>
 								</div>
-							</div>
-						</div>
-	
-						<div class="form-group">
-							<label for="toTime">To</label>
-							<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
-								<input type="text" class="form-control" name="toTime" id="toTimeId" />
-								<div class="input-group-addon">
-									<span class="glyphicon glyphicon-th"></span>
+			
+								<div class="form-group">
+									<label for="toTime">To</label>
+									<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
+										<input type="text" class="form-control" name="toTime" id="toTimeId" />
+										<div class="input-group-addon">
+											<span class="glyphicon glyphicon-th"></span>
+										</div>
+									</div>
 								</div>
-							</div>
+			
+								<div class="form-group">
+									<label for="requestType">Request Type</label>
+									<select class="form-control" name="requestType" id="requestTypeId">
+										<option value=""></option>
+										<option value="1">Saved</option>
+										<option value="2">Approved</option>
+										<option value="3">Denied</option>
+										<option value="4">Responded</option>
+										<option value="5">Waiting</option>
+									</select>
+								</div>
+			
+								<br/>
+								<div>
+									<button type="button" class="btn btn-primary" id="btnSearch">Search</button>&nbsp;&nbsp;
+									<button type="button" class="btn btn-primary" id="btnClear">Clear</button>
+								</div>
+							</form>
 						</div>
-	
-						<div class="form-group">
-							<label for="requestType">Request Type</label>
-							<select class="form-control" name="requestType" id="requestTypeId">
-								<option value=""></option>
-								<option value="1">Saved</option>
-								<option value="2">Approved</option>
-								<option value="3">Denied</option>
-								<option value="4">Responded</option>
-								<option value="5">Waiting</option>
-							</select>
-						</div>
-	
-						<br/>
-						<div>
-							<button type="button" class="btn btn-primary" id="btnSearch">Search</button>&nbsp;&nbsp;
-							<button type="button" class="btn btn-primary" id="btnClear">Clear</button>
-						</div>
-					</form>
+					</fieldset>
 					
+					<br/>
 					<table class="display table table-bordered" cellspacing="0" width="100%" id="requestHistoryTable">
 						<thead>
 							<tr>

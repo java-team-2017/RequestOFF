@@ -13,4 +13,6 @@ public interface CompanyYearOffService {
 	public CompanyYearOffSearchResponse search(CompanyYearOffSearchRequest companyYearOffSearchRequest);
 	
 	public CompanyYearOffDetailsResponse details(CompanyYearOffDetailsRequest companyYearOffDetailsRequest);
+	
+	public long getCurrentYear();
 }

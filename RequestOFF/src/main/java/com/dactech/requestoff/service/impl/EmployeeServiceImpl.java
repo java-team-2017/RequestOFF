@@ -42,6 +42,7 @@ import com.dactech.requestoff.repository.RequestRepository;
 import com.dactech.requestoff.repository.RoleRepository;
 import com.dactech.requestoff.repository.TeamEmployeeRepository;
 import com.dactech.requestoff.repository.TeamRepository;
+import com.dactech.requestoff.service.CompanyYearOffService;
 import com.dactech.requestoff.service.EmployeeService;
 import com.dactech.requestoff.util.StringUtil;
 
@@ -69,6 +70,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 	private PositionRepository positionRepository;
 	@Autowired
 	private EmployeeRoleRepository employeeRoleRepository;
+	@Autowired
+	private CompanyYearOffService companyYearOffService;
 
 	@Override
 	public EmployeeRegistResponse employeeRegist(EmployeeRegistRequest erRequest) throws Exception {
@@ -199,7 +202,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		employeeRepository.save(employee);
 		
 		EmployeeOffStatus eos;
-		long currentYear = Calendar.getInstance().get(Calendar.YEAR);
+		long currentYear = companyYearOffService.getCurrentYear();
 		if (StringUtil.isEmpty(erRequest.getId())) {
 			eos = new EmployeeOffStatus();
 			eos.setEmployeeId(employee.getId());
@@ -230,7 +233,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			e.setDepartmentName(departmentName);
 			listEmployee.set(i, e);
 			
-			long currentYear = Calendar.getInstance().get(Calendar.YEAR);
+			long currentYear = companyYearOffService.getCurrentYear();
 			EmployeeOffStatus eos = employeeOffStatusRepository.findById(currentYear, e.getId());
 			e.setEmployeeOffStatus(eos);
 		}
@@ -475,7 +478,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	
 	@Override
 	public double getRemainHours(long employeeId) {
-		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+		long currentYear = companyYearOffService.getCurrentYear();
 		double remainHours;
 		EmployeeOffStatus eos = employeeOffStatusRepository.findById(currentYear, employeeId);
 		if(eos != null) {
