@@ -208,7 +208,7 @@
 					officialWorkingDate = officialWorkingDate.substr(6, 4) + "-" + officialWorkingDate.substr(0, 2) + "-"
 											+ officialWorkingDate.substr(3, 2);
 					
-					var totalTime = parseInt(addData.totalDaysModalAdd) * 8 + parseFloat(addData.totalHoursModalAdd);
+					var totalTime = parseInt(addData.totalDaysModalAdd) * 8;
 					
 					//-----------validate------------
 					var complete = 1, exceedLength = 0, isNotNagativeInteger = 1, dateError = 0, valid = 1;
@@ -846,25 +846,7 @@
 										<div class="form-group row">
 											<label class="control-label col-sm-3">Total off time * : </label>
 											<div class="form-inline">
-												<input type="text" class="form-control" name="totalDaysModalAdd" id="totalDaysModalAddId" />&nbsp;day(s)&nbsp;
-												<select class="form-control" name="totalHoursModalAdd" id="totalHoursModalAddId">
-													<option value="0">0</option>
-													<option value="0.5">0.5</option>
-													<option value="1">1</option>
-													<option value="1.5">1.5</option>
-													<option value="2">2</option>
-													<option value="2.5">2.5</option>
-													<option value="3">3</option>
-													<option value="3.5">3.5</option>
-													<option value="4">4</option>
-													<option value="4.5">4.5</option>
-													<option value="5">5</option>
-													<option value="5.5">5.5</option>
-													<option value="6">6</option>
-													<option value="6.5">6.5</option>
-													<option value="7">7</option>
-													<option value="7.5">7.5</option>
-												</select>&nbsp;hour(s)
+												<input type="text" class="form-control" name="totalDaysModalAdd" id="totalDaysModalAddId" />&nbsp;day(s)
 											</div>
 										</div>
 									</form>
