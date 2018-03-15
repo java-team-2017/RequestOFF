@@ -12,6 +12,15 @@
 		
 		search();
 		
+		$('.btnForm').click(function(){
+			$(this).toggleClass('btnForm');
+			if($(this).hasClass('btnForm')){
+				$(this).text('Search Form');			
+			} else {
+				$(this).text('Close');
+			}
+		});
+		
 		$('#btnSearch').on('click', function(){
 			search();
 		});
@@ -291,7 +300,8 @@
 	<div class="requestOffContentBody">
 		<h2>Department Management</h2>
 		<div id="alertMessage" class="alert" style="display:none;"></div>
-			<form id="departmentForm" class="form-input">
+		<button type="button" class="btn btn-primary btnForm" data-toggle="collapse" data-target="#departmentForm">Search Form</button>
+			<form id="departmentForm" class="form-input collapse">
 				<div class="form-group">
 					<label class="control-label">Department: </label>
 					<input class="form-control" type="text" name="name" id="department" value=""></input>

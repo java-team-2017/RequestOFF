@@ -34,6 +34,15 @@
 				}
 			});
 			
+			$('.btnForm').click(function(){
+				$(this).toggleClass('btnForm');
+				if($(this).hasClass('btnForm')){
+					$(this).text('Search Form');			
+				} else {
+					$(this).text('Close');
+				}
+			});
+			
 			$('[data-toggle="tooltip"]').tooltip();
 			
 			$('.datepicker').on('changeDate', function(ev){
@@ -325,7 +334,8 @@
 	<div class="requestOffContentBody">			
 		<h2>Request Browsing</h2>
 		<div id="alertMessage" class="alert" style="display:none;"></div>
-			<form id="requestForm" class="form-input">
+		<button type="button" class="btn btn-primary btnForm" data-toggle="collapse" data-target="#requestForm">Search Form</button>
+			<form id="requestForm" class="form-input collapse">
 				<div class="form-group">
 					<label class="control-label">Employee: </label>
 					<input class="form-control" type="text" name="name" id="employee" value=""></input>
