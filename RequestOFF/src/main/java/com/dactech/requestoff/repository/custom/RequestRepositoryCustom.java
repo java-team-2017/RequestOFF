@@ -10,4 +10,7 @@ public interface RequestRepositoryCustom {
 	public List<Request> searchRequest(RequestSearchRequest requestSearchRequest);
 	
 	public List<Request> browseRequest(RequestBrowsingRequest request) throws Exception;
+	
+	//get requests having paid day off type and status saved/waiting/responded of an employee
+	public List<Request> getChangeDisplayedRemainHoursRequest(long employeeId);
 }

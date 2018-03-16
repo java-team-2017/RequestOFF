@@ -48,9 +48,9 @@
 						console.log(returnData);
 						employee = returnData.user;
 						employeeId = employee.id;
-						remainHours = returnData.remainHours;
+						remainHours = returnData.displayedRemainHours;
 						
-						renderRemainHours(returnData.remainHours, 'remainHours');
+						renderRemainHours(returnData.displayedRemainHours, 'remainHours');
 						renderRecipientSelect(returnData.listRecipients, 'id_recipient');
 						
 						if(returnData.listRecipients.length == 0) {
@@ -188,7 +188,7 @@
 									if(returnData.status_info.status == 1) {
 										$('#alertMessage').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
 									} else {
-										renderRemainHours(returnData.remainHours, 'remainHours');
+										renderRemainHours(returnData.displayedRemainHours, 'remainHours');
 									}
 								},
 								error : function(e) {

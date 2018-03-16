@@ -42,27 +42,13 @@ public class RequestServiceImpl implements RequestService{
 	@Override
 	public RequestRegistResponse regist(RequestRegistRequest requestRegistRequest) throws Exception {
 		Request request;
-//		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
 		long currentYear = companyYearOffService.getCurrentYear();
 		if(StringUtil.isEmpty(requestRegistRequest.getId())) {	//create new request
 			request = new Request();
 			Employee employee = employeeRepository.findById(Long.parseLong(requestRegistRequest.getEmployeeId()));
 			DayOffType dayOffType = dayOffTypeRepository.findById(Long.parseLong(requestRegistRequest.getDayOffTypeId()));
 			
-			if(dayOffType.getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING) {
-				EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employee.getId());
-				double remainHours = employeeOffStatus.getRemainHours();
-				double newRemainHours = remainHours - Double.parseDouble(requestRegistRequest.getTotalTime());
-				if(newRemainHours >= 0) {
-					employeeOffStatus.setRemainHours(newRemainHours);
-					employeeOffStatusRepository.save(employeeOffStatus);
-				} else {
-					throw new Exception("Off hours exceed remain hours");
-				}
-			}
-			
 			request.setEmployee(employee);
-			
 			request.setFromTime(requestRegistRequest.getFromTime());
 			request.setToTime(requestRegistRequest.getToTime());
 			request.setTotalTime(Double.parseDouble(requestRegistRequest.getTotalTime()));
@@ -93,75 +79,21 @@ public class RequestServiceImpl implements RequestService{
 				EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employee.getId());
 				double remainHours = employeeOffStatus.getRemainHours();
 				double newRemainHours = remainHours;
-				double oldOffHours = request.getTotalTime();
-				int oldStatus = request.getStatus();
-				double offHours;
-				long oldPaymentFlag = request.getDayOffType().getPaymentFlag();
-				long newPaymentFlag;
+				double offHours = request.getTotalTime();
 				
-				
-				if(StringUtil.isNotEmpty(requestRegistRequest.getDayOffTypeId())) {
-					DayOffType dayOffType = dayOffTypeRepository.findById(Long.parseLong(requestRegistRequest.getDayOffTypeId()));
-					newPaymentFlag = dayOffType.getPaymentFlag();
-				} else {
-					newPaymentFlag = oldPaymentFlag;
-				}
-				
-				if(StringUtil.isNotEmpty(requestRegistRequest.getTotalTime()) && StringUtil.isEmpty(requestRegistRequest.getValidFlag())
-						&& StringUtil.isEmpty(requestRegistRequest.getStatus())) {
-					offHours = Double.parseDouble(requestRegistRequest.getTotalTime());
-					if(oldPaymentFlag == DayOffType.PAYMENT_FLAG_PAYING && newPaymentFlag == DayOffType.PAYMENT_FLAG_NOT_PAYING) {
-						newRemainHours = remainHours + oldOffHours;
-					} else if(oldPaymentFlag == DayOffType.PAYMENT_FLAG_PAYING && newPaymentFlag == DayOffType.PAYMENT_FLAG_PAYING) {
-						newRemainHours = remainHours + oldOffHours - offHours;
-					} else if(oldPaymentFlag == DayOffType.PAYMENT_FLAG_NOT_PAYING && newPaymentFlag == DayOffType.PAYMENT_FLAG_PAYING) {
-						newRemainHours = remainHours - offHours;
-					}
-				}
-				else if(StringUtil.isEmpty(requestRegistRequest.getTotalTime()) && StringUtil.isNotEmpty(requestRegistRequest.getValidFlag())
-						&& StringUtil.isEmpty(requestRegistRequest.getStatus())) {
-					if(requestRegistRequest.getValidFlag().equals("0") && request.getValidFlag() == 1
-							&& (oldStatus == Request.REQUEST_STATUS_SAVED || oldStatus == Request.REQUEST_STATUS_RESPONDED)) { //delete request
-						if(oldPaymentFlag == DayOffType.PAYMENT_FLAG_PAYING) {
-							newRemainHours = remainHours + oldOffHours;
-						}
-					}
-				}
-				else if(StringUtil.isEmpty(requestRegistRequest.getTotalTime()) && StringUtil.isEmpty(requestRegistRequest.getValidFlag())
-						&& StringUtil.isNotEmpty(requestRegistRequest.getStatus())) {
-					if(Integer.parseInt(requestRegistRequest.getStatus()) == Request.REQUEST_STATUS_DENIED
-						&& oldStatus == Request.REQUEST_STATUS_WAITING) { //deny request
-						if(oldPaymentFlag == DayOffType.PAYMENT_FLAG_PAYING) {
-							newRemainHours = remainHours + oldOffHours;
-						}
-					}
-				}
-				else if(StringUtil.isNotEmpty(requestRegistRequest.getTotalTime()) && StringUtil.isEmpty(requestRegistRequest.getValidFlag())
-						&& StringUtil.isNotEmpty(requestRegistRequest.getStatus())) {
-					if(oldStatus == Request.REQUEST_STATUS_SAVED || oldStatus == Request.REQUEST_STATUS_RESPONDED) {
-						offHours = Double.parseDouble(requestRegistRequest.getTotalTime());
-						if(oldPaymentFlag == DayOffType.PAYMENT_FLAG_PAYING && newPaymentFlag == DayOffType.PAYMENT_FLAG_NOT_PAYING) {
-							newRemainHours = remainHours + oldOffHours;
-						} else if(oldPaymentFlag == DayOffType.PAYMENT_FLAG_PAYING && newPaymentFlag == DayOffType.PAYMENT_FLAG_PAYING) {
-							newRemainHours = remainHours + oldOffHours - offHours;
-						} else if(oldPaymentFlag == DayOffType.PAYMENT_FLAG_NOT_PAYING && newPaymentFlag == DayOffType.PAYMENT_FLAG_PAYING) {
+				if(StringUtil.isNotEmpty(requestRegistRequest.getStatus())) {
+					if(Integer.parseInt(requestRegistRequest.getStatus()) == Request.REQUEST_STATUS_APPROVED
+						&& request.getStatus() == Request.REQUEST_STATUS_WAITING) { //deny request
+						if(request.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING) {
 							newRemainHours = remainHours - offHours;
 						}
 					}
-				}
-				else if(StringUtil.isEmpty(requestRegistRequest.getTotalTime()) && StringUtil.isEmpty(requestRegistRequest.getValidFlag())
-						&& StringUtil.isEmpty(requestRegistRequest.getStatus())) {
-					newRemainHours = remainHours;
-				}
-				else {
+				} else {
 					throw new Exception("RequestRegistRequest parameter is invalid");
 				}
-				if(newRemainHours >= 0) {
-					employeeOffStatus.setRemainHours(newRemainHours);
-					employeeOffStatusRepository.save(employeeOffStatus);
-				} else {
-					throw new Exception("Off hours exceed remain hours");
-				}
+				
+				employeeOffStatus.setRemainHours(newRemainHours);
+				employeeOffStatusRepository.save(employeeOffStatus);
 				
 				if(StringUtil.isNotEmpty(requestRegistRequest.getFromTime())) {
 					request.setFromTime(requestRegistRequest.getFromTime());

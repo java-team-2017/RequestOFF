@@ -69,10 +69,10 @@
 						console.log(returnData);
 						employee = returnData.user;
 						employeeId = employee.id;
-						remainHours = returnData.remainHours;
+						remainHours = returnData.displayedRemainHours;
 						listRecipient = returnData.listRecipients;
 						
-						renderRemainHours(returnData.remainHours, 'remainHours');
+						renderRemainHours(returnData.displayedRemainHours, 'remainHours');
 						renderRecipientSelect(listRecipient, 'modalRecipient');
 						
 						//set default value for searching request
@@ -247,7 +247,7 @@
 												$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
 											} else {
 												remainHours = returnData.remainHours;
-												renderRemainHours(returnData.remainHours, 'remainHours');
+												renderRemainHours(returnData.displayedRemainHours, 'remainHours');
 											}
 										},
 										error : function(e) {
@@ -508,7 +508,7 @@
 										$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
 									} else {
 										remainHours = returnData.remainHours;
-										renderRemainHours(returnData.remainHours, 'remainHours');
+										renderRemainHours(returnData.displayedRemainHours, 'remainHours');
 									}
 								},
 								error : function(e) {

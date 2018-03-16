@@ -8,6 +8,7 @@ import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.dactech.requestoff.model.entity.DayOffType;
 import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.Position;
@@ -218,6 +219,21 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 			}
 		}
 		return listRequests;
+	}
+	
+	@Override
+	public List<Request> getChangeDisplayedRemainHoursRequest(long employeeId) {
+		String sqlQuery = "SELECT * FROM request INNER JOIN day_off_type ON request.day_off_type_id = day_off_type.id WHERE request.employee_id = " + employeeId
+							+ " AND status = " + Request.REQUEST_STATUS_SAVED + " OR status = " + Request.REQUEST_STATUS_WAITING
+							+ " OR status = " + Request.REQUEST_STATUS_RESPONDED + " AND payment_flag = "
+							+ DayOffType.PAYMENT_FLAG_PAYING + " AND request.valid_flag = 1";
+		
+		System.out.println(sqlQuery);
+		
+		Query query = entityManager.createNativeQuery(sqlQuery.toString(), Request.class);
+		@SuppressWarnings("unchecked")
+		List<Request> requests = query.getResultList();
+		return requests;
 	}
 
 }

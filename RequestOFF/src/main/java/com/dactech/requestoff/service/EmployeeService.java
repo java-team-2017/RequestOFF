@@ -31,6 +31,8 @@ public interface EmployeeService {
 	
 	public double getRemainHours(long employeeId);
 	
+	public double getDisplayedRemainHours(long employeeId);
+	
 	public String getTeamName(long employeeId);
 	
 	public String getDepartmentName(long employeeId);

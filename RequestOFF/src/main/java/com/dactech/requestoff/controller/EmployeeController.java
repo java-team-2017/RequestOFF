@@ -150,6 +150,9 @@ public class EmployeeController {
 			double remainHours = employeeService.getRemainHours(user.getId());
 			response.setRemainHours(remainHours);
 			
+			double displayedRemainHours = employeeService.getDisplayedRemainHours(user.getId());
+			response.setDisplayedRemainHours(displayedRemainHours);
+			
 			response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
 		} catch (Exception e) {
 			e.printStackTrace();

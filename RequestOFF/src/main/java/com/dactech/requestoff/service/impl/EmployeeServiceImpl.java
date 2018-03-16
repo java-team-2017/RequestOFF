@@ -34,6 +34,7 @@ import com.dactech.requestoff.model.response.EmployeeOffStatisticsPagingResponse
 import com.dactech.requestoff.model.response.EmployeeRegistResponse;
 import com.dactech.requestoff.model.response.EmployeeSearchResponse;
 import com.dactech.requestoff.model.response.GetUserResponse;
+import com.dactech.requestoff.repository.DayOffTypeRepository;
 import com.dactech.requestoff.repository.DepartmentRepository;
 import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
@@ -73,6 +74,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 	private EmployeeRoleRepository employeeRoleRepository;
 	@Autowired
 	private CompanyYearOffService companyYearOffService;
+	@Autowired
+	private DayOffTypeRepository dayOffTypeRepository;
 
 	@Override
 	public EmployeeRegistResponse employeeRegist(EmployeeRegistRequest erRequest) throws Exception {
@@ -478,6 +481,25 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 	
 	@Override
+	public double getDisplayedRemainHours(long employeeId) {
+		long currentYear = companyYearOffService.getCurrentYear();
+		double remainHours;
+		EmployeeOffStatus eos = employeeOffStatusRepository.findById(currentYear, employeeId);
+		if(eos != null) {
+			remainHours = eos.getRemainHours();
+			List<Request> requests = requestRepository.getChangeDisplayedRemainHoursRequest(employeeId);
+			if(requests != null && requests.size() > 0) {
+				for(Request r : requests) {
+					remainHours -= r.getTotalTime();
+				}
+			}
+		} else {
+			remainHours = 0;
+		}
+		return remainHours;
+	}
+	
+	@Override
 	public double getRemainHours(long employeeId) {
 		long currentYear = companyYearOffService.getCurrentYear();
 		double remainHours;
@@ -609,4 +631,5 @@ public class EmployeeServiceImpl implements EmployeeService {
 		}
 		return false;
 	}
+	
 }
