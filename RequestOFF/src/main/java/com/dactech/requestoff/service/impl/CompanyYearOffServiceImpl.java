@@ -151,7 +151,6 @@ public class CompanyYearOffServiceImpl implements CompanyYearOffService{
 		CompanyYearOffDetailsResponse companyYearOffDetailsResponse = new CompanyYearOffDetailsResponse(companyYearOff);
 		return companyYearOffDetailsResponse;
 	}
-<<<<<<< HEAD
 	
 	@Override
 	public long getCurrentYear() {
@@ -159,7 +158,7 @@ public class CompanyYearOffServiceImpl implements CompanyYearOffService{
 		cyoSearchRequest.setCurrentYearFlag("1");
 		CompanyYearOffSearchResponse cyoSearchResponse = search(cyoSearchRequest);
 		return cyoSearchResponse.getListCompanyYearOff().get(0).getId();
-=======
+	}
 
 	@Override
 	public CompanyYearOffCurrentAndNextYearSearchResponse search(
@@ -167,6 +166,6 @@ public class CompanyYearOffServiceImpl implements CompanyYearOffService{
 		List<CompanyYearOff> listCompanyYearOff = companyYearOffRepository.getCompanyYearOffOfCurrentYearAndNextYear(companyYearOffCurrentAndNextYearSearchRequest);
 		CompanyYearOffCurrentAndNextYearSearchResponse response = new CompanyYearOffCurrentAndNextYearSearchResponse(listCompanyYearOff);
 		return response;
->>>>>>> b9565865d34607a25d23125bbc1d26cbe7f1d5f6
+
 	}
 }
