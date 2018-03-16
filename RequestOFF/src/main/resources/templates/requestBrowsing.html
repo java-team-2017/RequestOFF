@@ -34,15 +34,6 @@
 				}
 			});
 			
-			$('.btnForm').click(function(){
-				$(this).toggleClass('btnForm');
-				if($(this).hasClass('btnForm')){
-					$(this).text('Search Form');			
-				} else {
-					$(this).text('Close');
-				}
-			});
-			
 			$('[data-toggle="tooltip"]').tooltip();
 			
 			$('.datepicker').on('changeDate', function(ev){
@@ -381,7 +372,7 @@
 					</p>
 				</form>
 			</div>
-		</fieldset>		
+		</fieldset>
 			<div class="table-responsive" style="margin-top:3em;"> 
 				<table class="table table-bordered table-striped table-hover" id="requestTable">
 					<thead>

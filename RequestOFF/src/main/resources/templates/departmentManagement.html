@@ -12,15 +12,6 @@
 		
 		search();
 		
-		$('.btnForm').click(function(){
-			$(this).toggleClass('btnForm');
-			if($(this).hasClass('btnForm')){
-				$(this).text('Search Form');			
-			} else {
-				$(this).text('Close');
-			}
-		});
-		
 		$('#btnSearch').on('click', function(){
 			search();
 		});
@@ -180,7 +171,7 @@
 			});
 		});
 		
-		$('#departmentTable').on('click', '#btnDelete', function () {
+		$('#departmentTable').on('click', '.btnDelete', function () {
 			var button = $(this);
 			$(this).confirmation({
 				placement: 'left',
@@ -284,7 +275,7 @@
 				},
 				{
 					render: function (index) {
-							return '<a id="btnDelete"><span class="glyphicon glyphicon-trash" style="cursor: pointer;" value="' + index + '"></span></a>';
+							return '<a class="btnDelete"><span class="glyphicon glyphicon-trash" style="cursor: pointer;" value="' + index + '"></span></a>';
 					},
 				}
 			]
@@ -300,25 +291,30 @@
 	<div class="requestOffContentBody">
 		<h2>Department Management</h2>
 		<div id="alertMessage" class="alert" style="display:none;"></div>
-		<button type="button" class="btn btn-primary btnForm" data-toggle="collapse" data-target="#departmentForm">Search Form</button>
-			<form id="departmentForm" class="form-input collapse">
-				<div class="form-group">
-					<label class="control-label">Department: </label>
-					<input class="form-control" type="text" name="name" id="department" value=""></input>
-				</div>
-				
-				<div class="form-group">
-					<label class="control-label">Manager: </label>
-					<input class="form-control" type="text" name="name_of_employee" id="manager" value=""></input>
-				</div>
-				
-				<p>
-					<button id="btnSearch" type="button" class="btn btn-primary" style="width:76px;">Search</button>&nbsp;&nbsp;
-					<button id="btnCreate" type="button" class="btn btn-primary" style="width:76px;">Create</button>&nbsp;&nbsp;
-					<button type="reset" class="btn btn-primary" style="width:76px;">Clear</button>
-				</p>
-			</form>
+		<fieldset class="filter-fieldset">
+			<legend>
+				<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Search Filter</a>
+			</legend>
+			<div class="filter-collapse collapse">
+				<form id="departmentForm" class="form-input">
+					<div class="form-group">
+						<label class="control-label">Department: </label>
+						<input class="form-control" type="text" name="name" id="department" value=""></input>
+					</div>
 					
+					<div class="form-group">
+						<label class="control-label">Manager: </label>
+						<input class="form-control" type="text" name="name_of_employee" id="manager" value=""></input>
+					</div>
+					
+					<p>
+						<button id="btnSearch" type="button" class="btn btn-primary" style="width:76px;">Search</button>&nbsp;&nbsp;
+						<button id="btnCreate" type="button" class="btn btn-primary" style="width:76px;">Create</button>&nbsp;&nbsp;
+						<button type="reset" class="btn btn-primary" style="width:76px;">Clear</button>
+					</p>
+				</form>
+			</div>
+		</fieldset>
 			<div class="table-responsive" style="margin-top:3em;"> 
 				<table class="table table-bordered table-striped table-hover" id="departmentTable">
 					<thead>
