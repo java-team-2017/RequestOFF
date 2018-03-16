@@ -1,3 +1,7 @@
 .mydatepicker {
 	padding: 0px;
 }
+
+.idCell, .editCell, .deleteCell {
+	width: 5%;
+}
