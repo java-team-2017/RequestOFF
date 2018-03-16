@@ -397,32 +397,39 @@
 	<div class="requestOffContentBody">
 		<h2>Request Off Statistics</h2>
 		<div id="alertMessage" class="alert" style="display:none;"></div>
-		<form id="searchForm" class="form-input">
-			<div class="form-group">
-				<label>Year</label>
-				<select id="year" name="year" class="form-control"></select>
+		<fieldset class="filter-fieldset">
+			<legend>
+				<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Search Filter</a>
+			</legend>
+			<div class="filter-collapse collapse">
+				<form id="searchForm" class="form-input">
+					<div class="form-group">
+						<label>Year</label>
+						<select id="year" name="year" class="form-control"></select>
+					</div>
+					
+					<div class="form-group">
+						<label>Department</label>
+						<select id="department" name="department_id" class="form-control"></select>
+					</div>
+					
+					<div class="form-group">
+						<label>Team</label>
+						<select id="team" name="team_id" class="form-control"></select>
+					</div>
+					
+					<div class="form-group">
+						<label>Employee</label>
+						<input id="employee" name="employee" type="text" class="form-control"></input>
+					</div>
+					
+					<div>
+						<button id="searchBtn" type="button" class="btn btn-primary">Search</button>
+						<button id="clearBtn" type="button" class="btn btn-primary">Clear</button>
+					</div>
+				</form>
 			</div>
-			
-			<div class="form-group">
-				<label>Department</label>
-				<select id="department" name="department_id" class="form-control"></select>
-			</div>
-			
-			<div class="form-group">
-				<label>Team</label>
-				<select id="team" name="team_id" class="form-control"></select>
-			</div>
-			
-			<div class="form-group">
-				<label>Employee</label>
-				<input id="employee" name="employee" type="text" class="form-control"></input>
-			</div>
-			
-			<div>
-				<button id="searchBtn" type="button" class="btn btn-primary">Search</button>
-				<button id="clearBtn" type="button" class="btn btn-primary">Clear</button>
-			</div>
-		</form>
+		</fieldset>
 		<div class="table-responsive" style="margin-top:3em;"> 
 			<table id="statisticsTable" class="table table-striped table-bordered table-hover table-condensed text-center" style="word-wrap: break-word">
 				<col width="3%"/>

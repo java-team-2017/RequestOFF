@@ -364,25 +364,33 @@
 	<div class="requestOffContentBody">			
 		<h2>Team Management</h2>
 		<div id="alertMessage" class="alert" style="display:none;"></div>
-			<form id="requestForm" class="form-input">
-				<div class="form-group">
-					<label>Department</label>
-					<select id="department" name="department_id" class="form-control"></select>
-				</div>
-				
-				<div class="form-group">
-					<label>Team</label>
-					<select id="team" name="team_id" class="form-control"></select>
-				</div>
+			<fieldset class="filter-fieldset">
+				<legend>
+					<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Search Filter</a>
+				</legend>
+				<div class="filter-collapse collapse">
+					<form id="requestForm" class="form-input">
+						<div class="form-group">
+							<label>Department</label>
+							<select id="department" name="department_id" class="form-control"></select>
+						</div>
 						
-				<p>
-					<button id="btnSearch" type="button" class="btn btn-primary" style="width:76px;">Search</button>&nbsp;&nbsp;
-					<button id="btnAdd" type="button" class="btn btn-primary" style="width:76px;">Add</button>&nbsp;&nbsp;
-					<button type="reset" class="btn btn-primary" style="width:76px;">Clear</button>
-				</p>
-			</form>
-					
-			<div class="table-responsive" style="margin-top:3em;"> 
+						<div class="form-group">
+							<label>Team</label>
+							<select id="team" name="team_id" class="form-control"></select>
+						</div>
+								
+						<p>
+							<button id="btnSearch" type="button" class="btn btn-primary" style="width:76px;">Search</button>&nbsp;&nbsp;
+							<button type="reset" class="btn btn-primary" style="width:76px;">Clear</button>
+						</p>
+					</form>
+				</div>
+			</fieldset>
+			<br/>
+			
+			<button id="btnAdd" type="button" class="btn btn-primary" style="width:76px;">Add</button>&nbsp;&nbsp;		
+			<div class="table-responsive" style="margin-top:2em;"> 
 				<table class="table table-bordered table-striped table-hover" id="teamTable">
 					<thead>
 						<tr>
