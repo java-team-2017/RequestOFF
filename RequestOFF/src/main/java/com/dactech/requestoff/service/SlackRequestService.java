@@ -22,4 +22,6 @@ public interface SlackRequestService {
 	SlackRequestSearchResponse search(SlackRequestSearchRequest request);
 	
 	long importSlackRequest(String token, String channel, Date latest, Date oldest) throws Exception;
+	
+	void save(SlackRequest slackRequests);
 }

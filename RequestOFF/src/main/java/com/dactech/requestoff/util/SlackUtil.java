@@ -2,14 +2,19 @@ package com.dactech.requestoff.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import com.dactech.requestoff.model.entity.SlackRequest;
+import com.dactech.requestoff.model.response.SlackRequestGetResponse;
 import com.dactech.requestoff.model.response.SlackRequestGetResponse.SlackMsg;
 import com.dactech.requestoff.service.EmployeeService;
 
@@ -191,6 +196,62 @@ public class SlackUtil {
 		}
 		slackRequest.setErrMsg(errMsg);
 		return slackRequest;
+	}
+	
+	public static List<SlackRequest> getSlackRequest(String token, String channel, Date latest, Date oldest) throws Exception {
+		List<SlackRequest> slackRequests = new ArrayList<SlackRequest>();
+		RestTemplate restTemplate = new RestTemplate();
+		String url = "https://slack.com/api/channels.history";
+		String oldestParam = "", lastestParam = "";
+		long lastestTime = 0, oldestTime = 0;
+
+		if (StringUtil.isEmpty(token)) {
+			throw new Exception("Token is empty");
+		} else if (StringUtil.isEmpty(channel)) {
+			throw new Exception("Chanel is empty");
+		}
+
+		url = url + "?token=" + token + "&channel=" + channel;
+
+		if (latest != null) {
+			lastestTime = (long) latest.getTime() / 1000;
+			lastestParam = "&latest=" + (lastestTime);
+		}
+		if (oldest != null) {
+			oldestTime = (long) oldest.getTime() / 1000;
+			oldestParam = "&oldest=" + (oldestTime);
+		}
+
+		ResponseEntity<SlackRequestGetResponse> responseEntity = restTemplate
+				.getForEntity(url + lastestParam + oldestParam, SlackRequestGetResponse.class);
+		SlackRequestGetResponse response = responseEntity.getBody();
+
+		if (response.getOk().equals("true")) {
+			for (SlackMsg slackMsg : response.getMessages()) {
+				SlackRequest slackRequest = SlackUtil.processSlackMessage(slackMsg);
+				slackRequests.add(slackRequest);
+			}
+
+			while (response.getHasMore().equals("true")) {
+				lastestTime = (long) Double
+						.parseDouble(response.getMessages().get(response.getMessages().size() - 1).getTs());
+				lastestTime--;
+				lastestParam = "&latest=" + (lastestTime);
+
+				responseEntity = restTemplate.getForEntity(url + lastestParam + oldestParam,
+						SlackRequestGetResponse.class);
+				response = responseEntity.getBody();
+
+				for (SlackMsg slackMsg : response.getMessages()) {
+					SlackRequest slackRequest = SlackUtil.processSlackMessage(slackMsg);
+					slackRequests.add(slackRequest);
+				}
+			}
+		} else {
+			throw new Exception(response.getError());
+		}
+
+		return slackRequests;
 	}
 
 }

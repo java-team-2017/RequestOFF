@@ -309,4 +309,9 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 		return 0;
 	}
 
+	@Override
+	public void save(SlackRequest slackRequests) {
+		slackRequestRepository.save(slackRequests);
+	}
+
 }
