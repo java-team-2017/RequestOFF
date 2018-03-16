@@ -87,4 +87,9 @@ public class WebController {
 		return "changePassword";
 	}
 	
+	@GetMapping("/hrViewRequests")
+	public String hrViewRequests() {
+		return "hrViewRequests";
+	}
+	
 }
