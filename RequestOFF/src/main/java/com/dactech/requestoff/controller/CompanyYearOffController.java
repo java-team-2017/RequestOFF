@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dactech.requestoff.model.common.StatusInfo;
+import com.dactech.requestoff.model.request.CompanyYearOffCurrentAndNextYearSearchRequest;
 import com.dactech.requestoff.model.request.CompanyYearOffDetailsRequest;
 import com.dactech.requestoff.model.request.CompanyYearOffRegistRequest;
 import com.dactech.requestoff.model.request.CompanyYearOffSearchRequest;
+import com.dactech.requestoff.model.response.CompanyYearOffCurrentAndNextYearSearchResponse;
 import com.dactech.requestoff.model.response.CompanyYearOffDetailsResponse;
 import com.dactech.requestoff.model.response.CompanyYearOffRegistResponse;
 import com.dactech.requestoff.model.response.CompanyYearOffSearchResponse;
@@ -43,6 +45,19 @@ public class CompanyYearOffController {
 			response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
 		} catch (Exception e) {
 			response = new CompanyYearOffSearchResponse();
+			response.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
+		}
+		return response;
+	}
+	
+	@RequestMapping(value = "/companyYearOff/getCompanyYearOffCurrentAndNextYear", method = RequestMethod.POST)
+	public CompanyYearOffCurrentAndNextYearSearchResponse search(@RequestBody CompanyYearOffCurrentAndNextYearSearchRequest request) {
+		CompanyYearOffCurrentAndNextYearSearchResponse response;
+		try {
+			response = companyYearOffService.search(request);
+			response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
+		} catch (Exception e) {
+			response = new CompanyYearOffCurrentAndNextYearSearchResponse();
 			response.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
 		}
 		return response;

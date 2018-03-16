@@ -7,10 +7,12 @@ import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.CompanyYearOff;
 import com.dactech.requestoff.model.entity.EmployeeOffStatus;
+import com.dactech.requestoff.model.request.CompanyYearOffCurrentAndNextYearSearchRequest;
 import com.dactech.requestoff.model.request.CompanyYearOffDetailsRequest;
 import com.dactech.requestoff.model.request.CompanyYearOffRegistRequest;
 import com.dactech.requestoff.model.request.CompanyYearOffSearchRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatusSearchRequest;
+import com.dactech.requestoff.model.response.CompanyYearOffCurrentAndNextYearSearchResponse;
 import com.dactech.requestoff.model.response.CompanyYearOffDetailsResponse;
 import com.dactech.requestoff.model.response.CompanyYearOffRegistResponse;
 import com.dactech.requestoff.model.response.CompanyYearOffSearchResponse;
@@ -149,6 +151,7 @@ public class CompanyYearOffServiceImpl implements CompanyYearOffService{
 		CompanyYearOffDetailsResponse companyYearOffDetailsResponse = new CompanyYearOffDetailsResponse(companyYearOff);
 		return companyYearOffDetailsResponse;
 	}
+<<<<<<< HEAD
 	
 	@Override
 	public long getCurrentYear() {
@@ -156,5 +159,14 @@ public class CompanyYearOffServiceImpl implements CompanyYearOffService{
 		cyoSearchRequest.setCurrentYearFlag("1");
 		CompanyYearOffSearchResponse cyoSearchResponse = search(cyoSearchRequest);
 		return cyoSearchResponse.getListCompanyYearOff().get(0).getId();
+=======
+
+	@Override
+	public CompanyYearOffCurrentAndNextYearSearchResponse search(
+			CompanyYearOffCurrentAndNextYearSearchRequest companyYearOffCurrentAndNextYearSearchRequest) {
+		List<CompanyYearOff> listCompanyYearOff = companyYearOffRepository.getCompanyYearOffOfCurrentYearAndNextYear(companyYearOffCurrentAndNextYearSearchRequest);
+		CompanyYearOffCurrentAndNextYearSearchResponse response = new CompanyYearOffCurrentAndNextYearSearchResponse(listCompanyYearOff);
+		return response;
+>>>>>>> b9565865d34607a25d23125bbc1d26cbe7f1d5f6
 	}
 }
