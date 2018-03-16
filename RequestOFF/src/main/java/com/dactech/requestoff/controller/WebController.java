@@ -82,4 +82,9 @@ public class WebController {
 		return "companyYearOffManagement";
 	}
 	
+	@GetMapping("/changePassword")
+	public String changePassword() {
+		return "changePassword";
+	}
+	
 }

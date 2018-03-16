@@ -3,6 +3,7 @@ package com.dactech.requestoff.service;
 import java.util.List;
 
 import com.dactech.requestoff.model.entity.Employee;
+import com.dactech.requestoff.model.request.EmployeeChangePasswordRequest;
 import com.dactech.requestoff.model.request.EmployeeDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatisticsPagingRequest;
 import com.dactech.requestoff.model.request.EmployeeRegistRequest;
@@ -37,4 +38,6 @@ public interface EmployeeService {
 	public boolean delete(long employeeId) throws Exception;
 	
 	public boolean isLeader(long employeeId);
+	
+	public boolean changePassword(EmployeeChangePasswordRequest employeeChangePasswordRequest) throws Exception;
 }

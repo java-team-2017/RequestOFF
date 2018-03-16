@@ -22,6 +22,7 @@ import com.dactech.requestoff.model.entity.Request;
 import com.dactech.requestoff.model.entity.Role;
 import com.dactech.requestoff.model.entity.Team;
 import com.dactech.requestoff.model.entity.TeamEmployee;
+import com.dactech.requestoff.model.request.EmployeeChangePasswordRequest;
 import com.dactech.requestoff.model.request.EmployeeDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatisticsPagingRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatusSearchRequest;
@@ -588,6 +589,23 @@ public class EmployeeServiceImpl implements EmployeeService {
 				return true;
 			}
 			return false;
+		}
+		return false;
+	}
+	
+	@Override
+	public boolean changePassword(EmployeeChangePasswordRequest employeeChangePasswordRequest) throws Exception {
+		long employeeId = Long.parseLong(employeeChangePasswordRequest.getId());
+		Employee e = employeeRepository.findById(employeeId);
+		if(e != null) {
+			if(bCryptPasswordEncoder.matches(employeeChangePasswordRequest.getOldPassword(), e.getPassword())) {
+				e.setPassword(bCryptPasswordEncoder.encode(employeeChangePasswordRequest.getNewPassword()));
+				employeeRepository.save(e);
+			} else {
+				throw new Exception("Old password is incorrect");
+			}
+		} else {
+			throw new Exception("Can not find employee with id " + employeeId);
 		}
 		return false;
 	}

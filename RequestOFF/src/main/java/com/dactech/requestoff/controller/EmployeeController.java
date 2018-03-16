@@ -15,12 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dactech.requestoff.model.common.StatusInfo;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.Position;
+import com.dactech.requestoff.model.request.EmployeeChangePasswordRequest;
 import com.dactech.requestoff.model.request.EmployeeDeleteRequest;
 import com.dactech.requestoff.model.request.EmployeeDetailsRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatisticsPagingRequest;
 import com.dactech.requestoff.model.request.EmployeeRegistRequest;
 import com.dactech.requestoff.model.request.EmployeeSearchRequest;
 import com.dactech.requestoff.model.request.GetUserRequest;
+import com.dactech.requestoff.model.response.EmployeeChangePasswordResponse;
 import com.dactech.requestoff.model.response.EmployeeDeleteResponse;
 import com.dactech.requestoff.model.response.EmployeeDetailsResponse;
 import com.dactech.requestoff.model.response.EmployeeOffStatisticsPagingResponse;
@@ -127,12 +129,6 @@ public class EmployeeController {
 			
 			response.setUser(user);
 			
-//			if (user.getPosition().getCode() == Position.CODE_EMPLOYEE && user.getListTeam().get(0).getLeaderId() == user.getId()) {
-//				response.setLeaderFlag(1);
-//			} else {
-//				response.setLeaderFlag(0);
-//			}
-			
 			if (user.getPosition().getCode() == Position.CODE_EMPLOYEE) {
 				if(user.getListTeam() != null && user.getListTeam().size() > 0) {
 					if(user.getListTeam().get(0).getLeaderId() == user.getId()) {
@@ -154,6 +150,19 @@ public class EmployeeController {
 			double remainHours = employeeService.getRemainHours(user.getId());
 			response.setRemainHours(remainHours);
 			
+			response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setStatusInfo(new StatusInfo(StatusInfo.ERROR, e.getMessage()));
+		}
+		return response;
+	}
+	
+	@RequestMapping(value = "/employee/changePassword", method = RequestMethod.POST)
+	EmployeeChangePasswordResponse changePassword(@RequestBody EmployeeChangePasswordRequest employeeChangePasswordRequest) {
+		EmployeeChangePasswordResponse response = new EmployeeChangePasswordResponse();
+		try {
+			employeeService.changePassword(employeeChangePasswordRequest);
 			response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
 		} catch (Exception e) {
 			e.printStackTrace();
