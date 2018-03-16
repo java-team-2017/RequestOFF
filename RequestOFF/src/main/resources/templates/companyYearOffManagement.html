@@ -15,31 +15,46 @@
 			search();
 			
 			$('#btnOk').on('click', function(){
-				var dataRequest = {
-					"for_next_year" : $('#forNextYear').val(),
-					"day_off_reset_flag" : $('input[name=resetOrNot]:checked').val(),
-					"number_day_off" : $('#numberOfDay').val()
-				};
-				$.ajax({
-					type : "POST",
-					contentType : "application/json",
-					url : /*[[@{/companyYearOff/regist}]]*/,
-					dataType : 'json',
-					data : JSON.stringify(dataRequest),
-					success : function(dataResult) {
-						if (dataResult.status_info.status == 0) {
-							$('#alertMessage').html("Setting Successfully").attr('class', 'alert alert-success').show();
-						} 
- 						else {
- 							$('#alertMessage').html("Setting failed !").attr('class', 'alert alert-danger').show();
- 						}
-						var loadTable = $('#companyYearOffTable').DataTable();
-						loadTable.ajax.reload();
-					},
-					error : function(e) {
-						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+				var infoInput = 1;
+				var listInput = $('#companyYearOffForm').find(':input').not("button, #reset, #notReset");
+				$.each(listInput, function() {
+					if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
+						infoInput = 0;
+					}
+					if( !($('#reset').is(':checked') || $('#notReset').is(':checked')) ) { 
+						infoInput = 0; 
 					}
 				});
+				console.log(infoInput);
+				if(infoInput == 1){
+					var dataRequest = {
+						"for_next_year" : $('#forNextYear').val(),
+						"day_off_reset_flag" : $('input[name=resetOrNot]:checked').val(),
+						"number_day_off" : $('#numberOfDay').val()
+					};
+					$.ajax({
+						type : "POST",
+						contentType : "application/json",
+						url : /*[[@{/companyYearOff/regist}]]*/,
+						dataType : 'json',
+						data : JSON.stringify(dataRequest),
+						success : function(dataResult) {
+							if (dataResult.status_info.status == 0) {
+								$('#alertMessage').html("Setting Successfully").attr('class', 'alert alert-success').show();
+							} 
+	 						else {
+	 							$('#alertMessage').html("Setting failed !").attr('class', 'alert alert-danger').show();
+	 						}
+							var loadTable = $('#companyYearOffTable').DataTable();
+							loadTable.ajax.reload();
+						},
+						error : function(e) {
+							$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+						}
+					});
+				} else {
+					$('#alertMessage').html(errors['incompleteFields']).attr('class', 'alert alert-danger').show();
+				}
 			});
 		});
 		function search(){
@@ -68,6 +83,7 @@
 				},
 				destroy: true,
 				searching: false,
+				pageLength: 50,
 				columns: [
 					{ data: 'id' },
 					{ 
@@ -93,8 +109,7 @@
 				<form class="form-input" id="companyYearOffForm">
 					<div class="form-group">
 						<label for="name">Number of day off in year *</label>
-						<input type="text" class="form-control" name="name" id="numberOfDay"/>
-						<input type="hidden" class="form-control" name="number_day_off"/>
+						<input type="text" class="form-control" name="number_day_off" id="numberOfDay"/>
 					</div>
 					<div class="form-group">
 						<label>Reset day off *</label>

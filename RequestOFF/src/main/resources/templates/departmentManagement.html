@@ -25,8 +25,8 @@
 		$('#departmentTable').on('click', 'td', function () {
 			var table = $('#departmentTable').DataTable();
 			var rowData = table.row($(this).parent()).data();
-			var lastChild = $(this).is(':last-child') || $(this).is(':nth-last-child(2)') ;
-			if(!lastChild){
+			var lastOrPreLastChildTag = $(this).is(':last-child') || $(this).is(':nth-last-child(2)') ;
+			if(!lastOrPreLastChildTag){
 				$('#departmentDetails').val(rowData.name);
 				$('#managerDetails').val(rowData.manager.name);
 				$('#modalDetails').modal('show');
@@ -54,6 +54,7 @@
 				info: false,
 				lengthChange: false,
 				paging: false,
+				pageLength: 50,
 				columns: [
 					{ data: 'id' },
 					{ data: 'name' },
@@ -62,56 +63,28 @@
 			});
 		});
 		
-		$('body').on('click', '#btnCreate, .glyphiconEdit', function () {
+		$('tbody').on('click', '.glyphiconEdit', function () {
 			var table = $('#departmentTable').DataTable();
 			rowDataRequest = table.row($(this).parent()).data();
 			$('#editModal').modal('show');
 			$('#editMsg').hide();
-			var isCreate;
-			if ($(this).attr("id") == 'btnCreate') {
-				isCreate = true;
-				$('#editDepartment').val("");
-				$('#editModalName').text("Add Department");
-				$('#btnSave').hide();
-			} else {
-				isCreate = false;
-				$('#editDepartment').val(rowDataRequest.name);
-				$('#editModalName').text("Edit Department");
-				$('#btnCreateModal').hide();
-				$('#btnSave').show();
-			}
-			
-			$.ajax({
-				type : "POST",
-				contentType : "application/json",
-				url : /*[[@{/department/departmentInfo}]]*/,
-				dataType : 'json',
-				data : JSON.stringify({}),
-				success : function(resultData) {
-					if (resultData.status_info.status == 0) {
-						$('#editManager').empty();
-						if (isCreate == false) {
-							$('#editManager').append('<option style="font-weight:bold;" value="' + rowDataRequest.manager.id + '" selected="true">' + rowDataRequest.manager.name + '</option>');
-						} else {
-							if (resultData.listManagerNotInDepartment.length > 0) {
-								$('#btnCreateModal').show();
-							} else {
-								$('#btnCreateModal').hide();
-								$('#editMsg').html("No manager found").attr('class', 'alert alert-danger').show();
-							}
-						}
-						
-						$.each(resultData.listManagerNotInDepartment, function(index, manager) {
-							$('#editManager').append('<option value="' + manager.id + '">' + manager.name + '</option>');
-						});
-					} else {
-						$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
-					}
-				},
-				error : function(e) {
-					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-				}
-			});
+			$('#editDepartment').val(rowDataRequest.name);
+			$('#editModalName').text("Edit Department");
+			$('#btnCreateModal').hide();
+			$('#btnSave').show();
+			departmentInfo(rowDataRequest);
+		});
+		
+		$('#btnCreate').on('click', function(){
+			var table = $('#departmentTable').DataTable();
+			rowDataRequest = table.row($(this).parent()).data();
+			$('#editModal').modal('show');
+			$('#editMsg').hide();
+			$('#editDepartment').val("");
+			$('#editModalName').text("Add Department");
+			$('#btnCreateModal').show();
+			$('#btnSave').hide();
+			departmentInfo(rowDataRequest)
 		});
 		
 		$('#btnSave, #btnCreateModal').on('click', function(){
@@ -146,12 +119,7 @@
 						if (isAdd) {
 							$('#alertMessage').html("Create Department Successfully").attr('class', 'alert alert-success').show();
 						} else {
-							if($('#editManager').val() == rowDataRequest.manager.id){
-								$('#alertMessage').html("No manager is changed").attr('class', 'alert alert-warning').show();
-							}
-							else{
-								$('#alertMessage').html("Edit Department Successfully").attr('class', 'alert alert-success').show();
-							}
+							$('#alertMessage').html("Edit Department Successfully").attr('class', 'alert alert-success').show();
 						}
 						$('#editModal').modal('hide');
 					} else {
@@ -206,7 +174,7 @@
 		});
 		
 		$('#department').typeahead({
-			name: 'suggest-employee',
+			name: 'suggest-department',
 			limit: 100,
 			hint: false,
 			remote: {
@@ -236,7 +204,35 @@
 		});
 		
 	});
-		
+	
+	function departmentInfo(rowDataRequest){
+		$.ajax({
+			type : "POST",
+			contentType : "application/json",
+			url : /*[[@{/department/departmentInfo}]]*/,
+			dataType : 'json',
+			data : JSON.stringify({}),
+			success : function(resultData) {
+				if (resultData.status_info.status == 0) {
+					if (resultData.listManagerNotInDepartment.length <= 0) {
+						$('#btnCreateModal').hide();
+						$('#btnSave').hide();
+						$('#editMsg').html("No manager found").attr('class', 'alert alert-danger').show();
+					}
+					$('#editManager').empty();
+					$.each(resultData.listManagerNotInDepartment, function(index, manager) {
+						$('#editManager').append('<option value="' + manager.id + '">' + manager.name + '</option>');
+					});
+				} else {
+					$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
+				}
+			},
+			error : function(e) {
+				$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+			}
+		});
+	}
+	
 	function search(){
 		var requestData = $('#departmentForm').serializeJSON();
 		var requestSearch = {
@@ -264,6 +260,7 @@
 			},
 			destroy: true,
 			searching: false,
+			pageLength: 50,
 			columns: [
 				{ data: 'id' },
 				{ data: 'name' },
@@ -309,12 +306,13 @@
 					
 					<p>
 						<button id="btnSearch" type="button" class="btn btn-primary" style="width:76px;">Search</button>&nbsp;&nbsp;
-						<button id="btnCreate" type="button" class="btn btn-primary" style="width:76px;">Create</button>&nbsp;&nbsp;
+						
 						<button type="reset" class="btn btn-primary" style="width:76px;">Clear</button>
 					</p>
 				</form>
 			</div>
-		</fieldset>
+		</fieldset><br></br>
+		<button id="btnCreate" type="button" class="btn btn-primary" style="width:76px;">Create</button>
 			<div class="table-responsive" style="margin-top:3em;"> 
 				<table class="table table-bordered table-striped table-hover" id="departmentTable">
 					<thead>
@@ -336,7 +334,7 @@
 					<div class="modal-content">
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h4 class="modal-title">Details</h4>
+							<h3 class="modal-title">Details</h3>
 						</div>
 						
 						<div class="modal-body">
@@ -383,7 +381,7 @@
 					<div class="modal-content">
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h4 id="editModalName" class="modal-title">Edit</h4>
+							<h3 id="editModalName" class="modal-title"></h3>
 						</div>
 						
 						<div class="modal-body">
