@@ -471,27 +471,27 @@
 					columnDefs: [
 						{
 							"targets": [ 0 ],
-							"data": 'id'
-						},
-						{
-							"targets": [ 1 ],
 							"data": 'name'
 						},
 						{
-							"targets": [ 2 ],
+							"targets": [ 1 ],
 							"data": 'birthday'
 						},
 						{
-							"targets": [ 3 ],
+							"targets": [ 2 ],
 							"data": 'email'
 						},
 						{
-							"targets": [ 4 ],
+							"targets": [ 3 ],
 							"data": 'teamName'
 						},
 						{
-							"targets": [ 5 ],
+							"targets": [ 4 ],
 							"data": 'departmentName'
+						},
+						{
+							"targets": [ 5 ],
+							"data": 'startWorkingDate'
 						},
 						{
 							"targets": [ 6 ],
@@ -572,12 +572,12 @@
 					<table class="display table table-bordered" cellspacing="0" width="100%" id="employeeTable">
 						<thead>
 							<tr>
-								<th class="text-center idCell">ID</th>
 								<th class="text-center nameCell">Name</th>
-								<th class="text-center genderCell">Date of birth</th>
-								<th class="text-center positionCell">Email</th>
+								<th class="text-center dateOfBirthCell">Date of birth</th>
+								<th class="text-center emailCell">Email</th>
 								<th class="text-center teamCell">Team</th>
 								<th class="text-center departmentCell">Department</th>
+								<th class="text-center startWorkingDateCell">Start working date</th>
 								<th class="text-center editCell">Edit</th>
 								<th class="text-center deleteCell">Delete</th>
 							</tr>
@@ -598,7 +598,7 @@
 								<div class="modal-body">
 									<div id="alertMessage_modalDetails" class="alert" style="display:none;"></div>
 									<form id="modalDetailsForm">
-										<div class="form-group row">
+										<div class="form-group row" style="display: none;">
 											<label class="control-label col-sm-3">ID </label>
 											<label class="control-label col-sm-9" style="text-align: left;" id="idModalDetailsId"></label>
 										</div>
