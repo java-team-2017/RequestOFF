@@ -7,7 +7,6 @@ import javax.persistence.Id;
 
 @Entity
 public class Role {
-	public static final String ROLE_HR_MAMAGER = "ROLE_HR_MAMAGER";
 	public static final String ROLE_HR = "ROLE_HR";
 	
 	@Id

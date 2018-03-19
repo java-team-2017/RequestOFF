@@ -138,7 +138,6 @@
 				"department_id": requestData.department,
 				"team_id": requestData.team
 			};
-			console.log(requestData);
 			$('#requestTable').DataTable( {
 				ajax: {
 					type: "POST",
@@ -255,8 +254,8 @@
 					</div>
 							
 					<p>
-						<button id="btnSearch" type="button" class="btn btn-primary" value="Search" style="width:76px;">Tìm kiếm</button>&nbsp;&nbsp;
-						<button type="reset" class="btn btn-primary" style="width:76px;">Làm mới</button>
+						<button id="btnSearch" type="button" class="btn btn-primary" value="Search" style="width:82px;">Tìm kiếm</button>&nbsp;&nbsp;
+						<button type="reset" class="btn btn-primary" style="width:80px;">Làm mới</button>
 					</p>
 				</form>
 			</div>
@@ -269,7 +268,7 @@
 							<th class="text-center">Nhân viên</th>
 							<th class="text-center">Từ</th>
 							<th class="text-center">Đến</th>
-							<th class="text-center">Tổng thời gian nghỉ</th>
+							<th class="text-center">Thời gian nghỉ</th>
 							<th class="text-center">Lí do</th>
 							<th class="text-center">Trạng thái</th>
 						</tr>
@@ -324,8 +323,7 @@
 								<div class="col-md-9">
 									<input id="toTimeDetails" class="form-control" readonly="readonly"></input>
 								</div>
-								
-								<label class="col-md-3 control-label">Tổng thời gian nghỉ:</label>
+								<label class="col-md-3 control-label">Thời gian nghỉ:</label>
 								<div class="col-md-9">
 									<input id="totalTimeDetails" class="form-control" readonly="readonly"></input>
 								</div>
