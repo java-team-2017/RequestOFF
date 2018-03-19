@@ -9,6 +9,8 @@ import javax.persistence.Id;
 public class DayOffType {
 	public static final long PAYMENT_FLAG_PAYING = 1;
 	public static final long PAYMENT_FLAG_NOT_PAYING = 0;
+	
+	public static final long NGHI_PHEP_THUONG_ID = 26;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

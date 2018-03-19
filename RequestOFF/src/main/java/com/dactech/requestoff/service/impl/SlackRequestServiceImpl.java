@@ -129,7 +129,7 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 		request.setReason(slackRequest.getReason());
 		request.setStatus(Request.REQUEST_STATUS_APPROVED);
 		request.setResponseMessage("");
-		DayOffType dayOffType = dayOffTypeRepository.findById(16);
+		DayOffType dayOffType = dayOffTypeRepository.findById(DayOffType.NGHI_PHEP_THUONG_ID);
 		request.setDayOffType(dayOffType);
 		request.setRecipientId(employee.getId());
 		request.setValidFlag(1);
