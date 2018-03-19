@@ -4,10 +4,10 @@
 	</div>
 	<div class="header-right">
 		
-			<span sec:authorize="isAuthenticated()"> Logged user: <span
+			<span sec:authorize="isAuthenticated()"> Người dùng: <span
 				sec:authentication="name"></span> | Roles: <span
 				sec:authentication="principal.authorities"></span> | <a
-				th:href="@{/logout}">Sign Out</a>
+				th:href="@{/logout}">Đăng xuất</a>
 			</span>
 
 	</div>

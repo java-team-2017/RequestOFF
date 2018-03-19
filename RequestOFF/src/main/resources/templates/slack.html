@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Slack Request Management</title>
+	<title>Quản lý request từ Slack</title>
+	<meta charset="UTF-8"/>
 	<div th:replace="library"></div>
 	<link rel="stylesheet" type="text/css" href="css/slackStyle.css" />
 </head>
@@ -27,7 +28,7 @@
 			var fromTime = new Date($('#from').val());
 			var toTime = new Date($('#to').val());
 			if (fromTime != 'Invalid Date' && toTime != 'Invalid Date' && fromTime.getTime() > toTime.getTime()) {
-				$('#alertMessage').html("From time must be after to time").attr('class', 'alert alert-danger').show();
+				$('#alertMessage').html(errors['DateError']).attr('class', 'alert alert-danger').show();
 				return;
 			}
 				
@@ -180,7 +181,7 @@
 			if (action == 'modal save' || action == 'modal approve') { // click save or approve button on detail modal
 				$('#detailModal .modal-input').each(function() {
 					if ($(this).val() == "") {
-						$('#modalMsg').html("Please fill all field").attr('class', 'alert alert-danger').show();
+						$('#modalMsg').html(errors['incompleteFields']).attr('class', 'alert alert-danger').show();
 						return;
 					}
 				})
@@ -190,16 +191,16 @@
 				var days = $('#detailTotalDay').val();
 				var hours = $('#detailTotalHour').val();
 				if (toTime < fromTime) {
-					$('#modalMsg').html("To time must be after from time").attr('class', 'alert alert-danger').show();
+					$('#modalMsg').html(errors['DateError']).attr('class', 'alert alert-danger').show();
 					return;
 				}
 				if (isNaN(parseInt(days)) || parseInt(days) != parseFloat(days) || parseInt(days) < 0) {
-					$('#modalMsg').html("number of days must be a positive integer").show();
+					$('#modalMsg').html("Số ngày nghỉ phải là số nguyên dương").show();
 					return;
 				}
 				var totalTime = parseFloat(days) * 8 + parseFloat(hours);
 				if (totalTime == 0) {
-					$('#modalMsg').html("Time off must be greater than 0").show();
+					$('#modalMsg').html("Thời gian nghỉ phải lớn hơn 0 giờ").show();
 					return;
 				}
 				
@@ -250,11 +251,11 @@
 						}
 					} else {
 						if (action == 'modal approve') {
-							$('#alertMessage').html("Approve successully").attr('class', 'alert alert-success').show();
+							$('#alertMessage').html("Chấp nhận thành công").attr('class', 'alert alert-success').show();
 						} else if (action == 'modal deny' || action == 'table deny') {
-							$('#alertMessage').html("Deny successully").attr('class', 'alert alert-success').show();
+							$('#alertMessage').html("Từ chối thành công").attr('class', 'alert alert-success').show();
 						} else if (action == 'modal save') {
-							$('#alertMessage').html("Edit successully").attr('class', 'alert alert-success').show();
+							$('#alertMessage').html("Sửa thành công").attr('class', 'alert alert-success').show();
 						}
 						$('#detailModal').modal('hide');
 					}
@@ -275,11 +276,12 @@
 	<div th:replace="menu"></div>
 	
 	<div class="requestOffContentBody">			
-		<h2>Slack Request Message Management</h2>
+		<h2>Quản lý request từ Slack</h2>
+		<br/>
 		<div id="alertMessage" class="alert" style="display:none;"></div>
 		<form id="slackForm" class="form-input">
 			<div class="form-group">
-				<label class="control-label">From: </label>
+				<label class="control-label">Từ: </label>
 				<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 					<input class="form-control" type="text" name="msg_time_from" id="from" value=""></input>
 					<div class="input-group-addon">
@@ -288,7 +290,7 @@
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="control-label">To: </label>
+				<label class="control-label">Đến: </label>
 				<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 					<input class="form-control" type="text" name="msg_time_to" id="to" value=""></input>
 					<div class="input-group-addon">
@@ -297,22 +299,22 @@
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="control-label">Process status:</label>
+				<label class="control-label">Trạng thái xử lý:</label>
 					<select id="processStatus" name="process_flag" class="form-control">
-						<option value = "0">unprocessed</option>
-						<option value = "1">processed</option>
+						<option value = "0">Chưa xử lý</option>
+						<option value = "1">Đã xử lý</option>
 					</select>
 			</div>
 			<div class="form-group">
-				<label class="control-label">Message valid status:</label>
+				<label class="control-label">Tính hợp lệ:</label>
 					<select id="validStatus" name="is_valid_msg" class="form-control">
 						<option value = ""></option>
-						<option value = "1">valid request message</option>
-						<option value = "0">invalid request message</option>
+						<option value = "1">Request hợp lệ</option>
+						<option value = "0">Request không hợp lệ</option>
 					</select>
 			</div>
 			<p>
-				<button id="searchBtn" type="button" class="btn btn-primary" style="width:76px;">Search</button>
+				<button id="searchBtn" type="button" class="btn btn-primary" style="width:76px;">Tìm kiếm</button>
 			</p>
 		</form>
 				
@@ -330,13 +332,13 @@
 				<thead>
 					<tr>
 						<th class="text-center" style="width: 40px;">Id</th>
-						<th class="text-center">Message Time</th>
-						<th class="text-center">Name</th>
-						<th class="text-center" style="width: 500px;">Msg content</th>
-						<th class="text-center">From</th>
-						<th class="text-center">To</th>
-						<th class="text-center">Total Time</th>
-						<th class="text-center">Error</th>
+						<th class="text-center">Thời gian</th>
+						<th class="text-center">Nhân viên</th>
+						<th class="text-center" style="width: 500px;">Nội dung</th>
+						<th class="text-center">Từ</th>
+						<th class="text-center">Đến</th>
+						<th class="text-center">Thời gian nghỉ</th>
+						<th class="text-center">Lỗi</th>
 						<th class="text-center"></th>
 					</tr>
 				</thead>
@@ -350,7 +352,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title" align="center">Detail</h4>
+						<h4 class="modal-title" align="center">Chi tiết</h4>
 					</div>
 					<div class="modal-body">
 						<div class="row">
@@ -358,26 +360,26 @@
 							<div id="modalMsg" class="alert alert-danger" style="display: none;"></div>
 							<br/>
 						</div>
-						<div class="row">
+						<div class="row" style="display: none;">
 							<label class="col-sm-4 col-form-label">Id</label>
 							<div class="col-sm-8">
 								<input id="detailId" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
 							</div>
 						</div>
 						<div class="row">
-							<label class="col-sm-4 col-form-label">Message Time</label>
+							<label class="col-sm-4 col-form-label">Thời gian</label>
 							<div class="col-sm-8">
 								<input id="detailMsgTime" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
 							</div>
 						</div>
 						<div class="row">
-							<label class="col-sm-4 col-form-label">Employee Name</label>
+							<label class="col-sm-4 col-form-label">Nhân viên</label>
 							<div class="col-sm-8">
 								<input id="detailName" class="col-sm-3 form-control modal-input" type="text"></input>
 							</div>
 						</div>
 						<div class="row">
-							<label class="col-sm-4 col-form-label">From</label>
+							<label class="col-sm-4 col-form-label">Từ</label>
 							<div class="col-sm-8">
 								<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 									<input type="text" class="form-control modal-input" name="fromTime" id="detailFrom" />
@@ -388,7 +390,7 @@
 							</div>
 						</div>
 						<div class="row">
-							<label class="col-sm-4 col-form-label">To</label>
+							<label class="col-sm-4 col-form-label">Đến</label>
 							<div class="col-sm-8">
 								<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 									<input type="text" class="form-control modal-input" name="fromTime" id="detailTo" />
@@ -399,41 +401,41 @@
 							</div>
 						</div>
 						<div class="row">
-							<label class="col-sm-4 col-form-label">Total Time</label>
+							<label class="col-sm-4 col-form-label">Thời gian nghỉ</label>
 							<div class="col-sm-2">
 								<input id="detailTotalDay" class="col-sm-3 form-control modal-input" type="text"></input>
 							</div>
-							<label class="col-sm-1" style="padding-top: 5px">Days</label>
+							<label class="col-sm-1" style="padding-top: 5px">Ngày</label>
 							<div class="col-sm-1"></div>
 							<div class="col-sm-2">
 								<select id="detailTotalHour" class="form-control modal-input"></select>
 							</div>
-							<label class="col-sm-1 col-form-label" style="padding-top: 5px">Hours</label>
+							<label class="col-sm-1 col-form-label" style="padding-top: 5px">Giờ</label>
 						</div>
 						<div class="row">
-							<label class="col-sm-4 col-form-label">Message Content</label>
+							<label class="col-sm-4 col-form-label">Nội dung</label>
 							<div class="col-sm-8">
 								<textarea id="detailMsgContent" rows="4" cols="10" class="col-sm-3 form-control" readonly="readonly" style="height: 176px;"></textarea>
 							</div>
 						</div>
 						<div class="row">
-							<label class="col-sm-4 col-form-label">Valid Message</label>
+							<label class="col-sm-4 col-form-label">Hợp lệ</label>
 							<div class="col-sm-8">
 								<span id="detailValidStatus"></span>
 							</div>
 						</div>
 						<div class="row">
-							<label class="col-sm-4 col-form-label">Processed</label>
+							<label class="col-sm-4 col-form-label">Đã xử lý</label>
 							<div class="col-sm-8">
 								<span id="detailProcessFlag"></span>
 							</div>
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button id="modalApproveBtn" type="button" class="btn btn-default">Approve</button>
-						<button id="modalDenyBtn" type="button" class="btn btn-default">Deny</button>
-						<button id="modalSaveBtn" type="button" class="btn btn-default">Save</button>
-						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+						<button id="modalApproveBtn" type="button" class="btn btn-default">Chấp nhận</button>
+						<button id="modalDenyBtn" type="button" class="btn btn-default">Từ chối</button>
+						<button id="modalSaveBtn" type="button" class="btn btn-default">Lưu</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
 					</div>
 				</div>
 			</div>
