@@ -10,7 +10,15 @@ var errors = {
 	'APIResponseError': function (errMsg) {
 		return errMsg;
 	}
-}
+};
+
+var requestStatus = {
+	'1': 'đã lưu',
+	'2': 'đã duyệt',
+	'3': 'đã từ chối',
+	'4': 'đã phản hồi',
+	'5': 'đang chờ'
+};
 
 // usage example: $.notify(notification['DateError']);
 //				  $.notify(notification['APIResponseError'](errMsg));
