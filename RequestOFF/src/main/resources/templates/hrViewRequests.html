@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>Danh sách request</title>
+	<meta charset="UTF-8" />
 	<div th:replace="library"></div>
 </head>
 
@@ -163,7 +164,7 @@
 				destroy: true,
 				searching: false,
 				pageLength: 50,
-				order: [[ 1, "desc" ]],
+				order: [[ 2, "desc" ]],
 				columns: [
 					{ data: 'id' },
 					{ data: 'employee.name' },
@@ -259,7 +260,7 @@
 							
 					<p>
 						<button id="btnSearch" type="button" class="btn btn-primary" value="Search" style="width:76px;">Tìm kiếm</button>&nbsp;&nbsp;
-						<button type="reset" class="btn btn-primary" style="width:76px;">Xóa</button>
+						<button type="reset" class="btn btn-primary" style="width:76px;">Làm mới</button>
 					</p>
 				</form>
 			</div>
