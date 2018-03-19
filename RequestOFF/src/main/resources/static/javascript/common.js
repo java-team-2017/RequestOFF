@@ -13,11 +13,11 @@ var errors = {
 };
 
 var requestStatus = {
-	'1': 'đã lưu',
-	'2': 'đã duyệt',
-	'3': 'đã từ chối',
-	'4': 'đã phản hồi',
-	'5': 'đang chờ'
+	'1': 'Đã lưu',
+	'2': 'Đã duyệt',
+	'3': 'Đã từ chối',
+	'4': 'Đã phản hồi',
+	'5': 'Đang chờ'
 };
 
 // usage example: $.notify(notification['DateError']);

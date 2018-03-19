@@ -10,13 +10,6 @@
 	/*<![CDATA[*/
 		var userData;
 		var requestObjArr = [];
-		var requestStatus = {
-			'1' : 'Đã lưu',
-			'2' : 'Chấp nhận',
-			'3' : 'Từ chối',
-			'4' : 'Đã phản hồi',
-			'5' : 'Đang chờ'
-		};
 		$(function() {
 			var dataReturnRequest;
 			
@@ -60,6 +53,8 @@
 					});
 				}
 			})
+			
+			$("#from").val("01/01/" + new Date().getFullYear());
 			
 			$('.datepicker').on('changeDate', function(ev){
 				$(this).datepicker('hide');
@@ -209,7 +204,7 @@
 		<div id="alertMessage" class="alert" style="display:none;"></div>
 		<fieldset class="filter-fieldset">
 			<legend>
-				<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Search Filter</a>
+				<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Khung tìm kiếm</a>
 			</legend>
 			<div class="filter-collapse collapse">
 				<form id="requestForm" class="form-input">
@@ -233,15 +228,16 @@
 						<select name="status" id="status" value="" class="form-control">
 							<option value="">Tất cả</option>
 							<option value="5">Đang chờ</option>
-							<option value="2">Chấp nhận</option>
-							<option value="3">Từ chối</option>
+							<option value="2">Đã duyệt</option>
+							<option value="3">Đã từ chối</option>
+							<option value="4">Đã phản hồi</option>
 						</select>
 					</div>
 							
 					<div class="form-group">
-							<label class="control-label">Từ: </label>
+						<label class="control-label">Từ: </label>
 						<div class="input-group date datepicker" data-provide="datepicker">
-							<input type="text" class="form-control" name="from_time" id="from" value=""/>
+							<input type="text" class="form-control" name="from_time" id="from" value="0"/>
 							<div class="input-group-addon">
 								<span class="glyphicon glyphicon-calendar"></span>
 							</div>
@@ -249,7 +245,7 @@
 					</div>
 							
 					<div class="form-group">
-							<label class="control-label">Đến: </label>
+						<label class="control-label">Đến: </label>
 						<div class="input-group date datepicker" data-provide="datepicker">
 							<input type="text" class="form-control" name="to_time" id="to" value=""/>
 							<div class="input-group-addon">

@@ -10,13 +10,6 @@
 	/*<![CDATA[*/
 		var userData;
 		var requestObjArr = [];
-		var requestStatus = {
-			'1' : 'Đã lưu',
-			'2' : 'Đã chấp nhận',
-			'3' : 'Từ chối',
-			'4' : 'Đã phản hồi',
-			'5' : 'Đang chờ'
-		};
 		$(function() {
 			var dataReturnRequest;
 			
@@ -40,6 +33,8 @@
 			$('.datepicker').on('changeDate', function(ev){
 				$(this).datepicker('hide');
 			});
+			
+			$("#from").val("01/01/" + new Date().getFullYear());
 			
 			$('#btnSearch').on('click', function(){
 				search();
@@ -343,8 +338,8 @@
 						<select name="status" id="status" value="" class="form-control">
 							<option value="5">Đang chờ</option>
 							<option value="">Tất cả</option>
-							<option value="2">Chấp nhận</option>
-							<option value="3">Từ chối</option>
+							<option value="2">Đã duyệt</option>
+							<option value="3">Đã từ chối</option>
 						</select>
 					</div>
 							
