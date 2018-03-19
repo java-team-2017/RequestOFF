@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>HR xem request</title>
+	<title>Danh sách request</title>
 	<div th:replace="library"></div>
 </head>
 
@@ -10,11 +10,11 @@
 		var userData;
 		var requestObjArr = [];
 		var requestStatus = {
-			'1' : 'Saved',
-			'2' : 'Approved',
-			'3' : 'Denied',
-			'4' : 'Responded',
-			'5' : 'Waiting'
+			'1' : 'Đã lưu',
+			'2' : 'Chấp nhận',
+			'3' : 'Từ chối',
+			'4' : 'Đã phản hồi',
+			'5' : 'Đang chờ'
 		};
 		$(function() {
 			var dataReturnRequest;
@@ -203,8 +203,8 @@
 	<div th:replace="fragments/header"></div>
 	<div th:replace="menu"></div>
 	
-	<div class="requestOffContentBody">			
-		<h2>HR xem request</h2>
+	<div class="requestOffContentBody">
+		<h2>Danh sách request</h2>
 		<div id="alertMessage" class="alert" style="display:none;"></div>
 		<fieldset class="filter-fieldset">
 			<legend>
