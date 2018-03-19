@@ -103,10 +103,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 //			employee.setListTeam(listTeam);
 			
 			List<Role> listRole = new ArrayList<Role>();
-			for(String roleId : erRequest.getRoleIds()) {
-				Role role = roleRepository.findById(Long.parseLong(roleId));
+			if(erRequest.getRoleIds().size() > 0) {
+				for(String roleId : erRequest.getRoleIds()) {
+					Role role = roleRepository.findById(Long.parseLong(roleId));
+					listRole.add(role);
+				}
+			} else if(Long.parseLong(erRequest.getPositionId()) == Position.CODE_EMPLOYEE) {
+				Role role = roleRepository.findByRole(Role.ROLE_EMPLOYEE);
 				listRole.add(role);
+				employee.setListRole(listRole);
 			}
+			
 			employee.setListRole(listRole);
 		} else { // update employee
 			Long EmployeeId = Long.parseLong(erRequest.getId());
@@ -197,6 +204,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 					Role role = roleRepository.findById(Long.parseLong(roleId));
 					listRole.add(role);
 				}
+				employee.setListRole(listRole);
+			} else if(Long.parseLong(erRequest.getPositionId()) == Position.CODE_EMPLOYEE) {
+				List<Role> listRole = new ArrayList<Role>();
+				Role role = roleRepository.findByRole(Role.ROLE_EMPLOYEE);
+				listRole.add(role);
 				employee.setListRole(listRole);
 			}
 			if (StringUtil.isNotEmpty(erRequest.getValidFlag())) {

@@ -8,6 +8,7 @@ import javax.persistence.Id;
 @Entity
 public class Role {
 	public static final String ROLE_HR = "ROLE_HR";
+	public static final String ROLE_EMPLOYEE = "ROLE_EMPLOYEE";
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

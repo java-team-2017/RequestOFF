@@ -4,8 +4,6 @@ var errors = {
 	'incompleteFields': 'Vui lòng điền vào tất cả các trường bắt buộc',
 	'offHoursEqual0': 'Thời gian nghỉ phải lớn hơn 0 giờ',
 	'exceedTime': 'Thời gian nghỉ vượt quá thời gian nghỉ phép còn lại',
-	'roundHour': 'Your hours of off time must be round',
-	'weekend': 'Your choosen hours are belong to weekends',
 	'stringExceedLimit': 'Độ dài chuỗi vượt quá độ dài cho phép',
 	'APIResponseError': function (errMsg) {
 		return errMsg;
@@ -19,40 +17,6 @@ var requestStatus = {
 	'4': 'Đã phản hồi',
 	'5': 'Đang chờ'
 };
-
-// usage example: $.notify(notification['DateError']);
-//				  $.notify(notification['APIResponseError'](errMsg));
-var notification = {
-	'DateError': {
-		message: 'time of To field must be after From field',
-		status: 'error', // 'default', 'info', 'error', 'warning', 'success'
-		timeout: 3000, // ms
-		pos: 'top-center' // 'top-center','top-right', 'bottom-right', 'bottom-center', 'bottom-left'
-	},'incompleteFields': {
-		message: 'Please fill in all fields',
-		status: 'error',
-		timeout: 3000,
-		pos: 'top-center'
-	},'APIResponseError': function (errMsg) {
-		return {
-			message: '<h5 align = "center">API response error</h5>' + errMsg,
-			status: 'error',
-			timeout: 3000,
-			pos: 'top-center'
-		}
-	},'exceedTime': {
-		message: 'Hours of off time exceed remain hours',
-		status: 'error',
-		timeout: 3000,
-		pos: 'top-center'
-	}
-	
-}
-
-//function notify(containerId, message) {
-//	$('#' + containerId).attr('class', 'alert fade in alert-success').show();
-//	$('#' + containerId + ' > span').html(message);
-//}
 
 function renderRemainHours(remainHours, containerId) {
 	var days = parseInt(parseFloat(remainHours) / 8);
@@ -87,28 +51,6 @@ function renderDayOffTypeSelect(containerId) {
 		}
 	});
 }
-
-//function renderRecipientSelect(employeeId, selectBoxId) {
-//	$.ajax({
-//		type : "POST",
-//		contentType : "application/json",
-//		url : "/employee/getListRecipients",
-////		url : /*[[@{/employee/getListRecipients}]]*/,
-//		dataType : 'json',
-//		data : JSON.stringify({"employee_id" : employeeId}),
-//		success : function(returnData) {
-//			var option = "";
-//			var listRecipient = returnData.list_recipients;
-//			$.each(listRecipient, function(i, element) {
-//				option += "<option value='" + element.id + "'>" + element.name + "</option>"; 
-//			});
-//			$("#" + selectBoxId).append(option);
-//		},
-//		error : function(e) {
-//			$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-success').show();
-//		}
-//	});
-//}
 
 function renderRecipientSelect(listRecipient, selectBoxId) {
 	var option = "";

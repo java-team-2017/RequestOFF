@@ -7,4 +7,5 @@ import com.dactech.requestoff.repository.custom.RoleRepositoryCustom;
 
 public interface RoleRepository extends JpaRepository<Role, Long>, RoleRepositoryCustom {
 	public Role findById(long id);
+	public Role findByRole(String role);
 }

@@ -213,7 +213,7 @@
 					
 					//-----------validate------------
 					var complete = 1, exceedLength = 0, isNotNagativeInteger = 1, dateError = 0, valid = 1;
-					var listInput = $("#modalAddForm").find(':input');
+					var listInput = $("#modalAddForm").find(':input').not('#roleModalAddId');
 					$.each(listInput, function() {
 						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
 							complete = 0;
@@ -311,7 +311,7 @@
 					
 					//---------validate------------
 					var complete = 1, exceedLength = 0, isNotNagativeInteger = 1, dateError = 0, valid = 1;
-					var listInput = $("#modalDetailsForm").find(':input').not("#teamModalDetailsId, #departmentModalDetailsId, #passwordModalDetailsId");
+					var listInput = $("#modalDetailsForm").find(':input').not("#teamModalDetailsId, #departmentModalDetailsId, #passwordModalDetailsId, #roleModalDetailsId");
 					$.each(listInput, function() {
 						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
 							complete = 0;
