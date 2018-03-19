@@ -88,8 +88,6 @@ public class RequestServiceImpl implements RequestService{
 							newRemainHours = remainHours - offHours;
 						}
 					}
-				} else {
-					throw new Exception("RequestRegistRequest parameter is invalid");
 				}
 				
 				employeeOffStatus.setRemainHours(newRemainHours);
