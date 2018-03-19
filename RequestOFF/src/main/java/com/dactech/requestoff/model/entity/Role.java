@@ -7,6 +7,8 @@ import javax.persistence.Id;
 
 @Entity
 public class Role {
+	public static final String ROLE_HR_MAMAGER = "ROLE_HR_MAMAGER";
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;

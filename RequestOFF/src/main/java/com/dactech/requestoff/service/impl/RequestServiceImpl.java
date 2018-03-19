@@ -14,10 +14,12 @@ import com.dactech.requestoff.model.request.RequestBrowsingRequest;
 import com.dactech.requestoff.model.request.RequestDetailsRequest;
 import com.dactech.requestoff.model.request.RequestRegistRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
+import com.dactech.requestoff.model.request.RequestViewRequest;
 import com.dactech.requestoff.model.response.RequestBrowsingResponse;
 import com.dactech.requestoff.model.response.RequestDetailsResponse;
 import com.dactech.requestoff.model.response.RequestRegistResponse;
 import com.dactech.requestoff.model.response.RequestSearchResponse;
+import com.dactech.requestoff.model.response.RequestViewResponse;
 import com.dactech.requestoff.repository.DayOffTypeRepository;
 import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
@@ -170,6 +172,14 @@ public class RequestServiceImpl implements RequestService{
 		List<Request> requests = requestRepository.browseRequest(request);
 		RequestBrowsingResponse response = new RequestBrowsingResponse();
 		response.setRequests(requests);
+		return response;
+	}
+
+	@Override
+	public RequestViewResponse viewRequest(RequestViewRequest request) throws Exception {
+		List<Request> requests = requestRepository.viewRequest(request);
+		RequestViewResponse response = new RequestViewResponse();
+		response.setRequest(requests);
 		return response;
 	}
 	
