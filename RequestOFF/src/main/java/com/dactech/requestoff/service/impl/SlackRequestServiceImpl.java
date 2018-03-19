@@ -279,11 +279,11 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 						String from = request.getFromTime();
 						year = Integer.parseInt(from.substring(0, 4)); // yyyy-MM-dd
 					} catch (Exception ex) {
-						System.err.println("Warning: do not update remain hours");
+						System.err.println("Warning: Parse year error, do not update remain hours");
 					}
 					
 					if (year != currentYear) {
-						System.err.println("Warning: do not update remain hours");
+						System.err.println("Warning: Do not update remain hours because the time is not current year");
 					} else {
 						double newRemainHours;
 						Employee e = request.getEmployee();
@@ -306,7 +306,7 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 			System.out.println(++i);
 			slackRequestRepository.save(slackRequest);
 		}
-		return 0;
+		return slackRequests.size();
 	}
 
 	@Override
