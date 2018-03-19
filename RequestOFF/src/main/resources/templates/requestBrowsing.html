@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Request Browsing</title>
+	<title>Duyệt Request</title>
 	<div th:replace="library"></div>
 </head>
 
@@ -99,21 +99,21 @@
 				}
 				var isNotSend = true;
 				if ($(this).attr('id') == 'btnApproveModal') {
-					$('#confirmMsg').text("Are you sure want to APPROVE this request ?");
+					$('#confirmMsg').text("Bạn có chắc chắn muốn CHẤP NHẬN request này ?");
 					requestObj['status'] = 2;
 				} else if ($(this).attr('id') == 'btnDenyModal') {
-					$('#confirmMsg').text("Are you sure want to DENY this request ?");
+					$('#confirmMsg').text("Bạn có chắc chắn muốn TỪ CHỐI request này ?");
 					requestObj['status'] = 3;
 				} else if ($(this).attr('id') == 'btnSendModal') {
 					if($('#responseMessage').val() == ""){
-						$('#modalDetailsMessage').text("You must write message before sending this request !").attr('class', 'alert alert-danger').show();
+						$('#modalDetailsMessage').text("Bạn phải nhập tin nhắn trước khi gửi request này !").attr('class', 'alert alert-danger').show();
 						isNotSend = false;
 					} else{
-						$('#confirmMsg').text("Are you sure want to SEND MESSAGE to this request ?");
+						$('#confirmMsg').text("Bạn có chắc chắn muốn GỬI TIN NHẮN đến request này ?");
 						requestObj['status'] = 4;
 					}
 				} else if ($(this).attr('id') == 'btnForward') {
-					$('#confirmMsg').text("Are you sure want to FORWARD this request to " + dataReturnRequest.forwardName + " ?");
+					$('#confirmMsg').text("Bạn có chắc chắn muốn CHUYỂN request này đến " + dataReturnRequest.forwardName + " ?");
 					requestObj['recipient_id'] = $("#forward").val();
 				}
 				if(isNotSend == true){
@@ -128,13 +128,13 @@
 			$("#btnApprove, #btnDeny").on('click', function() {
 				requestObjArr = [];
 				var status = $(this).attr('id') == 'btnApprove' ? 2 : 3;
-				var action = $(this).attr('id') == 'btnApprove' ? 'APPROVE' : 'DENY';
+				var action = $(this).attr('id') == 'btnApprove' ? 'CHẤP NHẬN' : 'TỪ CHỐI';
 				if($('#requestTable input[type="checkbox"]:checked').length > 0){
 					var numberOfRequest = $('#requestTable input[type="checkbox"]:checked').length;
 					if(numberOfRequest == 1){
-						$('#confirmMsg').text("Are you sure want to " + action + " this request ?");
+						$('#confirmMsg').text("Bạn có chắc chắn muốn " + action + " request này ?");
 					} else {
-						$('#confirmMsg').text("Are you sure want to " + action + " "+ numberOfRequest + " requests ?");
+						$('#confirmMsg').text("Bạn có chắc chắn muốn  " + action + " "+ numberOfRequest + " những request này ?");
 					}
 					$('#requestTable input[type="checkbox"]:checked').each(function(){
 						var table = $('#requestTable').DataTable();
@@ -149,7 +149,7 @@
 					$('#confirmModal').modal('show');
 				} else {
 					$('#alertModal').modal('show');
-					$('#alertMsg').text("You must select at least 1 request before clicking this button!").attr('class', 'alert alert-warning').show();
+					$('#alertMsg').text("Bạn phải chọn ít nhất 1 request !").attr('class', 'alert alert-warning').show();
 				}
 			});
 			
@@ -162,10 +162,10 @@
 					"update_date": rowData.updateDate
 				}
 				if ($(this).hasClass('btnApprove')) {
-					$('#confirmMsg').text("Are you sure want to APPROVE this request ?");
+					$('#confirmMsg').text("Bạn có chắc chắn muốn CHẤP NHẬN request này ?");
 					requestObj["status"] = 2;
 				} else {
-					$('#confirmMsg').text("Are you sure want to DENY this request ?");
+					$('#confirmMsg').text("Bạn có chắc chắn muốn TỪ CHỐI request này ?");
 					requestObj["status"] = 3;
 				}
 				requestObjArr.push(requestObj);
@@ -324,31 +324,31 @@
 	<div th:replace="menu"></div>
 	
 	<div class="requestOffContentBody">			
-		<h2>Request Browsing</h2>
+		<h2>Duyệt Request</h2>
 		<div id="alertMessage" class="alert" style="display:none;"></div>
 		<fieldset class="filter-fieldset">
 			<legend>
-				<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Search Filter</a>
+				<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Khung tìm kiếm</a>
 			</legend>
 			<div class="filter-collapse collapse">
 				<form id="requestForm" class="form-input">
 					<div class="form-group">
-						<label class="control-label">Employee: </label>
+						<label class="control-label">Nhân viên: </label>
 						<input class="form-control" type="text" name="name" id="employee" value=""></input>
 					</div>
 							
 					<div class="form-group">
-						<label class="control-label">Request Status: </label>
+						<label class="control-label">Trạng thái: </label>
 						<select name="status" id="status" value="" class="form-control">
-							<option value="5">Waiting</option>
-							<option value="">All</option>
-							<option value="2">Approved</option>
-							<option value="3">Denied</option>
+							<option value="5">Đang chờ</option>
+							<option value="">Tất cả</option>
+							<option value="2">Chấp nhận</option>
+							<option value="3">Từ chối</option>
 						</select>
 					</div>
 							
 					<div class="form-group">
-							<label class="control-label">From: </label>
+							<label class="control-label">Từ: </label>
 						<div class="input-group date datepicker" data-provide="datepicker">
 							<input type="text" class="form-control" name="from_time" id="from" value=""/>
 							<div class="input-group-addon">
@@ -358,7 +358,7 @@
 					</div>
 							
 					<div class="form-group">
-							<label class="control-label">To: </label>
+							<label class="control-label">Đến: </label>
 						<div class="input-group date datepicker" data-provide="datepicker">
 							<input type="text" class="form-control" name="to_time" id="to" value=""/>
 							<div class="input-group-addon">
@@ -368,8 +368,8 @@
 					</div>
 							
 					<p>
-						<button id="btnSearch" type="button" class="btn btn-primary" value="Search" style="width:76px;">Search</button>&nbsp;&nbsp;
-						<button type="reset" class="btn btn-primary" style="width:76px;">Clear</button>
+						<button id="btnSearch" type="button" class="btn btn-primary" value="Search" style="width:79px;">Tìm kiếm</button>&nbsp;&nbsp;
+						<button type="reset" class="btn btn-primary" style="width:76px;">Xóa</button>
 					</p>
 				</form>
 			</div>
@@ -378,14 +378,14 @@
 				<table class="table table-bordered table-striped table-hover" id="requestTable">
 					<thead>
 						<tr>
-							<th class="text-center" style="width: 40px;">Select</th>
+							<th class="text-center" style="width: 40px;">Chọn</th>
 							<th class="text-center" style="width: 40px;">ID</th>
-							<th class="text-center">Employee</th>
-							<th class="text-center">From</th>
-							<th class="text-center">To</th>
-							<th class="text-center">Total Time</th>
-							<th class="text-center">Reason</th>
-							<th class="text-center">Status</th>
+							<th class="text-center">Nhân viên</th>
+							<th class="text-center">Từ</th>
+							<th class="text-center">Đến</th>
+							<th class="text-center">Tổng thời gian nghỉ</th>
+							<th class="text-center">Lí do</th>
+							<th class="text-center">Trạng thái</th>
 						</tr>
 					</thead>
 					<tbody class="text-center" style="cursor: pointer;">
@@ -393,26 +393,26 @@
 				</table>
 			</div>
 				
-			<button type="button" class="btn btn-primary" id="btnApprove" >Approve</button>&nbsp;&nbsp;
-			<button type="button" class="btn btn-primary" style="width:76px;" id="btnDeny">Deny</button><br></br>
+			<button type="button" class="btn btn-primary" id="btnApprove" >Chấp nhận</button>&nbsp;&nbsp;
+			<button type="button" class="btn btn-primary" style="width:76px;" id="btnDeny">Từ chối</button><br></br>
 			
 			<div class="modal fade" id="modalDetails" role="dialog">
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h3 class="modal-title">Details</h3>
+							<h3 class="modal-title">Chi tiết</h3>
 							<div id="modalDetailsMessage" class="alert" style="display:none;"></div>
 						</div>
 						
 						<div class="modal-body">
 							<form class="form-horizontal" id="formModal">
-								<label class="col-md-3 control-label">Employee:</label>
+								<label class="col-md-3 control-label">Nhân viên:</label>
 								<div class="col-md-9">
 									<input id="nameDetails" class="form-control" readonly="readonly"></input>
 								</div>
 			
-								<label class="col-md-3 control-label">Position:</label>
+								<label class="col-md-3 control-label">Vị trí:</label>
 								<div class="col-md-9">
 									<input id="positionDetails" class="form-control" readonly="readonly"></input>
 								</div>
@@ -427,61 +427,61 @@
 									<input id="departmentDetails" class="form-control" readonly="readonly"></input>
 								</div>
 			
-								<label class="col-md-3 control-label">Recipient:</label>
+								<label class="col-md-3 control-label">Người nhận:</label>
 								<div class="col-md-9">
 									<input id="recipientDetails" class="form-control" readonly="readonly"></input>
 								</div>
 								
-								<label class="col-md-3 control-label">From:</label>
+								<label class="col-md-3 control-label">Từ:</label>
 								<div class="col-md-9">
 									<input id="fromTimeDetails" class="form-control" readonly="readonly"></input>
 								</div>
 								
-								<label class="col-md-3 control-label">To:</label>
+								<label class="col-md-3 control-label">Đến:</label>
 								<div class="col-md-9">
 									<input id="toTimeDetails" class="form-control" readonly="readonly"></input>
 								</div>
 								
-								<label class="col-md-3 control-label">Total Time:</label>
+								<label class="col-md-3 control-label">Tổng thời gian :</label>
 								<div class="col-md-9">
 									<input id="totalTimeDetails" class="form-control" readonly="readonly"></input>
 								</div>
 			
-								<label class="col-md-3 control-label">Reason:</label>
+								<label class="col-md-3 control-label">Lí do:</label>
 								<div class="col-md-9">
 									<input id="reasonDetails" class="form-control" readonly="readonly"></input>
 								</div>
 								
-								<label class="col-md-3 control-label">Status:</label>
+								<label class="col-md-3 control-label">Trạng thái:</label>
 								<div class="col-md-9">
 									<input id="statusDetails" class="form-control" readonly="readonly"></input>
 								</div>
 			
-								<label class="col-md-3 control-label">Day Off Type:</label>
+								<label class="col-md-3 control-label">Loại ngày nghỉ:</label>
 								<div class="col-md-9">
 									<input id="dayOffTypeDetails" class="form-control" readonly="readonly"></input>
 								</div>
 			
-								<label class="col-md-3 control-label">Response Message:</label>
+								<label class="col-md-3 control-label">Tin nhắn phản hồi:</label>
 								<div class="col-md-9">
 									<textarea id="responseMessage"
-										placeholder="Write message..."
+										placeholder="Viết tin nhắn..."
 										style="height: 100px; width: 100%;">
 									</textarea>
 								</div>&nbsp;
 								
 								<p align="center">
-									<button type="button" class="btn btn-default" style="width:76px;" id="btnApproveModal">Approve</button>
-									<button type="button" class="btn btn-default" style="width:76px;" id="btnDenyModal">Deny</button>
-									<button type="button" class="btn btn-default" style="width:76px;" id="btnSendModal">Send</button>
-									<button type="button" class="btn btn-default" style="width:76px;" data-dismiss="modal">Cancel</button>
+									<button type="button" class="btn btn-default" id="btnApproveModal">Chấp nhận</button>
+									<button type="button" class="btn btn-default" style="width:76px;" id="btnDenyModal">Từ chối</button>
+									<button type="button" class="btn btn-default" style="width:76px;" id="btnSendModal">Gửi</button>
+									<button type="button" class="btn btn-default" style="width:76px;" data-dismiss="modal">Hủy</button>
 								</p>
 			
-								<label> Forward request to : <select name="forward" id="forward" value=""></select>
+								<label> Chuyển request đến : <select name="forward" id="forward" value=""></select>
 								</label>
 								
 								<button type="button" class="btn btn-default btn-sm" id="btnForward">
-									<span class="glyphicon glyphicon-share-alt"></span> Forward
+									<span class="glyphicon glyphicon-share-alt"></span> Chuyển
 								</button>
 								
 							</form>
@@ -496,7 +496,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h2 class="modal-title">Confirm</h2>
+						<h2 class="modal-title">Xác nhận</h2>
 					</div>
 					<div class="modal-body">
 						<h4 id="confirmMsg"></h4>
@@ -516,13 +516,13 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h2 class="modal-title"><span class="glyphicon glyphicon-alert"></span> Warning</h2>
+						<h2 class="modal-title"><span class="glyphicon glyphicon-alert"></span> Cảnh báo</h2>
 					</div>
 					<div class="modal-body">
 						<h4 id="alertMsg"></h4>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-warning" data-dismiss="modal" id="btnConfirm">Got it</button>
+						<button type="button" class="btn btn-warning" data-dismiss="modal" id="btnConfirm">Đã hiểu</button>
 					</div>
 				</div>
 

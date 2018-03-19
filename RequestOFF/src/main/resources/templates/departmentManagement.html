@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Department Management</title>
+	<title>Quản lý Department</title>
 	<div th:replace="library"></div>
 </head>
 
@@ -73,7 +73,7 @@
 			$('#editModal').modal('show');
 			$('#editMsg').hide();
 			$('#editDepartment').val(rowDataRequest.name);
-			$('#editModalName').text("Edit Department");
+			$('#editModalName').text("Sửa Department");
 			$('#btnCreateModal').hide();
 			$('#btnSave').show();
 			departmentInfo(rowDataRequest);
@@ -85,7 +85,7 @@
 			$('#editModal').modal('show');
 			$('#editMsg').hide();
 			$('#editDepartment').val("");
-			$('#editModalName').text("Add Department");
+			$('#editModalName').text("Thêm Department");
 			$('#btnCreateModal').show();
 			$('#btnSave').hide();
 			departmentInfo(rowDataRequest)
@@ -99,7 +99,7 @@
 			}
 			
 			if($('#editDepartment').val() == ""){
-				$('#editMsg').html("Please fill in Department field").attr('class', 'alert alert-danger').show();
+				$('#editMsg').html("Vui lòng điền vào trường Department").attr('class', 'alert alert-danger').show();
 				return;
 			}
 			
@@ -121,14 +121,14 @@
 				success : function(resultData) {
 					if (resultData.status_info.status == 0) {
 						if (isAdd) {
-							$('#alertMessage').html("Create Department Successfully").attr('class', 'alert alert-success').show();
+							$('#alertMessage').html("Thêm Department thành công").attr('class', 'alert alert-success').show();
 						} else {
-							$('#alertMessage').html("Edit Department Successfully").attr('class', 'alert alert-success').show();
+							$('#alertMessage').html("Sửa Department thành công").attr('class', 'alert alert-success').show();
 						}
 						$('#editModal').modal('hide');
 					} else {
 						if($('#editManager').val() == rowDataRequest.manager.id){
-							$('#alertMessage').html("No manager is changed").attr('class', 'alert alert-warning').show();
+							$('#alertMessage').html("Không có manager nào được thay đổi").attr('class', 'alert alert-warning').show();
 							$('#editModal').modal('hide');
 						} else{
 							$('#editMsg').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
@@ -163,7 +163,7 @@
 							if (resultData.status_info.status == 0) {
 								var loadTable = $('#departmentTable').DataTable();
 								loadTable.ajax.reload();
-								$('#alertMessage').html("Delete Department Successfully").attr('class', 'alert alert-success').show();
+								$('#alertMessage').html("Xóa Department thành công").attr('class', 'alert alert-success').show();
 							} else {
 								$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
 							}
@@ -191,7 +191,7 @@
 					if (resultData.listManagerNotInDepartment.length <= 0) {
 						$('#btnCreateModal').hide();
 						$('#btnSave').hide();
-						$('#editMsg').html("No manager found").attr('class', 'alert alert-danger').show();
+						$('#editMsg').html("Không có manager nào được tìm thấy").attr('class', 'alert alert-danger').show();
 					}
 					$('#editManager').empty();
 					$.each(resultData.listManagerNotInDepartment, function(index, manager) {
@@ -258,11 +258,11 @@
 	<div th:replace="menu"></div>
 	
 	<div class="requestOffContentBody">
-		<h2>Department Management</h2>
+		<h2>Quản lý Department</h2>
 		<div id="alertMessage" class="alert" style="display:none;"></div>
 		<fieldset class="filter-fieldset">
 			<legend>
-				<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Search Filter</a>
+				<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Khung tìm kiếm</a>
 			</legend>
 			<div class="filter-collapse collapse">
 				<form id="departmentForm" class="form-input">
@@ -277,23 +277,23 @@
 					</div>
 					
 					<p>
-						<button id="btnSearch" type="button" class="btn btn-primary" style="width:76px;">Search</button>&nbsp;&nbsp;
+						<button id="btnSearch" type="button" class="btn btn-primary" style="width:76px;">Tìm kiếm</button>&nbsp;&nbsp;
 						
-						<button type="reset" class="btn btn-primary" style="width:76px;">Clear</button>
+						<button type="reset" class="btn btn-primary" style="width:76px;">Xóa</button>
 					</p>
 				</form>
 			</div>
 		</fieldset><br></br>
-		<button id="btnCreate" type="button" class="btn btn-primary" style="width:76px;">Create</button>
+		<button id="btnCreate" type="button" class="btn btn-primary" style="width:76px;">Thêm</button>
 			<div class="table-responsive" style="margin-top:3em;"> 
 				<table class="table table-bordered table-striped table-hover" id="departmentTable">
 					<thead>
 						<tr>
 							<th class="text-center" style="width: 40px;">ID</th>
 							<th class="text-center">Department</th>
-							<th class="text-center">Manager</th>
-							<th class="text-center" style="width: 40px;">Edit</th>
-							<th class="text-center" style="width: 40px;">Delete</th>
+							<th class="text-center">Người quản lý</th>
+							<th class="text-center" style="width: 40px;">Sửa</th>
+							<th class="text-center" style="width: 40px;">Xóa</th>
 						</tr>
 					</thead>
 					<tbody class="text-center" style="cursor: pointer;">
@@ -306,7 +306,7 @@
 					<div class="modal-content">
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h3 class="modal-title">Details</h3>
+							<h3 class="modal-title">Chi tiết</h3>
 						</div>
 						
 						<div class="modal-body">
@@ -317,7 +317,7 @@
 									<input id="departmentDetails" class="form-control" readonly="readonly"></input>
 								</div>
 			
-								<label class="col-md-3 control-label">Manager:</label>
+								<label class="col-md-3 control-label">Người quản lý:</label>
 								<div class="col-md-9">
 									<input id="managerDetails" class="form-control" readonly="readonly"></input>
 								</div>&nbsp;
@@ -325,7 +325,7 @@
 								<div class="row">
 									<div class="col-sm-12">
 										<table id="teamDetails" class="table table-bordered table-hover" style="width: 100%">
-											<label>List Teams</label>
+											<label>Danh sách Teams</label>
 											<thead>
 												<tr>
 													<th class="text-center">ID</th>
@@ -340,7 +340,7 @@
 								</div>
 								
 								<p align="right">
-									<button type="button" class="btn btn-default" style="width:76px;" data-dismiss="modal">Close</button>
+									<button type="button" class="btn btn-default" style="width:76px;" data-dismiss="modal">Đóng</button>
 								</p>
 							</form>
 						</div>
@@ -364,15 +364,15 @@
 									<input id="editDepartment" class="form-control"></input>
 								</div>
 			
-								<label class="col-md-3 control-label">Manager:</label>
+								<label class="col-md-3 control-label">Người quản lý:</label>
 								<div class="col-md-9">
 									<select style="font-weight:bold" id="editManager" class="form-control"></select>
 								</div>&nbsp;
 								
 								<p align="center">
-									<button type="button" class="btn btn-default" id="btnCreateModal" style="width:76px;">Create</button>&nbsp;
-									<button type="button" class="btn btn-default" id="btnSave" style="width:76px;">Save</button>&nbsp;
-									<button type="button" class="btn btn-default" style="width:76px;" data-dismiss="modal">Cancel</button>
+									<button type="button" class="btn btn-default" id="btnCreateModal" style="width:76px;">Thêm</button>&nbsp;
+									<button type="button" class="btn btn-default" id="btnSave" style="width:76px;">Lưu</button>&nbsp;
+									<button type="button" class="btn btn-default" style="width:76px;" data-dismiss="modal">Hủy</button>
 								</p>
 							</form>
 						</div>

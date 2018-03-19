@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Company Year Off Management</title>
+		<title>Quản lý ngày nghỉ</title>
 		<div th:replace="library"></div>
 	</head>
 	<body class="content-body">
@@ -39,10 +39,10 @@
 						data : JSON.stringify(dataRequest),
 						success : function(dataResult) {
 							if (dataResult.status_info.status == 0) {
-								$('#alertMessage').html("Setting Successfully").attr('class', 'alert alert-success').show();
+								$('#alertMessage').html("Cài đặt thành công").attr('class', 'alert alert-success').show();
 							} 
 	 						else {
-	 							$('#alertMessage').html("Setting failed !").attr('class', 'alert alert-danger').show();
+	 							$('#alertMessage').html("Cài đặt thất bại !").attr('class', 'alert alert-danger').show();
 	 						}
 							var loadTable = $('#companyYearOffTable').DataTable();
 							loadTable.ajax.reload();
@@ -101,17 +101,17 @@
 		<div th:replace="menu"></div>
 		
 		<div class="requestOffContentBody">
-			<h2>Company Year Off Management</h2><br/>
+			<h2>Quản lý ngày nghỉ</h2><br/>
 			<div>
 				<div id="alertMessage" class="alert" style="display:none;"></div>
 				
 				<form class="form-input" id="companyYearOffForm">
 					<div class="form-group">
-						<label for="name">Number of day off in year *</label>
+						<label for="name">Số ngày nghỉ trong một năm *</label>
 						<input type="text" class="form-control" name="number_day_off" id="numberOfDay"/>
 					</div>
 					<div class="form-group">
-						<label>Reset day off *</label>
+						<label>Reset ngày nghỉ *</label>
 						<div class="row">
 							<div class="col-sm-2">
 								<input name="resetOrNot" type="radio" value="1" id="reset"/> Reset
@@ -122,16 +122,16 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="position">Setting for *</label>
+						<label for="position">Cài đặt cho *</label>
 						<select class="form-control" name="" id="forNextYear">
-							<option value="0">Current year</option>
-							<option value="1">Next year</option>
+							<option value="0">Năm hiện tại</option>
+							<option value="1">Năm tiếp theo</option>
 						</select>
 					</div>
 					<br/>
 					<div>
 						<button type="button" class="btn btn-primary" id="btnOk">OK</button>&nbsp;&nbsp;
-						<button type="reset" class="btn btn-primary" id="btnClear">Clear</button>
+						<button type="reset" class="btn btn-primary" id="btnClear">Xóa</button>
 					</div>
 				</form>
 				
@@ -140,9 +140,9 @@
 						id="companyYearOffTable">
 						<thead>
 							<tr>
-								<th class="text-center">Year</th>
-								<th class="text-center">Day Off Reset</th>
-								<th class="text-center">Number Of Day Off</th>
+								<th class="text-center">Năm</th>
+								<th class="text-center">Reset ngày nghỉ</th>
+								<th class="text-center">Số ngày nghỉ</th>
 							</tr>
 						</thead>
 						<tbody class="text-center">
