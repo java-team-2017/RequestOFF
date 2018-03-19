@@ -1,12 +1,12 @@
 var webRootPath = '/';
 var errors = {
-	'DateError': 'time in To field must be after From field',
-	'incompleteFields': 'Please fill in all required fields',
-	'offHoursEqual0': 'Off time must be greater than 0',
-	'exceedTime': 'Off hours exceed remain hours',
+	'DateError': 'Thời gian trong ô \'đến\' phải sau thời gian trong ô \'từ\'',
+	'incompleteFields': 'Vui lòng điền vào tất cả các trường bắt buộc',
+	'offHoursEqual0': 'Thời gian nghỉ phải lớn hơn 0 giờ',
+	'exceedTime': 'Thời gian nghỉ vượt quá thời gian nghỉ phép còn lại',
 	'roundHour': 'Your hours of off time must be round',
 	'weekend': 'Your choosen hours are belong to weekends',
-	'stringExceedLimit': 'String length exceeds the limit',
+	'stringExceedLimit': 'Độ dài chuỗi vượt quá độ dài cho phép',
 	'APIResponseError': function (errMsg) {
 		return errMsg;
 	}
@@ -51,20 +51,10 @@ function renderRemainHours(remainHours, containerId) {
 	var hours = parseFloat(remainHours) - (days * 8);
 	htmlStr = "";
 	if(days < 2) {
-		htmlStr = days + " day and ";
-		if(hours < 2) {
-			htmlStr += hours + " hour";
-		} else {
-			htmlStr += hours + " hours";
-		}
+		htmlStr = days + " ngày và " + hours + " giờ";
 	}
 	else {
-		htmlStr = days + " days and ";
-		if(hours < 2) {
-			htmlStr += hours + " hour";
-		} else {
-			htmlStr += hours + " hours";
-		}
+		htmlStr = days + " ngày và " + hours + " giờ";
 	}
 	$("#" + containerId).html(htmlStr);
 }

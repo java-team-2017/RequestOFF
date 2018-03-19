@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Employee Management</title>
+		<title>Quản lý nhân viên</title>
+		<meta charset="UTF-8"/>
 		<div th:replace="library"></div>
 		<link rel="stylesheet" type="text/css" href="css/employeeManagementStyle.css" />
 	</head>
@@ -238,13 +239,13 @@
 						$('#alertMessage_modalAdd').html(errors['stringExceedLimit']).attr('class', 'alert alert-danger').show();
 					}
 					else if(isNotNagativeInteger == 0) {
-						$('#alertMessage_modalAdd').html("Values of total off days and remain off days must be non-negative integers").attr('class', 'alert alert-danger').show();
+						$('#alertMessage_modalAdd').html("Tổng số ngày nghỉ và số ngày nghỉ còn lại phải là số nguyên không âm").attr('class', 'alert alert-danger').show();
 					}
 					else if(dateError == 1) {
-						$('#alertMessage_modalAdd').html("time in Start working date field must be before Official working date field and after Birthday field").attr('class', 'alert alert-danger').show();
+						$('#alertMessage_modalAdd').html("Thời gian bắt đầu làm việc phải sau ngày sinh và trước ngày chính thức làm việc").attr('class', 'alert alert-danger').show();
 					}
 					else if(valid == 0) {
-						$('#alertMessage_modalAdd').html("Total time must be equal or greater than remain time").attr('class', 'alert alert-danger').show();
+						$('#alertMessage_modalAdd').html("Tổng thời gian nghỉ phép phải lớn hơn hoặc bằng thời gian nghỉ phép còn lại").attr('class', 'alert alert-danger').show();
 					}
 					else {
 						var employeeRegistRequest = {
@@ -339,13 +340,13 @@
 						$('#alertMessage_modalDetails').html(errors['stringExceedLimit']).attr('class', 'alert alert-danger').show();
 					}
 					else if(isNotNagativeInteger == 0) {
-						$('#alertMessage_modalDetails').html("Values of total off days and remain off days must be non-negative integers").attr('class', 'alert alert-danger').show();
+						$('#alertMessage_modalDetails').html("Tổng số ngày nghỉ và số ngày nghỉ còn lại phải là số nguyên không âm").attr('class', 'alert alert-danger').show();
 					}
 					else if(dateError == 1) {
-						$('#alertMessage_modalDetails').html("time in Start working date field must be before Official working date field and after Birthday field").attr('class', 'alert alert-danger').show();
+						$('#alertMessage_modalDetails').html("Thời gian bắt đầu làm việc phải sau ngày sinh và trước ngày chính thức làm việc").attr('class', 'alert alert-danger').show();
 					}
 					else if(valid == 0) {
-						$('#alertMessage_modalDetails').html("Total time must be equal or greater than remain time").attr('class', 'alert alert-danger').show();
+						$('#alertMessage_modalDetails').html("Tổng thời gian nghỉ phép phải lớn hơn hoặc bằng thời gian nghỉ phép còn lại").attr('class', 'alert alert-danger').show();
 					}
 					else {
 						var employeeRegistRequest = {
@@ -516,30 +517,31 @@
 			<div th:replace="menu"></div>
 			
 			<div class="requestOffContentBody">
-				<h2>Employee Management</h2>
+				<h2>Quản lý nhân viên</h2>
+				<br/>
 				<div>
 					<div id="alertMessage_search" class="alert" style="display:none;"></div>
 					
 					<fieldset class="filter-fieldset">
 						<legend>
-							<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Search Filter</a>
+							<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Khung tìm kiếm</a>
 						</legend>
 						<div class="filter-collapse collapse">
 							<form class="form-input" id="employeeForm">
 								<div class="form-group">
-									<label for="name">Name</label>
+									<label for="name">Tên</label>
 									<input type="text" class="form-control" name="name" id="nameId" />
 								</div>
 								<div class="form-group">
-									<label for="gender">Gender</label>
+									<label for="gender">Giới tính</label>
 									<select class="form-control" name="gender">
 										<option value=""></option>
-										<option value="male">Male</option>
-										<option value="female">Female</option>
+										<option value="male">Nam</option>
+										<option value="female">Nữ</option>
 									</select>
 								</div>
 								<div class="form-group">
-									<label for="position">Position</label>
+									<label for="position">Vị trí</label>
 									<select class="form-control" name="position" id="positionId">
 										<option value=""></option>
 									</select>
@@ -558,28 +560,28 @@
 								</div>
 								<br/>
 								<div>
-									<button type="button" class="btn btn-primary" id="btnSearch">Search</button>&nbsp;&nbsp;
+									<button type="button" class="btn btn-primary" id="btnSearch">Tìm kiếm</button>&nbsp;&nbsp;
 									
-									<button type="button" class="btn btn-primary" id="btnClear">Clear</button>
+									<button type="button" class="btn btn-primary" id="btnClear">Xóa</button>
 								</div>
 							</form><br/>
 						</div>
 					</fieldset>
 					
 					<br/>
-					<button type="button" class="btn btn-primary" id="btnAdd">Add</button>&nbsp;&nbsp;
+					<button type="button" class="btn btn-primary" id="btnAdd">Thêm</button>&nbsp;&nbsp;
 					<br/><br/>
 					<table class="display table table-bordered" cellspacing="0" width="100%" id="employeeTable">
 						<thead>
 							<tr>
-								<th class="text-center nameCell">Name</th>
-								<th class="text-center dateOfBirthCell">Date of birth</th>
+								<th class="text-center nameCell">Tên</th>
+								<th class="text-center dateOfBirthCell">Ngày sinh</th>
 								<th class="text-center emailCell">Email</th>
 								<th class="text-center teamCell">Team</th>
 								<th class="text-center departmentCell">Department</th>
-								<th class="text-center startWorkingDateCell">Start working date</th>
-								<th class="text-center editCell">Edit</th>
-								<th class="text-center deleteCell">Delete</th>
+								<th class="text-center startWorkingDateCell">Ngày bắt đầu làm việc</th>
+								<th class="text-center editCell">Sửa</th>
+								<th class="text-center deleteCell">Xóa</th>
 							</tr>
 						</thead>
 						
@@ -593,7 +595,7 @@
 							<div class="modal-content">
 								<div class="modal-header">
 									<button type="button" class="close" data-dismiss="modal">&times;</button>
-									<h4 class="modal-title" id="modalDetailsTitle">Employee details</h4>
+									<h4 class="modal-title" id="modalDetailsTitle">Chi tiết nhân viên</h4>
 								</div>
 								<div class="modal-body">
 									<div id="alertMessage_modalDetails" class="alert" style="display:none;"></div>
@@ -603,22 +605,22 @@
 											<label class="control-label col-sm-9" style="text-align: left;" id="idModalDetailsId"></label>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Name * </label>
+											<label class="control-label col-sm-3">Tên * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<input type="text" class="form-control" name="nameModalDetails" id="nameModalDetailsId" />
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Gender * </label>
+											<label class="control-label col-sm-3">Giới tính * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<select class="form-control" name="genderModalDetails" id="genderModalDetailsId">
-													<option value="male">Male</option>
-													<option value="female">Female</option>
+													<option value="male">Nam</option>
+													<option value="female">Nữ</option>
 												</select>
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Birthday * </label>
+											<label class="control-label col-sm-3">Ngày sinh * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
 												<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="birthdayModalDetails" id="birthdayModalDetailsId"/>
@@ -635,19 +637,19 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Password </label>
+											<label class="control-label col-sm-3">Mật khẩu </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<input type="text" class="form-control" name="passwordModalDetails" id="passwordModalDetailsId" />
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Phone * </label>
+											<label class="control-label col-sm-3">Số điện thoại * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<input type="text" class="form-control" name="phoneModalDetails" id="phoneModalDetailsId" />
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Start working date * </label>
+											<label class="control-label col-sm-3">Ngày bắt đầu làm việc * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
 												<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="startWorkingModalDetails" id="startWorkingModalDetailsId"/>
@@ -658,7 +660,7 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Official working date * </label>
+											<label class="control-label col-sm-3">Ngày chính thức làm việc * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
 												<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="officialWorkingModalDetails" id="officialWorkingModalDetailsId"/>
@@ -669,7 +671,7 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Position * </label>
+											<label class="control-label col-sm-3">Vị trí * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<select class="form-control" name="positionModalDetails" id="positionModalDetailsId">
 												</select>
@@ -697,9 +699,9 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Total off time * </label>
+											<label class="control-label col-sm-3">Tổng thời gian nghỉ phép * </label>
 											<div class="form-inline">
-												<input type="text" class="form-control"  maxlength="2" name="totalDaysModalDetails" id="totalDaysModalDetailsId" />&nbsp;day(s)&nbsp;
+												<input type="text" class="form-control only-number" maxlength="2" name="totalDaysModalDetails" id="totalDaysModalDetailsId" />&nbsp;ngày&nbsp;
 												<select class="form-control" name="totalHoursModalDetails" id="totalHoursModalDetailsId">
 													<option value="0">0</option>
 													<option value="0.5">0.5</option>
@@ -717,13 +719,13 @@
 													<option value="6.5">6.5</option>
 													<option value="7">7</option>
 													<option value="7.5">7.5</option>
-												</select>&nbsp;hour(s)
+												</select>&nbsp;giờ
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Remain time * </label>
+											<label class="control-label col-sm-3">Thời gian nghỉ phép còn lại * </label>
 											<div class="form-inline">
-												<input type="text" class="form-control" maxlength="2" name="remainDaysModalDetails" id="remainDaysModalDetailsId" />&nbsp;day(s)&nbsp;
+												<input type="text" class="form-control" maxlength="2" name="remainDaysModalDetails" id="remainDaysModalDetailsId" />&nbsp;ngày&nbsp;
 												<select class="form-control" name="remainHoursModalDetails" id="remainHoursModalDetailsId">
 													<option value="0">0</option>
 													<option value="0.5">0.5</option>
@@ -741,15 +743,15 @@
 													<option value="6.5">6.5</option>
 													<option value="7">7</option>
 													<option value="7.5">7.5</option>
-												</select>&nbsp;hour(s)
+												</select>&nbsp;giờ
 											</div>
 										</div>
 										<input type="hidden" name="updateDateModalDetails" id="updateDateModalDetailsId" />
 									</form>
 								</div>
 								<div class="modal-footer">
-									<button type="button" class="btn btn-default" id="btnSave_modalDetails">Save</button>
-									<button type="button" class="btn btn-default" data-dismiss="modal" id="btnCancel_modalDetails">Cancel</button>
+									<button type="button" class="btn btn-default" id="btnSave_modalDetails">Lưu</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal" id="btnCancel_modalDetails">Hủy</button>
 								</div>
 							</div>
 						</div>
@@ -761,28 +763,28 @@
 							<div class="modal-content">
 								<div class="modal-header">
 									<button type="button" class="close" data-dismiss="modal">&times;</button>
-									<h4 class="modal-title" id="modalAddTitle">Add employee</h4>
+									<h4 class="modal-title" id="modalAddTitle">Thêm nhân viên</h4>
 								</div>
 								<div class="modal-body">
 									<div id="alertMessage_modalAdd" class="alert" style="display:none;"></div>
 									<form id="modalAddForm">
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Name * </label>
+											<label class="control-label col-sm-3">Tên * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<input type="text" class="form-control" name="nameModalAdd" id="nameModalAddId" />
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Gender * </label>
+											<label class="control-label col-sm-3">Giới tính * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<select class="form-control" name="genderModalAdd" id="genderModalAddId">
-													<option value="male">Male</option>
-													<option value="female">Female</option>
+													<option value="male">Nam</option>
+													<option value="female">Nữ</option>
 												</select>
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Birthday * </label>
+											<label class="control-label col-sm-3">Ngày sinh * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
 												<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="birthdayModalAdd" id="birthdayModalAddId"/>
@@ -799,19 +801,19 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Password * </label>
+											<label class="control-label col-sm-3">Mật khẩu * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<input type="text" class="form-control" name="passwordModalAdd" id="passwordModalAddId" />
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Phone * </label>
+											<label class="control-label col-sm-3">Số điện thoại * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<input type="text" class="form-control" name="phoneModalAdd" id="phoneModalAddId" />
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Start working date * </label>
+											<label class="control-label col-sm-3">Ngày bắt đầu làm việc * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
 												<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="startWorkingModalAdd" id="startWorkingModalAddId"/>
@@ -822,7 +824,7 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Official working date * </label>
+											<label class="control-label col-sm-3">Ngày chính thức làm việc * </label>
 											<div class="col-sm-9" style="padding-left:0px;">
 												<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="officialWorkingModalAdd" id="officialWorkingModalAddId"/>
@@ -833,7 +835,7 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Position * </label>
+											<label class="control-label col-sm-3">Vị trí * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<select class="form-control" name="positionModalAdd" id="positionModalAddId">
 												</select>
@@ -854,15 +856,15 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Total off time * : </label>
+											<label class="control-label col-sm-3">Tổng thời gian nghỉ phép * : </label>
 											<div class="form-inline">
-												<input type="text" class="form-control" maxlength="2" name="totalDaysModalAdd" id="totalDaysModalAddId" />&nbsp;day(s)
+												<input type="text" class="form-control only-number" maxlength="2" name="totalDaysModalAdd" id="totalDaysModalAddId" />&nbsp;ngày
 											</div>
 										</div>
 									</form>
 								</div>
 								<div class="modal-footer">
-									<button type="button" class="btn btn-default" id="btnAdd_modalAdd">Add</button>
+									<button type="button" class="btn btn-default" id="btnAdd_modalAdd">Thêm</button>
 									<button type="button" class="btn btn-default" data-dismiss="modal" id="btnCancel_modalAdd">Cancel</button>
 								</div>
 							</div>
@@ -874,14 +876,14 @@
 							<div class="modal-content">
 								<div class="modal-header">
 									<button type="button" class="close" data-dismiss="modal">&times;</button>
-									<h4 class="modal-title">Confirm delete</h4>
+									<h4 class="modal-title">Xác nhận xóa</h4>
 								</div>
 								<div class="modal-body">
-									<p>Are you sure you want to delete this employee?</p>
+									<p>Ban có chắc chắn muốn xóa nhân viên này?</p>
 								</div>
 								<div class="modal-footer">
-									<button type="button" class="btn btn-default" data-dismiss="modal" id="yesConfirm">Yes</button>
-									<button type="button" class="btn btn-default" data-dismiss="modal" id="noConfirm">No</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal" id="yesConfirm">Có</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal" id="noConfirm">Không</button>
 								</div>
 								<input type="hidden" name="employeeId_confirmModal" id="employeeId_confirmModalId" />
 							</div>

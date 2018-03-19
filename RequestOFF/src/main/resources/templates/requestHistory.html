@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Request History</title>
+		<title>Lịch sử request</title>
+		<meta charset="UTF-8"/>
 		<div th:replace="library"></div>
 		<link rel="stylesheet" type="text/css" href="css/requestHistoryStyle.css" />
 	</head>
@@ -146,8 +147,8 @@
 								}
 								else {
 									console.log(rowData.status + "====--");
-									$('#alertMessage_edit').html(rowData.recipientName + " who is the recipient of this request is no longer your leader/manager. "
-																	+ "Please choose another recipient").attr('class', 'alert alert-warning').show();
+									$('#alertMessage_edit').html(rowData.recipientName + " - người nhận của request này hiện không còn là leader/manager của bạn. "
+																	+ "Vui lòng chọn một người nhận khác").attr('class', 'alert alert-warning').show();
 									$("#hiddenRecipientDiv").hide();
 									$("#modalRecipientDiv").show();
 								}
@@ -212,7 +213,7 @@
 					
 					$("#requestId_confirmModalId").val(id);
 					$("#updateDate_confirmModalId").val(updateDate);
-					$("#confirmMessage").html("Are you sure you want to delete this request?");
+					$("#confirmMessage").html("Bạn có chắc chắn muốn xóa request này?");
 					$("#confirmModal").modal('show');
 					deleteFlag = 1;
 				});
@@ -325,7 +326,7 @@
 						$('#alertMessage_edit').html(errors['DateError']).attr('class', 'alert alert-danger').show();
 					}
 					else if(isNotNagativeInteger == 0) {
-						$('#alertMessage_edit').html("Value of off days must be a non-negative integer").attr('class', 'alert alert-danger').show();
+						$('#alertMessage_edit').html("Số ngày nghỉ phải là số nguyên không âm").attr('class', 'alert alert-danger').show();
 					}
 					else if(offHoursEqual0 == 1) {
 						$('#alertMessage_edit').html(errors['offHoursEqual0']).attr('class', 'alert alert-danger').show();
@@ -347,7 +348,7 @@
 							requestRegistRequest.status = "1";
 							registRequest(requestRegistRequest);
 						} else {
-							$("#confirmMessage").html("Are you sure you want to send this request?");
+							$("#confirmMessage").html("Bạn có chắc chắn muốn gửi request này?");
 							$("#confirmModal").modal('show');
 							deleteFlag = 0;
 						}
@@ -479,9 +480,9 @@
 			function registRequest(registData) {
 				var notifyStr;
 				if(registData.status == 1) {
-					notifyStr = "Your request has been saved";
+					notifyStr = "Request của bạn đã được lưu";
 				} else {
-					notifyStr = "Your request has been sent";
+					notifyStr = "Request của bạn đã được gửi";
 				}
 				
 				console.log(registData);
@@ -533,18 +534,19 @@
 			<div th:replace="menu"></div>
 			
 			<div class="requestOffContentBody">
-				<h2>Request Off History</h2>
+				<h2>Lịch sử request</h2>
+				<br/>
 				<div>
 					<div id="alertMessage_search" class="alert" style="display:none;"></div>
-					<h4>You have <span id="remainHours" style="font-weight: bold;"></span> of off time with payment left</h4>
+					<h4>Bạn còn <span id="remainHours" style="font-weight: bold;"></span> nghỉ phép</h4>
 					<fieldset class="filter-fieldset">
 						<legend>
-							<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Search Filter</a>
+							<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Khung tìm kiếm</a>
 						</legend>
 						<div class="filter-collapse collapse">
 							<form class="form-input" id="requestHistoryForm">
 								<div class="form-group">
-									<label for="fromTime">From</label>
+									<label for="fromTime">Từ</label>
 									<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 										<input type="text" class="form-control" name="fromTime" id="fromTimeId" />
 										<div class="input-group-addon">
@@ -554,7 +556,7 @@
 								</div>
 			
 								<div class="form-group">
-									<label for="toTime">To</label>
+									<label for="toTime">Đến</label>
 									<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 										<input type="text" class="form-control" name="toTime" id="toTimeId" />
 										<div class="input-group-addon">
@@ -564,21 +566,21 @@
 								</div>
 			
 								<div class="form-group">
-									<label for="requestType">Request Type</label>
+									<label for="requestType">Loại request</label>
 									<select class="form-control" name="requestType" id="requestTypeId">
 										<option value=""></option>
-										<option value="1">Saved</option>
-										<option value="2">Approved</option>
-										<option value="3">Denied</option>
-										<option value="4">Responded</option>
-										<option value="5">Waiting</option>
+										<option value="1">Lưu</option>
+										<option value="2">Chấp nhận</option>
+										<option value="3">Từ chối</option>
+										<option value="4">Phản hồi</option>
+										<option value="5">Chờ</option>
 									</select>
 								</div>
 			
 								<br/>
 								<div>
-									<button type="button" class="btn btn-primary" id="btnSearch">Search</button>&nbsp;&nbsp;
-									<button type="button" class="btn btn-primary" id="btnClear">Clear</button>
+									<button type="button" class="btn btn-primary" id="btnSearch">Tìm kiếm</button>&nbsp;&nbsp;
+									<button type="button" class="btn btn-primary" id="btnClear">Xóa</button>
 								</div>
 							</form>
 						</div>
@@ -589,14 +591,14 @@
 						<thead>
 							<tr>
 								<th class="text-center idCell">ID</th>
-								<th class="text-center timeOfCreationCell">Time of creation</th>
-								<th class="text-center fromCell">From</th>
-								<th class="text-center toCell">To</th>
-								<th class="text-center offHoursCell">Off time</th>
-								<th class="text-center reasonCell">Reason</th>
-								<th class="text-center statusCell">Status</th>
-								<th class="text-center editCell">Edit</th>
-								<th class="text-center deleteCell">Delete</th>
+								<th class="text-center timeOfCreationCell">Ngày tạo</th>
+								<th class="text-center fromCell">Từ</th>
+								<th class="text-center toCell">Đến</th>
+								<th class="text-center offHoursCell">Thời gian nghỉ</th>
+								<th class="text-center reasonCell">Lý do</th>
+								<th class="text-center statusCell">Trạng thái</th>
+								<th class="text-center editCell">Sửa</th>
+								<th class="text-center deleteCell">Xóa</th>
 							</tr>
 						</thead>
 						
@@ -621,15 +623,15 @@
 											<label class="control-label col-sm-9" style="text-align: left;" id="modalRequestId"></label>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Status </label>
+											<label class="control-label col-sm-3">Trạng thái </label>
 											<label class="control-label col-sm-9" id="modalStatus"></label>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Employee </label>
+											<label class="control-label col-sm-3">Nhân viên </label>
 											<label class="control-label col-sm-9" style="text-align: left;" id="modalName"></label>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Position </label>
+											<label class="control-label col-sm-3">Vị trí </label>
 											<label class="control-label col-sm-9" id="modalPosition"></label>
 										</div>
 										<div class="form-group row">
@@ -641,9 +643,9 @@
 											<label class="control-label col-sm-9" id="modalDepartment"></label>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Off time * : </label>
+											<label class="control-label col-sm-3">Thời gian nghỉ * : </label>
 											<div class="form-inline">
-												<input type="text" class="form-control"  maxlength="2" name="offDays" id="modalOffDays" style="width:100px;"/>&nbsp;day(s)&nbsp;
+												<input type="text" class="form-control only-number" maxlength="2" name="offDays" id="modalOffDays" style="width:100px;"/>&nbsp;ngày&nbsp;
 												<select class="form-control" name="offHours" id="modalOffHours" style="width:100px;">
 													<option value="0">0</option>
 													<option value="0.5">0.5</option>
@@ -661,11 +663,11 @@
 													<option value="6.5">6.5</option>
 													<option value="7">7</option>
 													<option value="7.5">7.5</option>
-												</select>&nbsp;hour(s)
+												</select>&nbsp;giờ
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">From * </label>
+											<label class="control-label col-sm-3">Từ * </label>
 											<div class="col-sm-5" style="padding-left:0px;">
 												<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="from_modalForm" id="modalFrom"/>
@@ -706,7 +708,7 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">To * </label>
+											<label class="control-label col-sm-3">Đến * </label>
 											<div class="col-sm-5" style="padding-left:0px;">
 												<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 													<input type="text" class="form-control" name="to_modalForm" id="modalTo"/>
@@ -747,31 +749,31 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Reason * </label>
+											<label class="control-label col-sm-3">Lý do * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<textarea class="form-control col-sm-9" name="reason_modalForm" id="modalReason"></textarea>
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Day off type * </label>
+											<label class="control-label col-sm-3">Loại ngày nghỉ * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<select class="form-control" name="dayOffType_modalForm" id="modalDayOffType">
 												</select>
 											</div>
 										</div>
 										<div class="form-group row" id="modalRecipientDiv">
-											<label class="control-label col-sm-3">Recipient * </label>
+											<label class="control-label col-sm-3">Người nhận * </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<select class="form-control" name="recipient_modalForm" id="modalRecipient">
 												</select>
 											</div>
 										</div>
 										<div class="form-group row" style="display: none;" id="hiddenRecipientDiv">
-											<label class="control-label col-sm-3">Recipient </label>
+											<label class="control-label col-sm-3">Người nhận </label>
 											<label class="control-label col-sm-9" style="text-align: left;" id="hiddenRecipientName"></label>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Response Message </label>
+											<label class="control-label col-sm-3">Phản hồi </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
 												<textarea readonly="true" class="form-control" name="responseMessage_modalForm" id="modalResponseMessage"></textarea>
 											</div>
@@ -781,9 +783,9 @@
 									</form>
 								</div>
 								<div class="modal-footer">
-									<button type="button" class="btn btn-default" id="btnSave_modal">Save</button>
-									<button type="button" class="btn btn-default" id="btnSend_modal">Send</button>
-									<button type="button" class="btn btn-default" data-dismiss="modal" id="btnCancel_modal">Cancel</button>
+									<button type="button" class="btn btn-default" id="btnSave_modal">Lưu</button>
+									<button type="button" class="btn btn-default" id="btnSend_modal">Gửi</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal" id="btnCancel_modal">Hủy</button>
 								</div>
 							</div>
 						</div>
@@ -794,14 +796,14 @@
 							<div class="modal-content">
 								<div class="modal-header">
 									<button type="button" class="close" data-dismiss="modal">&times;</button>
-									<h4 class="modal-title">Confirm delete</h4>
+									<h4 class="modal-title">Xác nhận xóa</h4>
 								</div>
 								<div class="modal-body">
 									<p id="confirmMessage"></p>
 								</div>
 								<div class="modal-footer">
-									<button type="button" class="btn btn-default" data-dismiss="modal" id="yesConfirm">Yes</button>
-									<button type="button" class="btn btn-default" data-dismiss="modal" id="noConfirm">No</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal" id="yesConfirm">Có</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal" id="noConfirm">Không</button>
 								</div>
 								<input type="hidden" name="requestId_confirmModal" id="requestId_confirmModalId" />
 								<input type="hidden" name="updateDate_confirmModal" id="updateDate_confirmModalId" />
