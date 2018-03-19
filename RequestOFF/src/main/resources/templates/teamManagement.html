@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Team Management</title>
+	<title>Quản lý team</title>
+	<meta charset="UTF-8"/>
 	<div th:replace="library"></div>
 </head>
 
@@ -220,7 +221,7 @@
 							
 						} else { // for create event
 							if (response.listMemberNotInTeam.length == 0) {
-								$('#teamEditMsg').html('There are no member for creating the team').attr('class', 'alert alert-danger').show();
+								$('#teamEditMsg').html('Không có thành viên nào để tạo team').attr('class', 'alert alert-danger').show();
 							} else {
 								$('#createBtn').show();
 							}
@@ -265,12 +266,12 @@
 			
 // 			validate form
 			if (members.length == 0) {
-				$('#teamEditMsg').html("Team must have at least 1 member").attr('class', 'alert alert-danger').show();
+				$('#teamEditMsg').html("Team phải có ít nhất 1 thành viên").attr('class', 'alert alert-danger').show();
 				return;
 			}
 			
 			if ($('#editTeam').val() == "") {
-				$('#teamEditMsg').html("Please fill all field in form").attr('class', 'alert alert-danger').show();
+				$('#teamEditMsg').html(errors['incompleteFields']).attr('class', 'alert alert-danger').show();
 				return;
 			}
 			
@@ -301,9 +302,9 @@
 						$('#teamEditMsg').html(errors['APIResponseError'](response.status_info.error)).attr('class', 'alert alert-danger').show();
 					} else {
 						if (isCreate == false) {
-							$('#alertMessage').html("Edit Successfully").attr('class', 'alert alert-success').show();
+							$('#alertMessage').html("Sửa thành công").attr('class', 'alert alert-success').show();
 						} else {
-							$('#alertMessage').html("Create Successfully").attr('class', 'alert alert-success').show();
+							$('#alertMessage').html("Thêm thành công").attr('class', 'alert alert-success').show();
 						}
 						$('#teamEditModal').modal('hide');
 						reloadPage();
@@ -340,7 +341,7 @@
 							if (response.status_info.status != 0) {
 								$('#alertMessage').html(errors['APIResponseError'](response.status_info.error)).attr('class', 'alert alert-danger').show();
 							} else {
-								$('#alertMessage').html("Delete Successfully").attr('class', 'alert alert-success').show();
+								$('#alertMessage').html("Xóa thành công").attr('class', 'alert alert-success').show();
 							}
 							reloadPage();
 						},
@@ -363,11 +364,11 @@
 	<div th:replace="menu"></div>
 	
 	<div class="requestOffContentBody">			
-		<h2>Team Management</h2>
+		<h2>Quản lý team</h2>
 		<div id="alertMessage" class="alert" style="display:none;"></div>
 			<fieldset class="filter-fieldset">
 				<legend>
-					<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Search Filter</a>
+					<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Khung tìm kiếm</a>
 				</legend>
 				<div class="filter-collapse collapse">
 					<form id="requestForm" class="form-input">
@@ -382,15 +383,15 @@
 						</div>
 								
 						<p>
-							<button id="btnSearch" type="button" class="btn btn-primary" style="width:76px;">Search</button>&nbsp;&nbsp;
-							<button type="reset" class="btn btn-primary" style="width:76px;">Clear</button>
+							<button id="btnSearch" type="button" class="btn btn-primary" style="width:76px;">Tìm kiếm</button>&nbsp;&nbsp;
+							<button type="reset" class="btn btn-primary" style="width:76px;">Xóa</button>
 						</p>
 					</form>
 				</div>
 			</fieldset>
 			<br/>
 			
-			<button id="btnAdd" type="button" class="btn btn-primary" style="width:76px;">Add</button>&nbsp;&nbsp;		
+			<button id="btnAdd" type="button" class="btn btn-primary" style="width:76px;">Thêm</button>&nbsp;&nbsp;		
 			<div class="table-responsive" style="margin-top:2em;"> 
 				<table class="table table-bordered table-striped table-hover" id="teamTable">
 					<thead>
@@ -399,8 +400,8 @@
 							<th class="text-center" name="team"><span>Team</span></th>
 							<th class="text-center" name="leader"><span>Leader</span></th>
 							<th class="text-center" name="department"><span>Department</span></th>
-							<th class="text-center" name="edit" style="width: 40px;"><span>Edit</span></th>
-							<th class="text-center" name="delete" style="width: 40px;"><span>Delete</span></th>
+							<th class="text-center" name="edit" style="width: 40px;"><span>Sửa</span></th>
+							<th class="text-center" name="delete" style="width: 40px;"><span>Xóa</span></th>
 						</tr>
 					</thead>
 					<tbody class="text-center">
@@ -413,7 +414,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title" align="center">Team Details</h4>
+						<h4 class="modal-title" align="center">Chi tiết team</h4>
 					</div>
 					<div class="modal-body">
 						<div class="row">
@@ -440,7 +441,7 @@
 							</div>
 						</div>
 						<div class="row">
-							<label class="col-sm-4 col-form-label">Number Of Member</label>
+							<label class="col-sm-4 col-form-label">Số thành viên</label>
 							<div class="col-sm-8">
 								<input id="detailNumOfMem" class="col-sm-3 form-control" type="text" readonly="readonly"></input>
 							</div>
@@ -448,11 +449,11 @@
 						<div class="row">
 							<div class="col-sm-12">
 								<table id="detailMemberTable" class="table table-bordered table-hover" style="width: 100%">
-									<caption>Team Members</caption>
+									<caption>Thành viên</caption>
 									<thead>
 										<tr>
 											<th class="col-md-2 text-center">Id</th>
-											<th class="col-md-10 text-center">Name</th>
+											<th class="col-md-10 text-center">Tên</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -463,8 +464,8 @@
 						
 					</div>
 					<div class="modal-footer">
-						<button id="editModal" type="button" class="btn btn-default btnEdit"> Edit </button>
-						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+						<button id="editModal" type="button" class="btn btn-default btnEdit"> Sửa </button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
 					</div>
 				</div>
 			</div>
@@ -474,7 +475,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title" align="center">Edit team</h4>
+						<h4 class="modal-title" align="center">Sửa team</h4>
 					</div>
 					<div class="modal-body">
 						<div class="row">
@@ -502,8 +503,8 @@
 						</div>
 						
 						<div class="row">
-							<label class="col-sm-7 col-form-label">Member in team</label>
-							<label class="col-sm-5 col-form-label">Member not in team</label>
+							<label class="col-sm-7 col-form-label">Thành viên thuộc team</label>
+							<label class="col-sm-5 col-form-label">Thành viên không thuộc team</label>
 						</div>
 						<div class="row">
 							<div class="col-md-5">
@@ -529,9 +530,9 @@
 						</div>
 					</div>
 					<div class="modal-footer">
-					<button type="button" id="createBtn" class="btn btn-default">Create</button>
-					<button type="button" id="editOk" class="btn btn-default">Ok</button>
-						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" id="createBtn" class="btn btn-default">Thêm</button>
+					<button type="button" id="editOk" class="btn btn-default">OK</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
 					</div>
 				</div>
 			</div>
