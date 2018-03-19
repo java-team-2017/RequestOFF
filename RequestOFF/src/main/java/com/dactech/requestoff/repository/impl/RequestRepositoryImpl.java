@@ -105,18 +105,18 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 	public List<Request> browseRequest(RequestBrowsingRequest requests) throws Exception {
 		Employee user = employeeRepository.findById(Long.parseLong(requests.getUserId()));
 		if (user == null) {
-			throw new Exception("User " + user.getName() + " is not found");
+			throw new Exception("Người đăng nhập " + user.getName() + " không tìm thấy");
 		}
 		StringBuilder queryString = new StringBuilder("SELECT * FROM request INNER JOIN employee ON request.employee_id = employee.id WHERE ");
 		if (user.getPosition().getCode() == Position.CODE_EMPLOYEE) {
 			TeamEmployee teamEmployee = teamEmployeeRepository.findByEmployeeId(Long.parseLong(requests.getUserId()));
 			if (teamEmployee == null) {
-				throw new Exception("User " + user.getName() + " does not belong to any team");
+				throw new Exception("Người đăng nhập " + user.getName() + " không thuộc bất cứ team nào");
 			}
 			if (teamEmployee.getLeaderFlag() == 1) { //user is a leader
 				queryString.append(" (employee_id IN (SELECT employee_id from team t INNER JOIN team_employee te ON t.id = te.team_id WHERE t.leader_id = " + requests.getUserId() + ")) ");
 			} else {
-				throw new Exception("User " + user.getName() + " is just a member of team");
+				throw new Exception("Người đăng nhập " + user.getName() + " chỉ là thành viên trong team");
 			}
 		} else if (user.getPosition().getCode() == Position.CODE_MANAGER) {
 			queryString.append(" (employee_id IN (SELECT employee_id from team_employee te INNER JOIN team t ON t.id=te.team_id INNER JOIN department d ON d.id=t.department_id WHERE manager_id= " + requests.getUserId() + ") "
@@ -175,21 +175,23 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 						}
 					}
 					else {
-						throw new Exception("User with id " + request.getRecipientId() + " is just a member of team");
+						throw new Exception("Người đăng nhập " + request.getRecipientName() + " chỉ là thành viên trong team");
 					}
 				} else if (recipient.getPosition().getCode() == Position.CODE_MANAGER) {
-					if (sender.getPosition().getCode() == Position.CODE_EMPLOYEE) {
-						if(employeeId.getLeaderFlag() != 1 && sender.getPosition().getCode() != Position.CODE_MANAGER) {
-							String queryStr = "SELECT * from employee e INNER JOIN team t on e.id = t.leader_id INNER JOIN team_employee te ON t.id = te.team_id "
-									+ "WHERE te.employee_id = " + request.getEmployee().getId();
-							Query queryObj = entityManager.createNativeQuery(queryStr.toString(), Employee.class);
-							List<Employee> leader = queryObj.getResultList();
-							if(leader != null && leader.size() > 0) {
-								request.setForwardId(leader.get(0).getId());
-								request.setForwardName(leader.get(0).getName());
+					if(teamEmployee.getLeaderFlag() != 1) {// manager is not leader
+						if (sender.getPosition().getCode() == Position.CODE_EMPLOYEE) {
+							if(employeeId.getLeaderFlag() != 1 && sender.getPosition().getCode() != Position.CODE_MANAGER) {
+								String queryStr = "SELECT * from employee e INNER JOIN team t on e.id = t.leader_id INNER JOIN team_employee te ON t.id = te.team_id "
+										+ "WHERE te.employee_id = " + request.getEmployee().getId();
+								Query queryObj = entityManager.createNativeQuery(queryStr.toString(), Employee.class);
+								List<Employee> leader = queryObj.getResultList();
+								if(leader != null && leader.size() > 0) {
+									request.setForwardId(leader.get(0).getId());
+									request.setForwardName(leader.get(0).getName());
+								}
 							}
-						}
-					} 
+						} 
+					}
 				}
 			}
 			
@@ -201,7 +203,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 						sender.setTeamName(team.getName());
 						sender.setDepartmentName(team.getDepartment().getName());
 					} else {
-						sender.setTeamName("No Team");
+						sender.setTeamName("Không có team");
 					}
 				}
 			} else if (sender.getPosition().getCode() == Position.CODE_MANAGER) {
@@ -210,7 +212,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 					sender.setTeamName("");
 					sender.setDepartmentName(dept.getName());
 				} else {
-					sender.setDepartmentName("No Department");
+					sender.setDepartmentName("Không có Department");
 				}
 			} else {
 				Employee employee = employeeRepository.findById(sender.getId());
@@ -251,7 +253,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 				queryString.append(" (request.employee_id IN (select request.employee_id from team_employee te INNER JOIN team t ON t.id=te.team_id INNER JOIN department d ON d.id=t.department_id ) "
 						+ "OR request.employee_id IN (SELECT leader_id FROM team t INNER JOIN department d ON t.department_id=d.id )) AND status <> 1 ");
 			} else {
-				throw new Exception("User " + user.getName() + " is not HR");
+				throw new Exception("Người đăng nhập " + user.getName() + " không phải là HR");
 			}
 		}
 		
@@ -260,7 +262,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 				queryString.append(" (request.employee_id IN (select request.employee_id from team_employee te INNER JOIN team t ON t.id=te.team_id INNER JOIN department d ON d.id=t.department_id ) "
 						+ "OR request.employee_id IN (SELECT leader_id FROM team t INNER JOIN department d ON t.department_id=d.id )) AND status <> 1 ");
 			} else {
-				throw new Exception("User " + user.getName() + " is not HR Manager");
+				throw new Exception("Người đăng nhập " + user.getName() + " không phải là quản lý HR");
 			}
 		}
 		
