@@ -245,15 +245,54 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		if (user == null) {
 			throw new Exception("User " + user.getName() + " is not found");
 		}
-		StringBuilder queryString = new StringBuilder("SELECT * FROM request INNER JOIN employee ON request.employee_id = employee.id WHERE ");
+		StringBuilder queryString = new StringBuilder("SELECT * FROM request INNER JOIN employee e ON request.employee_id = e.id INNER JOIN team_employee te ON te.employee_id = e.id INNER JOIN team t ON t.id = te.team_id INNER JOIN department d ON d.id = t.department_id WHERE ");
+		if (user.getPosition().getCode() == Position.CODE_EMPLOYEE){
+			if(user.getListRole().get(0).getRole().equals(Role.ROLE_HR)) {
+				queryString.append(" (request.employee_id IN (select request.employee_id from team_employee te INNER JOIN team t ON t.id=te.team_id INNER JOIN department d ON d.id=t.department_id ) "
+						+ "OR request.employee_id IN (SELECT leader_id FROM team t INNER JOIN department d ON t.department_id=d.id )) AND status <> 1 ");
+			} else {
+				throw new Exception("User " + user.getName() + " is not HR");
+			}
+		}
+		
 		if (user.getPosition().getCode() == Position.CODE_MANAGER){
 			if(user.getListRole().get(0).getRole().equals(Role.ROLE_HR_MAMAGER)) {
-				queryString.append(" (employee_id IN (select employee_id from team_employee te INNER JOIN team t ON t.id=te.team_id INNER JOIN department d ON d.id=t.department_id ) "
-						+ "OR employee_id IN (SELECT leader_id FROM team t INNER JOIN department d ON t.department_id=d.id )) AND status <> 1 AND request.valid_flag = '1'");
+				queryString.append(" (request.employee_id IN (select request.employee_id from team_employee te INNER JOIN team t ON t.id=te.team_id INNER JOIN department d ON d.id=t.department_id ) "
+						+ "OR request.employee_id IN (SELECT leader_id FROM team t INNER JOIN department d ON t.department_id=d.id )) AND status <> 1 ");
+			} else {
+				throw new Exception("User " + user.getName() + " is not HR Manager");
 			}
-		} 
+		}
+		
+		if (StringUtil.isNotEmpty(request.getEmployeeName())) {
+			queryString.append(" AND e.name like '%" + request.getEmployeeName() + "%'");
+		}
+		
+		if (StringUtil.isNotEmpty(request.getFromTime())) {
+			queryString.append(" AND to_time >= '" + request.getFromTime() + "'");
+		}
+
+		if (StringUtil.isNotEmpty(request.getToTime())) {
+			queryString.append(" AND from_time <= '" + request.getToTime() + "'");
+		}
+		
+		if (StringUtil.isNotEmpty(request.getDepartmentId())) {
+			queryString.append(" AND d.id = '" + request.getDepartmentId() + "'");
+		}
+		
+		if (StringUtil.isNotEmpty(request.getTeamId())) {
+			queryString.append(" AND t.id = '" + request.getTeamId() + "'");
+		}
+		
+		queryString.append(" AND request.valid_flag = '1'");
+		
 		Query query = entityManager.createNativeQuery(queryString.toString(), Request.class);
 		List<Request> listRequests = query.getResultList();
+		
+		for (Request requests : listRequests) {
+			Employee recipient = employeeRepository.findById(requests.getRecipientId());
+			requests.setRecipientName(recipient.getName());
+		}
 		return listRequests;
 	}
 

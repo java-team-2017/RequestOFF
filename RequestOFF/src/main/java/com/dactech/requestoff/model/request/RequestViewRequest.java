@@ -5,19 +5,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class RequestViewRequest {
 	@JsonProperty("user_id")
 	private String userId;
-	private String name;
+	@JsonProperty("employee_name")
+	private String employeeName;
 	private String status;
 	@JsonProperty("from_time")
 	private String fromTime;
 	@JsonProperty("to_time")
 	private String toTime;
+	@JsonProperty("department_id")
+	private String departmentId;
+	@JsonProperty("team_id")
+	private String teamId;
 
-	public RequestViewRequest(String userId, String name, String status, String fromTime, String toTime) {
+	public RequestViewRequest(String userId, String employeeName, String status, String fromTime, String toTime,
+			String departmentId, String teamId) {
 		this.userId = userId;
-		this.name = name;
+		this.employeeName = employeeName;
 		this.status = status;
 		this.fromTime = fromTime;
 		this.toTime = toTime;
+		this.departmentId = departmentId;
+		this.teamId = teamId;
 	}
 
 	public RequestViewRequest() {
@@ -31,12 +39,12 @@ public class RequestViewRequest {
 		this.userId = userId;
 	}
 
-	public String getName() {
-		return name;
+	public String getEmployeeName() {
+		return employeeName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setEmployeeName(String employeeName) {
+		this.employeeName = employeeName;
 	}
 
 	public String getStatus() {
@@ -61,6 +69,22 @@ public class RequestViewRequest {
 
 	public void setToTime(String toTime) {
 		this.toTime = toTime;
+	}
+
+	public String getDepartmentId() {
+		return departmentId;
+	}
+
+	public void setDepartmentId(String departmentId) {
+		this.departmentId = departmentId;
+	}
+
+	public String getTeamId() {
+		return teamId;
+	}
+
+	public void setTeamId(String teamId) {
+		this.teamId = teamId;
 	}
 
 }

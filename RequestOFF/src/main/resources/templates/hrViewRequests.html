@@ -34,6 +34,32 @@
 				}
 			});
 			
+			renderDepartmentSelect("department", function(departments) {
+				listDepartment = departments;
+			});
+			
+			renderTeamSelect("team", function(teams) {
+				listTeam = teams;
+			});
+			
+			$('#department').on('change', function() {
+				if ($(this).val() != '') {
+					var id = $(this).val();
+					var teams = $.grep(listTeam, function(team) {
+						return team.department.id == id;
+					});
+					$('#team').empty().append('<option value=""></option>');
+					$.each(teams, function(index, team) {
+						$('#team').append('<option value="' + team.id + '">' + team.name + '</option>');
+					});
+				} else {
+					$('#team').empty().append('<option value=""></option>');
+					$.each(listTeam, function(index, team) {
+						$('#team').append('<option value="' + team.id + '">' + team.name + '</option>');
+					});
+				}
+			})
+			
 			$('.datepicker').on('changeDate', function(ev){
 				$(this).datepicker('hide');
 			});
@@ -112,8 +138,11 @@
 				"from_time" : requestData.from_time,
 				"to_time" : requestData.to_time,
 				"status" : requestData.status,
-				"name": requestData.name
+				"employee_name": requestData.employee,
+				"department_id": requestData.department,
+				"team_id": requestData.team
 			};
+			console.log(requestData);
 			$('#requestTable').DataTable( {
 				ajax: {
 					type: "POST",
@@ -185,17 +214,17 @@
 				<form id="requestForm" class="form-input">
 					<div class="form-group">
 						<label class="control-label">Employee: </label>
-						<input class="form-control" type="text" name="name" id="employee" value=""></input>
+						<input class="form-control" type="text" name="employee" id="employee" value=""></input>
 					</div>
 							
 					<div class="form-group">
 						<label class="control-label">Department: </label>
-						<input class="form-control" type="text" name="" id="" value=""></input>
+						<select class="form-control" type="text" name="department" id="department" value=""></select>
 					</div>
 							
 					<div class="form-group">
 						<label class="control-label">Team: </label>
-						<input class="form-control" type="text" name="" id="" value=""></input>
+						<select class="form-control" type="text" name="team" id="team" value=""></select>
 					</div>
 							
 					<div class="form-group">
