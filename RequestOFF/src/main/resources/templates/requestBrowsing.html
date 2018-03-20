@@ -130,7 +130,7 @@
 					if(numberOfRequest == 1){
 						$('#confirmMsg').text("Bạn có chắc chắn muốn " + action + " request này ?");
 					} else {
-						$('#confirmMsg').text("Bạn có chắc chắn muốn  " + action + " "+ numberOfRequest + " những request này ?");
+						$('#confirmMsg').text("Bạn có chắc chắn muốn  " + action + " "+ numberOfRequest + " request này ?");
 					}
 					$('#requestTable input[type="checkbox"]:checked').each(function(){
 						var table = $('#requestTable').DataTable();
@@ -277,7 +277,13 @@
 							}
 						},
 					},
-					{ data: 'id' },
+					{ 
+						data: 'insertDate',
+						"render": function(data, type, full, meta) {
+						return data.substr(0, data.length - 2);
+						},
+					},
+					
 					{ data: 'employee.name' },
 					{ 
 						data: 'fromTime' ,
@@ -375,7 +381,7 @@
 					<thead>
 						<tr>
 							<th class="text-center" style="width: 40px;">Chọn</th>
-							<th class="text-center" style="width: 40px;">ID</th>
+							<th class="text-center">Ngày tạo</th>
 							<th class="text-center">Nhân viên</th>
 							<th class="text-center">Từ</th>
 							<th class="text-center">Đến</th>

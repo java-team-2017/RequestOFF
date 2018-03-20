@@ -158,9 +158,14 @@
 				destroy: true,
 				searching: false,
 				pageLength: 50,
-				order: [[ 2, "desc" ]],
+				order: [[ 0, "desc" ]],
 				columns: [
-					{ data: 'id' },
+					{ 
+						data: 'insertDate',
+						"render": function(data, type, full, meta) {
+						return data.substr(0, data.length - 2);
+						},
+					},
 					{ data: 'employee.name' },
 					{ 
 						data: 'fromTime' ,
@@ -264,7 +269,7 @@
 				<table class="table table-bordered table-striped table-hover" id="requestTable">
 					<thead>
 						<tr>
-							<th class="text-center" style="width: 40px;">ID</th>
+							<th class="text-center">Ngày tạo</th>
 							<th class="text-center">Nhân viên</th>
 							<th class="text-center">Từ</th>
 							<th class="text-center">Đến</th>
