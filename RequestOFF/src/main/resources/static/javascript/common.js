@@ -6,6 +6,16 @@ $(function() {
 			event.preventDefault();
 		}
 	});
+	
+	var pathname = $(location).attr('pathname');
+	$('#navbarOfMe').find('li').each(function(i, li) {
+		var selectedHref = $(this).find("a").attr('href');
+		if(selectedHref.localeCompare(pathname) == 0) {
+			$("#navbarOfMe li a.active-menu").removeClass("active-menu");
+			$(this).addClass('active-menu');
+		}
+	});
+	
 });
 
 var errors = {

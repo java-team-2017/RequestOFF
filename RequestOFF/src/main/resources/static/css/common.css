@@ -218,3 +218,7 @@ legend {
 .filter-collapse {
 	padding: 10px;
 }
+
+.active-menu {
+	background-color: powderblue;
+}

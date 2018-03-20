@@ -5,8 +5,7 @@
 	<div class="header-right">
 		
 			<span sec:authorize="isAuthenticated()"> Người dùng: <span
-				sec:authentication="name"></span> | Roles: <span
-				sec:authentication="principal.authorities"></span> | <a
+				sec:authentication="name"></span> | <a
 				th:href="@{/logout}">Đăng xuất</a>
 			</span>
 
