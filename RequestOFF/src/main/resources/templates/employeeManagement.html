@@ -722,7 +722,7 @@
 										<div class="form-group row">
 											<label class="control-label col-sm-3">Tổng thời gian nghỉ phép * </label>
 											<div class="form-inline">
-												<input type="text" class="form-control only-number" maxlength="2" name="totalDaysModalDetails" id="totalDaysModalDetailsId" />&nbsp;ngày&nbsp;
+												<input type="text" onkeypress="preventNonNumeric(event)" class="form-control only-number" maxlength="2" name="totalDaysModalDetails" id="totalDaysModalDetailsId" />&nbsp;ngày&nbsp;
 												<select class="form-control" name="totalHoursModalDetails" id="totalHoursModalDetailsId">
 													<option value="0">0</option>
 													<option value="0.5">0.5</option>
@@ -746,7 +746,7 @@
 										<div class="form-group row">
 											<label class="control-label col-sm-3">Thời gian nghỉ phép còn lại * </label>
 											<div class="form-inline">
-												<input type="text" class="form-control" maxlength="2" name="remainDaysModalDetails" id="remainDaysModalDetailsId" />&nbsp;ngày&nbsp;
+												<input type="text" onkeypress="preventNonNumeric(event)" class="form-control only-number" maxlength="2" name="remainDaysModalDetails" id="remainDaysModalDetailsId" />&nbsp;ngày&nbsp;
 												<select class="form-control" name="remainHoursModalDetails" id="remainHoursModalDetailsId">
 													<option value="0">0</option>
 													<option value="0.5">0.5</option>
@@ -879,7 +879,7 @@
 										<div class="form-group row">
 											<label class="control-label col-sm-3">Tổng thời gian nghỉ phép * : </label>
 											<div class="form-inline">
-												<input type="text" class="form-control only-number" maxlength="2" name="totalDaysModalAdd" id="totalDaysModalAddId" />&nbsp;ngày
+												<input type="text" onkeypress="preventNonNumeric(event)" class="form-control only-number" maxlength="2" name="totalDaysModalAdd" id="totalDaysModalAddId" />&nbsp;ngày
 											</div>
 										</div>
 									</form>

@@ -570,7 +570,7 @@
 						<div class="row">
 							<label class="col-sm-4 col-form-label">Thời gian nghỉ phép còn lại mới</label>
 							<div class="col-sm-2">
-								<input id="editDays" class="col-sm-3 form-control" type="text"></input>
+								<input id="editDays" onkeypress="preventNonNumeric(event)" class="col-sm-3 form-control only-number" type="text" maxlength="2"></input>
 							</div>
 							<label class="col-sm-1">ngày</label>
 							<div class="col-sm-1"></div>

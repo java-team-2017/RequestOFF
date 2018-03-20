@@ -18,6 +18,12 @@ var requestStatus = {
 	'5': 'Đang chờ'
 };
 
+function preventNonNumeric(event) {
+	if (event.keyCode < 48 || event.keyCode > 57) {
+		event.preventDefault();
+	}
+}
+
 function renderRemainHours(remainHours, containerId) {
 	var days = parseInt(parseFloat(remainHours) / 8);
 	var hours = parseFloat(remainHours) - (days * 8);
