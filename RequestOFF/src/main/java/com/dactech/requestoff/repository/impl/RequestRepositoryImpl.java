@@ -116,7 +116,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 			if (teamEmployee.getLeaderFlag() == 1) { //user is a leader
 				queryString.append(" (employee_id IN (SELECT employee_id from team t INNER JOIN team_employee te ON t.id = te.team_id WHERE t.leader_id = " + requests.getUserId() + ")) ");
 			} else {
-				throw new Exception("Người đăng nhập " + user.getName() + " chỉ là thành viên trong team");
+				throw new Exception("Người đăng nhập " + user.getName() + " không có quyền sử dụng chức năng này");
 			}
 		} else if (user.getPosition().getCode() == Position.CODE_MANAGER) {
 			queryString.append(" (employee_id IN (SELECT employee_id from team_employee te INNER JOIN team t ON t.id=te.team_id INNER JOIN department d ON d.id=t.department_id WHERE manager_id= " + requests.getUserId() + ") "

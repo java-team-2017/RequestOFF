@@ -148,6 +148,9 @@
 			var button = $(this);
 			$(this).confirmation({
 				placement: 'left',
+				title: "Bạn có chắc không?",
+				btnOkLabel: "Có",
+				btnCancelLabel: "Không",
 				onConfirm: function() {
 					var table = $('#departmentTable').DataTable();
 					rowDataRequest = table.row(button.parent()).data();
