@@ -36,6 +36,9 @@
 					"update_date" : ""
 				};
 				
+				$(".only-number").on("keypress", function(event) {
+					preventNonNumeric(event);
+				});
 				renderDayOffTypeSelect('id_dayOffType');
 				
 				//get current user
@@ -224,7 +227,7 @@
 						<div class="form-group">
 							<label>Thời gian * </label>
 							<div class="form-inline">
-								<input type="text" onkeypress="preventNonNumeric(event)" class="form-control only-number" maxlength="2" name="offDays" id="offDaysId" style="width:100px;"/>&nbsp;ngày&nbsp;
+								<input type="text" class="form-control only-number" maxlength="2" name="offDays" id="offDaysId" style="width:100px;"/>&nbsp;ngày&nbsp;
 								<select class="form-control" name="offHours" id="offHoursId" style="width:100px;">
 									<option value="0">0</option>
 									<option value="0.5">0.5</option>

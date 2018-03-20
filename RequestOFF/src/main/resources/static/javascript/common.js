@@ -1,4 +1,11 @@
 var webRootPath = '/';
+
+function preventNonNumeric(event) {
+	if (event.keyCode < 48 || event.keyCode > 57) {
+		event.preventDefault();
+	}
+}
+
 var errors = {
 	'DateError': 'Thời gian trong ô \'đến\' phải sau thời gian trong ô \'từ\'',
 	'incompleteFields': 'Vui lòng điền vào tất cả các trường bắt buộc',
@@ -17,12 +24,6 @@ var requestStatus = {
 	'4': 'Đã phản hồi',
 	'5': 'Đang chờ'
 };
-
-function preventNonNumeric(event) {
-	if (event.keyCode < 48 || event.keyCode > 57) {
-		event.preventDefault();
-	}
-}
 
 function renderRemainHours(remainHours, containerId) {
 	var days = parseInt(parseFloat(remainHours) / 8);
