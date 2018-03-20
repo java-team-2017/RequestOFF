@@ -89,7 +89,7 @@
 					$('#reasonDetails').val(rowData.reason);
 					$('#statusDetails').val(requestStatus[rowData.status]);
 					$('#dayOffTypeDetails').val(rowData.dayOffType.name);
-					$('#responseMessage').val(rowData.responseMessage);
+					$('#responseMessage').val(rowData.responseMessage).prop('disabled', true);
 					
 					$('#modalDetails').modal('show');
 				}
