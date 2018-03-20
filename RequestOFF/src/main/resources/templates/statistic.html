@@ -19,10 +19,6 @@
 		var editEmployee; // for editing remain hours of employee purpose
 		var searchParam;
 		
-		$(".only-number").on("keypress", function(event) {
-			preventNonNumeric(event);
-		});
-		
 		//Department combobox
 		renderDepartmentSelect("department", function(departments) {
 			listDepartment = departments;
