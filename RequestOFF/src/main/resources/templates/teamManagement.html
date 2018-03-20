@@ -326,6 +326,9 @@
 			var button = $(this);
 			$(this).confirmation({
 				placement: 'left',
+				title: "Bạn có chắc chắn muốn xóa?",
+				btnOkLabel: "Có",
+				btnCancelLabel: "Không",
 				onConfirm: function() {
 					var table = $('#teamTable').DataTable();
 					selectedRow = table.row(button.parent()).data();
