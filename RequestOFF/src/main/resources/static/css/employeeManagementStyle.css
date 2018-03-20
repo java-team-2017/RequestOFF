@@ -2,6 +2,10 @@
 	padding: 0px;
 }
 
-.editCell, .deleteCell {
+.idCell, .editCell, .deleteCell {
 	width: 4%;
+}
+
+.hideColumn {
+	display : none;
 }

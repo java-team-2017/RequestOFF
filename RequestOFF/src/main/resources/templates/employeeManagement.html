@@ -12,6 +12,11 @@
 			$(function() {
 				var listPosition, listTeam, listDepartment, listRole;
 				var table;
+				
+				var position = {
+					"employee" : "1",
+					"manager" : "2"
+				}
 
 				renderPositionSelect("positionId", function(positions) {
 					listPosition = positions;
@@ -219,6 +224,11 @@
 							complete = 0;
 						}
 					});
+					if($("#roleModalAddId").val() == "" || $("#roleModalAddId").val() == undefined || $("#roleModalAddId").val() == null) {
+						if($("#positionModalAddId").val() != position['employee']) {
+							complete = 0;
+						}
+					}
 					if((addData.nameModalAdd).length > 200 || (addData.phoneModalAdd).length > 20) {
 						exceedLength = 1;
 					}
@@ -317,6 +327,11 @@
 							complete = 0;
 						}
 					});
+					if($("#roleModalDetailsId").val() == "" || $("#roleModalDetailsId").val() == undefined || $("#roleModalDetailsId").val() == null) {
+						if($("#positionModalDetailsId").val() != position['employee']) {
+							complete = 0;
+						}
+					}
 					if((updateData.nameModalDetails).length > 200 || (updateData.phoneModalDetails).length > 20) {
 						exceedLength = 1;
 					}
@@ -471,37 +486,42 @@
 					pageLength: 50,
 					columnDefs: [
 						{
+							"className": 'hideColumn',
 							"targets": [ 0 ],
-							"data": 'name'
+							"data": 'id'
 						},
 						{
 							"targets": [ 1 ],
-							"data": 'birthday'
+							"data": 'name'
 						},
 						{
 							"targets": [ 2 ],
-							"data": 'email'
+							"data": 'birthday'
 						},
 						{
 							"targets": [ 3 ],
-							"data": 'teamName'
+							"data": 'email'
 						},
 						{
 							"targets": [ 4 ],
-							"data": 'departmentName'
+							"data": 'teamName'
 						},
 						{
 							"targets": [ 5 ],
-							"data": 'startWorkingDate'
+							"data": 'departmentName'
 						},
 						{
 							"targets": [ 6 ],
+							"data": 'startWorkingDate'
+						},
+						{
+							"targets": [ 7 ],
 							"className": "text-center",
 							"data": null,
 							"defaultContent": "<a><span class='glyphicon glyphicon-pencil' style='cursor: pointer;'></span></a>"
 						},
 						{
-							"targets": [ 7 ],
+							"targets": [ 8 ],
 							"className": "text-center",
 							"data": null,
 							"defaultContent": "<a class='btnDelete'><span class='glyphicon glyphicon-remove' style='cursor: pointer;'></span></a>"
@@ -574,6 +594,7 @@
 					<table class="display table table-bordered" cellspacing="0" width="100%" id="employeeTable">
 						<thead>
 							<tr>
+								<th class="text-center idCell hideColumn" style="display: none;">Id</th>
 								<th class="text-center nameCell">Tên</th>
 								<th class="text-center dateOfBirthCell">Ngày sinh</th>
 								<th class="text-center emailCell">Email</th>
