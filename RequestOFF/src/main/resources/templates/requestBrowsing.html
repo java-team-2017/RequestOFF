@@ -257,6 +257,7 @@
 					dataSrc: function (data) {
 						if (data.status_info.status != 0) {
 							$('#alertMessage').html(errors['APIResponseError'](data.status_info.error)).attr('class', 'alert alert-danger').show();
+							$('#employee, #status, #from, #to, #btnSearch, #btnReset, #btnApprove, #btnDeny').prop('disabled', true);
 							return [];
 						}
 						return data.requests;
@@ -371,7 +372,7 @@
 							
 					<p>
 						<button id="btnSearch" type="button" class="btn btn-primary" value="Search" style="width:82px;">Tìm kiếm</button>&nbsp;&nbsp;
-						<button type="reset" class="btn btn-primary" style="width:80px;">Làm mới</button>
+						<button id="btnReset" type="reset" class="btn btn-primary" style="width:80px;">Làm mới</button>
 					</p>
 				</form>
 			</div>
@@ -409,68 +410,92 @@
 						
 						<div class="modal-body">
 							<form class="form-horizontal" id="formModal">
-								<label class="col-md-3 control-label">Nhân viên:</label>
-								<div class="col-md-9">
-									<input id="nameDetails" class="form-control" readonly="readonly"></input>
-								</div>
-			
-								<label class="col-md-3 control-label">Vị trí:</label>
-								<div class="col-md-9">
-									<input id="positionDetails" class="form-control" readonly="readonly"></input>
-								</div>
-			
-								<label class="col-md-3 control-label">Team:</label>
-								<div class="col-md-9">
-									<input id="teamDetails" class="form-control" readonly="readonly"></input>
-								</div>
-			
-								<label class="col-md-3 control-label">Department:</label>
-								<div class="col-md-9">
-									<input id="departmentDetails" class="form-control" readonly="readonly"></input>
-								</div>
-			
-								<label class="col-md-3 control-label">Người nhận:</label>
-								<div class="col-md-9">
-									<input id="recipientDetails" class="form-control" readonly="readonly"></input>
+								<div class="form-group row">
+									<label class="col-md-3 control-label">Nhân viên:</label>
+									<div class="col-md-9">
+										<input id="nameDetails" class="form-control" readonly="readonly"></input>
+									</div>
 								</div>
 								
-								<label class="col-md-3 control-label">Từ:</label>
-								<div class="col-md-9">
-									<input id="fromTimeDetails" class="form-control" readonly="readonly"></input>
+								<div class="form-group row">
+									<label class="col-md-3 control-label">Vị trí:</label>
+									<div class="col-md-9">
+										<input id="positionDetails" class="form-control" readonly="readonly"></input>
+									</div>
 								</div>
 								
-								<label class="col-md-3 control-label">Đến:</label>
-								<div class="col-md-9">
-									<input id="toTimeDetails" class="form-control" readonly="readonly"></input>
+								<div class="form-group row">
+									<label class="col-md-3 control-label">Team:</label>
+									<div class="col-md-9">
+										<input id="teamDetails" class="form-control" readonly="readonly"></input>
+									</div>
+								</div>
+			
+								<div class="form-group row">
+									<label class="col-md-3 control-label">Department:</label>
+									<div class="col-md-9">
+										<input id="departmentDetails" class="form-control" readonly="readonly"></input>
+									</div>
+								</div>
+			
+								<div class="form-group row">
+									<label class="col-md-3 control-label">Người nhận:</label>
+									<div class="col-md-9">
+										<input id="recipientDetails" class="form-control" readonly="readonly"></input>
+									</div>
 								</div>
 								
-								<label class="col-md-3 control-label">Thời gian nghỉ :</label>
-								<div class="col-md-9">
-									<input id="totalTimeDetails" class="form-control" readonly="readonly"></input>
-								</div>
-			
-								<label class="col-md-3 control-label">Lí do:</label>
-								<div class="col-md-9">
-									<input id="reasonDetails" class="form-control" readonly="readonly"></input>
+								<div class="form-group row">
+									<label class="col-md-3 control-label">Từ:</label>
+									<div class="col-md-9">
+										<input id="fromTimeDetails" class="form-control" readonly="readonly"></input>
+									</div>
 								</div>
 								
-								<label class="col-md-3 control-label">Trạng thái:</label>
-								<div class="col-md-9">
-									<input id="statusDetails" class="form-control" readonly="readonly"></input>
+								<div class="form-group row">
+									<label class="col-md-3 control-label">Đến:</label>
+									<div class="col-md-9">
+										<input id="toTimeDetails" class="form-control" readonly="readonly"></input>
+									</div>
+								</div>
+								
+								<div class="form-group row">
+									<label class="col-md-3 control-label">Thời gian nghỉ :</label>
+									<div class="col-md-9">
+										<input id="totalTimeDetails" class="form-control" readonly="readonly"></input>
+									</div>
 								</div>
 			
-								<label class="col-md-3 control-label">Loại ngày nghỉ:</label>
-								<div class="col-md-9">
-									<input id="dayOffTypeDetails" class="form-control" readonly="readonly"></input>
+								<div class="form-group row">
+									<label class="col-md-3 control-label">Lí do:</label>
+									<div class="col-md-9">
+										<input id="reasonDetails" class="form-control" readonly="readonly"></input>
+									</div>
+								</div>
+								
+								<div class="form-group row">
+									<label class="col-md-3 control-label">Trạng thái:</label>
+									<div class="col-md-9">
+										<input id="statusDetails" class="form-control" readonly="readonly"></input>
+									</div>
 								</div>
 			
-								<label class="col-md-3 control-label">Tin nhắn phản hồi:</label>
-								<div class="col-md-9">
-									<textarea id="responseMessage"
-										placeholder="Viết tin nhắn..."
-										style="height: 100px; width: 100%;">
-									</textarea>
-								</div>&nbsp;
+								<div class="form-group row">
+									<label class="col-md-3 control-label">Loại ngày nghỉ:</label>
+									<div class="col-md-9">
+										<input id="dayOffTypeDetails" class="form-control" readonly="readonly"></input>
+									</div>
+								</div>
+			
+								<div class="form-group row">
+									<label class="col-md-3 control-label">Tin nhắn phản hồi:</label>
+									<div class="col-md-9">
+										<textarea id="responseMessage"
+											placeholder="Viết tin nhắn..."
+											style="height: 100px; width: 100%;">
+										</textarea>
+									</div>
+								</div>
 								
 								<p align="center">
 									<button type="button" class="btn btn-default" id="btnApproveModal">Chấp nhận</button>
