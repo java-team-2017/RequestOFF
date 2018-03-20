@@ -16,7 +16,7 @@
 				var position = {
 					"employee" : "1",
 					"manager" : "2"
-				}
+				};
 				
 				renderPositionSelect("positionId", function(positions) {
 					listPosition = positions;
@@ -51,6 +51,9 @@
 				renderRoleSelect("roleModalDetailsId", function(roles) {
 					listRole = roles;
 				});
+				
+				//set status working to default value for searching employee
+				$("#workingStatusId").val(1);
 				
 				var employeeSearchRequest = getEmployeeSearchRequest();
 				console.log("employeeSearchRequest:");
@@ -149,7 +152,11 @@
 						console.log(days + " ----- " + hours);
 						$("#remainDaysModalDetailsId").val(days);
 						$("#remainHoursModalDetailsId").val(hours);
-						$("#isQuitModalDetailsId").val(rowData.validFlag);
+						if(rowData.validFlag == 1) {
+							$("#isWorkingModalDetailsId").prop("checked", true);
+						} else {
+							$("#isWorkingModalDetailsId").prop("checked", false);
+						}
 						
 						$('#alertMessage_modalDetails').hide();
 						$('#employeeDetailsModal').modal('show');
@@ -366,10 +373,10 @@
 					}
 					else {
 						var validFlag;
-						if($('input[name="isQuitModalDetails"]').is(':checked')) {
-							validFlag = 0;
-						} else {
+						if($('input[name="isWorkingModalDetails"]').is(':checked')) {
 							validFlag = 1;
+						} else {
+							validFlag = 0;
 						}
 						var employeeRegistRequest = {
 							"id" : id,
@@ -467,7 +474,7 @@
 					"phone" : "",
 					"start_working_date" : "",
 					"offical_working_date" : "",
-					"valid_flag" : "1",
+					"valid_flag" : searchData.workingStatus,
 					"team_id" : searchData.team,
 					"department_id" : searchData.department,
 					"team_dept_flag" : teamDepartment
@@ -584,6 +591,14 @@
 									<label for="department">Department</label>
 									<select class="form-control" name="department" id="departmentId">
 										<option value=""></option>
+									</select>
+								</div>
+								<div class="form-group">
+									<label for="workingStatus">Trạng thái làm việc</label>
+									<select class="form-control" name="workingStatus" id="workingStatusId">
+										<option value=""></option>
+										<option value="1">Đang làm việc</option>
+										<option value="0">Đã nghỉ việc</option>
 									</select>
 								</div>
 								<br/>
@@ -776,9 +791,9 @@
 											</div>
 										</div>
 										<div class="form-group row">
-											<label class="control-label col-sm-3">Đã nghỉ việc * : </label>
+											<label class="control-label col-sm-3">Đang làm việc * : </label>
 											<div class="input-group col-sm-9" style="padding-right:15px;">
-												<input type="checkbox" value="0" name="isQuitModalDetails" id="isQuitModalDetailsId" />
+												<input type="checkbox" name="isWorkingModalDetails" id="isWorkingModalDetailsId" />
 											</div>
 										</div>
 										<input type="hidden" name="updateDateModalDetails" id="updateDateModalDetailsId" />

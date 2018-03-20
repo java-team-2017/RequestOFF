@@ -116,10 +116,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 			
 			employee.setListRole(listRole);
 		} else { // update employee
-			Long EmployeeId = Long.parseLong(erRequest.getId());
-			employee = employeeRepository.findById(EmployeeId);
+			Position position;
+			Long employeeId = Long.parseLong(erRequest.getId());
+			employee = employeeRepository.findById(employeeId);
 			if (employee == null) {
-				throw new Exception("cannot find the Employee with id : " + EmployeeId);
+				throw new Exception("cannot find the Employee with id : " + employeeId);
 			}
 			if (!employee.getUpdateDate().equals(erRequest.getUpdateDate())) {
 				throw new Exception(
@@ -137,10 +138,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 			}
 			if (StringUtil.isNotEmpty(erRequest.getPositionId())) {
 				Position oldPosition = employee.getPosition();
-				Position newPosition = positionRepository.findById(Long.parseLong(erRequest.getPositionId()));
-				if((oldPosition.getCode() == Position.CODE_EMPLOYEE && newPosition.getCode() != Position.CODE_EMPLOYEE)) {
+				position = positionRepository.findById(Long.parseLong(erRequest.getPositionId()));
+				if((oldPosition.getCode() == Position.CODE_EMPLOYEE && position.getCode() != Position.CODE_EMPLOYEE)) {
 					if(isLeader(employee.getId())) {
-						Team team = teamRepository.findByLeaderId(EmployeeId);
+						Team team = teamRepository.findByLeaderId(employeeId);
 						if (team != null) {
 							throw new Exception(employee.getName() + " is currently the leader of " + team.getName() + ". Please remove " + employee.getName() 
 												+ " from " + team.getName() + " before changing position");
@@ -152,7 +153,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 							if(employee.getListTeam() != null && employee.getListTeam().size() > 0) {
 								Team team = employee.getListTeam().get(0);
 								if(team != null) {
-									TeamEmployee teamEmployee = teamEmployeeRepository.findByTeamIdAndEmployeeId(team.getId(), EmployeeId);
+									TeamEmployee teamEmployee = teamEmployeeRepository.findByTeamIdAndEmployeeId(team.getId(), employeeId);
 									if(teamEmployee != null) {
 										teamEmployeeRepository.delete(teamEmployee);
 									}
@@ -163,8 +164,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 						}
 					}
 				} else if((oldPosition.getCode() == Position.CODE_MANAGER 
-						&& newPosition.getCode() != Position.CODE_MANAGER)) {
-					Department dept = departmentRepository.findByManagerId(EmployeeId);
+						&& position.getCode() != Position.CODE_MANAGER)) {
+					Department dept = departmentRepository.findByManagerId(employeeId);
 					if(dept != null) {
 						throw new Exception(employee.getName() + " is currently the manager of " + dept.getName() + ". Please remove " + employee.getName() 
 											+ " from " + dept.getName() + " before changing position");
@@ -173,9 +174,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 					}
 				}
 				
-				Position position = new Position();
-				position.setId(Long.parseLong(erRequest.getPositionId()));
+//				Position position = new Position();
+//				position.setId(Long.parseLong(erRequest.getPositionId()));
 				employee.setPosition(position);
+			} else {
+				position = employee.getPosition();
 			}
 			if (StringUtil.isNotEmpty(erRequest.getEmail())) {
 				employee.setEmail(erRequest.getEmail());
@@ -212,7 +215,56 @@ public class EmployeeServiceImpl implements EmployeeService {
 				employee.setListRole(listRole);
 			}
 			if (StringUtil.isNotEmpty(erRequest.getValidFlag())) {
-				employee.setValidFlag(Integer.parseInt(erRequest.getValidFlag()));
+				int validFlag = Integer.parseInt(erRequest.getValidFlag());
+//				if(Integer.parseInt(erRequest.getValidFlag()) == 0) {
+					if (isLeader(employeeId)) {
+						Team team = teamRepository.findByLeaderId(employeeId);
+						if (team != null) {
+							throw new Exception(employee.getName() + " is currently the leader of team : " + team.getName() + ". Please remove "
+												+ employee.getName() + " from " + team.getName() + " first!");
+						}
+					} else if (position.getCode() == Position.CODE_EMPLOYEE) {
+						if (employee.getListTeam() != null && employee.getListTeam().size() > 0 && employee.getListTeam().get(0)!= null) {
+							throw new Exception(employee.getName() + " is currently a member of team : " + employee.getListTeam().get(0).getName()
+												+ ". Please remove " + employee.getName() + " from " + employee.getListTeam().get(0).getName() + " first!");
+						} else if(requestRepository.getNumberOfRequestInProcessing(employeeId) > 0) {
+							throw new Exception(employee.getName() + " has requests in processing. Please let these requests processed before delete");
+						}
+					} else if (position.getCode() == Position.CODE_MANAGER) {
+						Department dept = departmentRepository.findByManagerId(employeeId);
+						if (dept != null) {
+							throw new Exception(employee.getName() + " is currently the manager of department : " + dept.getName() + ". Please remove "
+												+ employee.getName() + " from " + dept.getName() + " first!");
+						}
+					} else {
+						throw new Exception("Unsolved ");
+					}
+					
+					EmployeeOffStatusSearchRequest eosRequest = new EmployeeOffStatusSearchRequest("", employeeId + "", "", "", "");
+					List<EmployeeOffStatus>  listEos = employeeOffStatusRepository.search(eosRequest);
+					for(EmployeeOffStatus eos : listEos) {
+						eos.setValidFlag(validFlag);
+						employeeOffStatusRepository.save(eos);
+					}
+					
+					List<EmployeeRole> listEmployeeRole = employeeRoleRepository.findByEmployeeId(employeeId);
+					for(EmployeeRole er : listEmployeeRole) {
+						er.setValidFlag(validFlag);
+						employeeRoleRepository.save(er);
+					}
+					
+					RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
+					requestSearchRequest.setEmployeeId(employeeId + "");
+					requestSearchRequest.setStatus(Request.REQUEST_STATUS_APPROVED + "");
+					List<Request> listRequest = requestRepository.searchRequest(requestSearchRequest);
+					requestSearchRequest.setStatus(Request.REQUEST_STATUS_DENIED + "");
+					listRequest.addAll(requestRepository.searchRequest(requestSearchRequest));
+					for(Request request : listRequest) {
+						request.setValidFlag(validFlag);
+						requestRepository.save(request);
+					}
+//				}
+				employee.setValidFlag(validFlag);
 			}
 		}
 		employeeRepository.save(employee);
@@ -589,14 +641,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 		EmployeeOffStatusSearchRequest eosRequest = new EmployeeOffStatusSearchRequest("", employeeId + "", "", "", "");
 		List<EmployeeOffStatus>  listEos = employeeOffStatusRepository.search(eosRequest);
 		for(EmployeeOffStatus eos : listEos) {
-			eos.setValidFlag(0);
-			employeeOffStatusRepository.save(eos);
+//			eos.setValidFlag(0);
+//			employeeOffStatusRepository.save(eos);
+			employeeOffStatusRepository.delete(eos);
 		}
 		
 		List<EmployeeRole> listEmployeeRole = employeeRoleRepository.findByEmployeeId(employeeId);
 		for(EmployeeRole er : listEmployeeRole) {
-			er.setValidFlag(0);
-			employeeRoleRepository.save(er);
+//			er.setValidFlag(0);
+//			employeeRoleRepository.save(er);
+			employeeRoleRepository.delete(er);
 		}
 		
 		RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
@@ -606,12 +660,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 		requestSearchRequest.setStatus(3 + "");
 		listRequest.addAll(requestRepository.searchRequest(requestSearchRequest));
 		for(Request request : listRequest) {
-			request.setValidFlag(0);
-			requestRepository.save(request);
+//			request.setValidFlag(0);
+//			requestRepository.save(request);
+			requestRepository.delete(request);
 		}
 
-		employee.setValidFlag(0);
-		employeeRepository.save(employee);
+//		employee.setValidFlag(0);
+//		employeeRepository.save(employee);
+		employeeRepository.delete(employee);
 		return true;
 	}
 	
