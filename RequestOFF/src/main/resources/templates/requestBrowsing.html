@@ -255,6 +255,9 @@
 						return JSON.stringify(requestSearch);
 					},
 					dataSrc: function (data) {
+						if(data.requests.length > 0){
+							$('#numberOfRequest').html(data.requests.length);
+						}
 						if (data.status_info.status != 0) {
 							$('#alertMessage').html(errors['APIResponseError'](data.status_info.error)).attr('class', 'alert alert-danger').show();
 							$('#employee, #status, #from, #to, #btnSearch, #btnReset, #btnApprove, #btnDeny').prop('disabled', true);
