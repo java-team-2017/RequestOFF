@@ -75,7 +75,7 @@ public class RequestServiceImpl implements RequestService{
 			}
 			else if(requestRegistRequest.getUpdateDate().equals(request.getUpdateDate()) == false) {
 				throw new Exception("Request với id " + requestRegistRequest.getId() + " đã được chỉnh sửa vào lúc " + request.getUpdateDate()
-									+ ". Vui lòng tải lại trang để cập nhật thông tin mới nhất");
+									+ ".<br/>Vui lòng tải lại trang để cập nhật thông tin mới nhất");
 			}
 			else {
 				Employee employee = employeeRepository.findById(request.getEmployee().getId());

@@ -40,7 +40,7 @@ public class DayOffTypeServiceImpl implements DayOffTypeService {
 
 			if (!dayOffType.getUpdateDate().equals(request.getUpdateDate())) {
 				throw new Exception("Loại ngày nghỉ với id " + dayOffType.getId() + " đã được chỉnh sửa vào lúc "
-						+ dayOffType.getUpdateDate() + ". Vui lòng tải lại trang để cập nhật thông tin mới nhất");
+						+ dayOffType.getUpdateDate() + ".<br/>Vui lòng tải lại trang để cập nhật thông tin mới nhất");
 			}
 
 			if (StringUtil.isNotEmpty(request.getNameDayOffType())) {

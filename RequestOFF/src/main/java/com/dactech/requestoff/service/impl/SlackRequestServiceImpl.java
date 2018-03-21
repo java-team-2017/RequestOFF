@@ -172,7 +172,7 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 
 			if (!slackRequest.getUpdateDate().equals(request.getUpdateDate())) {
 				throw new Exception("Request từ Slack với id " + slackRequest.getId() + " đã được chỉnh sửa vào lúc "
-						+ slackRequest.getUpdateDate() + ". Vui lòng tải lại trang để cập nhật thông tin mới nhất");
+						+ slackRequest.getUpdateDate() + ".<br/>Vui lòng tải lại trang để cập nhật thông tin mới nhất");
 			}
 
 			if (StringUtil.isNotEmpty(request.getMsgUserId())) {

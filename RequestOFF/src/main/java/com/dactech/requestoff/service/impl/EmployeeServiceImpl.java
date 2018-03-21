@@ -34,7 +34,6 @@ import com.dactech.requestoff.model.response.EmployeeOffStatisticsPagingResponse
 import com.dactech.requestoff.model.response.EmployeeRegistResponse;
 import com.dactech.requestoff.model.response.EmployeeSearchResponse;
 import com.dactech.requestoff.model.response.GetUserResponse;
-import com.dactech.requestoff.repository.DayOffTypeRepository;
 import com.dactech.requestoff.repository.DepartmentRepository;
 import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
@@ -118,7 +117,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			if (!employee.getUpdateDate().equals(erRequest.getUpdateDate())) {
 				throw new Exception(
 						"Nhân viên với id " + erRequest.getId() + " đã được chỉnh sửa vào lúc " + employee.getUpdateDate()
-						+ ". Vui lòng tải lại trang để cập nhật thông tin mới nhất");
+						+ ".<br/>Vui lòng tải lại trang để cập nhật thông tin mới nhất");
 			}
 
 			if (StringUtil.isNotEmpty(erRequest.getName())) {
@@ -137,25 +136,15 @@ public class EmployeeServiceImpl implements EmployeeService {
 					if(isLeader(employee.getId())) {
 						Team team = teamRepository.findByLeaderId(employeeId);
 						if (team != null) {
-							throw new Exception(employee.getName() + " hiện đang là leader của team " + team.getName() + ". Vui lòng xóa " + employee.getName() 
+							throw new Exception(employee.getName() + " hiện đang là leader của team " + team.getName() + ".<br/>Vui lòng xóa " + employee.getName() 
 												+ " khỏi " + team.getName() + " trước khi thay đổi vị trí");
 						} else if(requestRepository.getNumberOfRequestInProcessing(employee.getId()) > 0) {
-							throw new Exception(employee.getName() + " có request đang chờ xử lý. Vui lòng để " + employee.getName()
+							throw new Exception(employee.getName() + " có request đang chờ xử lý.<br/>Vui lòng để " + employee.getName()
 												+ " xử lý những request này trước khi thay đổi vị trí");
 						}
 					} else {
-						if(requestRepository.getNumberOfRequestInProcessing(employee.getId()) == 0) {
-							if(employee.getListTeam() != null && employee.getListTeam().size() > 0) {
-								Team team = employee.getListTeam().get(0);
-								if(team != null) {
-									TeamEmployee teamEmployee = teamEmployeeRepository.findByTeamIdAndEmployeeId(team.getId(), employeeId);
-									if(teamEmployee != null) {
-										teamEmployeeRepository.delete(teamEmployee);
-									}
-								}
-							}
-						} else {
-							throw new Exception(employee.getName() + " có request đang chờ xử lý. Vui lòng để " + employee.getName()
+						if(requestRepository.getNumberOfRequestInProcessing(employee.getId()) > 0) {
+							throw new Exception(employee.getName() + " có request đang chờ xử lý.<br/>Vui lòng để " + employee.getName()
 												+ " xử lý những request này trước khi thay đổi vị trí");
 						}
 					}
@@ -163,10 +152,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 						&& position.getCode() != Position.CODE_MANAGER)) {
 					Department dept = departmentRepository.findByManagerId(employeeId);
 					if(dept != null) {
-						throw new Exception(employee.getName() + " hiện đang là manager của department " + dept.getName() + ". Vui lòng xóa " + employee.getName() 
+						throw new Exception(employee.getName() + " hiện đang là manager của department " + dept.getName() + ".<br/>Vui lòng xóa " + employee.getName() 
 											+ " khỏi " + dept.getName() + " trước khi thay đổi vị trí");
 					} else if(requestRepository.getNumberOfRequestInProcessing(employee.getId()) > 0) {
-						throw new Exception(employee.getName() + " có request đang chờ xử lý. Vui lòng để " + employee.getName()
+						throw new Exception(employee.getName() + " có request đang chờ xử lý.<br/>Vui lòng để " + employee.getName()
 											+ " xử lý những request này trước khi thay đổi vị trí");
 					}
 				}
@@ -210,21 +199,21 @@ public class EmployeeServiceImpl implements EmployeeService {
 					if (isLeader(employeeId)) {
 						Team team = teamRepository.findByLeaderId(employeeId);
 						if (team != null) {
-							throw new Exception(employee.getName() + " hiện đang là leader của team : " + team.getName() + ". Vui lòng xóa "
+							throw new Exception(employee.getName() + " hiện đang là leader của team : " + team.getName() + ".<br/>Vui lòng xóa "
 												+ employee.getName() + " khỏi " + team.getName() + " trước khi thay đổi trạng thái làm việc");
 						}
 					} else if (position.getCode() == Position.CODE_EMPLOYEE) {
 						if (employee.getListTeam() != null && employee.getListTeam().size() > 0 && employee.getListTeam().get(0)!= null) {
 							throw new Exception(employee.getName() + " hiện đang là thành viên của team : " + employee.getListTeam().get(0).getName()
-												+ ". Vui lòng xóa " + employee.getName() + " khỏi " + employee.getListTeam().get(0).getName() + " trước khi thay đổi trạng thái làm việc");
+												+ ".<br/>Vui lòng xóa " + employee.getName() + " khỏi " + employee.getListTeam().get(0).getName() + " trước khi thay đổi trạng thái làm việc");
 						} else if(requestRepository.getNumberOfRequestInProcessing(employeeId) > 0) {
-							throw new Exception(employee.getName() + " có request đang chờ xử lý. Vui lòng để " + employee.getName()
+							throw new Exception(employee.getName() + " có request đang chờ xử lý.<br/>Vui lòng để " + employee.getName()
 												+ " xử lý những request này trước khi thay đổi trạng thái làm việc");
 						}
 					} else if (position.getCode() == Position.CODE_MANAGER) {
 						Department dept = departmentRepository.findByManagerId(employeeId);
 						if (dept != null) {
-							throw new Exception(employee.getName() + " hiện đang là manager của department : " + dept.getName() + ". Vui lòng xóa "
+							throw new Exception(employee.getName() + " hiện đang là manager của department : " + dept.getName() + ".<br/>Vui lòng xóa "
 												+ employee.getName() + " khỏi " + dept.getName() + " trước khi thay đổi trạng thái làm việc");
 						}
 					} else {
@@ -609,21 +598,21 @@ public class EmployeeServiceImpl implements EmployeeService {
 		if (isLeader(employeeId)) {
 			Team team = teamRepository.findByLeaderId(employeeId);
 			if (team != null) {
-				throw new Exception(employee.getName() + " hiện đang là leader của team : " + team.getName() + ". Vui lòng xóa "
+				throw new Exception(employee.getName() + " hiện đang là leader của team : " + team.getName() + ".<br/>Vui lòng xóa "
 									+ employee.getName() + " khỏi " + team.getName() + " trước khi xóa");
 			}
 		} else if (employee.getPosition().getCode() == Position.CODE_EMPLOYEE) {
 			if (employee.getListTeam() != null && employee.getListTeam().size() > 0 && employee.getListTeam().get(0)!= null) {
 				throw new Exception(employee.getName() + " hiện đang là thành viên của team : " + employee.getListTeam().get(0).getName()
-									+ ". Vui lòng xóa " + employee.getName() + " khỏi " + employee.getListTeam().get(0).getName() + " trước khi xóa");
+									+ ".<br/>Vui lòng xóa " + employee.getName() + " khỏi " + employee.getListTeam().get(0).getName() + " trước khi xóa");
 			} else if(requestRepository.getNumberOfRequestInProcessing(employeeId) > 0) {
-				throw new Exception(employee.getName() + " có request đang chờ xử lý. Vui lòng để " + employee.getName()
+				throw new Exception(employee.getName() + " có request đang chờ xử lý.<br/>Vui lòng để " + employee.getName()
 									+ " xử lý những request này trước khi xóa");
 			}
 		} else if (employee.getPosition().getCode() == Position.CODE_MANAGER) {
 			Department dept = departmentRepository.findByManagerId(employeeId);
 			if (dept != null) {
-				throw new Exception(employee.getName() + " hiện đang là manager của department : " + dept.getName() + ". Vui lòng xóa "
+				throw new Exception(employee.getName() + " hiện đang là manager của department : " + dept.getName() + ".<br/>Vui lòng xóa "
 									+ employee.getName() + " khỏi " + dept.getName() + " trước khi xóa");
 			}
 		} else {

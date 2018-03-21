@@ -50,11 +50,11 @@ public class DepartmentServiceImpl implements DepartmentService {
 		else {
 			department = departmentRepository.findById(Long.parseLong(departmentRegistRequest.getId()));
 			if(department == null) {
-				throw new Exception("Không thể tìm department với id = " + departmentRegistRequest.getId());
+				throw new Exception("Không thể tìm department với id " + departmentRegistRequest.getId());
 			}
 			else if(departmentRegistRequest.getUpdateDate().equals(department.getUpdateDate()) == false) {
 				throw new Exception("Department với id " + departmentRegistRequest.getId() + " đã được chỉnh sửa vào lúc " + department.getUpdateDate()
-									+ ". Vui lòng tải lại trang để cập nhật thông tin mới nhất");
+									+ ".<br/>Vui lòng tải lại trang để cập nhật thông tin mới nhất");
 			}
 			else {
 				if(StringUtil.isNotEmpty(departmentRegistRequest.getName())) {
@@ -72,7 +72,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 						int requestInProcessing = requestRepository.getNumberOfRequestInProcessing(oldManagerId);
 						if (requestInProcessing > 0) { // employee has requests which are in processing
 							Employee em = employeeRepository.findById(oldManagerId);
-							throw new Exception (em.getName() + " có request đang chờ được xử lý. <br/>"
+							throw new Exception (em.getName() + " có request đang chờ được xử lý.<br/>"
 								+ "Vui lòng xử lý tất cả request trước khi xóa");
 						}
 						List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
@@ -80,7 +80,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 						if(requests != null && requests.size() > 0) {
 							Employee manager = employeeRepository.findById(department.getManagerId());
 							throw new Exception(manager.getName()
-								+ " có request đang chờ anh ấy/cô ấy xử lý. Vui lòng để anh ấy/cô ấy xử lý trước khi thay đổi manager mới");
+								+ " có request đang chờ anh ấy/cô ấy xử lý.<br/>Vui lòng để anh ấy/cô ấy xử lý trước khi thay đổi manager mới");
 						}
 						
 						department.setManagerId(newManagerId);

@@ -66,7 +66,7 @@ public class TeamServiceImpl implements TeamService {
 			}
 			if(!team.getUpdateDate().equals(teamRegistRequest.getUpdateDate())) {
 				throw new Exception("Team với id " + teamRegistRequest.getId() + " đã được chỉnh sửa vào lúc "
-						+ team.getUpdateDate() + ". Vui lòng tải lại trang để cập nhật thông tin mới nhất");
+						+ team.getUpdateDate() + ".<br/>Vui lòng tải lại trang để cập nhật thông tin mới nhất");
 			}
 			
 			if (StringUtil.isNotEmpty(teamRegistRequest.getName())) {
@@ -193,13 +193,13 @@ public class TeamServiceImpl implements TeamService {
 			if (employee != null ) {
 				int requestInProcessing = requestRepository.getNumberOfRequestInProcessing(te.getEmployeeId());
 				if (requestInProcessing > 0) {
-					throw new Exception (employee.getName() + "có request đang chờ xử lý.<br/>Vui lòng để " + employee.getName()
+					throw new Exception (employee.getName() + " có request đang chờ xử lý.<br/>Vui lòng để " + employee.getName()
 							+ " xử lý những request này trước khi xóa");
 				}
 				if (te.getLeaderFlag() == 1) { // employee is a leader
 					int numOfRequest = requestRepository.getNumberOfRequestReceivedInProcessing(te.getEmployeeId());
 					if (numOfRequest > 0) {
-						throw new Exception(employee.getName() + "có request đang chờ xử lý.<br/>Vui lòng để " + employee.getName()
+						throw new Exception(employee.getName() + " có request đang chờ xử lý.<br/>Vui lòng để " + employee.getName()
 								+ " xử lý những request này trước khi đổi sang leader mới");
 					}
 				}
