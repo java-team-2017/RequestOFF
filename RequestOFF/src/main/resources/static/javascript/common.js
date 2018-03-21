@@ -7,6 +7,17 @@ $(function() {
 		}
 	});
 	
+	$('fieldset div.filter-collapse').on('show.bs.collapse', function () {
+		$(this).parent().find('i.filter-toggle-icon').removeClass("glyphicon-triangle-right");
+		$(this).parent().find('i.filter-toggle-icon').addClass("glyphicon-triangle-bottom");
+	});
+	
+	$('fieldset div.filter-collapse').on('hidden.bs.collapse', function () {
+		$(this).parent().find('i.filter-toggle-icon').removeClass("glyphicon-triangle-bottom");
+		$(this).parent().find('i.filter-toggle-icon').addClass("glyphicon-triangle-right");
+	});
+	
+	
 	var pathname = $(location).attr('pathname');
 	$('#navbarOfMe').find('li').each(function(i, li) {
 		var selectedHref = $(this).find("a").attr('href');
