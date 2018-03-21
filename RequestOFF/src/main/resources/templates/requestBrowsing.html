@@ -257,6 +257,8 @@
 					dataSrc: function (data) {
 						if(data.requests.length > 0){
 							$('#numberOfRequest').html(data.requests.length);
+						} else {
+							$('#numberOfRequest').hide();
 						}
 						if (data.status_info.status != 0) {
 							$('#alertMessage').html(errors['APIResponseError'](data.status_info.error)).attr('class', 'alert alert-danger').show();
