@@ -134,7 +134,7 @@ public class TeamServiceImpl implements TeamService {
 				if (requestInProcessing > 0) { // employee has requests which are in processing
 					Employee em = employeeRepository.findById(te.getEmployeeId());
 					throw new Exception (em.getName() + " có request đang chờ xử lý.<br/>Vui lòng để " + em.getName()
-							+ " xử lý những request này trước khi thay đổi");
+							+ " xử lý những request này trước khi dời khỏi team");
 				}
 				TERepository.delete(te);
 			}
