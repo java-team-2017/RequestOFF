@@ -18,37 +18,19 @@
 					"manager" : "2"
 				};
 				
-				renderPositionSelect("positionId", function(positions) {
-					listPosition = positions;
-				});
-				renderPositionSelect("positionModalDetailsId", function(positions) {
-					listPosition = positions;
-				});
-				renderPositionSelect("positionModalAddId", function(positions) {
+				renderPositionSelect(["positionId", "positionModalDetailsId", "positionModalAddId"], function(positions) {
 					listPosition = positions;
 				});
 				
-				renderTeamSelect("teamId", function(teams) {
+				renderTeamSelect(["teamId", "teamModalDetailsId"], function(teams) {
 					listTeam = teams;
 				});
-				renderTeamSelect("teamModalDetailsId", function(teams) {
-					listTeam = teams;
-				});
-// 				renderTeamSelect("teamModalAddId", function(teams) {
-// 					listTeam = teams;
-// 				});
 
-				renderDepartmentSelect("departmentId", function(departments) {
-					listDepartment = departments;
-				});
-				renderDepartmentSelect("departmentModalDetailsId", function(departments) {
+				renderDepartmentSelect(["departmentId", "departmentModalDetailsId"], function(departments) {
 					listDepartment = departments;
 				});
 				
-				renderRoleSelect("roleModalAddId", function(roles) {
-					listRole = roles;
-				});
-				renderRoleSelect("roleModalDetailsId", function(roles) {
+				renderRoleSelect(["roleModalAddId", "roleModalDetailsId"], function(roles) {
 					listRole = roles;
 				});
 				

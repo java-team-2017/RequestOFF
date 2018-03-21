@@ -19,7 +19,7 @@ $(function() {
 
 var errors = {
 	'DateError': 'Thời gian trong ô \'đến\' phải sau thời gian trong ô \'từ\'',
-	'incompleteFields': 'Vui lòng điền vào tất cả các trường bắt buộc',
+	'incompleteFields': 'Vui lòng điền vào tất cả các ô bắt buộc',
 	'offHoursEqual0': 'Thời gian nghỉ phải lớn hơn 0 giờ',
 	'exceedTime': 'Thời gian nghỉ vượt quá thời gian nghỉ phép còn lại',
 	'stringExceedLimit': 'Độ dài chuỗi vượt quá độ dài cho phép',
@@ -78,7 +78,7 @@ function renderRecipientSelect(listRecipient, selectBoxId) {
 	$("#" + selectBoxId).append(option);
 }
 
-function renderPositionSelect(selectBoxId, dataHandler) {
+function renderPositionSelect(selectBoxIds, dataHandler) {
 	$.ajax({
 		url: webRootPath + "position/search",
 		type: "post",
@@ -91,13 +91,19 @@ function renderPositionSelect(selectBoxId, dataHandler) {
 			if (positionSearchResponse.status_info.status == 0) {
 				listPosition = positionSearchResponse.listPosition;
 				$.each(listPosition, function(index, position) {
-					$('#' + selectBoxId).append('<option value="' + position.id + '">' + position.name + '</option>');
+					if (selectBoxIds instanceof Array){
+						$.each(selectBoxIds, function(i, item){
+							$('#' + item).append('<option value="' + position.id + '">' + position.name + '</option>');
+						});
+					} else {
+						$('#' + selectBoxIds).append('<option value="' + position.id + '">' + position.name + '</option>');
+					}
 				});
 				if (typeof(dataHandler) == 'function') {
 					dataHandler(listPosition);
 				}
 			} else {
-				$.notify(notification['APIResponseError'](positionSearchResponse.status_info.error));
+				console.log(positionSearchResponse.status_info.error);
 			}
 		},
 		error: function(e) {
@@ -106,7 +112,7 @@ function renderPositionSelect(selectBoxId, dataHandler) {
 	});
 }
 
-function renderDepartmentSelect(selectBoxId, dataHandler) {
+function renderDepartmentSelect(selectBoxIds, dataHandler) {
 	$.ajax({
 		url: webRootPath + "department/search",
 		type: "post",
@@ -118,15 +124,21 @@ function renderDepartmentSelect(selectBoxId, dataHandler) {
 		success: function (departmentSearchResponse){
 			if (departmentSearchResponse.status_info.status == 0) {
 				listDepartment = departmentSearchResponse.listDepartment;
-				$('#' + selectBoxId).empty().append('<option value=""></option>');
+				$('#' + selectBoxIds).empty().append('<option value=""></option>');
 				$.each(listDepartment, function(index, department) {
-					$('#' + selectBoxId).append('<option value="' + department.id + '">' + department.name + '</option>');
+					if (selectBoxIds instanceof Array){
+						$.each(selectBoxIds, function(i, item){
+							$('#' + item).append('<option value="' + department.id + '">' + department.name + '</option>');
+						});
+					} else {
+						$('#' + selectBoxIds).append('<option value="' + department.id + '">' + department.name + '</option>');
+					}
 				});
 				if (typeof(dataHandler) == 'function') {
 					dataHandler(listDepartment);
 				}
 			} else {
-				$.notify(notification['APIResponseError'](departmentSearchResponse.status_info.error));
+				console.log(departmentSearchResponse.status_info.error);
 			}
 		},
 		error: function(e) {
@@ -135,7 +147,7 @@ function renderDepartmentSelect(selectBoxId, dataHandler) {
 	});
 }
 
-function renderTeamSelect(selectBoxId, dataHandler) {
+function renderTeamSelect(selectBoxIds, dataHandler) {
 	$.ajax({
 		url: webRootPath + "team/search",
 		type: "post",
@@ -147,13 +159,19 @@ function renderTeamSelect(selectBoxId, dataHandler) {
 		success: function (teamSearchResponse){
 			if (teamSearchResponse.status_info.status == 0) {
 				listTeam = teamSearchResponse.teams;
-				$('#' + selectBoxId).empty().append('<option value=""></option>');
+				$('#' + selectBoxIds).empty().append('<option value=""></option>');
 				$.each(listTeam, function(index, team) {
-					$('#' + selectBoxId).append('<option value="' + team.id + '">' + team.name + '</option>');
+					if (selectBoxIds instanceof Array){
+						$.each(selectBoxIds, function(i, item){
+							$('#' + item).append('<option value="' + team.id + '">' + team.name + '</option>');
+						});
+					} else {
+						$('#' + selectBoxIds).append('<option value="' + team.id + '">' + team.name + '</option>');
+					}
 				});
 				dataHandler(listTeam);
 			} else {
-				console.log(notification['APIResponseError'](teamSearchResponse.status_info.error))
+				console.log(teamSearchResponse.status_info.error);
 			}
 		},
 		error: function() {
@@ -162,7 +180,7 @@ function renderTeamSelect(selectBoxId, dataHandler) {
 	});
 }
 
-function renderRoleSelect(selectBoxId, dataHandler) {
+function renderRoleSelect(selectBoxIds, dataHandler) {
 	$.ajax({
 		url: webRootPath + "role/search",
 		type: "post",
@@ -175,11 +193,17 @@ function renderRoleSelect(selectBoxId, dataHandler) {
 			if (roleSearchResponse.status_info.status == 0) {
 				listRole = roleSearchResponse.listRole;
 				$.each(listRole, function(index, role) {
-					$('#' + selectBoxId).append('<option value="' + role.id + '">' + role.role + '</option>');
+					if (selectBoxIds instanceof Array){
+						$.each(selectBoxIds, function(i, item){
+							$('#' + item).append('<option value="' + role.id + '">' + role.role + '</option>');
+						});
+					} else {
+						$('#' + selectBoxIds).append('<option value="' + role.id + '">' + role.role + '</option>');
+					}
 				});
 				dataHandler(listRole);
 			} else {
-				console.log(notification['APIResponseError'](roleSearchResponse.status_info.error))
+				console.log(roleSearchResponse.status_info.error);
 			}
 		},
 		error: function() {
