@@ -8,6 +8,7 @@
 
 <script th:inline="javascript">
 	/*<![CDATA[*/
+	var btnEditIsClicked;
 	$(function() {
 		var rowDataRequest;
 		
@@ -68,56 +69,29 @@
 			});
 		});
 		
-		$('body').on('click', '#btnCreate, .glyphiconEdit', function () {
+		$('tbody').on('click', '.glyphiconEdit', function () {
+			btnEditIsClicked = $(this).hasClass("glyphiconEdit");
 			var table = $('#departmentTable').DataTable();
- 			rowDataRequest = table.row($(this).parent()).data();
- 			$('#editModal').modal('show');
- 			$('#editMsg').hide();
-			var isCreate;
-			if ($(this).attr("id") == 'btnCreate') {
-				isCreate = true;
-				$('#editDepartment').val("");
-				$('#editModalName').text("Add Department");
-				$('#btnSave').hide();
-			} else {
-				isCreate = false;
-				$('#editDepartment').val(rowDataRequest.name);
-				$('#editModalName').text("Edit Department");
-				$('#btnCreateModal').hide();
-				$('#btnSave').show();
-			}
-			
-			$.ajax({
-				type : "POST",
-				contentType : "application/json",
-				url : /*[[@{/department/departmentInfo}]]*/,
-				dataType : 'json',
-				data : JSON.stringify({}),
-				success : function(resultData) {
-					if (resultData.status_info.status == 0) {
-						$('#editManager').empty();
-						if (isCreate == false) {
-							$('#editManager').append('<option style="font-weight:bold;" value="' + rowDataRequest.manager.id + '" selected="true">' + rowDataRequest.manager.name + '</option>');
-						} else {
-							if (resultData.listManagerNotInDepartment.length > 0) {
-								$('#btnCreateModal').show();
-							} else {
-								$('#btnCreateModal').hide();
-								$('#editMsg').html("Không có department nào được tìm thấy").attr('class', 'alert alert-danger').show();
-							}
-						}
-						
-						$.each(resultData.listManagerNotInDepartment, function(index, manager) {
-							$('#editManager').append('<option value="' + manager.id + '">' + manager.name + '</option>');
-						});
-					} else {
-						$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
-					}
-				},
-				error : function(e) {
-					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-				}
-			});
+			rowDataRequest = table.row($(this).parent()).data();
+			$('#editModal').modal('show');
+			$('#editMsg').hide();
+			$('#editDepartment').val(rowDataRequest.name);
+			$('#editModalName').text("Sửa Department");
+			$('#btnCreateModal').hide();
+			$('#btnSave').show();
+			departmentInfo(rowDataRequest);
+		});
+		
+		$('#btnCreate').on('click', function(){
+			var table = $('#departmentTable').DataTable();
+			rowDataRequest = table.row($(this).parent()).data();
+			$('#editModal').modal('show');
+			$('#editMsg').hide();
+			$('#editDepartment').val("");
+			$('#editModalName').text("Thêm Department");
+			$('#btnCreateModal').show();
+			$('#btnSave').hide();
+			departmentInfo(rowDataRequest)
 		});
 		
 		$('#btnSave, #btnCreateModal').on('click', function(){
@@ -210,6 +184,40 @@
 		});
 		
 	});
+	
+	function departmentInfo(rowDataRequest){
+		$.ajax({
+			type : "POST",
+			contentType : "application/json",
+			url : /*[[@{/department/departmentInfo}]]*/,
+			dataType : 'json',
+			data : JSON.stringify({}),
+			success : function(resultData) {
+				if (resultData.status_info.status == 0) {
+					$('#editManager').empty();
+					if (btnEditIsClicked == true) {
+						$('#editManager').append('<option style="font-weight:bold;" value="' + rowDataRequest.manager.id + '" selected="true">' + rowDataRequest.manager.name + '</option>');
+						btnEditIsClicked = false;
+					} else {
+						if (resultData.listManagerNotInDepartment.length > 0) {
+							$('#btnCreateModal').show();
+						} else {
+							$('#btnCreateModal').hide();
+							$('#editMsg').html("Không có manager nào được tìm thấy").attr('class', 'alert alert-danger').show();
+						}
+					}
+					$.each(resultData.listManagerNotInDepartment, function(index, manager) {
+						$('#editManager').append('<option value="' + manager.id + '">' + manager.name + '</option>');
+					});
+				} else {
+					$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
+				}
+			},
+			error : function(e) {
+				$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+			}
+		});
+	}
 	
 	function search(){
 		var requestData = $('#departmentForm').serializeJSON();
