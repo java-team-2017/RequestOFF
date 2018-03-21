@@ -27,8 +27,6 @@ public class SlackRequestController<ProcessSlackMsgResponse> {
 			String token = "xoxp-19649473766-19665717429-193929444448-26860ce71a6202e1e1aa0ad9f658691f";
 			String channel = "C0KJXFU5S";
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-//			Date oldest = sdf.parse("2017/07/10 10:45:01");
-//			Date latest = sdf.parse("2017/07/10 11:50:00");
 			Date oldest = sdf.parse("2017/01/01 00:00:01");
 			Date latest = sdf.parse("2017/12/01 00:00:00");
 			slackRequestService.importSlackRequest(token, channel, latest, oldest);

@@ -89,9 +89,9 @@ public class DepartmentController {
 		try {
 			boolean isSuccess = departmentService.departmentDelete(Long.parseLong(departmentDeleteRequest.getDepartmentId()));
 			if (isSuccess) {
-				statusInfo = new StatusInfo(StatusInfo.SUCCESS, "Delete successfully");
+				statusInfo = new StatusInfo(StatusInfo.SUCCESS, "Xóa thành công");
 			} else {
-				throw new Exception("Can not delete department");
+				throw new Exception("Không thể xóa department");
 			}
 		} catch (Exception e) {
 			statusInfo = new StatusInfo(StatusInfo.ERROR, e.getMessage());

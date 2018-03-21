@@ -63,7 +63,7 @@ public class EmployeeController {
 			if (isDeleted == true) {
 				response.setStatusInfo(new StatusInfo(StatusInfo.SUCCESS, null));
 			} else {
-				throw new Exception("Cannot delete Employee");
+				throw new Exception("Không thể xóa nhân viên");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -121,7 +121,7 @@ public class EmployeeController {
 			String email = AuthenticationUtil.getCurrentUserEmail();
 			Employee user = employeeService.findByEmail(email);
 			if (user == null) {
-				throw new Exception("Anonymous user");
+				throw new Exception("Không tìm thấy người dùng với email " + email);
 			}
 			
 			user.setTeamName(employeeService.getTeamName(user.getId()));

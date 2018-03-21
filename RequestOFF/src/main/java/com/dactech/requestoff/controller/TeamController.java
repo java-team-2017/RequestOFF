@@ -89,7 +89,7 @@ public class TeamController {
 			if (isSuccess) {
 				statusInfo = new StatusInfo(StatusInfo.SUCCESS, null);
 			} else {
-				statusInfo = new StatusInfo(StatusInfo.ERROR, "Cannot delete Team");
+				statusInfo = new StatusInfo(StatusInfo.ERROR, "Không thể xóa team");
 			}
 		} catch (Exception e) {
 			statusInfo = new StatusInfo(StatusInfo.ERROR, e.getMessage());
