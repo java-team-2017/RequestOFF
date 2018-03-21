@@ -72,24 +72,24 @@
 			var table = $('#departmentTable').DataTable();
 			rowDataRequest = table.row($(this).parent()).data();
 			$('#editModal').modal('show');
-			$('#editMsg').hide();
 			$('#editDepartment').val(rowDataRequest.name);
-			$('#editModalName').text("Sửa Department");
-			$('#btnCreateModal').hide();
-			$('#btnSave').show();
 			departmentInfo(rowDataRequest);
+// 			$('#editMsg').hide();
+// 			$('#editModalName').text("Sửa Department");
+// 			$('#btnCreateModal').hide();
+// 			$('#btnSave').show();
 		});
 		
 		$('#btnCreate').on('click', function(){
 			var table = $('#departmentTable').DataTable();
 			rowDataRequest = table.row($(this).parent()).data();
-			$('#editModal').modal('show');
-			$('#editMsg').hide();
+			$('#createModal').modal('show');
 			$('#editDepartment').val("");
-			$('#editModalName').text("Thêm Department");
-			$('#btnCreateModal').show();
-			$('#btnSave').hide();
 			departmentInfo(rowDataRequest)
+// 			$('#editMsg').hide();
+// 			$('#editModalName').text("Thêm Department");
+// 			$('#btnCreateModal').show();
+// 			$('#btnSave').hide();
 		});
 		
 		$('#btnSave, #btnCreateModal').on('click', function(){
@@ -192,12 +192,14 @@
 			data : JSON.stringify({}),
 			success : function(resultData) {
 				if (resultData.status_info.status == 0) {
+					$('#editManager').empty();
+					$('#editManager').append('<option style="font-weight:bold;" value="' + rowDataRequest.manager.id + '" selected="true">' + rowDataRequest.manager.name + '</option>');
 					if (resultData.listManagerNotInDepartment.length <= 0) {
-						$('#btnCreateModal').hide();
-						$('#btnSave').hide();
+// 						$('#btnCreateModal').hide();
+// 						$('#btnSave').hide();
 						$('#editMsg').html("Không có manager nào được tìm thấy").attr('class', 'alert alert-danger').show();
 					}
-					$('#editManager').empty();
+// 					$('#editManager').empty();
 					$.each(resultData.listManagerNotInDepartment, function(index, manager) {
 						$('#editManager').append('<option value="' + manager.id + '">' + manager.name + '</option>');
 					});
@@ -357,7 +359,7 @@
 					<div class="modal-content">
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-							<h3 id="editModalName" class="modal-title"></h3>
+							<h3 id="editModalName" class="modal-title">Sửa Department</h3>
 						</div>
 						
 						<div class="modal-body">
@@ -374,8 +376,38 @@
 								</div>&nbsp;
 								
 								<p align="center">
-									<button type="button" class="btn btn-default" id="btnCreateModal" style="width:76px;">Thêm</button>&nbsp;
 									<button type="button" class="btn btn-default" id="btnSave" style="width:76px;">Lưu</button>&nbsp;
+									<button type="button" class="btn btn-default" style="width:76px;" data-dismiss="modal">Hủy</button>
+								</p>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="modal fade" id="createModal" role="dialog">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h3 id="createModalName" class="modal-title">Thêm Department</h3>
+						</div>
+						
+						<div class="modal-body">
+							<div id="editMsgOfCreateModal" class="alert" style="display:none;"></div>
+							<form class="form-horizontal" id="formModal">
+								<label class="col-md-3 control-label">Department:</label>
+								<div class="col-md-9">
+									<input id="createDepartment" class="form-control"></input>
+								</div>
+			
+								<label class="col-md-3 control-label">Người quản lý:</label>
+								<div class="col-md-9">
+									<select style="font-weight:bold" id="createManager" class="form-control"></select>
+								</div>&nbsp;
+								
+								<p align="center">
+									<button type="button" class="btn btn-default" id="btnCreateModal" style="width:76px;">Thêm</button>&nbsp;
 									<button type="button" class="btn btn-default" style="width:76px;" data-dismiss="modal">Hủy</button>
 								</p>
 							</form>

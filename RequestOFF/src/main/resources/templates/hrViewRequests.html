@@ -150,6 +150,7 @@
 					dataSrc: function (data) {
 						if (data.status_info.status != 0) {
 							$('#alertMessage').html(errors['APIResponseError'](data.status_info.error)).attr('class', 'alert alert-danger').show();
+							$('#employee, #department, #team, #status, #from, #to, #btnSearch, #btnReset').prop('disabled', true);
 							return [];
 						}
 						return data.request;
@@ -260,7 +261,7 @@
 							
 					<p>
 						<button id="btnSearch" type="button" class="btn btn-primary" value="Search" style="width:82px;">Tìm kiếm</button>&nbsp;&nbsp;
-						<button type="reset" class="btn btn-primary" style="width:80px;">Làm mới</button>
+						<button id="btnReset" type="reset" class="btn btn-primary" style="width:80px;">Làm mới</button>
 					</p>
 				</form>
 			</div>
