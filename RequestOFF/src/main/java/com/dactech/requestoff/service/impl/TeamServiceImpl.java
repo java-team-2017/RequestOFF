@@ -62,11 +62,11 @@ public class TeamServiceImpl implements TeamService {
 			long teamId = Long.parseLong(teamRegistRequest.getId());
 			team = teamRepository.findById(teamId);
 			if (team == null) {
-				throw new Exception("cannot find the team with id : " + teamId);
+				throw new Exception("Không tìm thấy team với id " + teamId);
 			}
 			if(!team.getUpdateDate().equals(teamRegistRequest.getUpdateDate())) {
-				throw new Exception("Someone updated Team with id " + teamRegistRequest.getId() + " at "
-						+ team.getUpdateDate());
+				throw new Exception("Team với id " + teamRegistRequest.getId() + " đã được chỉnh sửa vào lúc "
+						+ team.getUpdateDate() + ". Vui lòng tải lại trang để cập nhật thông tin mới nhất");
 			}
 			
 			if (StringUtil.isNotEmpty(teamRegistRequest.getName())) {
@@ -83,15 +83,9 @@ public class TeamServiceImpl implements TeamService {
 					if (numOfRequest > 0) {
 						Employee leader = employeeRepository.findById(oldLeaderId);
 						throw new Exception(leader.getName()
-							+ " has requests waiting for him to process. <br/>Please let him process them before changing to new leader");
+							+ " có request đang chờ xử lý. <br/>Vui lòng để " + leader.getName() + " xử lý những request này trước khi đổi sang leader mới");
 					}
 					
-//					int requestInProcessing = requestRepository.getNumberOfRequestInProcessing(oldLeaderId);
-//					if (requestInProcessing > 0) { // employee has requests which are in processing
-//						Employee em = employeeRepository.findById(oldLeaderId);
-//						throw new Exception (em.getName() + " has requests which are in processing. <br/>"
-//								+ "Please delete or process all those requests before remove");
-//					}
 					team.setLeaderId(newLeaderId);
 				}
 			}
@@ -139,8 +133,8 @@ public class TeamServiceImpl implements TeamService {
 				int requestInProcessing = requestRepository.getNumberOfRequestInProcessing(te.getEmployeeId());
 				if (requestInProcessing > 0) { // employee has requests which are in processing
 					Employee em = employeeRepository.findById(te.getEmployeeId());
-					throw new Exception (em.getName() + " has requests which are in processing. <br/>"
-							+ "Please delete or process all those requests before remove");
+					throw new Exception (em.getName() + " có request đang chờ xử lý.<br/>Vui lòng để " + em.getName()
+							+ " xử lý những request này trước khi thay đổi");
 				}
 				TERepository.delete(te);
 			}
@@ -199,14 +193,14 @@ public class TeamServiceImpl implements TeamService {
 			if (employee != null ) {
 				int requestInProcessing = requestRepository.getNumberOfRequestInProcessing(te.getEmployeeId());
 				if (requestInProcessing > 0) {
-					throw new Exception (employee.getName() + " has requests which are in waiting to process. <br/>"
-							+ "Please process all those requests before deleting");
+					throw new Exception (employee.getName() + "có request đang chờ xử lý.<br/>Vui lòng để " + employee.getName()
+							+ " xử lý những request này trước khi xóa");
 				}
 				if (te.getLeaderFlag() == 1) { // employee is a leader
 					int numOfRequest = requestRepository.getNumberOfRequestReceivedInProcessing(te.getEmployeeId());
 					if (numOfRequest > 0) {
-						throw new Exception(employee.getName() + " has requests waiting for him/her to process. <br/>"
-								+ "Please let him/her process them before changing to new leader");
+						throw new Exception(employee.getName() + "có request đang chờ xử lý.<br/>Vui lòng để " + employee.getName()
+								+ " xử lý những request này trước khi đổi sang leader mới");
 					}
 				}
 			}

@@ -71,10 +71,11 @@ public class RequestServiceImpl implements RequestService{
 			long id = Long.parseLong(requestRegistRequest.getId());
 			request = requestRepository.findById(id);
 			if(request == null) {
-				throw new Exception("Can not find request with id = " + id);
+				throw new Exception("Không tìm thấy request với id " + id);
 			}
 			else if(requestRegistRequest.getUpdateDate().equals(request.getUpdateDate()) == false) {
-				throw new Exception("Someone updated request with id " + requestRegistRequest.getId() + " at " + request.getUpdateDate());
+				throw new Exception("Request với id " + requestRegistRequest.getId() + " đã được chỉnh sửa vào lúc " + request.getUpdateDate()
+									+ ". Vui lòng tải lại trang để cập nhật thông tin mới nhất");
 			}
 			else {
 				Employee employee = employeeRepository.findById(request.getEmployee().getId());

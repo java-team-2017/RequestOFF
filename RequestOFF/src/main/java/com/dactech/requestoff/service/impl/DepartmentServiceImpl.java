@@ -53,7 +53,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 				throw new Exception("Không thể tìm department với id = " + departmentRegistRequest.getId());
 			}
 			else if(departmentRegistRequest.getUpdateDate().equals(department.getUpdateDate()) == false) {
-				throw new Exception("Someone updated department with id " + departmentRegistRequest.getId() + " at " + department.getUpdateDate());
+				throw new Exception("Department với id " + departmentRegistRequest.getId() + " đã được chỉnh sửa vào lúc " + department.getUpdateDate()
+									+ ". Vui lòng tải lại trang để cập nhật thông tin mới nhất");
 			}
 			else {
 				if(StringUtil.isNotEmpty(departmentRegistRequest.getName())) {
@@ -131,7 +132,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 	public boolean departmentDelete(long departmentId) throws Exception {
 		Department department = departmentRepository.findById(departmentId);
 		if(department == null) {
-			throw new Exception("Không thể tìm department!");
+			throw new Exception("Không thể tìm thấy department với id " + departmentId);
 		}
 		List<Team> teams = teamRepository.findByDepartmentId(departmentId);
 		long managerId = department.getManagerId();

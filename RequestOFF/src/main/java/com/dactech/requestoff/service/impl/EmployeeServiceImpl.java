@@ -74,8 +74,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 	private EmployeeRoleRepository employeeRoleRepository;
 	@Autowired
 	private CompanyYearOffService companyYearOffService;
-	@Autowired
-	private DayOffTypeRepository dayOffTypeRepository;
 
 	@Override
 	public EmployeeRegistResponse employeeRegist(EmployeeRegistRequest erRequest) throws Exception {
@@ -97,11 +95,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 			employee.setOfficialWorkingDate(erRequest.getOfficialWorkingDate());
 			employee.setValidFlag(Integer.parseInt(erRequest.getValidFlag()));
 			
-//			Team team = teamRepository.findById(Long.parseLong(erRequest.getTeamId()));
-//			List<Team> listTeam = new ArrayList<Team>();
-//			listTeam.add(team);
-//			employee.setListTeam(listTeam);
-			
 			List<Role> listRole = new ArrayList<Role>();
 			if(erRequest.getRoleIds().size() > 0) {
 				for(String roleId : erRequest.getRoleIds()) {
@@ -120,11 +113,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 			Long employeeId = Long.parseLong(erRequest.getId());
 			employee = employeeRepository.findById(employeeId);
 			if (employee == null) {
-				throw new Exception("cannot find the Employee with id : " + employeeId);
+				throw new Exception("Không tìm thấy nhân viên với id " + employeeId);
 			}
 			if (!employee.getUpdateDate().equals(erRequest.getUpdateDate())) {
 				throw new Exception(
-						"Someone updated Employee with id " + erRequest.getId() + " at " + employee.getUpdateDate());
+						"Nhân viên với id " + erRequest.getId() + " đã được chỉnh sửa vào lúc " + employee.getUpdateDate()
+						+ ". Vui lòng tải lại trang để cập nhật thông tin mới nhất");
 			}
 
 			if (StringUtil.isNotEmpty(erRequest.getName())) {
@@ -143,10 +137,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 					if(isLeader(employee.getId())) {
 						Team team = teamRepository.findByLeaderId(employeeId);
 						if (team != null) {
-							throw new Exception(employee.getName() + " is currently the leader of " + team.getName() + ". Please remove " + employee.getName() 
-												+ " from " + team.getName() + " before changing position");
+							throw new Exception(employee.getName() + " hiện đang là leader của team " + team.getName() + ". Vui lòng xóa " + employee.getName() 
+												+ " khỏi " + team.getName() + " trước khi thay đổi vị trí");
 						} else if(requestRepository.getNumberOfRequestInProcessing(employee.getId()) > 0) {
-							throw new Exception(employee.getName() + " has requests in processing. Please let these requests processed before changing position");
+							throw new Exception(employee.getName() + " có request đang chờ xử lý. Vui lòng để " + employee.getName()
+												+ " xử lý những request này trước khi thay đổi vị trí");
 						}
 					} else {
 						if(requestRepository.getNumberOfRequestInProcessing(employee.getId()) == 0) {
@@ -160,22 +155,22 @@ public class EmployeeServiceImpl implements EmployeeService {
 								}
 							}
 						} else {
-							throw new Exception(employee.getName() + " has requests in processing. Please let these requests processed before changing position");
+							throw new Exception(employee.getName() + " có request đang chờ xử lý. Vui lòng để " + employee.getName()
+												+ " xử lý những request này trước khi thay đổi vị trí");
 						}
 					}
 				} else if((oldPosition.getCode() == Position.CODE_MANAGER 
 						&& position.getCode() != Position.CODE_MANAGER)) {
 					Department dept = departmentRepository.findByManagerId(employeeId);
 					if(dept != null) {
-						throw new Exception(employee.getName() + " is currently the manager of " + dept.getName() + ". Please remove " + employee.getName() 
-											+ " from " + dept.getName() + " before changing position");
+						throw new Exception(employee.getName() + " hiện đang là manager của department " + dept.getName() + ". Vui lòng xóa " + employee.getName() 
+											+ " khỏi " + dept.getName() + " trước khi thay đổi vị trí");
 					} else if(requestRepository.getNumberOfRequestInProcessing(employee.getId()) > 0) {
-						throw new Exception(employee.getName() + " has requests in processing. Please let these requests processed before changing position");
+						throw new Exception(employee.getName() + " có request đang chờ xử lý. Vui lòng để " + employee.getName()
+											+ " xử lý những request này trước khi thay đổi vị trí");
 					}
 				}
 				
-//				Position position = new Position();
-//				position.setId(Long.parseLong(erRequest.getPositionId()));
 				employee.setPosition(position);
 			} else {
 				position = employee.getPosition();
@@ -195,12 +190,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 			if (StringUtil.isNotEmpty(erRequest.getOfficialWorkingDate())) {
 				employee.setOfficialWorkingDate(erRequest.getOfficialWorkingDate());
 			}
-//			if (StringUtil.isNotEmpty(erRequest.getTeamId())) {
-//				Team team = teamRepository.findById(Long.parseLong(erRequest.getTeamId()));
-//				List<Team> listTeam = new ArrayList<Team>();
-//				listTeam.add(team);
-//				employee.setListTeam(listTeam);
-//			}
 			if (erRequest.getRoleIds().size() > 0) {
 				List<Role> listRole = new ArrayList<Role>();
 				for(String roleId : erRequest.getRoleIds()) {
@@ -221,24 +210,25 @@ public class EmployeeServiceImpl implements EmployeeService {
 					if (isLeader(employeeId)) {
 						Team team = teamRepository.findByLeaderId(employeeId);
 						if (team != null) {
-							throw new Exception(employee.getName() + " is currently the leader of team : " + team.getName() + ". Please remove "
-												+ employee.getName() + " from " + team.getName() + " before setting him/her to quit working status!");
+							throw new Exception(employee.getName() + " hiện đang là leader của team : " + team.getName() + ". Vui lòng xóa "
+												+ employee.getName() + " khỏi " + team.getName() + " trước khi thay đổi trạng thái làm việc");
 						}
 					} else if (position.getCode() == Position.CODE_EMPLOYEE) {
 						if (employee.getListTeam() != null && employee.getListTeam().size() > 0 && employee.getListTeam().get(0)!= null) {
-							throw new Exception(employee.getName() + " is currently a member of team : " + employee.getListTeam().get(0).getName()
-												+ ". Please remove " + employee.getName() + " from " + employee.getListTeam().get(0).getName() + " before setting him/her to quit working status!");
+							throw new Exception(employee.getName() + " hiện đang là thành viên của team : " + employee.getListTeam().get(0).getName()
+												+ ". Vui lòng xóa " + employee.getName() + " khỏi " + employee.getListTeam().get(0).getName() + " trước khi thay đổi trạng thái làm việc");
 						} else if(requestRepository.getNumberOfRequestInProcessing(employeeId) > 0) {
-							throw new Exception(employee.getName() + " has requests in processing. Please let these requests processed before before setting him/her to quit working status");
+							throw new Exception(employee.getName() + " có request đang chờ xử lý. Vui lòng để " + employee.getName()
+												+ " xử lý những request này trước khi thay đổi trạng thái làm việc");
 						}
 					} else if (position.getCode() == Position.CODE_MANAGER) {
 						Department dept = departmentRepository.findByManagerId(employeeId);
 						if (dept != null) {
-							throw new Exception(employee.getName() + " is currently the manager of department : " + dept.getName() + ". Please remove "
-												+ employee.getName() + " from " + dept.getName() + " before setting him/her to quit working status!");
+							throw new Exception(employee.getName() + " hiện đang là manager của department : " + dept.getName() + ". Vui lòng xóa "
+												+ employee.getName() + " khỏi " + dept.getName() + " trước khi thay đổi trạng thái làm việc");
 						}
 					} else {
-						throw new Exception("Unsolved ");
+						throw new Exception("Chưa xử lý");
 					}
 				}
 					
@@ -354,7 +344,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 					employee.setDepartmentName(dept.getName());
 					employee.setTeamName("");
 				} else {
-					employee.setDepartmentName("No Department");
+					employee.setDepartmentName("Không có department");
 					employee.setTeamName("");
 				}
 			}
@@ -499,7 +489,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 				}
 			}
 		} else {
-			throw new Exception("Can not find employee with id " + employeeId);
+			throw new Exception("Không tìm thấy nhân viên với id " + employeeId);
 		}
 		
 		return forwards;
@@ -540,7 +530,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			}
 		}
 		else {
-			throw new Exception("Can not find employee with id " + employeeId);
+			throw new Exception("Không tìm thấy nhân viên với id " + employeeId);
 		}
 		return listRecipients;
 	}
@@ -613,30 +603,31 @@ public class EmployeeServiceImpl implements EmployeeService {
 		Employee employee = employeeRepository.findById(employeeId);
 		
 		if (employee == null) {
-			throw new Exception("can not find employee with id " + employeeId);
+			throw new Exception("Không tìm thấy nhân viên với id " + employeeId);
 		}
 		
 		if (isLeader(employeeId)) {
 			Team team = teamRepository.findByLeaderId(employeeId);
 			if (team != null) {
-				throw new Exception(employee.getName() + " is currently the leader of team : " + team.getName() + ". Please remove "
-									+ employee.getName() + " from " + team.getName() + " first!");
+				throw new Exception(employee.getName() + " hiện đang là leader của team : " + team.getName() + ". Vui lòng xóa "
+									+ employee.getName() + " khỏi " + team.getName() + " trước khi xóa");
 			}
 		} else if (employee.getPosition().getCode() == Position.CODE_EMPLOYEE) {
 			if (employee.getListTeam() != null && employee.getListTeam().size() > 0 && employee.getListTeam().get(0)!= null) {
-				throw new Exception(employee.getName() + " is currently a member of team : " + employee.getListTeam().get(0).getName()
-									+ ". Please remove " + employee.getName() + " from " + employee.getListTeam().get(0).getName() + " first!");
+				throw new Exception(employee.getName() + " hiện đang là thành viên của team : " + employee.getListTeam().get(0).getName()
+									+ ". Vui lòng xóa " + employee.getName() + " khỏi " + employee.getListTeam().get(0).getName() + " trước khi xóa");
 			} else if(requestRepository.getNumberOfRequestInProcessing(employeeId) > 0) {
-				throw new Exception(employee.getName() + " has requests in processing. Please let these requests processed before delete");
+				throw new Exception(employee.getName() + " có request đang chờ xử lý. Vui lòng để " + employee.getName()
+									+ " xử lý những request này trước khi xóa");
 			}
 		} else if (employee.getPosition().getCode() == Position.CODE_MANAGER) {
 			Department dept = departmentRepository.findByManagerId(employeeId);
 			if (dept != null) {
-				throw new Exception(employee.getName() + " is currently the manager of department : " + dept.getName() + ". Please remove "
-									+ employee.getName() + " from " + dept.getName() + " first!");
+				throw new Exception(employee.getName() + " hiện đang là manager của department : " + dept.getName() + ". Vui lòng xóa "
+									+ employee.getName() + " khỏi " + dept.getName() + " trước khi xóa");
 			}
 		} else {
-			throw new Exception("Unsolved ");
+			throw new Exception("Chưa xử lý");
 		}
 		
 		EmployeeOffStatusSearchRequest eosRequest = new EmployeeOffStatusSearchRequest("", employeeId + "", "", "", "");
@@ -693,10 +684,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 				e.setPassword(bCryptPasswordEncoder.encode(employeeChangePasswordRequest.getNewPassword()));
 				employeeRepository.save(e);
 			} else {
-				throw new Exception("Old password is incorrect");
+				throw new Exception("Mật khẩu cũ không đúng");
 			}
 		} else {
-			throw new Exception("Can not find employee with id " + employeeId);
+			throw new Exception("Không tìm thấy nhân viên với id " + employeeId);
 		}
 		return false;
 	}

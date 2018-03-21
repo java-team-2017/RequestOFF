@@ -47,9 +47,9 @@ public class EmployeeOffStatusServiceImpl implements EmployeeOffStatusService {
 
 		} else { // update
 			if (!employeeOffStatus.getUpdateDate().equals(eOSRRequest.getUpdateDate())) {
-				throw new Exception("Someone updated EmployeeOffStatus with year id "
-						+ yearId + " and employee id "
-						+ employeeId + " at " + employeeOffStatus.getUpdateDate());
+				throw new Exception("Trạng thái nghỉ phép năm " + yearId + " của nhân viên với id " + employeeId
+						+ " đã được chỉnh sửa vào lúc " + employeeOffStatus.getUpdateDate()
+						+ ". Vui lòng tải lại trang để cập nhật thông tin mới nhất");
 			}
 
 			if (StringUtil.isNotEmpty(eOSRRequest.getRemainHours())) {

@@ -36,12 +36,12 @@ public class PositionServiceImpl implements PositionService {
 			long positionId = Long.parseLong(request.getId());
 			position = positionRepository.findById(positionId);
 			if (position == null) {
-				throw new Exception("cannot find the position with id : " + positionId);
+				throw new Exception("Không tìm thấy vị trí với id " + positionId);
 			}
 			
 			if (!position.getUpdateDate().equals(request.getUpdateDate())) {
-				throw new Exception("Someone updated position with id " + position.getId() + " at "
-						+ position.getUpdateDate());
+				throw new Exception("Vị trí với id " + position.getId() + " đã được chỉnh sửa vào lúc "
+						+ position.getUpdateDate() + ". Vui lòng tải lại trang để cập nhật thông tin mới nhất");
 			}
 			
 			if (StringUtil.isNotEmpty(request.getCode())) {

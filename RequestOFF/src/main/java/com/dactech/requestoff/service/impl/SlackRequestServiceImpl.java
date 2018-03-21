@@ -58,9 +58,9 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 		long lastestTime = 0, oldestTime = 0;
 
 		if (StringUtil.isEmpty(token)) {
-			throw new Exception("Token is empty");
+			throw new Exception("Token rỗng");
 		} else if (StringUtil.isEmpty(channel)) {
-			throw new Exception("Chanel is empty");
+			throw new Exception("Chanel rỗng");
 		}
 
 		url = url + "?token=" + token + "&channel=" + channel;
@@ -109,15 +109,15 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 	@Override
 	public Request convertSlackRequest(SlackRequest slackRequest) throws Exception {
 		if (slackRequest.getIsValidMsg() != 1) {
-			throw new Exception("The message is not a Request");
+			throw new Exception("Tin nhắn không phải là request");
 		}
 		Request request = new Request();
 		List<Employee> employees = employeeRepository.findByNameLike(StringUtil.standardizeName(slackRequest.getName()));
 		if (employees == null || employees.size() == 0) {
-			throw new Exception("Employee not found");
+			throw new Exception("Không tìm thấy nhân viên");
 		}
 		if (employees.size() > 1) {
-			StringBuilder errMsg = new StringBuilder("Found more than 1 employee with name : " + slackRequest.getName());
+			StringBuilder errMsg = new StringBuilder("Tìm thấy nhiều hơn 1 nhân viên với tên : " + slackRequest.getName());
 			throw new Exception(errMsg.toString());
 		}
 		Employee employee = employees.get(0);
@@ -167,12 +167,12 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 			long slackRequestId = Long.parseLong(request.getId());
 			slackRequest = slackRequestRepository.findById(slackRequestId);
 			if (slackRequest == null) {
-				throw new Exception("cannot find the slack request with id : " + slackRequestId);
+				throw new Exception("Không tìm thấy request từ Slack với id : " + slackRequestId);
 			}
 
 			if (!slackRequest.getUpdateDate().equals(request.getUpdateDate())) {
-				throw new Exception("Someone updated slack request with id " + slackRequest.getId() + " at "
-						+ slackRequest.getUpdateDate());
+				throw new Exception("Request từ Slack với id " + slackRequest.getId() + " đã được chỉnh sửa vào lúc "
+						+ slackRequest.getUpdateDate() + ". Vui lòng tải lại trang để cập nhật thông tin mới nhất");
 			}
 
 			if (StringUtil.isNotEmpty(request.getMsgUserId())) {
@@ -232,7 +232,7 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 								EmployeeOffStatus eos = employeeOffStatusRepository.findById(year, e.getId());
 								newRemainHours = eos.getRemainHours() - requestOff.getTotalTime();
 								if (newRemainHours < 0) {
-									throw new Exception("Time off (" + requestOff.getTotalTime() + ") Greater than remain hours (" + eos.getRemainHours() + ")");
+									throw new Exception("Thời gian nghỉ (" + requestOff.getTotalTime() + ") vượt quá thời gian nghỉ còn lại (" + eos.getRemainHours() + ")");
 								}
 								eos.setRemainHours(newRemainHours);
 								employeeOffStatusRepository.save(eos);
@@ -290,7 +290,7 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 						EmployeeOffStatus eos = employeeOffStatusRepository.findById(year, e.getId());
 						newRemainHours = eos.getRemainHours() - request.getTotalTime();
 						if (newRemainHours < 0) {
-							throw new Exception("Time off (" + request.getTotalTime() + ") Greater than remain hours (" + eos.getRemainHours() + ")");
+							throw new Exception("Thời gian nghỉ (" + request.getTotalTime() + ") vượt quá thời gian nghỉ phép còn lại (" + eos.getRemainHours() + ")");
 						}
 						eos.setRemainHours(newRemainHours);
 						employeeOffStatusRepository.save(eos);

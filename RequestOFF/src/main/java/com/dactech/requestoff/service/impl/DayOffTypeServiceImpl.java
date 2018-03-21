@@ -35,12 +35,12 @@ public class DayOffTypeServiceImpl implements DayOffTypeService {
 			long dayOffTypeId = Long.parseLong(request.getId());
 			dayOffType = dayOffTypeRepository.findById(dayOffTypeId);
 			if (dayOffType == null) {
-				throw new Exception("cannot find the dayOffType with id : " + dayOffTypeId);
+				throw new Exception("Không tìm thấy loại ngày nghỉ với id " + dayOffTypeId);
 			}
 
 			if (!dayOffType.getUpdateDate().equals(request.getUpdateDate())) {
-				throw new Exception("Someone updated dayOffType with id " + dayOffType.getId() + " at "
-						+ dayOffType.getUpdateDate());
+				throw new Exception("Loại ngày nghỉ với id " + dayOffType.getId() + " đã được chỉnh sửa vào lúc "
+						+ dayOffType.getUpdateDate() + ". Vui lòng tải lại trang để cập nhật thông tin mới nhất");
 			}
 
 			if (StringUtil.isNotEmpty(request.getNameDayOffType())) {
