@@ -15,6 +15,7 @@ public class SlackRequest {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
+	private long executeID;
 	private String msgUserId;
 	private String name;
 	private String msgContent;
@@ -32,16 +33,12 @@ public class SlackRequest {
 	private String updateDate;
 	private long updateOperator;
 
-	public SlackRequest() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-	public SlackRequest(long id, String msgUserId, String name, String msgContent, long msgTime, String dayOffFrom,
-			String dayOffTo, double totalHours, String reason, int processFlag, int isValidMsg, String errMsg,
-			int validFlag, String insertDate, long insertOperator, String updateDate, long updateOperator) {
-		super();
+	public SlackRequest(long id, long executeID, String msgUserId, String name, String msgContent, long msgTime,
+			String dayOffFrom, String dayOffTo, double totalHours, String reason, int processFlag, int isValidMsg,
+			String errMsg, int validFlag, String insertDate, long insertOperator, String updateDate,
+			long updateOperator) {
 		this.id = id;
+		this.executeID = executeID;
 		this.msgUserId = msgUserId;
 		this.name = name;
 		this.msgContent = msgContent;
@@ -60,12 +57,23 @@ public class SlackRequest {
 		this.updateOperator = updateOperator;
 	}
 
+	public SlackRequest() {
+	}
+
 	public long getId() {
 		return id;
 	}
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public long getExecuteID() {
+		return executeID;
+	}
+
+	public void setExecuteID(long executeID) {
+		this.executeID = executeID;
 	}
 
 	public String getMsgUserId() {
