@@ -14,6 +14,7 @@ import com.dactech.requestoff.model.entity.DayOffType;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.EmployeeOffStatus;
 import com.dactech.requestoff.model.entity.Request;
+import com.dactech.requestoff.model.entity.SlackExecuteImport;
 import com.dactech.requestoff.model.entity.SlackRequest;
 import com.dactech.requestoff.model.request.SlackRequestRegistRequest;
 import com.dactech.requestoff.model.request.SlackRequestSearchRequest;
@@ -25,6 +26,7 @@ import com.dactech.requestoff.repository.DayOffTypeRepository;
 import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
 import com.dactech.requestoff.repository.RequestRepository;
+import com.dactech.requestoff.repository.SlackExecuteImportRepository;
 import com.dactech.requestoff.repository.SlackRequestRepository;
 import com.dactech.requestoff.service.SlackRequestService;
 import com.dactech.requestoff.util.SlackUtil;
@@ -32,6 +34,8 @@ import com.dactech.requestoff.util.StringUtil;
 
 @Service
 public class SlackRequestServiceImpl implements SlackRequestService {
+	@Autowired
+	SlackExecuteImportRepository slackExecuteImportRepository; 
 	@Autowired
 	SlackRequestRepository slackRequestRepository;
 	@Autowired
@@ -262,8 +266,15 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 	@Override
 	public long importSlackRequest(String token, String channel, Date latest, Date oldest) throws Exception {
 		List<SlackRequest> slackRequests = getSlackRequest(token, channel, latest, oldest);
-		//test
-		int i = 0;
+		if (slackRequests == null || slackRequests.size() == 0) {
+			return 0;
+		}
+
+		SlackExecuteImport slackExecuteImport = new SlackExecuteImport();
+		slackExecuteImport.setTimeStart(oldest);
+		slackExecuteImport.setTimeEnd(latest);
+		slackExecuteImportRepository.save(slackExecuteImport);
+		
 		for (SlackRequest slackRequest : slackRequests) {
 			try {
 				if (slackRequest.getIsValidMsg() == SlackRequest.VALID_REQUEST_MSG) {
@@ -297,7 +308,8 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 				slackRequest.setErrMsg(e.getMessage());
 				slackRequest.setIsValidMsg(SlackRequest.INVALID_REQUEST_MSG);
 			}
-			System.out.println(++i);
+			slackRequest.setExecuteId(slackExecuteImport.getExecuteId());
+
 			slackRequestRepository.save(slackRequest);
 		}
 		return slackRequests.size();
