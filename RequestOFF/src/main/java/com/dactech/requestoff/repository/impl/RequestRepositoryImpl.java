@@ -125,16 +125,10 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		}
 		
 		if (StringUtil.isNotEmpty(requests.getStatus())) {
-			if (requests.getStatus().equals("5")) {
-				queryString.append(" AND status = '5' AND recipient_id = '" + requests.getUserId() + "'");
-			} else {
 				queryString.append(" AND status = '" + requests.getStatus() + "'");
-			}
 		} else {
-			queryString.append(" AND NOT (status = '5' AND recipient_id <> '" + requests.getUserId() + "')");
+			queryString.append(" AND status <> 1 AND status <> 4"); // eliminate saved and responded request
 		}
-		
-		queryString.append(" AND status <> 1 AND status <> 4"); // eliminate saved and responded request
 		
 		if (StringUtil.isNotEmpty(requests.getName())) {
 			queryString.append(" AND employee.name like '%" + requests.getName() + "%'");
