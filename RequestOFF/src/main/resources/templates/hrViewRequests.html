@@ -9,18 +9,21 @@
 <script th:inline="javascript">
 	/*<![CDATA[*/
 		var userData;
-		var requestObjArr = [];
 		$(function() {
-			var dataReturnRequest;
+			
+			$("#from").val("01/01/" + new Date().getFullYear());
 			
 			getLoggedUser(function(returnData){
 				userData = returnData;
 				if(returnData.user.position.code == 2 || returnData.leaderFlag == 1){
 					renderNumberOfRequest(returnData.user.id);
-				} else if(!(returnData.user.listRole[0].role == "ROLE_HR")) {
+				}
+				if(!(returnData.user.listRole[0].role == "ROLE_HR")) {
 					$('#alertMessage').html("Người đăng nhập " + returnData.user.name + " không phải là HR ").attr('class', 'alert alert-danger').show();
 					$('#employee, #department, #team, #status, #from, #to, #btnSearch, #btnReset').prop('disabled', true);
 				}
+				
+				search();
 			});
 			
 			renderDepartmentSelect("department", function(departments) {
@@ -49,8 +52,6 @@
 				}
 			})
 			
-			$("#from").val("01/01/" + new Date().getFullYear());
-			
 			$('.datepicker').on('changeDate', function(ev){
 				$(this).datepicker('hide');
 			});
@@ -68,7 +69,6 @@
 			$('#requestTable').on('click', 'td', function () {
 				var table = $('#requestTable').DataTable();
 				var rowData = table.row(this).data();
-				dataReturnRequest = rowData;
 				$('#nameDetails').val(rowData.employee.name);
 				$('#positionDetails').val(rowData.employee.position.name);
 				$('#teamDetails').val(rowData.employee.teamName);

@@ -263,8 +263,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		}
 		StringBuilder queryString = new StringBuilder("SELECT * FROM request INNER JOIN employee e ON request.employee_id = e.id INNER JOIN team_employee te ON te.employee_id = e.id INNER JOIN team t ON t.id = te.team_id INNER JOIN department d ON d.id = t.department_id WHERE ");
 		if(user.getListRole().get(0).getRole().equals(Role.ROLE_HR)) {
-			queryString.append(" (request.employee_id IN (select request.employee_id from team_employee te INNER JOIN team t ON t.id=te.team_id INNER JOIN department d ON d.id=t.department_id ) "
-					+ "OR request.employee_id IN (SELECT leader_id FROM team t INNER JOIN department d ON t.department_id=d.id )) AND status <> 1 ");
+			queryString.append(" status <> 1 AND e.id <> " + user.getId());
 		} 
 		else {
 			throw new Exception("Người đăng nhập " + user.getName() + " không phải là HR");
