@@ -11,12 +11,12 @@
 	var btnEditIsClicked;
 	$(function() {
 		var rowDataRequest;
-		var userId;
 		search();
 		
 		getLoggedUser(function(returnData){
-			userId = returnData.user.id;
-			renderNumberOfRequest(userId);
+			if(returnData.user.position.code == 2 || returnData.leaderFlag == 1){
+				renderNumberOfRequest(returnData.user.id);
+			}
 		});
 		
 		renderDepartmentSelect("department", function(departments) {

@@ -13,10 +13,11 @@
 	var row;
 	
 	$(function() {
-		var userId;
+		
 		getLoggedUser(function(returnData){
-			userId = returnData.user.id;
-			renderNumberOfRequest(userId);
+			if(returnData.user.position.code == 2 || returnData.leaderFlag == 1){
+				renderNumberOfRequest(returnData.user.id);
+			}
 		});
 		
 		$('#editHours').empty();

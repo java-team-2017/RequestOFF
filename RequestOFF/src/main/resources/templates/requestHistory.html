@@ -109,7 +109,9 @@
 					var requestSearchRequest = getRequestSearchRequest();
 					console.log(requestSearchRequest);
 					search(requestSearchRequest);
-					renderNumberOfRequest(employeeId);
+					if(returnData.user.position.code == 2 || returnData.leaderFlag == 1){
+						renderNumberOfRequest(returnData.user.id);
+					}
 				});
 				
 				$('.datepicker').on('changeDate', function(ev){

@@ -52,7 +52,10 @@
 						$("#btnSave, #btnSend").prop('disabled', true);
 					}
 					
-					renderNumberOfRequest(employeeId);
+					if(returnData.user.position.code == 2 || returnData.leaderFlag == 1){
+						employeeId = returnData.user.id;
+						renderNumberOfRequest(employeeId);
+					}
 				});
 				
 				$('.datepicker').on('changeDate', function(ev){

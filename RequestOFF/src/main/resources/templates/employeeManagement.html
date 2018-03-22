@@ -17,11 +17,13 @@
 					"employee" : "1",
 					"manager" : "2"
 				};
-				var userId;
+				
 				getLoggedUser(function(returnData){
-					userId = returnData.user.id;
-					renderNumberOfRequest(userId);
+					if(returnData.user.position.code == 2 || returnData.leaderFlag == 1){
+						renderNumberOfRequest(returnData.user.id);
+					}
 				});
+				
 				renderPositionSelect(["positionId", "positionModalDetailsId", "positionModalAddId"], function(positions) {
 					listPosition = positions;
 				});
