@@ -15,7 +15,7 @@ public class SlackRequest {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
-	private long executeID;
+	private long executeId;
 	private String msgUserId;
 	private String name;
 	private String msgContent;
@@ -33,12 +33,12 @@ public class SlackRequest {
 	private String updateDate;
 	private long updateOperator;
 
-	public SlackRequest(long id, long executeID, String msgUserId, String name, String msgContent, long msgTime,
+	public SlackRequest(long id, long executeId, String msgUserId, String name, String msgContent, long msgTime,
 			String dayOffFrom, String dayOffTo, double totalHours, String reason, int processFlag, int isValidMsg,
 			String errMsg, int validFlag, String insertDate, long insertOperator, String updateDate,
 			long updateOperator) {
 		this.id = id;
-		this.executeID = executeID;
+		this.executeId = executeId;
 		this.msgUserId = msgUserId;
 		this.name = name;
 		this.msgContent = msgContent;
@@ -68,12 +68,12 @@ public class SlackRequest {
 		this.id = id;
 	}
 
-	public long getExecuteID() {
-		return executeID;
+	public long getExecuteId() {
+		return executeId;
 	}
 
-	public void setExecuteID(long executeID) {
-		this.executeID = executeID;
+	public void setExecuteId(long executeId) {
+		this.executeId = executeId;
 	}
 
 	public String getMsgUserId() {
