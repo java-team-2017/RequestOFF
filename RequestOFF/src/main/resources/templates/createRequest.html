@@ -14,13 +14,6 @@
 			var remainHours;
 			
 			$(function() {
-// 				var getStatus = {
-// 					'1': 'đã lưu',
-// 					'2': 'đã chấp nhận',
-// 					'3': 'đã từ chối',
-// 					'4': 'đã phản hồi',
-// 					'5': 'đang chờ'
-// 				};
 				var requestRegistRequest = {
 					"id" : "",
 					"employee_id" : "",
@@ -52,9 +45,8 @@
 						$("#btnSave, #btnSend").prop('disabled', true);
 					}
 					
-					if(returnData.user.position.code == 2 || returnData.leaderFlag == 1){
-						employeeId = returnData.user.id;
-						renderNumberOfRequest(employeeId);
+					if(employee.position.code == 2 || returnData.leaderFlag == 1){
+						renderNumberOfRequest(employee.id);
 					}
 				});
 				
