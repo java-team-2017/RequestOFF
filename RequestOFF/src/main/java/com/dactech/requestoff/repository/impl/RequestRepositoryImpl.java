@@ -124,6 +124,8 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 					+ " OR employee_id IN (SELECT employee_id from team t INNER JOIN team_employee te ON t.id = te.team_id WHERE t.leader_id = " + requests.getUserId() + " )) ");
 		}
 		
+		queryString.append(" AND employee.id <> " + user.getId());
+		
 		if (StringUtil.isNotEmpty(requests.getStatus())) {
 				queryString.append(" AND status = '" + requests.getStatus() + "'");
 		} else {
@@ -265,6 +267,10 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		
 		if (StringUtil.isNotEmpty(request.getEmployeeName())) {
 			queryString.append(" AND e.name like '%" + request.getEmployeeName() + "%'");
+		}
+		
+		if (StringUtil.isNotEmpty(request.getStatus())) {
+			queryString.append(" AND status = '" + request.getStatus() + "'");
 		}
 		
 		if (StringUtil.isNotEmpty(request.getFromTime())) {
