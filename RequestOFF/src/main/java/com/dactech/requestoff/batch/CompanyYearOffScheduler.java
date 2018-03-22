@@ -38,7 +38,7 @@ public class CompanyYearOffScheduler {
 	}
 	
 //	@Scheduled(cron = "00 59 23 31 12 *") // excute every year end
-	@Scheduled(cron = "00 40 16 22 3 *") // excute every year end
+	@Scheduled(cron = "00 58 16 22 3 *") // excute every year end
 	public void reportCurrentTime() throws Exception {
 		System.out.println("excute every year end");
 		long currentYear, nextYear;
@@ -84,7 +84,7 @@ public class CompanyYearOffScheduler {
 			//get approved requests of next year only
 			List<Request> nextYearRequests = new ArrayList<Request>();
 			for(Request r : requests) {
-				if(Long.parseLong(r.getToTime().substring(0, 4)) == currentYear) {
+				if(Long.parseLong(r.getToTime().substring(0, 4)) == nextYear) {
 					nextYearRequests.add(r);
 				}
 			}
@@ -95,6 +95,7 @@ public class CompanyYearOffScheduler {
 					totalNextYearOffHours += r.getTotalTime();
 				}
 			}
+			System.out.println(eos.getEmployeeId() + "---" + totalNextYearOffHours + "-----");
 			
 			double totalHours;
 			if(cyo.getDayOffResetFlag() == CompanyYearOff.DAY_OFF_RESET) {
