@@ -6,12 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.CompanyYearOff;
-import com.dactech.requestoff.model.entity.EmployeeOffStatus;
 import com.dactech.requestoff.model.request.CompanyYearOffCurrentAndNextYearSearchRequest;
 import com.dactech.requestoff.model.request.CompanyYearOffDetailsRequest;
 import com.dactech.requestoff.model.request.CompanyYearOffRegistRequest;
 import com.dactech.requestoff.model.request.CompanyYearOffSearchRequest;
-import com.dactech.requestoff.model.request.EmployeeOffStatusSearchRequest;
 import com.dactech.requestoff.model.response.CompanyYearOffCurrentAndNextYearSearchResponse;
 import com.dactech.requestoff.model.response.CompanyYearOffDetailsResponse;
 import com.dactech.requestoff.model.response.CompanyYearOffRegistResponse;
@@ -20,7 +18,6 @@ import com.dactech.requestoff.repository.CompanyYearOffRepository;
 import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
 import com.dactech.requestoff.service.CompanyYearOffService;
 import com.dactech.requestoff.service.EmployeeOffStatusService;
-import com.dactech.requestoff.util.StringUtil;
 
 @Service
 public class CompanyYearOffServiceImpl implements CompanyYearOffService{

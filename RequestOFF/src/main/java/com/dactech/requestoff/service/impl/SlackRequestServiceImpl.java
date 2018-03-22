@@ -231,9 +231,6 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 								Employee e = requestOff.getEmployee();
 								EmployeeOffStatus eos = employeeOffStatusRepository.findById(year, e.getId());
 								newRemainHours = eos.getRemainHours() - requestOff.getTotalTime();
-								if (newRemainHours < 0) {
-									throw new Exception("Thời gian nghỉ (" + requestOff.getTotalTime() + ") vượt quá thời gian nghỉ còn lại (" + eos.getRemainHours() + ")");
-								}
 								eos.setRemainHours(newRemainHours);
 								employeeOffStatusRepository.save(eos);
 							}
@@ -289,9 +286,6 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 						Employee e = request.getEmployee();
 						EmployeeOffStatus eos = employeeOffStatusRepository.findById(year, e.getId());
 						newRemainHours = eos.getRemainHours() - request.getTotalTime();
-						if (newRemainHours < 0) {
-							throw new Exception("Thời gian nghỉ (" + request.getTotalTime() + ") vượt quá thời gian nghỉ phép còn lại (" + eos.getRemainHours() + ")");
-						}
 						eos.setRemainHours(newRemainHours);
 						employeeOffStatusRepository.save(eos);
 					}
