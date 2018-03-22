@@ -13,6 +13,8 @@
 			'1' : 'Reset'
 		}
 		$(function(){
+			$('#notReset').prop('checked', true);
+			
 			search();
 			
 			$('#btnOk').on('click', function(){
@@ -43,7 +45,8 @@
 								$('#alertMessage').html("Cài đặt thành công").attr('class', 'alert alert-success').show();
 							} 
 	 						else {
-	 							$('#alertMessage').html("Cài đặt thất bại !").attr('class', 'alert alert-danger').show();
+// 	 							$('#alertMessage').html("Cài đặt thất bại !").attr('class', 'alert alert-danger').show();
+	 							$('#alertMessage').html(dataResult.status_info.error).attr('class', 'alert alert-danger').show();
 	 						}
 							var loadTable = $('#companyYearOffTable').DataTable();
 							loadTable.ajax.reload();
