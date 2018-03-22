@@ -13,6 +13,12 @@
 	var row;
 	
 	$(function() {
+		var userId;
+		getLoggedUser(function(returnData){
+			userId = returnData.user.id;
+			renderNumberOfRequest(userId);
+		});
+		
 		$('#editHours').empty();
 		for (var i = 0; i < 8 ; i = i + 0.5) {
 			$('#detailTotalHour').append('<option value="' + i + '">' + i + '</option>');

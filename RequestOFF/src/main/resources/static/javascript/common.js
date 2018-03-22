@@ -47,6 +47,44 @@ var requestStatus = {
 	'5': 'Đang chờ'
 };
 
+function getLoggedUser(callbackFunc){
+	$.ajax({
+		type : "post",
+		contentType : "application/json",
+		url : webRootPath + "employee/getUser",
+		data : JSON.stringify({}),
+		dataType : 'json',
+		success : function(data) {
+			if (typeof callbackFunc !== 'undefined'){
+				callbackFunc(data);
+			}
+		},
+		error : function(e) {
+			$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+		}
+	});
+}
+
+function renderNumberOfRequest(userId){
+	$.ajax({
+		type: "POST",
+		contentType: "application/json",
+		url : webRootPath + "request/getRequestBrowsing",
+		dataType : 'json',
+		data : JSON.stringify({"user_id" : userId, "status" : "5"}),
+		success : function(data) {
+			if(data.requests.length > 0){
+				$('#numberOfRequest').html(data.requests.length);
+			} else {
+				$('#numberOfRequest').hide();
+			}
+		},
+		error : function(e) {
+			console.log(html(errors['APIResponseError'](e)));
+		}
+	});
+}
+
 function renderRemainHours(remainHours, containerId) {
 	var days = parseInt(parseFloat(remainHours) / 8);
 	var hours = parseFloat(remainHours) - (days * 8);

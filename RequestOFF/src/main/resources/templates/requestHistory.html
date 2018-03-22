@@ -59,35 +59,57 @@
 				});
 				
 				//get current user
-				$.ajax({
-					type : "POST",
-					contentType : "application/json",
-					url : /*[[@{/employee/getUser}]]*/,
-					dataType : 'json',
-					data : JSON.stringify({}),
-					success : function(returnData) {
-						console.log("user: ");
-						console.log(returnData);
-						employee = returnData.user;
-						employeeId = employee.id;
-						remainHours = returnData.displayedRemainHours;
-						listRecipient = returnData.listRecipients;
+// 				$.ajax({
+// 					type : "POST",
+// 					contentType : "application/json",
+// 					url : /*[[@{/employee/getUser}]]*/,
+// 					dataType : 'json',
+// 					data : JSON.stringify({}),
+// 					success : function(returnData) {
+// 						console.log("user: ");
+// 						console.log(returnData);
+// 						employee = returnData.user;
+// 						employeeId = employee.id;
+// 						remainHours = returnData.displayedRemainHours;
+// 						listRecipient = returnData.listRecipients;
 						
-						renderRemainHours(returnData.displayedRemainHours, 'remainHours');
-						renderRecipientSelect(listRecipient, 'modalRecipient');
+// 						renderRemainHours(returnData.displayedRemainHours, 'remainHours');
+// 						renderRecipientSelect(listRecipient, 'modalRecipient');
 						
-						//set default value for searching request
-						var date = new Date();
-						var from = "01/01/" + date.getFullYear();
-						$("#fromTimeId").val(from);
+// 						//set default value for searching request
+// 						var date = new Date();
+// 						var from = "01/01/" + date.getFullYear();
+// 						$("#fromTimeId").val(from);
 						
-						var requestSearchRequest = getRequestSearchRequest();
-						console.log(requestSearchRequest);
-						search(requestSearchRequest);
-					},
-					error : function(e) {
-						$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-					}
+// 						var requestSearchRequest = getRequestSearchRequest();
+// 						console.log(requestSearchRequest);
+// 						search(requestSearchRequest);
+// 					},
+// 					error : function(e) {
+// 						$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+// 					}
+// 				});
+				
+				getLoggedUser(function(returnData){
+					console.log("user: ");
+					console.log(returnData);
+					employee = returnData.user;
+					employeeId = employee.id;
+					remainHours = returnData.displayedRemainHours;
+					listRecipient = returnData.listRecipients;
+					
+					renderRemainHours(returnData.displayedRemainHours, 'remainHours');
+					renderRecipientSelect(listRecipient, 'modalRecipient');
+					
+					//set default value for searching request
+					var date = new Date();
+					var from = "01/01/" + date.getFullYear();
+					$("#fromTimeId").val(from);
+					
+					var requestSearchRequest = getRequestSearchRequest();
+					console.log(requestSearchRequest);
+					search(requestSearchRequest);
+					renderNumberOfRequest(employeeId);
 				});
 				
 				$('.datepicker').on('changeDate', function(ev){

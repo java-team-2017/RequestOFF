@@ -18,6 +18,11 @@
 		
 		var editEmployee; // for editing remain hours of employee purpose
 		var searchParam;
+		var userId;
+		getLoggedUser(function(returnData){
+			userId = returnData.user.id;
+			renderNumberOfRequest(userId);
+		});
 		
 		//Department combobox
 		renderDepartmentSelect("department", function(departments) {

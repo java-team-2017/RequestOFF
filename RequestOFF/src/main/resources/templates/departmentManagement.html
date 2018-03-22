@@ -11,8 +11,13 @@
 	var btnEditIsClicked;
 	$(function() {
 		var rowDataRequest;
-		
+		var userId;
 		search();
+		
+		getLoggedUser(function(returnData){
+			userId = returnData.user.id;
+			renderNumberOfRequest(userId);
+		});
 		
 		renderDepartmentSelect("department", function(departments) {
 			listDepartment = departments;

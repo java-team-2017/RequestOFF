@@ -50,7 +50,7 @@ public class CompanyYearOffRepositoryImpl implements CompanyYearOffRepositoryCus
 	@Override
 	public List<CompanyYearOff> getCompanyYearOffOfCurrentYearAndNextYear(
 			CompanyYearOffCurrentAndNextYearSearchRequest request) {
-		String sqlQuery = "SELECT * FROM company_year_off  WHERE current_year_flag != 0 AND current_year_flag != 2 ";
+		String sqlQuery = "SELECT * FROM company_year_off  WHERE current_year_flag not in (0, 2)";
 		Query query = entityManager.createNativeQuery(sqlQuery, CompanyYearOff.class);
 		List<CompanyYearOff> listCompanyYearOff = query.getResultList();
 		return listCompanyYearOff;

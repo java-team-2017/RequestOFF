@@ -56,6 +56,7 @@
 		var listDepartment; // for combobox display purpose
 		var listTeam;
 		var selectedRow; // data of selected row of teamTable
+		var userId;
 		
 		function reloadPage() {
 			var teamTable = $('#teamTable').DataTable();
@@ -66,6 +67,11 @@
 				search();
 			});
 		}
+		
+		getLoggedUser(function(returnData){
+			userId = returnData.user.id;
+			renderNumberOfRequest(userId);
+		});
 		
 		//Department combobox
 		renderDepartmentSelect("department", function(departments) {

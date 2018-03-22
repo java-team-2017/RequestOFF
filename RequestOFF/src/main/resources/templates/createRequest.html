@@ -39,29 +39,20 @@
 				renderDayOffTypeSelect('id_dayOffType');
 				
 				//get current user
-				$.ajax({
-					type : "POST",
-					contentType : "application/json",
-					url : /*[[@{/employee/getUser}]]*/,
-					dataType : 'json',
-					data : JSON.stringify({}),
-					success : function(returnData) {
-						console.log(returnData);
-						employee = returnData.user;
-						employeeId = employee.id;
-						remainHours = returnData.displayedRemainHours;
-						
-						renderRemainHours(returnData.displayedRemainHours, 'remainHours');
-						renderRecipientSelect(returnData.listRecipients, 'id_recipient');
-						
-						if(returnData.listRecipients.length == 0) {
-							$('#alertMessage').html("Bạn chưa thuộc team hoặc department nào nên không thể tạo request!").attr('class', 'alert alert-danger').show();
-							$("#btnSave, #btnSend").prop('disabled', true);
-						}
-					},
-					error : function(e) {
-						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+				getLoggedUser(function(returnData){
+					employee = returnData.user;
+					employeeId = employee.id;
+					remainHours = returnData.displayedRemainHours;
+					
+					renderRemainHours(returnData.displayedRemainHours, 'remainHours');
+					renderRecipientSelect(returnData.listRecipients, 'id_recipient');
+					
+					if(returnData.listRecipients.length == 0) {
+						$('#alertMessage').html("Bạn chưa thuộc team hoặc department nào nên không thể tạo request!").attr('class', 'alert alert-danger').show();
+						$("#btnSave, #btnSend").prop('disabled', true);
 					}
+					
+					renderNumberOfRequest(employeeId);
 				});
 				
 				$('.datepicker').on('changeDate', function(ev){

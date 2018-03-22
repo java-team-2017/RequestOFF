@@ -17,7 +17,11 @@
 					"employee" : "1",
 					"manager" : "2"
 				};
-				
+				var userId;
+				getLoggedUser(function(returnData){
+					userId = returnData.user.id;
+					renderNumberOfRequest(userId);
+				});
 				renderPositionSelect(["positionId", "positionModalDetailsId", "positionModalAddId"], function(positions) {
 					listPosition = positions;
 				});

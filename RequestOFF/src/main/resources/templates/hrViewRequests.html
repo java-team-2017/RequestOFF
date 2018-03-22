@@ -12,20 +12,13 @@
 		var requestObjArr = [];
 		$(function() {
 			var dataReturnRequest;
+			var userId;
 			
-			$.ajax({
-				type : "post",
-				contentType : "application/json",
-				url : /*[[@{/employee/getUser}]]*/,
-				data : JSON.stringify({}),
-				dataType : 'json',
-				success : function(data) {
-					userData = data;
-					search();
-				},
-				error : function(e) {
-					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-				}
+			getLoggedUser(function(returnData){
+				userData = returnData;
+				search();
+				userId = returnData.user.id;
+				renderNumberOfRequest(userId);
 			});
 			
 			renderDepartmentSelect("department", function(departments) {
@@ -71,28 +64,24 @@
 			});
 			
 			$('#requestTable').on('click', 'td', function () {
-				var firstOrLastChildTag = $(this).is(':first-child') || $(this).is(':last-child');
-				if(!firstOrLastChildTag){
-					var table = $('#requestTable').DataTable();
-					var rowData = table.row(this).data();
-					dataReturnRequest = rowData;
-					$('#nameDetails').val(rowData.employee.name);
-					$('#positionDetails').val(rowData.employee.position.name);
-					$('#teamDetails').val(rowData.employee.teamName);
-					$('#departmentDetails').val(rowData.employee.departmentName);
-					$('#teamDetails').val(rowData.employee.listTeam[0].name);
-					$('#departmentDetails').val(rowData.employee.listTeam[0].department.name);
-					$('#recipientDetails').val(rowData.recipientName);
-					$('#fromTimeDetails').val((rowData.fromTime).substr(0, rowData.fromTime.length - 5));
-					$('#toTimeDetails').val((rowData.toTime).substr(0, rowData.toTime.length - 5));
-					$('#totalTimeDetails').val(Math.floor((rowData.totalTime)/8) + "d " + ((rowData.totalTime) % 8) + "h");
-					$('#reasonDetails').val(rowData.reason);
-					$('#statusDetails').val(requestStatus[rowData.status]);
-					$('#dayOffTypeDetails').val(rowData.dayOffType.name);
-					$('#responseMessage').val(rowData.responseMessage).prop('disabled', true);
-					
-					$('#modalDetails').modal('show');
-				}
+				var table = $('#requestTable').DataTable();
+				var rowData = table.row(this).data();
+				dataReturnRequest = rowData;
+				$('#nameDetails').val(rowData.employee.name);
+				$('#positionDetails').val(rowData.employee.position.name);
+				$('#teamDetails').val(rowData.employee.teamName);
+				$('#departmentDetails').val(rowData.employee.departmentName);
+				$('#teamDetails').val(rowData.employee.listTeam[0].name);
+				$('#departmentDetails').val(rowData.employee.listTeam[0].department.name);
+				$('#recipientDetails').val(rowData.recipientName);
+				$('#fromTimeDetails').val((rowData.fromTime).substr(0, rowData.fromTime.length - 5));
+				$('#toTimeDetails').val((rowData.toTime).substr(0, rowData.toTime.length - 5));
+				$('#totalTimeDetails').val(Math.floor((rowData.totalTime)/8) + "d " + ((rowData.totalTime) % 8) + "h");
+				$('#reasonDetails').val(rowData.reason);
+				$('#statusDetails').val(requestStatus[rowData.status]);
+				$('#dayOffTypeDetails').val(rowData.dayOffType.name);
+				$('#responseMessage').val(rowData.responseMessage).prop('disabled', true);
+				$('#modalDetails').modal('show');
 			});
 			
 			$('#employee').typeahead({
