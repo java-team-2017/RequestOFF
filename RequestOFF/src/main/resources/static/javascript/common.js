@@ -71,7 +71,7 @@ function renderNumberOfRequest(userId){
 		contentType: "application/json",
 		url : webRootPath + "request/getRequestBrowsing",
 		dataType : 'json',
-		data : JSON.stringify({"user_id" : userId, "status" : "5", "from_time" : "01/01/2018"}),
+		data : JSON.stringify({"user_id" : userId, "status" : "5", "from_time" : "01/01/" + new Date().getFullYear()}),
 		success : function(data) {
 			if(data.requests.length > 0){
 				$('#numberOfRequest').html(data.requests.length);
