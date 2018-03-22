@@ -125,7 +125,7 @@ public class RequestServiceImpl implements RequestService{
 					else {
 						if(Integer.parseInt(requestRegistRequest.getStatus()) == Request.REQUEST_STATUS_APPROVED
 							&& request.getStatus() == Request.REQUEST_STATUS_WAITING) { //approve request
-							if(request.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING) {
+							if(request.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING && newYearOfRequest == currentYear) {
 								EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employee.getId());
 								double remainHours = employeeOffStatus.getRemainHours();
 								double offHours;

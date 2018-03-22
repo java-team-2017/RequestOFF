@@ -1,5 +1,6 @@
 package com.dactech.requestoff.repository.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -24,6 +25,7 @@ import com.dactech.requestoff.repository.EmployeeRepository;
 import com.dactech.requestoff.repository.TeamEmployeeRepository;
 import com.dactech.requestoff.repository.TeamRepository;
 import com.dactech.requestoff.repository.custom.RequestRepositoryCustom;
+import com.dactech.requestoff.service.CompanyYearOffService;
 import com.dactech.requestoff.util.StringUtil;
 
 public class RequestRepositoryImpl implements RequestRepositoryCustom {
@@ -36,7 +38,9 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 	@Autowired
 	DepartmentRepository departmentRepository;
 	@Autowired
-	TeamEmployeeRepository teamEmployeeRepository; 
+	TeamEmployeeRepository teamEmployeeRepository;
+	@Autowired
+	CompanyYearOffService companyYearOffService;
 	@Override
 	public List<Request> searchRequest(RequestSearchRequest requestSearchRequest) {
 		StringBuilder queryString = new StringBuilder("SELECT * FROM request INNER JOIN employee ON request.employee_id = employee.id ");
@@ -247,7 +251,15 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		Query query = entityManager.createNativeQuery(sqlQuery.toString(), Request.class);
 		@SuppressWarnings("unchecked")
 		List<Request> requests = query.getResultList();
-		return requests;
+		
+		List<Request> nextYearRequests = new ArrayList<Request>();
+		long currentYear = companyYearOffService.getCurrentYear();
+		for(Request r : requests) {
+			if(Long.parseLong(r.getToTime().substring(0, 4)) == currentYear) {
+				nextYearRequests.add(r);
+			}
+		}
+		return nextYearRequests;
 	}
 
 	@SuppressWarnings({ "null", "unchecked" })
