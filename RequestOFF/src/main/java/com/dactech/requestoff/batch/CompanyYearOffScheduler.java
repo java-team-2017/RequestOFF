@@ -1,5 +1,6 @@
 package com.dactech.requestoff.batch;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -9,28 +10,35 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.dactech.requestoff.model.entity.CompanyYearOff;
+import com.dactech.requestoff.model.entity.DayOffType;
 import com.dactech.requestoff.model.entity.EmployeeOffStatus;
+import com.dactech.requestoff.model.entity.Request;
 import com.dactech.requestoff.model.request.CompanyYearOffSearchRequest;
 import com.dactech.requestoff.model.request.EmployeeOffStatusSearchRequest;
+import com.dactech.requestoff.model.request.RequestSearchRequest;
 import com.dactech.requestoff.repository.CompanyYearOffRepository;
 import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
+import com.dactech.requestoff.repository.RequestRepository;
 import com.dactech.requestoff.service.CompanyYearOffService;
 
 @Component
-public class CompanyYearOffSetting {
+public class CompanyYearOffScheduler {
 	@Autowired
 	CompanyYearOffService companyYearOffService;
 	@Autowired
 	CompanyYearOffRepository companyYearOffRepository;
 	@Autowired
 	EmployeeOffStatusRepository employeeOffStatusRepository;
+	@Autowired
+	RequestRepository requestRepository;
 	
 	@PostConstruct
 	public void initialize() {
 		System.out.println("do 1 time at first");
 	}
 	
-	@Scheduled(cron = "00 59 23 31 12 *") // excute every year end
+//	@Scheduled(cron = "00 59 23 31 12 *") // excute every year end
+	@Scheduled(cron = "00 40 16 22 3 *") // excute every year end
 	public void reportCurrentTime() throws Exception {
 		System.out.println("excute every year end");
 		long currentYear, nextYear;
@@ -65,11 +73,34 @@ public class CompanyYearOffSetting {
 			newEos.setYearId(cyo.getId());
 			newEos.setEmployeeId(eos.getEmployeeId());
 			
+			//get approved requests of employee
+			double totalNextYearOffHours = 0;
+			RequestSearchRequest rsr = new RequestSearchRequest();
+			rsr.setEmployeeId(eos.getEmployeeId() + "");
+			rsr.setValidFlag("1");
+			rsr.setStatus(Request.REQUEST_STATUS_APPROVED + "");
+			List<Request> requests = requestRepository.searchRequest(rsr);
+			
+			//get approved requests of next year only
+			List<Request> nextYearRequests = new ArrayList<Request>();
+			for(Request r : requests) {
+				if(Long.parseLong(r.getToTime().substring(0, 4)) == currentYear) {
+					nextYearRequests.add(r);
+				}
+			}
+			
+			//calculate total off hours of next year
+			for(Request r : nextYearRequests) {
+				if(r.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING) {
+					totalNextYearOffHours += r.getTotalTime();
+				}
+			}
+			
 			double totalHours;
 			if(cyo.getDayOffResetFlag() == CompanyYearOff.DAY_OFF_RESET) {
-				totalHours = cyo.getNumberDayOff() * 8;
+				totalHours = cyo.getNumberDayOff() * 8 - totalNextYearOffHours;
 			} else {
-				totalHours = cyo.getNumberDayOff() * 8 + eos.getRemainHours();
+				totalHours = cyo.getNumberDayOff() * 8 + eos.getRemainHours() - totalNextYearOffHours;
 			}
 			newEos.setRemainHours(totalHours);
 			newEos.setTotalHours(totalHours);
