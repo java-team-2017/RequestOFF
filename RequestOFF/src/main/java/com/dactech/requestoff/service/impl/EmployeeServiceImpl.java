@@ -143,7 +143,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 					Department dept = departmentRepository.findByManagerId(employeeId);
 					if(dept != null) {
 						throw new Exception(employee.getName() + " hiện đang là manager của department " + dept.getName() + ".<br/>Vui lòng xóa " + employee.getName() 
-											+ " khỏi " + dept.getName() + " trước khi thay đổi vị trí");
+											+ " khỏi vị trí manager của department này trước khi thay đổi vị trí");
 					} else if(requestRepository.getNumberOfRequestInProcessing(employee.getId()) > 0
 								|| requestRepository.getNumberOfRequestReceivedInProcessing(employee.getId()) > 0) {
 						throw new Exception(employee.getName() + " có request đang chờ xử lý.<br/>Vui lòng để " + employee.getName()
