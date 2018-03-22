@@ -50,11 +50,6 @@ public class RequestServiceImpl implements RequestService{
 			Employee employee = employeeRepository.findById(Long.parseLong(requestRegistRequest.getEmployeeId()));
 			DayOffType dayOffType = dayOffTypeRepository.findById(Long.parseLong(requestRegistRequest.getDayOffTypeId()));
 			long yearOfRequest = Long.parseLong(requestRegistRequest.getToTime().substring(0, 4));
-			System.out.println(yearOfRequest + "---------------");
-			
-			EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employee.getId());
-			double remainHours = employeeOffStatus.getRemainHours();
-			double newRemainHours = remainHours;
 			double offHours = Double.parseDouble(requestRegistRequest.getTotalTime());
 			
 			request.setEmployee(employee);
@@ -65,7 +60,11 @@ public class RequestServiceImpl implements RequestService{
 			if(employee.getPosition().getCode() == Position.CODE_MANAGER && requestRegistRequest.getStatus().equals("5")) {
 				request.setStatus(Request.REQUEST_STATUS_APPROVED);
 				if(dayOffType.getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING && yearOfRequest == currentYear) {
-					newRemainHours = remainHours - offHours;
+					EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employee.getId());
+					double remainHours = employeeOffStatus.getRemainHours();
+					double newRemainHours = remainHours - offHours;
+					employeeOffStatus.setRemainHours(newRemainHours);
+					employeeOffStatusRepository.save(employeeOffStatus);
 				}
 			}
 			else {
@@ -75,9 +74,6 @@ public class RequestServiceImpl implements RequestService{
 			request.setDayOffType(dayOffType);
 			request.setRecipientId(Long.parseLong(requestRegistRequest.getRecipientId()));
 			request.setValidFlag(Integer.parseInt(requestRegistRequest.getValidFlag()));
-			
-			employeeOffStatus.setRemainHours(newRemainHours);
-			employeeOffStatusRepository.save(employeeOffStatus);
 			
 			requestRepository.save(request);
 		} else {	//update request
@@ -92,20 +88,7 @@ public class RequestServiceImpl implements RequestService{
 			}
 			else {
 				Employee employee = employeeRepository.findById(request.getEmployee().getId());
-				EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employee.getId());
-				double remainHours = employeeOffStatus.getRemainHours();
-				double newRemainHours = remainHours;
-				double offHours = request.getTotalTime();
 				long newYearOfRequest;
-				
-				if(StringUtil.isNotEmpty(requestRegistRequest.getStatus())) {
-					if(Integer.parseInt(requestRegistRequest.getStatus()) == Request.REQUEST_STATUS_APPROVED
-						&& request.getStatus() == Request.REQUEST_STATUS_WAITING) { //approve request
-						if(request.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING) {
-							newRemainHours = remainHours - offHours;
-						}
-					}
-				}
 				
 				if(StringUtil.isNotEmpty(requestRegistRequest.getFromTime())) {
 					request.setFromTime(requestRegistRequest.getFromTime());
@@ -123,13 +106,39 @@ public class RequestServiceImpl implements RequestService{
 					request.setReason(requestRegistRequest.getReason());
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getStatus())) {
-					if(employee.getPosition().getCode() == Position.CODE_MANAGER && requestRegistRequest.getStatus().equals("5")) {
+					if(employee.getPosition().getCode() == Position.CODE_MANAGER && requestRegistRequest.getStatus().equals("5")) {	//manager send request
 						request.setStatus(Request.REQUEST_STATUS_APPROVED);
 						if(request.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING && newYearOfRequest == currentYear) {
-							newRemainHours = remainHours - offHours;
+							EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employee.getId());
+							double remainHours = employeeOffStatus.getRemainHours();
+							double offHours;
+							if(StringUtil.isNotEmpty(requestRegistRequest.getTotalTime())) {
+								offHours = Long.parseLong(requestRegistRequest.getTotalTime());
+							} else {
+								offHours = request.getTotalTime();
+							}
+							double newRemainHours = remainHours - offHours;
+							employeeOffStatus.setRemainHours(newRemainHours);
+							employeeOffStatusRepository.save(employeeOffStatus);
 						}
 					}
 					else {
+						if(Integer.parseInt(requestRegistRequest.getStatus()) == Request.REQUEST_STATUS_APPROVED
+							&& request.getStatus() == Request.REQUEST_STATUS_WAITING) { //approve request
+							if(request.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING) {
+								EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employee.getId());
+								double remainHours = employeeOffStatus.getRemainHours();
+								double offHours;
+								if(StringUtil.isNotEmpty(requestRegistRequest.getTotalTime())) {
+									offHours = Long.parseLong(requestRegistRequest.getTotalTime());
+								} else {
+									offHours = request.getTotalTime();
+								}
+								double newRemainHours = remainHours - offHours;
+								employeeOffStatus.setRemainHours(newRemainHours);
+								employeeOffStatusRepository.save(employeeOffStatus);
+							}
+						}
 						request.setStatus(Integer.parseInt(requestRegistRequest.getStatus()));
 					}
 				}
@@ -147,9 +156,6 @@ public class RequestServiceImpl implements RequestService{
 				if(StringUtil.isNotEmpty(requestRegistRequest.getValidFlag())) {
 					request.setValidFlag(Integer.parseInt(requestRegistRequest.getValidFlag()));
 				}
-				
-				employeeOffStatus.setRemainHours(newRemainHours);
-				employeeOffStatusRepository.save(employeeOffStatus);
 				
 				requestRepository.save(request);
 			}
