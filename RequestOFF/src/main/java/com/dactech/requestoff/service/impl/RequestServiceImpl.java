@@ -49,6 +49,8 @@ public class RequestServiceImpl implements RequestService{
 			request = new Request();
 			Employee employee = employeeRepository.findById(Long.parseLong(requestRegistRequest.getEmployeeId()));
 			DayOffType dayOffType = dayOffTypeRepository.findById(Long.parseLong(requestRegistRequest.getDayOffTypeId()));
+			long yearOfRequest = Long.parseLong(requestRegistRequest.getToTime().substring(0, 4));
+			System.out.println(yearOfRequest + "---------------");
 			
 			EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employee.getId());
 			double remainHours = employeeOffStatus.getRemainHours();
@@ -62,7 +64,7 @@ public class RequestServiceImpl implements RequestService{
 			request.setReason(requestRegistRequest.getReason());
 			if(employee.getPosition().getCode() == Position.CODE_MANAGER && requestRegistRequest.getStatus().equals("5")) {
 				request.setStatus(Request.REQUEST_STATUS_APPROVED);
-				if(dayOffType.getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING) {
+				if(dayOffType.getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING && yearOfRequest == currentYear) {
 					newRemainHours = remainHours - offHours;
 				}
 			}
@@ -94,6 +96,7 @@ public class RequestServiceImpl implements RequestService{
 				double remainHours = employeeOffStatus.getRemainHours();
 				double newRemainHours = remainHours;
 				double offHours = request.getTotalTime();
+				long newYearOfRequest;
 				
 				if(StringUtil.isNotEmpty(requestRegistRequest.getStatus())) {
 					if(Integer.parseInt(requestRegistRequest.getStatus()) == Request.REQUEST_STATUS_APPROVED
@@ -108,7 +111,10 @@ public class RequestServiceImpl implements RequestService{
 					request.setFromTime(requestRegistRequest.getFromTime());
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getToTime())) {
+					newYearOfRequest = Long.parseLong(requestRegistRequest.getToTime().substring(0, 4));
 					request.setToTime(requestRegistRequest.getToTime());
+				} else {
+					newYearOfRequest = Long.parseLong(request.getToTime().substring(0, 4));
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getTotalTime())) {
 					request.setTotalTime(Double.parseDouble(requestRegistRequest.getTotalTime()));
@@ -119,7 +125,7 @@ public class RequestServiceImpl implements RequestService{
 				if(StringUtil.isNotEmpty(requestRegistRequest.getStatus())) {
 					if(employee.getPosition().getCode() == Position.CODE_MANAGER && requestRegistRequest.getStatus().equals("5")) {
 						request.setStatus(Request.REQUEST_STATUS_APPROVED);
-						if(request.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING) {
+						if(request.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING && newYearOfRequest == currentYear) {
 							newRemainHours = remainHours - offHours;
 						}
 					}

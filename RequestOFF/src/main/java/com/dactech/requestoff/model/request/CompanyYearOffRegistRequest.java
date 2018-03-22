@@ -3,9 +3,6 @@ package com.dactech.requestoff.model.request;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CompanyYearOffRegistRequest {
-	// private String id;
-	@JsonProperty("for_next_year")
-	private String forNextYear;
 	@JsonProperty("day_off_reset_flag")
 	private String dayOffResetFlag;
 	@JsonProperty("number_day_off")
@@ -22,23 +19,14 @@ public class CompanyYearOffRegistRequest {
 		// TODO Auto-generated constructor stub
 	}
 
-	public CompanyYearOffRegistRequest(String forNextYear, String dayOffResetFlag, String numberDayOff,
-			String currentYearFlag, String validFlag, String updateDate) {
+	public CompanyYearOffRegistRequest(String dayOffResetFlag, String numberDayOff, String currentYearFlag,
+			String validFlag, String updateDate) {
 		super();
-		this.forNextYear = forNextYear;
 		this.dayOffResetFlag = dayOffResetFlag;
 		this.numberDayOff = numberDayOff;
 		this.currentYearFlag = currentYearFlag;
 		this.validFlag = validFlag;
 		this.updateDate = updateDate;
-	}
-
-	public String getForNextYear() {
-		return forNextYear;
-	}
-
-	public void setForNextYear(String forNextYear) {
-		this.forNextYear = forNextYear;
 	}
 
 	public String getDayOffResetFlag() {

@@ -35,75 +35,18 @@ public class CompanyYearOffServiceImpl implements CompanyYearOffService{
 	public CompanyYearOffRegistResponse regist(CompanyYearOffRegistRequest companyYearOffRegistRequest) throws Exception{
 		CompanyYearOff companyYearOff;
 		
-		if(StringUtil.isEmpty(companyYearOffRegistRequest.getForNextYear())) {
-			throw new Exception("Không tìm thấy năm để cài đặt ngày nghỉ");
-		}
-		else {
-			if(companyYearOffRegistRequest.getForNextYear().equals("1")) { // create new company year off
-				long currentYear, nextYear;
-				currentYear = getCurrentYear();
-				nextYear = currentYear + 1;
-					
-				companyYearOff = new CompanyYearOff();
-				companyYearOff.setId(nextYear);
-				companyYearOff.setDayOffResetFlag(Integer.parseInt(companyYearOffRegistRequest.getDayOffResetFlag()));
-				companyYearOff.setNumberDayOff(Integer.parseInt(companyYearOffRegistRequest.getNumberDayOff()));
-				companyYearOff.setCurrentYearFlag(CompanyYearOff.NEXT_YEAR);
-				companyYearOff.setValidFlag(1);
-				
-				companyYearOffRepository.save(companyYearOff);
-			} else {	//update current year
-				long currentYear;
-				currentYear = getCurrentYear();
-				
-				companyYearOff = companyYearOffRepository.findById(currentYear);
-				if(StringUtil.isNotEmpty(companyYearOffRegistRequest.getDayOffResetFlag())) {
-					companyYearOff.setDayOffResetFlag(Integer.parseInt(companyYearOffRegistRequest.getDayOffResetFlag()));
-				}
-				if(StringUtil.isNotEmpty(companyYearOffRegistRequest.getNumberDayOff())) {
-					companyYearOff.setNumberDayOff(Integer.parseInt(companyYearOffRegistRequest.getNumberDayOff()));
-				}
-				if(StringUtil.isNotEmpty(companyYearOffRegistRequest.getValidFlag())) {
-					companyYearOff.setValidFlag(Integer.parseInt(companyYearOffRegistRequest.getValidFlag()));
-				}
-				companyYearOffRepository.save(companyYearOff);
-				
-				EmployeeOffStatusSearchRequest eosSearchRequest = new EmployeeOffStatusSearchRequest(currentYear + "", "", "", "", "");
-				List<EmployeeOffStatus> listEos = employeeOffStatusRepository.search(eosSearchRequest);
-				for(EmployeeOffStatus eos : listEos) {
-					double remainHours, totalHours, offHours;
-					offHours = eos.getTotalHours() - eos.getRemainHours();
-					if(companyYearOffRegistRequest.getDayOffResetFlag().equals("1")) {
-						remainHours = Integer.parseInt(companyYearOffRegistRequest.getNumberDayOff()) * 8 - offHours;
-						totalHours = Integer.parseInt(companyYearOffRegistRequest.getNumberDayOff()) * 8;
-					} else {
-						CompanyYearOffSearchRequest cyoSearchRequest = new CompanyYearOffSearchRequest();
-						cyoSearchRequest.setCurrentYearFlag("2");
-						List<CompanyYearOff> listCompanyYearOff = companyYearOffRepository.search(cyoSearchRequest);
-						if(listCompanyYearOff != null && listCompanyYearOff.size() > 0) {
-							long lastYear = listCompanyYearOff.get(0).getId();
-							eosSearchRequest = new EmployeeOffStatusSearchRequest(lastYear + "", eos.getEmployeeId() + "", "", "", "");
-							List<EmployeeOffStatus> listLastEos = employeeOffStatusRepository.search(eosSearchRequest);
-							if(listLastEos != null && listLastEos.size() > 0) {
-								remainHours = listLastEos.get(0).getRemainHours()
-												+ Integer.parseInt(companyYearOffRegistRequest.getNumberDayOff()) * 8 - offHours;
-								totalHours = listLastEos.get(0).getRemainHours()
-												+ Integer.parseInt(companyYearOffRegistRequest.getNumberDayOff()) * 8;
-							} else {
-								remainHours = Integer.parseInt(companyYearOffRegistRequest.getNumberDayOff()) * 8 - offHours;
-								totalHours = Integer.parseInt(companyYearOffRegistRequest.getNumberDayOff()) * 8;
-							}
-						} else {
-							throw new Exception("Không tìm thấy cài đặt ngày nghỉ của năm vừa rồi");
-						}
-					}
-					eos.setRemainHours(remainHours);
-					eos.setTotalHours(totalHours);
-					eos.setValidFlag(1);
-					employeeOffStatusRepository.save(eos);
-				}
-			}
-		}
+		long currentYear, nextYear;
+		currentYear = getCurrentYear();
+		nextYear = currentYear + 1;
+			
+		companyYearOff = new CompanyYearOff();
+		companyYearOff.setId(nextYear);
+		companyYearOff.setDayOffResetFlag(Integer.parseInt(companyYearOffRegistRequest.getDayOffResetFlag()));
+		companyYearOff.setNumberDayOff(Integer.parseInt(companyYearOffRegistRequest.getNumberDayOff()));
+		companyYearOff.setCurrentYearFlag(CompanyYearOff.NEXT_YEAR);
+		companyYearOff.setValidFlag(1);
+		
+		companyYearOffRepository.save(companyYearOff);
 		
 		CompanyYearOffRegistResponse companyYearOffRegistResponse = new CompanyYearOffRegistResponse();
 		companyYearOffRegistResponse.setId(companyYearOff.getId());

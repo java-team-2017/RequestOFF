@@ -14,6 +14,8 @@
 		}
 		$(function(){
 			$('#notReset').prop('checked', true);
+			var nextYear = (new Date()).getFullYear() + 1;
+			$('#yearOfSetting').append(nextYear);
 			
 			search();
 			
@@ -30,7 +32,6 @@
 				});
 				if(infoInput == 1){
 					var dataRequest = {
-						"for_next_year" : $('#forNextYear').val(),
 						"day_off_reset_flag" : $('input[name=resetOrNot]:checked').val(),
 						"number_day_off" : $('#numberOfDay').val()
 					};
@@ -45,7 +46,6 @@
 								$('#alertMessage').html("Cài đặt thành công").attr('class', 'alert alert-success').show();
 							} 
 	 						else {
-// 	 							$('#alertMessage').html("Cài đặt thất bại !").attr('class', 'alert alert-danger').show();
 	 							$('#alertMessage').html(dataResult.status_info.error).attr('class', 'alert alert-danger').show();
 	 						}
 							var loadTable = $('#companyYearOffTable').DataTable();
@@ -111,8 +111,11 @@
 				
 				<form class="form-input" id="companyYearOffForm">
 					<div class="form-group">
-						<label for="name">Số ngày nghỉ trong một năm *</label>
-						<input type="text" class="form-control only-number" name="number_day_off" id="numberOfDay"/>
+						<label id="yearOfSetting">Cài đặt cho năm: </label>
+					</div>
+					<div class="form-group">
+						<label>Số ngày nghỉ trong một năm *</label>
+						<input type="text" class="form-control only-number" maxlength="2" name="number_day_off" id="numberOfDay"/>
 					</div>
 					<div class="form-group">
 						<label>Reset ngày nghỉ *</label>
@@ -124,13 +127,6 @@
 								<input name="resetOrNot" type="radio" value="0" id="notReset"/> Not Reset
 							</div>
 						</div>
-					</div>
-					<div class="form-group">
-						<label for="position">Cài đặt cho *</label>
-						<select class="form-control" name="" id="forNextYear">
-							<option value="0">Năm hiện tại</option>
-							<option value="1">Năm tiếp theo</option>
-						</select>
 					</div>
 					<br/>
 					<div>
