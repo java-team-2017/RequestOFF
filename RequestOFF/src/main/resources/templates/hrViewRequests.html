@@ -12,13 +12,15 @@
 		var requestObjArr = [];
 		$(function() {
 			var dataReturnRequest;
-			var userId;
 			
 			getLoggedUser(function(returnData){
 				userData = returnData;
-				search();
-				userId = returnData.user.id;
-				renderNumberOfRequest(userId);
+				if(returnData.user.position.code == 2 || returnData.leaderFlag == 1){
+					renderNumberOfRequest(returnData.user.id);
+				} else if(!(returnData.user.listRole[0].role == "ROLE_HR")) {
+					$('#alertMessage').html("Người đăng nhập " + returnData.user.name + " không phải là HR ").attr('class', 'alert alert-danger').show();
+					$('#employee, #department, #team, #status, #from, #to, #btnSearch, #btnReset').prop('disabled', true);
+				}
 			});
 			
 			renderDepartmentSelect("department", function(departments) {
