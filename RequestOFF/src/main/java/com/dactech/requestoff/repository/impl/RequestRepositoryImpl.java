@@ -252,14 +252,15 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		@SuppressWarnings("unchecked")
 		List<Request> requests = query.getResultList();
 		
-		List<Request> nextYearRequests = new ArrayList<Request>();
+		List<Request> currentYearRequests = new ArrayList<Request>();
 		long currentYear = companyYearOffService.getCurrentYear();
 		for(Request r : requests) {
 			if(Long.parseLong(r.getToTime().substring(0, 4)) == currentYear) {
-				nextYearRequests.add(r);
+				currentYearRequests.add(r);
 			}
 		}
-		return nextYearRequests;
+		currentYearRequests.size();
+		return currentYearRequests;
 	}
 
 	@SuppressWarnings({ "null", "unchecked" })
