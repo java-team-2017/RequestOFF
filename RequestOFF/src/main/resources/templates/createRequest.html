@@ -29,6 +29,8 @@
 					"update_date" : ""
 				};
 				
+				$("#hourToId").val(17);
+				
 				renderDayOffTypeSelect('id_dayOffType');
 				
 				//get current user
@@ -75,7 +77,6 @@
 					}
 					
 					var offHours = parseInt(createRequestData.offDays) * 8 + parseFloat(createRequestData.offHours);
-					console.log(offHours);
 					
 					if((createRequestData.reason).length > 300) {
 						exceedLength = 1;
@@ -245,7 +246,7 @@
 								
 								<div class="col-sm-6 form-inline" style="text-align: right;">
 									<label>Giờ * </label>
-									<select class="form-control" name="hourFrom" style="width:100px;">
+									<select class="form-control" name="hourFrom" id="hourFromId" style="width:100px;">
 										<option value="08">8</option>
 										<option value="09">9</option>
 										<option value="10">10</option>
@@ -287,7 +288,7 @@
 								</div>
 								<div class="col-sm-6 form-inline" style="text-align: right;">
 									<label>Giờ * </label>
-									<select class="form-control" name="hourTo" style="width:100px;">
+									<select class="form-control" name="hourTo" id="hourToId" style="width:100px;">
 										<option value="08">8</option>
 										<option value="09">9</option>
 										<option value="10">10</option>

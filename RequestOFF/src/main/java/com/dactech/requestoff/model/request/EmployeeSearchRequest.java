@@ -28,6 +28,7 @@ public class EmployeeSearchRequest {
 	@JsonProperty("team_dept_flag")
 	private String teamDeptFlag; // 1: search by team and department (eliminate employee not in team or dept)
 									// 0: other
+	private Integer year;
 
 	public EmployeeSearchRequest() {
 		super();
@@ -175,4 +176,12 @@ public class EmployeeSearchRequest {
 		this.teamDeptFlag = teamDeptFlag;
 	}
 
+	public Integer getYear() {
+		return year;
+	}
+
+	public void setYear(Integer year) {
+		this.year = year;
+	}
+	
 }

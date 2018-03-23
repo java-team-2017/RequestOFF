@@ -305,6 +305,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		ESRequest.setTeamDeptFlag("1");
 		ESRequest.setTeamId(eospRequest.getTeamId());
 		ESRequest.setDepartmentId(eospRequest.getDepartmentId());
+		ESRequest.setYear(year);
 		List<Employee> listEmployee = employeeRepository.search(ESRequest);
 
 		// create list statistics correspond to each employee

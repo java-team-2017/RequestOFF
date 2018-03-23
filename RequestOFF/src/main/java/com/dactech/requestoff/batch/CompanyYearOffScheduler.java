@@ -37,13 +37,12 @@ public class CompanyYearOffScheduler {
 		System.out.println("do 1 time at first");
 	}
 	
-	@Scheduled(cron = "00 59 23 31 12 *") // excute every year end
-//	@Scheduled(cron = "00 52 9 23 3 *") // excute every year end
+//	@Scheduled(cron = "00 59 23 31 12 *") // excute every year end
+	@Scheduled(cron = "00 23 14 23 3 *") // excute every year end
 	public void reportCurrentTime() throws Exception {
 		System.out.println("excute every year end");
 		long currentYear, nextYear;
 		currentYear = companyYearOffService.getCurrentYear();
-		nextYear = currentYear + 1;
 		
 		EmployeeOffStatusSearchRequest eosSearchRequest = new EmployeeOffStatusSearchRequest(Long.toString(currentYear), "", "", "", "1");
 		List<EmployeeOffStatus> listEos = employeeOffStatusRepository.search(eosSearchRequest);
@@ -55,10 +54,12 @@ public class CompanyYearOffScheduler {
 		CompanyYearOff cyo;
 		if(listCyo != null && listCyo.size() > 0) {
 			cyo = listCyo.get(0);
+			nextYear = cyo.getId();
 			cyo.setCurrentYearFlag(CompanyYearOff.CURRENT_YEAR);
 			companyYearOffRepository.save(cyo);
 		} else {
 			cyo = new CompanyYearOff();
+			nextYear = currentYear + 1;
 			cyo.setId(nextYear);
 			cyo.setDayOffResetFlag(CompanyYearOff.DEFAULT_DAY_OFF_RESET_FLAG);
 			cyo.setNumberDayOff(CompanyYearOff.DEFAULT_NUMBER_DAY_OFF);
@@ -69,46 +70,49 @@ public class CompanyYearOffScheduler {
 		}
 		
 		for(EmployeeOffStatus eos : listEos) {
-			EmployeeOffStatus newEos = new EmployeeOffStatus();
-			newEos.setYearId(cyo.getId());
-			newEos.setEmployeeId(eos.getEmployeeId());
-			
-			//get approved requests of employee
-			double totalNextYearOffHours = 0;
-			RequestSearchRequest rsr = new RequestSearchRequest();
-			rsr.setEmployeeId(eos.getEmployeeId() + "");
-			rsr.setValidFlag("1");
-			rsr.setStatus(Request.REQUEST_STATUS_APPROVED + "");
-			rsr.setFromTime(nextYear + "-01-01 00:00:00");
-			System.out.println(rsr.getFromTime() + "\n\n=================");
-			List<Request> requests = requestRepository.searchRequest(rsr);
-			
-			//get approved requests of next year only
-			List<Request> nextYearRequests = new ArrayList<Request>();
-			for(Request r : requests) {
-				if(Long.parseLong(r.getToTime().substring(0, 4)) == nextYear) {
-					nextYearRequests.add(r);
+			EmployeeOffStatus nextEos = employeeOffStatusRepository.findById(nextYear, eos.getEmployeeId());
+			if(nextEos == null) {
+				EmployeeOffStatus newEos = new EmployeeOffStatus();
+				newEos.setYearId(cyo.getId());
+				newEos.setEmployeeId(eos.getEmployeeId());
+				
+				//get approved requests of employee
+				double totalNextYearOffHours = 0;
+				RequestSearchRequest rsr = new RequestSearchRequest();
+				rsr.setEmployeeId(eos.getEmployeeId() + "");
+				rsr.setValidFlag("1");
+				rsr.setStatus(Request.REQUEST_STATUS_APPROVED + "");
+				rsr.setFromTime(nextYear + "-01-01 00:00:00");
+				System.out.println(rsr.getFromTime() + "\n\n=================");
+				List<Request> requests = requestRepository.searchRequest(rsr);
+				
+				//get approved requests of next year only
+				List<Request> nextYearRequests = new ArrayList<Request>();
+				for(Request r : requests) {
+					if(Long.parseLong(r.getToTime().substring(0, 4)) == nextYear) {
+						nextYearRequests.add(r);
+					}
 				}
-			}
-			
-			//calculate total off hours of next year
-			for(Request r : nextYearRequests) {
-				if(r.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING) {
-					totalNextYearOffHours += r.getTotalTime();
+				
+				//calculate total off hours of next year
+				for(Request r : nextYearRequests) {
+					if(r.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING) {
+						totalNextYearOffHours += r.getTotalTime();
+					}
 				}
+				System.out.println(eos.getEmployeeId() + "---" + totalNextYearOffHours + "-----");
+				
+				double totalHours;
+				if(cyo.getDayOffResetFlag() == CompanyYearOff.DAY_OFF_RESET) {
+					totalHours = cyo.getNumberDayOff() * 8 - totalNextYearOffHours;
+				} else {
+					totalHours = cyo.getNumberDayOff() * 8 + eos.getRemainHours() - totalNextYearOffHours;
+				}
+				newEos.setRemainHours(totalHours);
+				newEos.setTotalHours(totalHours);
+				newEos.setValidFlag(1);
+				employeeOffStatusRepository.save(newEos);
 			}
-			System.out.println(eos.getEmployeeId() + "---" + totalNextYearOffHours + "-----");
-			
-			double totalHours;
-			if(cyo.getDayOffResetFlag() == CompanyYearOff.DAY_OFF_RESET) {
-				totalHours = cyo.getNumberDayOff() * 8 - totalNextYearOffHours;
-			} else {
-				totalHours = cyo.getNumberDayOff() * 8 + eos.getRemainHours() - totalNextYearOffHours;
-			}
-			newEos.setRemainHours(totalHours);
-			newEos.setTotalHours(totalHours);
-			newEos.setValidFlag(1);
-			employeeOffStatusRepository.save(newEos);
 		}
 		
 		cyoSearchRequest.setCurrentYearFlag(CompanyYearOff.LAST_YEAR + "");

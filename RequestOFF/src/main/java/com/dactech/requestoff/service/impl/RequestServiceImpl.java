@@ -46,6 +46,12 @@ public class RequestServiceImpl implements RequestService{
 		Request request;
 		long currentYear = companyYearOffService.getCurrentYear();
 		if(StringUtil.isEmpty(requestRegistRequest.getId())) {	//create new request
+			System.out.println("From: " + requestRegistRequest.getFromTime().substring(0, 4));
+			System.out.println("To: " + requestRegistRequest.getToTime().substring(0, 4));
+			if(requestRegistRequest.getFromTime().substring(0, 4).equals(requestRegistRequest.getToTime().substring(0, 4)) == false) {
+				throw new Exception("Thời gian nghỉ của một request không được phép kéo dài sang năm khác.<br/>Vui lòng tạo nhiều request");
+			}
+			
 			request = new Request();
 			Employee employee = employeeRepository.findById(Long.parseLong(requestRegistRequest.getEmployeeId()));
 			DayOffType dayOffType = dayOffTypeRepository.findById(Long.parseLong(requestRegistRequest.getDayOffTypeId()));
@@ -87,6 +93,23 @@ public class RequestServiceImpl implements RequestService{
 									+ ".<br/>Vui lòng tải lại trang để cập nhật thông tin mới nhất");
 			}
 			else {
+				long newFromYear, newToYear;
+				if(StringUtil.isNotEmpty(requestRegistRequest.getFromTime())) {
+					newFromYear = Long.parseLong(requestRegistRequest.getFromTime().substring(0, 4));
+				} else {
+					newFromYear = Long.parseLong(request.getFromTime().substring(0, 4));
+				}
+				
+				if(StringUtil.isNotEmpty(requestRegistRequest.getToTime())) {
+					newToYear = Long.parseLong(requestRegistRequest.getToTime().substring(0, 4));
+				} else {
+					newToYear = Long.parseLong(request.getToTime().substring(0, 4));
+				}
+				
+				if(newFromYear != newToYear) {
+					throw new Exception("Thời gian nghỉ của một request không được phép kéo dài sang năm khác.<br/>Vui lòng tạo nhiều request");
+				}
+				
 				Employee employee = employeeRepository.findById(request.getEmployee().getId());
 				long newYearOfRequest;
 				
