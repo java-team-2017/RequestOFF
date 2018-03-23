@@ -156,15 +156,15 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		for (Request request : listRequests) {
 			Employee recipient = employeeRepository.findById(request.getRecipientId());
 			Employee sender = request.getEmployee();
-			TeamEmployee teamEmployee = teamEmployeeRepository.findByEmployeeId((request.getRecipientId()));
-			TeamEmployee employeeId = teamEmployeeRepository.findByEmployeeId((request.getEmployee().getId()));
+			TeamEmployee recipientTeamEmployee = teamEmployeeRepository.findByEmployeeId((request.getRecipientId()));
+			TeamEmployee teamEmployee = teamEmployeeRepository.findByEmployeeId((sender.getId()));
 			// set recipient Name
 			request.setRecipientName(recipient.getName());
 			
 			// set forward ID and name
 			if(request.getStatus() == Request.REQUEST_STATUS_WAITING) {
 				if (recipient.getPosition().getCode() == Position.CODE_EMPLOYEE) {
-					if(teamEmployee.getLeaderFlag() == 1) {// recipient is a leader, forward to manager
+					if(recipientTeamEmployee != null && recipientTeamEmployee.getLeaderFlag() == 1) {// recipient is a leader, forward to manager
 						String queryStr = "SELECT * FROM employee e INNER JOIN department d ON e.id = d.manager_id "
 								+ " INNER JOIN team t ON t.department_id = d.id"
 								+ " WHERE t.leader_id = " + recipient.getId();
@@ -179,9 +179,9 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 						throw new Exception("Người đăng nhập " + request.getRecipientName() + " chỉ là thành viên trong team");
 					}
 				} else if (recipient.getPosition().getCode() == Position.CODE_MANAGER) {
-					if(teamEmployee.getLeaderFlag() == 1) {//user is manager and leader
+					if(recipientTeamEmployee != null && recipientTeamEmployee.getLeaderFlag() == 1) {//user is manager and leader
 						if (sender.getPosition().getCode() == Position.CODE_EMPLOYEE) {
-							if(employeeId.getLeaderFlag() != 1 && sender.getPosition().getCode() != Position.CODE_MANAGER ) {
+							if(teamEmployee != null && teamEmployee.getLeaderFlag() != 1 && sender.getPosition().getCode() != Position.CODE_MANAGER ) {
 								String queryStr = "SELECT * from employee e INNER JOIN team t on e.id = t.leader_id INNER JOIN team_employee te ON t.id = te.team_id "
 										+ "WHERE te.employee_id = " + request.getEmployee().getId() + " AND e.id <> " + recipient.getId();
 								Query queryObj = entityManager.createNativeQuery(queryStr.toString(), Employee.class);
@@ -194,7 +194,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 						} 
 					} else { //user is just manager
 						if (sender.getPosition().getCode() == Position.CODE_EMPLOYEE) {
-							if(employeeId.getLeaderFlag() != 1 && sender.getPosition().getCode() != Position.CODE_MANAGER ) {
+							if(teamEmployee != null && teamEmployee.getLeaderFlag() != 1 && sender.getPosition().getCode() != Position.CODE_MANAGER ) {
 								String queryStr = "SELECT * from employee e INNER JOIN team t on e.id = t.leader_id INNER JOIN team_employee te ON t.id = te.team_id "
 										+ "WHERE te.employee_id = " + request.getEmployee().getId();
 								Query queryObj = entityManager.createNativeQuery(queryStr.toString(), Employee.class);
@@ -211,7 +211,7 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 			
 			// set department name and team name for request sender
 			if(sender.getPosition().getCode() == Position.CODE_EMPLOYEE) {
-				if(employeeId.getValidFlag() == 1) {
+				if(teamEmployee != null && teamEmployee.getValidFlag() == 1) {
 					Team team = teamRepository.findByLeaderId(sender.getId());
 					if (team != null) {
 						sender.setTeamName(team.getName());
