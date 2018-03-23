@@ -10,8 +10,8 @@
 	/*<![CDATA[*/
 		var userData;
 		var requestObjArr = [];
+		var dataReturnRequest;
 		$(function() {
-			var dataReturnRequest;
 			
 			$.ajax({
 				type : "post",
@@ -47,10 +47,8 @@
 			});
 			
 			$('#requestTable').on('click', 'td', function () {
-				var firstOrLastChildTag = $(this).is(':first-child') || $(this).is(':last-child');
-				if(!firstOrLastChildTag){
-					var table = $('#requestTable').DataTable();
-					var rowData = table.row(this).data();
+				var table = $('#requestTable').DataTable();
+				var rowData = table.row(this).data();
 					dataReturnRequest = rowData;
 					$('#nameDetails').val(rowData.employee.name);
 					$('#positionDetails').val(rowData.employee.position.name);
@@ -70,7 +68,10 @@
 					$('#forward').empty();
 					if(rowData.status != 5){
 						$('#btnApproveModal, #btnDenyModal, #btnSendModal, #btnForward, #responseMessage').prop('disabled', true);
-					} else {
+					} else if(rowData.status == 5 && rowData.recipientId != userData.user.id){
+						$('#btnApproveModal, #btnDenyModal, #btnSendModal, #btnForward, #responseMessage').prop('disabled', true);
+					}
+					else {
 						if (rowData.recipientId == userData.user.id) {
 							if (rowData.forwardId != 0 && rowData.forwardName != null) {
 								$('#forward').append('<option value = "' + rowData.forwardId + '">' + rowData.forwardName + '</option>');
@@ -81,9 +82,12 @@
 						}
 						$('#btnApproveModal, #btnDenyModal, #btnSendModal, #forward, #responseMessage').prop('disabled', false);
 					}
-					
+				var firstOrLastChildTag = $(this).is(':first-child') || $(this).is(':last-child');
+				if(!firstOrLastChildTag){
 					$('#modalDetails').modal('show');
 					$('#modalDetailsMessage').hide();
+				} else if(rowData.status == 5 && rowData.recipientId != userData.user.id){
+					$('#modalDetails').modal('show');
 				}
 			});
 			
@@ -149,7 +153,7 @@
 				}
 			});
 			
-			$('#requestTable').on('click', '.btnApprove, .btnDeny', function () {
+			$('tbody').on('click', '.btnApprove, .btnDeny', function () {
 				requestObjArr = [];
 				var table = $('#requestTable').DataTable();
 				var rowData = table.row($(this).parent()).data();
@@ -255,6 +259,7 @@
 						return JSON.stringify(requestSearch);
 					},
 					dataSrc: function (data) {
+						console.log(data);
 						if(userData.user.position.code == 2 || userData.leaderFlag == 1){
 							if(data.requests.length > 0){
 								$('#numberOfRequest').html(data.requests.length);
@@ -278,7 +283,9 @@
 					{
 						data: 'status',
 						render: function (data, type, row) {
-							if(row.status != 5){
+							if(row.status != 5 ){
+								return '<input id="checkbox" type="checkbox" disabled="disabled">';
+							} else if(row.status == 5 && row.recipientId != userData.user.id) {
 								return '<input id="checkbox" type="checkbox" disabled="disabled">';
 							} else {
 								return '<input id="checkbox" type="checkbox" >';
@@ -316,10 +323,10 @@
 					{
 						data: 'status',
 						render: function (data, type, row) {
-							if(row.status == 5) {
+							if(row.status == 5 && row.recipientId == userData.user.id) {
 								return '<a data-toggle="tooltip" title="Chấp nhận" class="btnApprove"><span class="glyphicon glyphicon-ok" style="cursor: pointer;">&nbsp;&nbsp;<a data-toggle="tooltip" title="Từ chối" class="btnDeny"><span class="glyphicon glyphicon-remove" style="cursor: pointer;"></span></a></a>';
 							} else {
-								return requestStatus[data];
+								return '<a class="not-active"><span class="glyphicon glyphicon-ok" style="opacity: 0.5;">&nbsp;&nbsp;<a class="not-active"><span class="glyphicon glyphicon-remove" style="opacity: 0.5;"></span></a></a>';
 							}
 						},
 					}
