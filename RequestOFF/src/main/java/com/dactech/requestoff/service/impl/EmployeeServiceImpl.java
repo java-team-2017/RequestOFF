@@ -475,25 +475,28 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public List<GetUserResponse.IdName> getListRecipients(long employeeId) throws Exception {
 		List<GetUserResponse.IdName> listRecipients = new ArrayList<GetUserResponse.IdName>();
 		Employee e = employeeRepository.findById(employeeId);
+		
 		if(e != null) {
-			if(isLeader(employeeId)) {
+			Department managerDept = departmentRepository.findByManagerId(employeeId);
+			if(managerDept != null) {
+				listRecipients.add(new GetUserResponse.IdName(employeeId, e.getName()));
+			} else if(isLeader(employeeId)) {
 				Team team = teamRepository.findByLeaderId(employeeId);
 				if(team != null) {
-					Department dept = team.getDepartment();
-					if(dept != null) {
-						Employee manager = employeeRepository.findById(dept.getManagerId());
+					Department leaderDept = team.getDepartment();
+					if(leaderDept != null) {
+						Employee manager = employeeRepository.findById(leaderDept.getManagerId());
 						listRecipients.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
 					}
 				}
-			}
-			else if(e.getPosition().getCode() == Position.CODE_EMPLOYEE) {
+			} else {
 				if(e.getListTeam() != null && e.getListTeam().size() > 0) {
 					Employee leader = employeeRepository.findById(e.getListTeam().get(0).getLeaderId());
 					if(leader != null) {
 						listRecipients.add(new GetUserResponse.IdName(leader.getId(), leader.getName()));
-						Department dept = e.getListTeam().get(0).getDepartment();
-						if(dept != null) {
-							Employee manager = employeeRepository.findById(dept.getManagerId());
+						Department employeeDepartment = e.getListTeam().get(0).getDepartment();
+						if(employeeDepartment != null) {
+							Employee manager = employeeRepository.findById(employeeDepartment.getManagerId());
 							if(manager.getId() != leader.getId()) {
 								listRecipients.add(new GetUserResponse.IdName(manager.getId(), manager.getName()));
 							}
@@ -501,13 +504,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 					}
 				}
 			}
-			else {
-				listRecipients.add(new GetUserResponse.IdName(e.getId(), e.getName()));
-			}
-		}
-		else {
+		} else {
 			throw new Exception("Không tìm thấy nhân viên với id " + employeeId);
 		}
+		
 		return listRecipients;
 	}
 	

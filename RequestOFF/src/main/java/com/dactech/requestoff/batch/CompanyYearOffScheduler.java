@@ -37,8 +37,8 @@ public class CompanyYearOffScheduler {
 		System.out.println("do 1 time at first");
 	}
 	
-//	@Scheduled(cron = "00 59 23 31 12 *") // excute every year end
-	@Scheduled(cron = "00 23 14 23 3 *") // excute every year end
+	@Scheduled(cron = "00 59 23 31 12 *") // excute every year end
+//	@Scheduled(cron = "00 23 14 23 3 *") // excute every year end
 	public void reportCurrentTime() throws Exception {
 		System.out.println("excute every year end");
 		long currentYear, nextYear;
@@ -83,7 +83,6 @@ public class CompanyYearOffScheduler {
 				rsr.setValidFlag("1");
 				rsr.setStatus(Request.REQUEST_STATUS_APPROVED + "");
 				rsr.setFromTime(nextYear + "-01-01 00:00:00");
-				System.out.println(rsr.getFromTime() + "\n\n=================");
 				List<Request> requests = requestRepository.searchRequest(rsr);
 				
 				//get approved requests of next year only
