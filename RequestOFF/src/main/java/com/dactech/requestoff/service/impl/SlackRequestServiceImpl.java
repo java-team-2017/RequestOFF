@@ -1,8 +1,6 @@
 package com.dactech.requestoff.service.impl;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -358,19 +356,6 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 		dataOutput.flush();
 		dataOutput.close();
 		System.out.println("Response Code: " + con.getResponseCode());
-		
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		String inputLine;
-		StringBuffer response = new StringBuffer();
-
-		while ((inputLine = in.readLine()) != null) {
-			response.append(inputLine);
-		}
-		in.close();
-		
-		if(response.toString().contains("false")) {
-			throw new Exception(response.substring(response.indexOf("\"error\""), response.length()-1));
-		}
 	}
 
 	@Override
@@ -399,19 +384,6 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 		dataOutput.writeBytes(urlParameters);
 		dataOutput.flush();
 		dataOutput.close();
-		
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		String inputLine;
-		StringBuffer response = new StringBuffer();
-
-		while ((inputLine = in.readLine()) != null) {
-			response.append(inputLine);
-		}
-		in.close();
-		
-		if(response.toString().contains("false")) {
-			throw new Exception(response.substring(response.indexOf("\"error\""), response.length()-1));
-		}
 	}
 
 }
