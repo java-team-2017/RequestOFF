@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.DayOffType;
+import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.EmployeeOffStatus;
 import com.dactech.requestoff.model.entity.Position;
@@ -21,6 +22,7 @@ import com.dactech.requestoff.model.response.RequestRegistResponse;
 import com.dactech.requestoff.model.response.RequestSearchResponse;
 import com.dactech.requestoff.model.response.RequestViewResponse;
 import com.dactech.requestoff.repository.DayOffTypeRepository;
+import com.dactech.requestoff.repository.DepartmentRepository;
 import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
 import com.dactech.requestoff.repository.RequestRepository;
@@ -43,6 +45,8 @@ public class RequestServiceImpl implements RequestService{
 	CompanyYearOffService companyYearOffService;
 	@Autowired
 	SlackRequestService slackRequestService;
+	@Autowired
+	DepartmentRepository departmentRepository;
 	
 	@Override
 	public RequestRegistResponse regist(RequestRegistRequest requestRegistRequest) throws Exception {
@@ -66,7 +70,8 @@ public class RequestServiceImpl implements RequestService{
 			request.setToTime(requestRegistRequest.getToTime());
 			request.setTotalTime(offHours);
 			request.setReason(requestRegistRequest.getReason());
-			if(employee.getPosition().getCode() == Position.CODE_MANAGER && requestRegistRequest.getStatus().equals("5")) {
+			if(employee.getPosition().getCode() == Position.CODE_MANAGER && departmentRepository.findByManagerId(employee.getId()) != null
+					&& requestRegistRequest.getStatus().equals("5")) {
 				request.setStatus(Request.REQUEST_STATUS_APPROVED);
 				if(dayOffType.getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING && yearOfRequest == currentYear) {
 					EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employee.getId());
@@ -138,7 +143,8 @@ public class RequestServiceImpl implements RequestService{
 					request.setReason(requestRegistRequest.getReason());
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getStatus())) {
-					if(employee.getPosition().getCode() == Position.CODE_MANAGER && requestRegistRequest.getStatus().equals("5")) {	//manager send request
+					if(employee.getPosition().getCode() == Position.CODE_MANAGER && departmentRepository.findByManagerId(employee.getId()) != null
+							&& requestRegistRequest.getStatus().equals("5")) {	//manager send request
 						request.setStatus(Request.REQUEST_STATUS_APPROVED);
 						if(request.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING && newYearOfRequest == currentYear) {
 							EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employee.getId());
