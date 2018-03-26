@@ -33,6 +33,9 @@
 			$('#detailTotalHour').append('<option value="' + i + '">' + i + '</option>');
 		}
 		
+		//set status processed for default request searching
+		$('#processStatus').val(0);
+		
 		search();
 		function search() {
 			$('#alertMessage').hide();
@@ -390,49 +393,57 @@
 	
 	<div class="requestOffContentBody">			
 		<h2>Quản lý request từ Slack</h2>
-		<br/>
 		<div id="alertMessage" class="alert" style="display:none;"></div>
-		<form id="slackForm" class="form-input">
-			<div class="form-group">
-				<label class="control-label">Từ: </label>
-				<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
-					<input class="form-control" type="text" name="msg_time_from" id="from" value=""></input>
-					<div class="input-group-addon">
-						<span class="glyphicon glyphicon-th"></span>
+		<fieldset class="filter-fieldset">
+			<legend>
+				<a href="javascript:void(0);" data-toggle="collapse" data-target=".filter-collapse" class=""><i class="filter-toggle-icon glyphicon glyphicon-triangle-right"></i> Khung tìm kiếm</a>
+			</legend>
+			<div class="filter-collapse collapse">
+				<form id="slackForm" class="form-input">
+					<div class="form-group">
+						<label class="control-label">Từ: </label>
+						<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
+							<input class="form-control" type="text" name="msg_time_from" id="from" value=""></input>
+							<div class="input-group-addon">
+								<span class="glyphicon glyphicon-th"></span>
+							</div>
+						</div>
 					</div>
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="control-label">Đến: </label>
-				<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
-					<input class="form-control" type="text" name="msg_time_to" id="to" value=""></input>
-					<div class="input-group-addon">
-						<span class="glyphicon glyphicon-th"></span>
+					<div class="form-group">
+						<label class="control-label">Đến: </label>
+						<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
+							<input class="form-control" type="text" name="msg_time_to" id="to" value=""></input>
+							<div class="input-group-addon">
+								<span class="glyphicon glyphicon-th"></span>
+							</div>
+						</div>
 					</div>
-				</div>
+					<div class="form-group">
+						<label class="control-label">Trạng thái xử lý:</label>
+							<select id="processStatus" name="process_flag" class="form-control">
+								<option value = ""></option>
+								<option value = "0">Chưa xử lý</option>
+								<option value = "1">Đã xử lý</option>
+							</select>
+					</div>
+					<div class="form-group">
+						<label class="control-label">Tính hợp lệ:</label>
+							<select id="validStatus" name="is_valid_msg" class="form-control">
+								<option value = ""></option>
+								<option value = "1">Request hợp lệ</option>
+								<option value = "0">Request không hợp lệ</option>
+							</select>
+					</div>
+					<p>
+						<button id="searchBtn" type="button" class="btn btn-primary">Tìm kiếm</button>&nbsp;&nbsp;
+						<button type="reset" class="btn btn-primary" id="btnClear">Làm mới</button>
+					</p>
+				</form>
 			</div>
-			<div class="form-group">
-				<label class="control-label">Trạng thái xử lý:</label>
-					<select id="processStatus" name="process_flag" class="form-control">
-						<option value = "0">Chưa xử lý</option>
-						<option value = "1">Đã xử lý</option>
-					</select>
-			</div>
-			<div class="form-group">
-				<label class="control-label">Tính hợp lệ:</label>
-					<select id="validStatus" name="is_valid_msg" class="form-control">
-						<option value = ""></option>
-						<option value = "1">Request hợp lệ</option>
-						<option value = "0">Request không hợp lệ</option>
-					</select>
-			</div>
-			<p>
-				<button id="searchBtn" type="button" class="btn btn-primary" style="width:76px;">Tìm kiếm</button>
-				<button type="reset" class="btn btn-primary" id="btnClear">Làm mới</button>
-			</p>
-		</form>
-				
-		<div class="table-responsive" style="margin-top:3em;"> 
+		</fieldset>
+		
+		<br/>
+		<div class="table-responsive"> 
 			<table class="table table-bordered table-striped table-hover" id="slackRequestTable">
 					<col width="3%"/>
 					<col width="10%"/>
@@ -568,7 +579,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Search for employee</h4>
+						<h4 class="modal-title">Tìm nhân viên</h4>
 					</div>
 					<div class="modal-body">
 						<div id="alertMessage_searchEmModal" class="alert" style="display:none;"></div>
