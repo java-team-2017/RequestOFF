@@ -70,7 +70,7 @@ public class RequestServiceImpl implements RequestService{
 			request.setTotalTime(offHours);
 			request.setReason(requestRegistRequest.getReason());
 			if(employee.getPosition().getCode() == Position.CODE_MANAGER && departmentRepository.findByManagerId(employee.getId()) != null
-					&& requestRegistRequest.getStatus().equals("5")) {
+					&& Integer.parseInt(requestRegistRequest.getStatus()) == Request.REQUEST_STATUS_WAITING) {
 				request.setStatus(Request.REQUEST_STATUS_APPROVED);
 				if(dayOffType.getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING && yearOfRequest == currentYear) {
 					EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employee.getId());
@@ -88,13 +88,11 @@ public class RequestServiceImpl implements RequestService{
 			request.setRecipientId(Long.parseLong(requestRegistRequest.getRecipientId()));
 			request.setValidFlag(Integer.parseInt(requestRegistRequest.getValidFlag()));
 			
-			if(StringUtil.isNotEmpty(requestRegistRequest.getStatus()) && Integer.parseInt(requestRegistRequest.getStatus()) == Request.REQUEST_STATUS_WAITING) {
-				requestRepository.save(request);
-				slackRequestService.sendRequestMsgToSlack(request);
-			} else {
-				requestRepository.save(request);
-			}
+			requestRepository.save(request);
 			
+			if(StringUtil.isNotEmpty(requestRegistRequest.getStatus()) && Integer.parseInt(requestRegistRequest.getStatus()) == Request.REQUEST_STATUS_WAITING) {
+				slackRequestService.sendRequestMsgToSlack(request);
+			}
 		} else {	//update request
 			long id = Long.parseLong(requestRegistRequest.getId());
 			request = requestRepository.findById(id);
@@ -124,16 +122,12 @@ public class RequestServiceImpl implements RequestService{
 				}
 				
 				Employee employee = employeeRepository.findById(request.getEmployee().getId());
-				long newYearOfRequest;
 				
 				if(StringUtil.isNotEmpty(requestRegistRequest.getFromTime())) {
 					request.setFromTime(requestRegistRequest.getFromTime());
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getToTime())) {
-					newYearOfRequest = Long.parseLong(requestRegistRequest.getToTime().substring(0, 4));
 					request.setToTime(requestRegistRequest.getToTime());
-				} else {
-					newYearOfRequest = Long.parseLong(request.getToTime().substring(0, 4));
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getTotalTime())) {
 					request.setTotalTime(Double.parseDouble(requestRegistRequest.getTotalTime()));
@@ -143,9 +137,9 @@ public class RequestServiceImpl implements RequestService{
 				}
 				if(StringUtil.isNotEmpty(requestRegistRequest.getStatus())) {
 					if(employee.getPosition().getCode() == Position.CODE_MANAGER && departmentRepository.findByManagerId(employee.getId()) != null
-							&& requestRegistRequest.getStatus().equals("5")) {	//manager send request
+							&& Integer.parseInt(requestRegistRequest.getStatus()) == Request.REQUEST_STATUS_WAITING) {	//manager send request
 						request.setStatus(Request.REQUEST_STATUS_APPROVED);
-						if(request.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING && newYearOfRequest == currentYear) {
+						if(request.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING && newToYear == currentYear) {
 							EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employee.getId());
 							double remainHours = employeeOffStatus.getRemainHours();
 							double offHours;
@@ -162,7 +156,7 @@ public class RequestServiceImpl implements RequestService{
 					else {
 						if(Integer.parseInt(requestRegistRequest.getStatus()) == Request.REQUEST_STATUS_APPROVED
 							&& request.getStatus() == Request.REQUEST_STATUS_WAITING) { //approve request
-							if(request.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING && newYearOfRequest == currentYear) {
+							if(request.getDayOffType().getPaymentFlag() == DayOffType.PAYMENT_FLAG_PAYING && newToYear == currentYear) {
 								EmployeeOffStatus employeeOffStatus = employeeOffStatusRepository.findById(currentYear, employee.getId());
 								double remainHours = employeeOffStatus.getRemainHours();
 								double offHours;
@@ -194,11 +188,10 @@ public class RequestServiceImpl implements RequestService{
 					request.setValidFlag(Integer.parseInt(requestRegistRequest.getValidFlag()));
 				}
 				
+				requestRepository.save(request);
+				
 				if(StringUtil.isNotEmpty(requestRegistRequest.getStatus()) && Integer.parseInt(requestRegistRequest.getStatus()) == Request.REQUEST_STATUS_WAITING) {
-					requestRepository.save(request);
 					slackRequestService.sendRequestMsgToSlack(request);
-				} else {
-					requestRepository.save(request);
 				}
 			}
 		}

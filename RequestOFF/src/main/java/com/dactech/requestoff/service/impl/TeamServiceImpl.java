@@ -77,7 +77,7 @@ public class TeamServiceImpl implements TeamService {
 				long newLeaderId = Long.parseLong(teamRegistRequest.getLeaderId());
 				long oldLeaderId = team.getLeaderId();
 				if (oldLeaderId != newLeaderId) { // change leader
-					// check whether old leader has wating requests which need to process
+					// check whether old leader has waiting requests which need to process
 					
 					int numOfRequest = requestRepository.countRequestReceivedInProcessingInTeam(oldLeaderId, teamId);
 					if (numOfRequest > 0) {
