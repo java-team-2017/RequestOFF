@@ -350,7 +350,6 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 		con.setRequestMethod("POST");
 		con.setRequestProperty("Accept-Language", "UTF-8");
 		con.setDoOutput(true);
-		
 		DataOutputStream dataOutput = new DataOutputStream(con.getOutputStream());
 		dataOutput.writeBytes(urlParameters);
 		dataOutput.flush();
@@ -377,9 +376,7 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 		URL obj = new URL(url);
 		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 		con.setRequestMethod("POST");
-		con.setRequestProperty("Accept-Language", "UTF-8");
 		con.setDoOutput(true);
-		
 		DataOutputStream dataOutput = new DataOutputStream(con.getOutputStream());
 		dataOutput.writeBytes(urlParameters);
 		dataOutput.flush();
