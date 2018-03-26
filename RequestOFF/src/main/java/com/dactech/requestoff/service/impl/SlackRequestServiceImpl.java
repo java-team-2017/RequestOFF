@@ -326,25 +326,6 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 		slackRequestRepository.save(slackRequests);
 	}
 
-//	@Override
-//	public void sendMsgToSlack(String token, String channel) throws Exception {
-//		String url = "https://slack.com/api/chat.postMessage";
-//		String urlParammeters = "?token=xoxp-282152434071-281018004115-334900370514-b001a2686c8d3f22feabab9592703ec5&channel=C94BSF83C&text=hello";
-//		URL obj = new URL(url);
-//		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
-//		
-//		con.setRequestMethod("POST");
-//		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-//		
-//		con.setDoOutput(true);
-//		DataOutputStream dataOutput = new DataOutputStream(con.getOutputStream());
-//		dataOutput.writeBytes(urlParammeters);
-//		dataOutput.flush();
-//		dataOutput.close();
-//		
-//		
-//	}
-	
 	@Override
 	public void sendRequestToSlack(Request request) throws Exception{
 		String url = "https://slack.com/api/chat.postMessage";
