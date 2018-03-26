@@ -342,7 +342,8 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 				"\n-Time off: "+request.getTotalTime()+  " hour(s)" +
 				"\n-From: "+request.getFromTime()+
 				"\n-To: "+request.getToTime()+
-				"\n-Reason: "+request.getReason();
+				"\n-Reason: "+request.getReason()+
+				"\n-Recipient: "+request.getRecipientName();
 		text = text.replaceAll(" ", "%20");
 		String urlParameters = "token="+token+"&channel="+channel+"&text="+text+"&pretty=1";
 		URL obj = new URL(url);
@@ -370,7 +371,8 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 		} else {
 			gender = "him";
 		}
-		String text = " :birthday: Today is Birthday of " + employee.getName() + " who is belong to " + team.getName() + " Team :smile: Let give " + gender + " the best wishes :tada:";
+		String text = " :birthday: Today is Birthday of " + employee.getName() + " who is belong to " + team.getName()
+				+ " Team :smile: Let give " + gender + " the best wishes :tada:";
 		text = text.replaceAll(" ", "%20");
 		String urlParameters = "token="+token+"&channel="+channel+"&text="+text+"&pretty=1";
 		URL obj = new URL(url);
