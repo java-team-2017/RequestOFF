@@ -1,9 +1,15 @@
 package com.dactech.requestoff.service.impl;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -318,6 +324,67 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 	@Override
 	public void save(SlackRequest slackRequests) {
 		slackRequestRepository.save(slackRequests);
+	}
+
+//	@Override
+//	public void sendMsgToSlack(String token, String channel) throws Exception {
+//		String url = "https://slack.com/api/chat.postMessage";
+//		String urlParammeters = "?token=xoxp-282152434071-281018004115-334900370514-b001a2686c8d3f22feabab9592703ec5&channel=C94BSF83C&text=hello";
+//		URL obj = new URL(url);
+//		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
+//		
+//		con.setRequestMethod("POST");
+//		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+//		
+//		con.setDoOutput(true);
+//		DataOutputStream dataOutput = new DataOutputStream(con.getOutputStream());
+//		dataOutput.writeBytes(urlParammeters);
+//		dataOutput.flush();
+//		dataOutput.close();
+//		
+//		
+//	}
+	
+	@Override
+	public void sendRequestToSlack(Request request) throws Exception{
+		String url = "https://slack.com/api/chat.postMessage";
+		String token = "xoxp-282152434071-281018004115-334900370514-b001a2686c8d3f22feabab9592703ec5";
+		String channel = "C94BSF83C";
+		String text = "Request Off : "+
+				"\n-Name: "+request.getEmployee().getName()+
+				"\n-Time off: "+request.getTotalTime()+  " hour(s)" +
+				"\n-From: "+request.getFromTime()+
+				"\n-To: "+request.getToTime()+
+				"\n-Reason: "+request.getReason();
+		text = text.replaceAll(" ", "%20");
+		URL obj = new URL(url);
+		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
+		con.setRequestMethod("POST");
+		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+		
+		String urlParameters = "token="+token+"&channel="+channel+"&text="+text+"&pretty=1";
+		
+		con.setDoOutput(true);
+		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+		wr.writeBytes(urlParameters);
+		wr.flush();
+		wr.close();
+		
+		int responseCode = con.getResponseCode();
+		System.out.println("Response Code: " + responseCode);
+		
+		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String inputLine;
+		StringBuffer response = new StringBuffer();
+
+		while ((inputLine = in.readLine()) != null) {
+			response.append(inputLine);
+		}
+		in.close();
+		
+		if(response.toString().contains("false")) {
+			throw new Exception(response.substring(response.indexOf("\"error\""), response.length()-1));
+		}
 	}
 
 }

@@ -259,7 +259,6 @@
 						return JSON.stringify(requestSearch);
 					},
 					dataSrc: function (data) {
-						console.log(data);
 						if(userData.user.position.code == 2 || userData.leaderFlag == 1){
 							if(data.requests.length > 0){
 								$('#numberOfRequest').html(data.requests.length);

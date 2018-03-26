@@ -26,6 +26,7 @@ import com.dactech.requestoff.repository.EmployeeRepository;
 import com.dactech.requestoff.repository.RequestRepository;
 import com.dactech.requestoff.service.CompanyYearOffService;
 import com.dactech.requestoff.service.RequestService;
+import com.dactech.requestoff.service.SlackRequestService;
 import com.dactech.requestoff.util.StringUtil;
 
 @Service
@@ -40,6 +41,8 @@ public class RequestServiceImpl implements RequestService{
 	DayOffTypeRepository dayOffTypeRepository;
 	@Autowired
 	CompanyYearOffService companyYearOffService;
+	@Autowired
+	SlackRequestService slackRequestService;
 	
 	@Override
 	public RequestRegistResponse regist(RequestRegistRequest requestRegistRequest) throws Exception {
@@ -81,7 +84,13 @@ public class RequestServiceImpl implements RequestService{
 			request.setRecipientId(Long.parseLong(requestRegistRequest.getRecipientId()));
 			request.setValidFlag(Integer.parseInt(requestRegistRequest.getValidFlag()));
 			
-			requestRepository.save(request);
+			if(requestRegistRequest.getStatus().equals("5")) {
+				requestRepository.save(request);
+				slackRequestService.sendRequestToSlack(request);
+			} else {
+				requestRepository.save(request);
+			}
+			
 		} else {	//update request
 			long id = Long.parseLong(requestRegistRequest.getId());
 			request = requestRepository.findById(id);
@@ -180,7 +189,12 @@ public class RequestServiceImpl implements RequestService{
 					request.setValidFlag(Integer.parseInt(requestRegistRequest.getValidFlag()));
 				}
 				
-				requestRepository.save(request);
+				if(requestRegistRequest.getStatus().equals("5")) {
+					requestRepository.save(request);
+					slackRequestService.sendRequestToSlack(request);
+				} else {
+					requestRepository.save(request);
+				}
 			}
 		}
 		
