@@ -42,4 +42,6 @@ public interface EmployeeService {
 	public boolean isLeader(long employeeId);
 	
 	public boolean changePassword(EmployeeChangePasswordRequest employeeChangePasswordRequest) throws Exception;
+	
+	public List<Employee> listEmployeeHaveBirthday();
 }

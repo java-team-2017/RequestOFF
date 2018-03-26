@@ -1,9 +1,12 @@
 package com.dactech.requestoff.service.impl;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -661,6 +664,23 @@ public class EmployeeServiceImpl implements EmployeeService {
 			throw new Exception("Không tìm thấy nhân viên với id " + employeeId);
 		}
 		return false;
+	}
+
+	@Override
+	public List<Employee> listEmployeeHaveBirthday() {
+		List<Employee> listEmployee = employeeRepository.findAll();
+		List<Employee> listEmployeeHaveBirthday = new ArrayList<Employee>();
+		
+		DateFormat dateFormat = new SimpleDateFormat("MM-dd");
+		Date currentDate = new Date();
+		String currentDateFormat = dateFormat.format(currentDate);
+		for(Employee employee : listEmployee) {
+			String birthDayOfEmployee = employee.getBirthday().substring(5, employee.getBirthday().length());
+			if(birthDayOfEmployee.equals(currentDateFormat)) {
+				listEmployeeHaveBirthday.add(employee);
+			}
+		}
+		return listEmployeeHaveBirthday;
 	}
 	
 }

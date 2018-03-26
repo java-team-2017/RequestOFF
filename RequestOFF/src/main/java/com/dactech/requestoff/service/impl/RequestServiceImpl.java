@@ -88,7 +88,7 @@ public class RequestServiceImpl implements RequestService{
 			request.setRecipientId(Long.parseLong(requestRegistRequest.getRecipientId()));
 			request.setValidFlag(Integer.parseInt(requestRegistRequest.getValidFlag()));
 			
-			if(requestRegistRequest.getStatus().equals("5")) {
+			if(StringUtil.isNotEmpty(requestRegistRequest.getStatus()) && Integer.parseInt(requestRegistRequest.getStatus()) == Request.REQUEST_STATUS_WAITING) {
 				requestRepository.save(request);
 				slackRequestService.sendRequestMsgToSlack(request);
 			} else {

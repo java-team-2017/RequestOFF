@@ -1,7 +1,7 @@
 package com.dactech.requestoff.batch;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.dactech.requestoff.model.entity.Employee;
+import com.dactech.requestoff.service.EmployeeService;
 import com.dactech.requestoff.service.SlackRequestService;
 
 @Component
@@ -20,12 +22,23 @@ public class SlackMessageImport {
 
 	@Autowired
 	SlackRequestService slackRequestService;
+	@Autowired
+	EmployeeService employeeService;
 
 	@PostConstruct
 	public void initialize() {
 		lastTime = new Date();
 	}
-
+	
+	@Scheduled(cron = "0 0 8 * * *") //chay vao 8h moi ngay
+	public void getBirthdayOfEmployee() throws Exception {
+		List<Employee> listEmployeeHaveBirthday = employeeService.listEmployeeHaveBirthday();
+		if(listEmployeeHaveBirthday.size() != 0) {
+			for(Employee employee : listEmployeeHaveBirthday) {
+				slackRequestService.sendBirthdayMsgToEmployee(employee);
+			}
+		}
+	}
 //	@Scheduled(cron = "* * 23 * * *") // chay vao 23h moi ngay
 	@Scheduled(cron = "*/5 * * * * *") // cach 5 giay chay 1 lan
 	public void reportCurrentTime() {

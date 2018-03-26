@@ -3,6 +3,7 @@ package com.dactech.requestoff.service;
 import java.util.Date;
 import java.util.List;
 
+import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.Request;
 import com.dactech.requestoff.model.entity.SlackRequest;
 import com.dactech.requestoff.model.request.SlackRequestRegistRequest;
@@ -26,4 +27,6 @@ public interface SlackRequestService {
 	void save(SlackRequest slackRequests);
 	
 	void sendRequestMsgToSlack(Request request) throws Exception;
+	
+	void sendBirthdayMsgToEmployee(Employee employee) throws Exception;
 }

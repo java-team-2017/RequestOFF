@@ -22,6 +22,8 @@ import com.dactech.requestoff.model.entity.EmployeeOffStatus;
 import com.dactech.requestoff.model.entity.Request;
 import com.dactech.requestoff.model.entity.SlackExecuteImport;
 import com.dactech.requestoff.model.entity.SlackRequest;
+import com.dactech.requestoff.model.entity.Team;
+import com.dactech.requestoff.model.entity.TeamEmployee;
 import com.dactech.requestoff.model.request.SlackRequestRegistRequest;
 import com.dactech.requestoff.model.request.SlackRequestSearchRequest;
 import com.dactech.requestoff.model.response.SlackRequestGetResponse;
@@ -34,6 +36,8 @@ import com.dactech.requestoff.repository.EmployeeRepository;
 import com.dactech.requestoff.repository.RequestRepository;
 import com.dactech.requestoff.repository.SlackExecuteImportRepository;
 import com.dactech.requestoff.repository.SlackRequestRepository;
+import com.dactech.requestoff.repository.TeamEmployeeRepository;
+import com.dactech.requestoff.repository.TeamRepository;
 import com.dactech.requestoff.service.SlackRequestService;
 import com.dactech.requestoff.util.SlackUtil;
 import com.dactech.requestoff.util.StringUtil;
@@ -52,6 +56,10 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 	RequestRepository requestRepository;
 	@Autowired
 	EmployeeOffStatusRepository employeeOffStatusRepository;
+	@Autowired
+	TeamEmployeeRepository teamEmployeeRepository;
+	@Autowired
+	TeamRepository teamRepository;
 
 	@Override
 	public long slackRequestRegist(SlackRequest slackRequest) {
@@ -338,21 +346,59 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 				"\n-To: "+request.getToTime()+
 				"\n-Reason: "+request.getReason();
 		text = text.replaceAll(" ", "%20");
+		String urlParameters = "token="+token+"&channel="+channel+"&text="+text+"&pretty=1";
 		URL obj = new URL(url);
 		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 		con.setRequestMethod("POST");
-		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-		
-		String urlParameters = "token="+token+"&channel="+channel+"&text="+text+"&pretty=1";
-		
+		con.setRequestProperty("Accept-Language", "UTF-8");
 		con.setDoOutput(true);
-		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-		wr.writeBytes(urlParameters);
-		wr.flush();
-		wr.close();
 		
-		int responseCode = con.getResponseCode();
-		System.out.println("Response Code: " + responseCode);
+		DataOutputStream dataOutput = new DataOutputStream(con.getOutputStream());
+		dataOutput.writeBytes(urlParameters);
+		dataOutput.flush();
+		dataOutput.close();
+		System.out.println("Response Code: " + con.getResponseCode());
+		
+		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String inputLine;
+		StringBuffer response = new StringBuffer();
+
+		while ((inputLine = in.readLine()) != null) {
+			response.append(inputLine);
+		}
+		in.close();
+		
+		if(response.toString().contains("false")) {
+			throw new Exception(response.substring(response.indexOf("\"error\""), response.length()-1));
+		}
+	}
+
+	@Override
+	public void sendBirthdayMsgToEmployee(Employee employee) throws Exception {
+		TeamEmployee teamEmployee = teamEmployeeRepository.findByEmployeeId(employee.getId());
+		Team team = teamRepository.findById(teamEmployee.getTeamId());
+		String url = "https://slack.com/api/chat.postMessage";
+		String token = "xoxp-282152434071-281018004115-334900370514-b001a2686c8d3f22feabab9592703ec5";
+		String channel = "C94BSF83C";
+		String gender = "";
+		if(employee.getGender().equals("female")) {
+			gender = "her";
+		} else {
+			gender = "him";
+		}
+		String text = " :birthday: Today is Birthday of " + employee.getName() + " who is belong to " + team.getName() + " Team :smile: Let give " + gender + " the best wishes :tada:";
+		text = text.replaceAll(" ", "%20");
+		String urlParameters = "token="+token+"&channel="+channel+"&text="+text+"&pretty=1";
+		URL obj = new URL(url);
+		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
+		con.setRequestMethod("POST");
+		con.setRequestProperty("Accept-Language", "UTF-8");
+		con.setDoOutput(true);
+		
+		DataOutputStream dataOutput = new DataOutputStream(con.getOutputStream());
+		dataOutput.writeBytes(urlParameters);
+		dataOutput.flush();
+		dataOutput.close();
 		
 		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String inputLine;
