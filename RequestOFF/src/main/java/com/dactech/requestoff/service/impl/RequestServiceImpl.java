@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.DayOffType;
-import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.EmployeeOffStatus;
 import com.dactech.requestoff.model.entity.Position;
@@ -195,7 +194,7 @@ public class RequestServiceImpl implements RequestService{
 					request.setValidFlag(Integer.parseInt(requestRegistRequest.getValidFlag()));
 				}
 				
-				if(requestRegistRequest.getStatus().equals("5")) {
+				if(StringUtil.isNotEmpty(requestRegistRequest.getStatus()) && Integer.parseInt(requestRegistRequest.getStatus()) == Request.REQUEST_STATUS_WAITING) {
 					requestRepository.save(request);
 					slackRequestService.sendRequestMsgToSlack(request);
 				} else {
