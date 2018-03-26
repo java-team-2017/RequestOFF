@@ -13,6 +13,14 @@
 	var row;
 	
 	$(function() {
+		var selectedEmployee = {
+			"id" : "",
+			"name" : ""
+		};
+		
+		$('.datepicker').on('changeDate', function(ev){
+			$(this).datepicker('hide');
+		});
 		
 		getLoggedUser(function(returnData){
 			if(returnData.user.position.code == 2 || returnData.leaderFlag == 1){
@@ -86,7 +94,7 @@
 						render: function (data, type, row){
 							if (type == 'display' || type == 'filter') { // for display and search
 								if (data == "") data = 0;
-								return Math.floor(data/8) + " d " + (data % 8) + " h";
+								return Math.floor(data/8) + "d " + (data % 8) + "h";
 							} else { // for sort and type detection
 								if (data == "") return 0;
 								return data;
@@ -118,13 +126,12 @@
 			rowData = $('#slackRequestTable').DataTable().row(this).data();
 			$('#modalMsg').hide();
 			if (rowData.processFlag == 1 || (rowData.processFlag == 0 && rowData.isValidMsg == 1)) {
-				$('#modalSaveBtn, #modalDenyBtn, #modalApproveBtn').hide();
-				$('#detailModal .modal-input').prop('disabled', true);
+				$('#modalDenyBtn, #modalApproveBtn').hide();
+				$('#detailModal .modal-input, #detailNameSearch').prop('disabled', true);
 			} else {
-				$('#modalSaveBtn, #modalDenyBtn, #modalApproveBtn').show();
-				$('#detailModal .modal-input').prop('disabled', false);
+				$('#modalDenyBtn, #modalApproveBtn').show();
+				$('#detailModal .modal-input, #detailNameSearch').prop('disabled', false);
 			}
-			
 			
 			$('#detailId').val(rowData.id);
 			var m = new Date(rowData.msgTime);
@@ -170,14 +177,41 @@
 			$('#detailModal').modal('show');
 		});
 		
+		$('#detailNameSearch').on('click', function() {
+			$('#searchEmModal').modal('show');
+			searchEm({
+				"name" : "",
+				"valid_flag" : "1"
+			});
+		});
 		
-		$('body').on('click', '#modalSaveBtn, #modalDenyBtn, #modalApproveBtn, #slackRequestTable .btnDeny', function() {
+		$('#btnSearch_searchEmModal').on('click', function() {
+			searchEm({
+				"name" : $('#nameSearchEmModalId').val(),
+				"valid_flag" : "1"
+			});
+		});
+		
+		$("body").on("click", ".btnSelect", function(event) {
+			var row = $(this).closest("tr");	// Finds the closest row <tr> 
+			selectedEmployee.id = $('input[name=selectSearchEmModal]:checked').val();
+			selectedEmployee.name = row.find("td:nth-child(3)").html();
+		});
+		
+		$('#btnOk_searchEmModal').on('click', function() {
+			if(selectedEmployee.name == "" || selectedEmployee.name === undefined || selectedEmployee.name === null) {
+				$('#alertMessage_searchEmModal').html('Vui lòng chọn một nhân viên').attr('class', 'alert alert-danger').show();
+				return;
+			}
+			$('#detailName').val(selectedEmployee.name);
+			$('#searchEmModal').modal('hide');
+		});
+		
+		$('body').on('click', '#modalDenyBtn, #modalApproveBtn, #slackRequestTable .btnDeny', function() {
 			rowData = row.data();
 			var updateData = {};
 			var action = "";
-			if ($(this).attr('id') == 'modalSaveBtn') {
-				action = 'modal save';
-			} else if ($(this).attr('id') == 'modalApproveBtn') {
+			if ($(this).attr('id') == 'modalApproveBtn') {
 				action = 'modal approve';
 			} else if ($(this).attr('id') == 'modalDenyBtn') {
 				action = 'modal deny';
@@ -185,13 +219,17 @@
 				action = 'table deny';
 			}
 			
-			if (action == 'modal save' || action == 'modal approve') { // click save or approve button on detail modal
+			if (action == 'modal approve') { // click save or approve button on detail modal
+				var complete = 1;
 				$('#detailModal .modal-input').each(function() {
 					if ($(this).val() == "") {
 						$('#modalMsg').html(errors['incompleteFields']).attr('class', 'alert alert-danger').show();
-						return;
+						complete = 0;
 					}
-				})
+				});
+				if(complete == 0) {
+					return;
+				}
 				
 				var fromTime = new Date($('#detailFrom').val());
 				var toTime = new Date($('#detailTo').val());
@@ -210,20 +248,90 @@
 					$('#modalMsg').html("Thời gian nghỉ phải lớn hơn 0 giờ").show();
 					return;
 				}
-				
+			}
+			
+			if (action == 'modal approve') {
+				$('#confirmModalMessage').html("Bạn có chắc chắn muốn cập nhật request này?");
+				$('#confirmModalTitle').html("Xác nhận cập nhật");
+				$('#action_confirmModalId').val(action);
+			} else if (action == 'modal deny' || action == 'table deny') {
+				$('#confirmModalMessage').html("Bạn có chắc chắn muốn từ chối request này?");
+				$('#confirmModalTitle').html("Xác nhận từ chối");
+				$('#action_confirmModalId').val(action);
+			}
+			
+			$('#confirmModal').modal('show');
+		});
+		
+		$('#yesConfirm').on('click', function() {
+			var action = $('#action_confirmModalId').val();
+			updateRequest(action);
+		});
+		
+		function searchEm(employeeSearchRequest) {
+			$('#alertMessage_searchEmModal').hide();
+			$('#searchEmTable').DataTable({
+				ajax: {
+					type : "POST",
+					contentType : "application/json",
+					url : /*[[@{/employee/search}]]*/,
+					dataType : 'json',
+					data : function() {
+						return JSON.stringify(employeeSearchRequest);
+					},
+					dataSrc: 'employees'
+				},
+				destroy: true,
+				searching: false,
+				order: [[ 1, "asc" ]],
+				pageLength: 10,
+				columnDefs: [
+					{
+						"targets": [ 0 ],
+						"orderable": false,
+						"className": "text-center",
+						"data": null,
+						"render": function(data, type, row) {
+							return "<a class='btnSelect'><input type='radio' name='selectSearchEmModal' value='" + row.id + "' /></a>"
+						}
+					},
+					{
+						"className": 'hideColumn',
+						"targets": [ 1 ],
+						"data": 'id'
+					},
+					{
+						"targets": [ 2 ],
+						"data": 'name'
+					},
+					{
+						"targets": [ 3 ],
+						"data": 'birthday'
+					}
+				]
+			});
+		}
+		
+		function updateRequest(action) {
+			if (action == 'modal approve') { // click save or approve button on detail modal
+				var fromTime = new Date($('#detailFrom').val());
+				var toTime = new Date($('#detailTo').val());
 				var fromTimeString = fromTime.getFullYear() +"-"+ (fromTime.getMonth()+1) +"-"+ fromTime.getDate();
 				var toTimeString = toTime.getFullYear() +"-"+ (toTime.getMonth()+1) +"-"+ toTime.getDate();
+				
+				var days = $('#detailTotalDay').val();
+				var hours = $('#detailTotalHour').val();
+				var totalTime = parseFloat(days) * 8 + parseFloat(hours);
+				
 				updateData = {
 					id: rowData.id,
 					update_date: rowData.updateDate,
 					name: $('#detailName').val(),
 					day_off_from: fromTimeString,
 					day_off_to: toTimeString,
-					total_hours: totalTime
-				}
-				if (action == 'modal approve') {
-					updateData.is_valid_msg = 1;
-					updateData.process_flag = 1;
+					total_hours: totalTime,
+					is_valid_msg: 1,
+					process_flag: 1
 				}
 			} else if (action == 'modal deny') { // click deny button on detail modal
 				updateData = {
@@ -240,6 +348,7 @@
 					process_flag: 1
 				}
 			}
+			
 			console.log("update data");
 			console.log(updateData);
 			$.ajax({
@@ -258,11 +367,9 @@
 						}
 					} else {
 						if (action == 'modal approve') {
-							$('#alertMessage').html("Chấp nhận thành công").attr('class', 'alert alert-success').show();
+							$('#alertMessage').html("Cập nhật thành công").attr('class', 'alert alert-success').show();
 						} else if (action == 'modal deny' || action == 'table deny') {
 							$('#alertMessage').html("Từ chối thành công").attr('class', 'alert alert-success').show();
-						} else if (action == 'modal save') {
-							$('#alertMessage').html("Sửa thành công").attr('class', 'alert alert-success').show();
 						}
 						$('#detailModal').modal('hide');
 					}
@@ -272,8 +379,7 @@
 					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 				}
 			});
-		});
-		
+		}
 	});
 /*]]>*/
 </script>
@@ -329,14 +435,14 @@
 		<div class="table-responsive" style="margin-top:3em;"> 
 			<table class="table table-bordered table-striped table-hover" id="slackRequestTable">
 					<col width="3%"/>
-	 				<col width="10%"/>
-	 				<col width="12%"/>
-	 				<col width="44%"/>
-	 				<col width="7%"/>
-	 				<col width="7%"/>
-	 				<col width="5%"/>
-	 				<col width="20%"/>
-	 				<col width="2%"/>
+					<col width="10%"/>
+					<col width="12%"/>
+					<col width="44%"/>
+					<col width="7%"/>
+					<col width="7%"/>
+					<col width="5%"/>
+					<col width="20%"/>
+					<col width="2%"/>
 				<thead>
 					<tr>
 						<th class="text-center" style="width: 40px;">Id</th>
@@ -383,7 +489,13 @@
 						<div class="row">
 							<label class="col-sm-4 col-form-label">Nhân viên</label>
 							<div class="col-sm-8">
-								<input id="detailName" class="col-sm-3 form-control modal-input" type="text"></input>
+<!-- 								<input id="detailName" class="col-sm-3 form-control modal-input" type="text"></input> -->
+								<div class="input-group">
+									<input type="text" id="detailName" readonly="readonly" class="col-sm-3 form-control modal-input" placeholder="Search for employee..." />
+									<span class="input-group-btn">
+										<button id="detailNameSearch" class="btn btn-secondary" type="button"><span class="glyphicon glyphicon-search"></span></button>
+									</span>
+								</div>
 							</div>
 						</div>
 						<div class="row">
@@ -411,7 +523,7 @@
 						<div class="row">
 							<label class="col-sm-4 col-form-label">Thời gian nghỉ</label>
 							<div class="col-sm-2">
-								<input id="detailTotalDay" class="col-sm-3 form-control modal-input" type="text"></input>
+								<input id="detailTotalDay" maxlength="2" class="col-sm-3 form-control modal-input only-number" type="text"></input>
 							</div>
 							<label class="col-sm-1" style="padding-top: 5px">Ngày</label>
 							<div class="col-sm-1"></div>
@@ -439,15 +551,80 @@
 							</div>
 						</div>
 					</div>
+					
 					<div class="modal-footer">
-						<button id="modalApproveBtn" type="button" class="btn btn-default">Chấp nhận</button>
+						<button id="modalApproveBtn" type="button" class="btn btn-default">Cập nhật</button>
 						<button id="modalDenyBtn" type="button" class="btn btn-default">Từ chối</button>
-						<button id="modalSaveBtn" type="button" class="btn btn-default">Lưu</button>
+						<button id="modalSaveBtn" type="button" class="btn btn-default" style="display: none;">Lưu</button>
 						<button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
 					</div>
 				</div>
 			</div>
 		</div>
+		
+		<div class="modal fade" id="searchEmModal" role="dialog">
+			<div class="modal-dialog modal-dialog-centered">
+				
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Search for employee</h4>
+					</div>
+					<div class="modal-body">
+						<div id="alertMessage_searchEmModal" class="alert" style="display:none;"></div>
+						<form id="searchEmModalForm">
+							<div class="form-group">
+								<label class="control-label col-sm-3">Tên nhân viên </label>
+								<div class="form-inline" style="padding-right:15px;">
+									<input type="text" class="form-control" name="nameSearchEmModal" id="nameSearchEmModalId" />&nbsp;&nbsp;
+									<button type="button" class="btn btn-primary" id="btnSearch_searchEmModal">Search</button>
+								</div>
+							</div>
+						</form>
+						
+						<br/>
+						
+						<table class="display table table-bordered" cellspacing="0" width="100%" id="searchEmTable">
+							<thead>
+								<tr>
+									<th class="text-center"></th>
+									<th class="text-center hideColumn">Id</th>
+									<th class="text-center">Tên</th>
+									<th class="text-center">Ngày sinh</th>
+								</tr>
+							</thead>
+							
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" id="btnOk_searchEmModal">OK</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal" id="btnCancel_searchEmModal">Đóng</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div id="confirmModal" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title" id="confirmModalTitle"></h4>
+					</div>
+					<div class="modal-body">
+						<p id="confirmModalMessage"></p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal" id="yesConfirm">Có</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal" id="noConfirm">Không</button>
+					</div>
+					<input type="hidden" id="action_confirmModalId" />
+				</div>
+			</div>
+		</div>
+		
 	</div>
 	<div th:replace="fragments/footer"></div>
 </body>

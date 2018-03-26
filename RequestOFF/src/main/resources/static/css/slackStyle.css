@@ -1,3 +1,7 @@
 .mydatepicker {
 	padding: 0px;
 }
+
+.hideColumn {
+	display : none;
+}
