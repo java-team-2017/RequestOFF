@@ -25,5 +25,5 @@ public interface SlackRequestService {
 	
 	void save(SlackRequest slackRequests);
 	
-	void sendRequestToSlack(Request request) throws Exception;
+	void sendRequestMsgToSlack(Request request) throws Exception;
 }

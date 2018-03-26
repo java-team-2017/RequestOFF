@@ -327,7 +327,7 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 	}
 
 	@Override
-	public void sendRequestToSlack(Request request) throws Exception{
+	public void sendRequestMsgToSlack(Request request) throws Exception{
 		String url = "https://slack.com/api/chat.postMessage";
 		String token = "xoxp-282152434071-281018004115-334900370514-b001a2686c8d3f22feabab9592703ec5";
 		String channel = "C94BSF83C";

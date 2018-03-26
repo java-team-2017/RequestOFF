@@ -86,7 +86,7 @@ public class RequestServiceImpl implements RequestService{
 			
 			if(requestRegistRequest.getStatus().equals("5")) {
 				requestRepository.save(request);
-				slackRequestService.sendRequestToSlack(request);
+				slackRequestService.sendRequestMsgToSlack(request);
 			} else {
 				requestRepository.save(request);
 			}
@@ -191,7 +191,7 @@ public class RequestServiceImpl implements RequestService{
 				
 				if(requestRegistRequest.getStatus().equals("5")) {
 					requestRepository.save(request);
-					slackRequestService.sendRequestToSlack(request);
+					slackRequestService.sendRequestMsgToSlack(request);
 				} else {
 					requestRepository.save(request);
 				}
