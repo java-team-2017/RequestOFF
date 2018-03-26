@@ -33,9 +33,6 @@
 			$('#detailTotalHour').append('<option value="' + i + '">' + i + '</option>');
 		}
 		
-		//set status processed for default request searching
-		$('#processStatus').val(0);
-		
 		search();
 		function search() {
 			$('#alertMessage').hide();
@@ -422,7 +419,7 @@
 						<label class="control-label">Trạng thái xử lý:</label>
 							<select id="processStatus" name="process_flag" class="form-control">
 								<option value = ""></option>
-								<option value = "0">Chưa xử lý</option>
+								<option value = "0" selected="true">Chưa xử lý</option>
 								<option value = "1">Đã xử lý</option>
 							</select>
 					</div>

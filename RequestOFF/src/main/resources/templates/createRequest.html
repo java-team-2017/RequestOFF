@@ -29,8 +29,6 @@
 					"update_date" : ""
 				};
 				
-				$("#hourToId").val(17);
-				
 				renderDayOffTypeSelect('id_dayOffType');
 				
 				//get current user
@@ -43,7 +41,7 @@
 					renderRecipientSelect(returnData.listRecipients, 'id_recipient');
 					
 					if(returnData.listRecipients.length == 0) {
-						$('#alertMessage').html("Bạn chưa thuộc team hoặc department nào nên không thể tạo request!").attr('class', 'alert alert-danger').show();
+						$('#alertMessage').html("Bạn chưa thuộc team hoặc department nào nên không được phép tạo request!").attr('class', 'alert alert-danger').show();
 						$("#btnSave, #btnSend").prop('disabled', true);
 					}
 					
@@ -138,11 +136,6 @@
 				$("#yesConfirm").on("click", function() {
 					requestRegistRequest.status = "5";
 					registRequest(requestRegistRequest);
-				});
-				
-				$('#btnClear').on('click', function() {
-					$("#createRequestForm :input").not("button, select").val("");
-					$("#createRequestForm select").prop('selectedIndex', 0);
 				});
 			});
 			
@@ -298,7 +291,7 @@
 										<option value="14">14</option>
 										<option value="15">15</option>
 										<option value="16">16</option>
-										<option value="17">17</option>
+										<option value="17" selected="true">17</option>
 									</select>&nbsp;:&nbsp;
 									<select class="form-control" name="minuteTo" style="width:100px;">
 										<option value="00">00</option>
@@ -335,7 +328,7 @@
 						<div>
 							<button type="button" class="btn btn-primary" id="btnSave">Lưu nháp</button>&nbsp;&nbsp;
 							<button type="button" class="btn btn-primary" id="btnSend">Lưu &amp; gửi</button>&nbsp;&nbsp;
-							<button type="button" class="btn btn-primary" id="btnClear">Làm mới</button>
+							<button type="reset" class="btn btn-primary" id="btnClear">Làm mới</button>
 						</div>
 					</form>
 					

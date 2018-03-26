@@ -185,6 +185,8 @@
 					$("#requestHistoryForm input, #requestHistoryForm select").each(function(){
 						$(this).val("");
 					});
+					var from = "01/01/" + (new Date()).getFullYear();
+					$("#fromTimeId").val(from);
 				});
 				
 				$("body").on("click", ".btnDelete", function(event) {

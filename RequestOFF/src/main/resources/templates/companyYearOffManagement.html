@@ -13,7 +13,6 @@
 			'1' : 'Reset'
 		}
 		$(function(){
-			$('#notReset').prop('checked', true);
 			var nextYear = (new Date()).getFullYear() + 1;
 			$('#yearOfSetting').append(nextYear);
 			
@@ -124,7 +123,7 @@
 								<input name="resetOrNot" type="radio" value="1" id="reset"/> Reset
 							</div>
 							<div class="col-sm-3">
-								<input name="resetOrNot" type="radio" value="0" id="notReset"/> Not Reset
+								<input name="resetOrNot" type="radio" value="0" checked="checked" id="notReset"/> Not Reset
 							</div>
 						</div>
 					</div>

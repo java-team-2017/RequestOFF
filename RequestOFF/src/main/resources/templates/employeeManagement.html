@@ -184,16 +184,6 @@
 					$('#employeeAddModal').modal('show');
 				});
 				
-				$('#btnClear').on('click', function() {
-					$("#employeeForm input, #employeeForm select").each(function(){
-						$(this).val("");
-					});
-					$('#teamId').empty().append('<option value=""></option>');
-					$.each(listTeam, function(index, team) {
-						$('#teamId').append('<option value="' + team.id + '">' + team.name + '</option>');
-					});
-				});
-				
 				$('#btnCancel_modalAdd').on('click', function() {
 					$("#modalAddForm input, #modalAddForm select").each(function(){
 						$(this).val("");
@@ -585,15 +575,14 @@
 									<label for="workingStatus">Trạng thái làm việc</label>
 									<select class="form-control" name="workingStatus" id="workingStatusId">
 										<option value=""></option>
-										<option value="1">Đang làm việc</option>
+										<option value="1" selected="true">Đang làm việc</option>
 										<option value="0">Đã nghỉ việc</option>
 									</select>
 								</div>
 								<br/>
 								<div>
 									<button type="button" class="btn btn-primary" id="btnSearch">Tìm kiếm</button>&nbsp;&nbsp;
-									
-									<button type="button" class="btn btn-primary" id="btnClear">Làm mới</button>
+									<button type="reset" class="btn btn-primary" id="btnClear">Làm mới</button>
 								</div>
 							</form><br/>
 						</div>
