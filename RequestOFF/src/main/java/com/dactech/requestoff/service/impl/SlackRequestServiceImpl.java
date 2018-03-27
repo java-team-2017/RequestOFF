@@ -339,7 +339,7 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 		String url = "https://slack.com/api/chat.postMessage";
 		String token = "xoxp-282152434071-281018004115-334900370514-b001a2686c8d3f22feabab9592703ec5";
 		String channel = "C94BSF83C";
-		String text = "Request Off : "+
+		String text = "Automatic Request Off : "+
 				"\n-Name: "+request.getEmployee().getName()+
 				"\n-Time off: "+request.getTotalTime()+  " hour(s)" +
 				"\n-From: "+request.getFromTime()+

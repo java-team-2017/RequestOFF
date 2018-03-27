@@ -34,7 +34,7 @@ public class SlackUtil {
 		StringTokenizer msg = new StringTokenizer(message.getText());
 		while (msg.hasMoreTokens()) {
 			String line = msg.nextToken("\n");
-			if (line.toLowerCase().indexOf("has joined the channel") != -1 || line.toLowerCase().indexOf("automatic request") != -1) {
+			if (line.toLowerCase().indexOf("has joined the channel") != -1 || line.toLowerCase().indexOf("Automatic Request Off") != -1) {
 				slackRequest.setProcessFlag(SlackRequest.PROCESSED);
 				slackRequest.setIsValidMsg(SlackRequest.INVALID_REQUEST_MSG);
 				return slackRequest;
