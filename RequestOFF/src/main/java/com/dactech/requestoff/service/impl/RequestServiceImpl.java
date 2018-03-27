@@ -144,7 +144,7 @@ public class RequestServiceImpl implements RequestService{
 							double remainHours = employeeOffStatus.getRemainHours();
 							double offHours;
 							if(StringUtil.isNotEmpty(requestRegistRequest.getTotalTime())) {
-								offHours = Long.parseLong(requestRegistRequest.getTotalTime());
+								offHours = Double.parseDouble(requestRegistRequest.getTotalTime());
 							} else {
 								offHours = request.getTotalTime();
 							}
@@ -161,7 +161,7 @@ public class RequestServiceImpl implements RequestService{
 								double remainHours = employeeOffStatus.getRemainHours();
 								double offHours;
 								if(StringUtil.isNotEmpty(requestRegistRequest.getTotalTime())) {
-									offHours = Long.parseLong(requestRegistRequest.getTotalTime());
+									offHours = Double.parseDouble(requestRegistRequest.getTotalTime());
 								} else {
 									offHours = request.getTotalTime();
 								}
