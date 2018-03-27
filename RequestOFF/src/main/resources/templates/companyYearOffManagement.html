@@ -43,11 +43,18 @@
 							if (dataResult.status_info.status == 0) {
 								$('#alertMessage').html("Cài đặt thành công").attr('class', 'alert alert-success').show();
 							} 
-								else {
-									$('#alertMessage').html(dataResult.status_info.error).attr('class', 'alert alert-danger').show();
-								}
+							else {
+								$('#alertMessage').html(dataResult.status_info.error).attr('class', 'alert alert-danger').show();
+							}
 							var loadTable = $('#companyYearOffTable').DataTable();
 							loadTable.ajax.reload();
+							
+							//reset input fields to default value
+							$("#companyYearOffForm input").each(function(){
+								$(this).val("");
+							});
+							$("#notReset").prop("checked", true);
+							
 						},
 						error : function(e) {
 							$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
