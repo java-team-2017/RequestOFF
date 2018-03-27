@@ -67,8 +67,7 @@
 			});
 			
 			$('#requestTable').on('click', 'td', function () {
-				var table = $('#requestTable').DataTable();
-				var rowData = table.row(this).data();
+				var rowData = $('#requestTable').DataTable().row(this).data();
 				$('#nameDetails').val(rowData.employee.name);
 				$('#positionDetails').val(rowData.employee.position.name);
 				$('#teamDetails').val(rowData.employee.teamName);
@@ -353,7 +352,6 @@
 					</div>
 				</div>
 			</div>
-		
 	</div>
 	<div th:replace="fragments/footer"></div>
 </body>

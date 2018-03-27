@@ -76,8 +76,7 @@
 		
 		$('tbody').on('click', '.glyphiconEdit', function () {
 			btnEditIsClicked = $(this).hasClass("glyphiconEdit");
-			var table = $('#departmentTable').DataTable();
-			rowDataRequest = table.row($(this).parent()).data();
+			rowDataRequest = $('#departmentTable').DataTable().row($(this).parent()).data();
 			$('#editModal').modal('show');
 			$('#editMsg').hide();
 			$('#editDepartment').val(rowDataRequest.name);
@@ -88,8 +87,7 @@
 		});
 		
 		$('#btnCreate').on('click', function(){
-			var table = $('#departmentTable').DataTable();
-			rowDataRequest = table.row($(this).parent()).data();
+			rowDataRequest = $('#departmentTable').DataTable().row($(this).parent()).data();
 			$('#editModal').modal('show');
 			$('#editMsg').hide();
 			$('#editDepartment').val("");

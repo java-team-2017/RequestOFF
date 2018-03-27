@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Quản lý ngày nghỉ</title>
-		<meta charset="UTF-8" />
-		<div th:replace="library"></div>
-	</head>
-	<body class="content-body">
-		<script th:inline="javascript">
-		/*<![CDATA[*/
+<head>
+	<title>Quản lý ngày nghỉ</title>
+	<meta charset="UTF-8" />
+	<div th:replace="library"></div>
+</head>
+<script th:inline="javascript">
+	/*<![CDATA[*/
 		var dayOffResetStatus = {
 			'0' : 'Not Reset',
 			'1' : 'Reset'
@@ -44,9 +43,9 @@
 							if (dataResult.status_info.status == 0) {
 								$('#alertMessage').html("Cài đặt thành công").attr('class', 'alert alert-success').show();
 							} 
-	 						else {
-	 							$('#alertMessage').html(dataResult.status_info.error).attr('class', 'alert alert-danger').show();
-	 						}
+								else {
+									$('#alertMessage').html(dataResult.status_info.error).attr('class', 'alert alert-danger').show();
+								}
 							var loadTable = $('#companyYearOffTable').DataTable();
 							loadTable.ajax.reload();
 						},
@@ -98,58 +97,59 @@
 				]
 			});
 		}
-		/*]]>*/
-		</script>
-		<div th:replace="fragments/header"></div>
-		<div th:replace="menu"></div>
-		
-		<div class="requestOffContentBody">
-			<h2>Quản lý ngày nghỉ</h2><br/>
-			<div>
-				<div id="alertMessage" class="alert" style="display:none;"></div>
-				
-				<form class="form-input" id="companyYearOffForm">
-					<div class="form-group">
-						<label id="yearOfSetting">Cài đặt cho năm: </label>
-					</div>
-					<div class="form-group">
-						<label>Số ngày nghỉ trong một năm *</label>
-						<input type="text" class="form-control only-number" maxlength="2" name="number_day_off" id="numberOfDay"/>
-					</div>
-					<div class="form-group">
-						<label>Reset ngày nghỉ *</label>
-						<div class="row">
-							<div class="col-sm-2">
-								<input name="resetOrNot" type="radio" value="1" id="reset"/> Reset
-							</div>
-							<div class="col-sm-3">
-								<input name="resetOrNot" type="radio" value="0" checked="checked" id="notReset"/> Not Reset
-							</div>
+	/*]]>*/
+</script>
+<body class="content-body">
+	<div th:replace="fragments/header"></div>
+	<div th:replace="menu"></div>
+	
+	<div class="requestOffContentBody">
+		<h2>Quản lý ngày nghỉ</h2><br/>
+		<div>
+			<div id="alertMessage" class="alert" style="display:none;"></div>
+			
+			<form class="form-input" id="companyYearOffForm">
+				<div class="form-group">
+					<label id="yearOfSetting">Cài đặt cho năm: </label>
+				</div>
+				<div class="form-group">
+					<label>Số ngày nghỉ trong một năm *</label>
+					<input type="text" class="form-control only-number" maxlength="2" name="number_day_off" id="numberOfDay"/>
+				</div>
+				<div class="form-group">
+					<label>Reset ngày nghỉ *</label>
+					<div class="row">
+						<div class="col-sm-2">
+							<input name="resetOrNot" type="radio" value="1" id="reset"/> Reset
+						</div>
+						<div class="col-sm-3">
+							<input name="resetOrNot" type="radio" value="0" checked="checked" id="notReset"/> Not Reset
 						</div>
 					</div>
-					<br/>
-					<div>
-						<button type="button" class="btn btn-primary" id="btnOk">OK</button>&nbsp;&nbsp;
-						<button type="reset" class="btn btn-primary" id="btnClear">Làm mới</button>
-					</div>
-				</form>
-				
-				<div class="table-responsive" style="margin-top: 3em;">
-					<table class="table table-bordered table-striped table-hover"
-						id="companyYearOffTable">
-						<thead>
-							<tr>
-								<th class="text-center">Năm</th>
-								<th class="text-center">Reset ngày nghỉ</th>
-								<th class="text-center">Số ngày nghỉ</th>
-							</tr>
-						</thead>
-						<tbody class="text-center">
-						</tbody>
-					</table>
 				</div>
+				<br/>
+				<div>
+					<button type="button" class="btn btn-primary" id="btnOk">OK</button>&nbsp;&nbsp;
+					<button type="reset" class="btn btn-primary" id="btnClear">Làm mới</button>
+				</div>
+			</form>
+			
+			<div class="table-responsive" style="margin-top: 3em;">
+				<table class="table table-bordered table-striped table-hover"
+					id="companyYearOffTable">
+					<thead>
+						<tr>
+							<th class="text-center">Năm</th>
+							<th class="text-center">Reset ngày nghỉ</th>
+							<th class="text-center">Số ngày nghỉ</th>
+						</tr>
+					</thead>
+					<tbody class="text-center">
+					</tbody>
+				</table>
 			</div>
 		</div>
-		<div th:replace="fragments/footer"></div>
-	</body>
+	</div>
+	<div th:replace="fragments/footer"></div>
+</body>
 </html>
