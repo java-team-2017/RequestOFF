@@ -47,6 +47,7 @@ var requestStatus = {
 	'5': 'Đang chờ'
 };
 
+var userData;
 function getLoggedUser(callbackFunc){
 	$.ajax({
 		type : "post",
@@ -55,6 +56,7 @@ function getLoggedUser(callbackFunc){
 		data : JSON.stringify({}),
 		dataType : 'json',
 		success : function(data) {
+			userData = data;
 			if (typeof callbackFunc !== 'undefined'){
 				callbackFunc(data);
 			}
@@ -73,8 +75,14 @@ function renderNumberOfRequest(userId){
 		dataType : 'json',
 		data : JSON.stringify({"user_id" : userId, "status" : "5", "from_time" : "01/01/" + new Date().getFullYear()}),
 		success : function(data) {
-			if(data.requests.length > 0){
-				$('#numberOfRequest').html(data.requests.length);
+			var countRequest = 0;
+			$.each(data.requests, function(index, returnRequest){
+				if(userData.user.name == returnRequest.recipientName){
+					countRequest ++;
+				}
+			});
+			if(countRequest > 0){
+				$('#numberOfRequest').html(countRequest);
 			} else {
 				$('#numberOfRequest').hide();
 			}

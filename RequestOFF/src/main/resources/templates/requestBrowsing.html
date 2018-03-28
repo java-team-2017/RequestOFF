@@ -260,8 +260,14 @@
 					},
 					dataSrc: function (data) {
 						if(userData.user.position.code == 2 || userData.leaderFlag == 1){
-							if(data.requests.length > 0){
-								$('#numberOfRequest').html(data.requests.length);
+							var countRequest = 0;
+							$.each(data.requests, function(index, returnRequest){
+								if(userData.user.name == returnRequest.recipientName){
+									countRequest ++;
+								}
+							});
+							if(countRequest > 0){
+								$('#numberOfRequest').html(countRequest);	
 							} else {
 								$('#numberOfRequest').hide();
 							}
