@@ -34,8 +34,7 @@
 		});
 		
 		$('#departmentTable').on('click', 'td', function () {
-			var table = $('#departmentTable').DataTable();
-			var rowData = table.row($(this).parent()).data();
+			var rowData = $('#departmentTable').DataTable().row($(this).parent()).data();
 			var lastOrPreLastChildTag = $(this).is(':last-child') || $(this).is(':nth-last-child(2)') ;
 			if(!lastOrPreLastChildTag){
 				$('#departmentDetails').val(rowData.name);
@@ -140,8 +139,7 @@
 							$('#editMsg').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
 						}
 					}
-					var loadTable = $('#departmentTable').DataTable();
-					loadTable.ajax.reload();
+					$('#departmentTable').DataTable().ajax.reload();
 				},
 				error : function(e) {
 					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
@@ -157,8 +155,7 @@
 				btnOkLabel: "Có",
 				btnCancelLabel: "Không",
 				onConfirm: function() {
-					var table = $('#departmentTable').DataTable();
-					rowDataRequest = table.row(button.parent()).data();
+					rowDataRequest = $('#departmentTable').DataTable().row(button.parent()).data();
 					var deleteRequets = {
 						"department_id" : rowDataRequest.id
 					}
@@ -170,8 +167,7 @@
 						data : JSON.stringify(deleteRequets),
 						success : function(resultData) {
 							if (resultData.status_info.status == 0) {
-								var loadTable = $('#departmentTable').DataTable();
-								loadTable.ajax.reload();
+								$('#departmentTable').DataTable().ajax.reload();
 								$('#alertMessage').html("Xóa Department thành công").attr('class', 'alert alert-success').show();
 							} else {
 								$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();

@@ -222,3 +222,6 @@ legend {
 .active-menu {
 	background-color: #f3f3f3;
 }
+.mydatepicker {
+	padding: 0px;
+}

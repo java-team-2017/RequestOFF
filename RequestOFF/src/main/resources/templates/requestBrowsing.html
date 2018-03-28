@@ -47,41 +47,40 @@
 			});
 			
 			$('#requestTable').on('click', 'td', function () {
-				var table = $('#requestTable').DataTable();
-				var rowData = table.row(this).data();
-					dataReturnRequest = rowData;
-					$('#nameDetails').val(rowData.employee.name);
-					$('#positionDetails').val(rowData.employee.position.name);
-					$('#teamDetails').val(rowData.employee.teamName);
-					$('#departmentDetails').val(rowData.employee.departmentName);
-					$('#teamDetails').val(rowData.employee.listTeam[0].name);
-					$('#departmentDetails').val(rowData.employee.listTeam[0].department.name);
-					$('#recipientDetails').val(rowData.recipientName);
-					$('#fromTimeDetails').val((rowData.fromTime).substr(0, rowData.fromTime.length - 5));
-					$('#toTimeDetails').val((rowData.toTime).substr(0, rowData.toTime.length - 5));
-					$('#totalTimeDetails').val(Math.floor((rowData.totalTime)/8) + "d " + ((rowData.totalTime) % 8) + "h");
-					$('#reasonDetails').val(rowData.reason);
-					$('#statusDetails').val(requestStatus[rowData.status]);
-					$('#dayOffTypeDetails').val(rowData.dayOffType.name);
-					$('#responseMessage').val(rowData.responseMessage);
-					
-					$('#forward').empty();
-					if(rowData.status != 5){
-						$('#btnApproveModal, #btnDenyModal, #btnSendModal, #btnForward, #responseMessage').prop('disabled', true);
-					} else if(rowData.status == 5 && rowData.recipientId != userData.user.id){
-						$('#btnApproveModal, #btnDenyModal, #btnSendModal, #btnForward, #responseMessage').prop('disabled', true);
-					}
-					else {
-						if (rowData.recipientId == userData.user.id) {
-							if (rowData.forwardId != 0 && rowData.forwardName != null) {
-								$('#forward').append('<option value = "' + rowData.forwardId + '">' + rowData.forwardName + '</option>');
-								$('#btnForward').prop('disabled', false);
-							} else {
-								$('#btnForward').prop('disabled', true);
-							}
+				var rowData = $('#requestTable').DataTable().row(this).data();
+				dataReturnRequest = rowData;
+				$('#nameDetails').val(rowData.employee.name);
+				$('#positionDetails').val(rowData.employee.position.name);
+				$('#teamDetails').val(rowData.employee.teamName);
+				$('#departmentDetails').val(rowData.employee.departmentName);
+				$('#teamDetails').val(rowData.employee.listTeam[0].name);
+				$('#departmentDetails').val(rowData.employee.listTeam[0].department.name);
+				$('#recipientDetails').val(rowData.recipientName);
+				$('#fromTimeDetails').val((rowData.fromTime).substr(0, rowData.fromTime.length - 5));
+				$('#toTimeDetails').val((rowData.toTime).substr(0, rowData.toTime.length - 5));
+				$('#totalTimeDetails').val(Math.floor((rowData.totalTime)/8) + "d " + ((rowData.totalTime) % 8) + "h");
+				$('#reasonDetails').val(rowData.reason);
+				$('#statusDetails').val(requestStatus[rowData.status]);
+				$('#dayOffTypeDetails').val(rowData.dayOffType.name);
+				$('#responseMessage').val(rowData.responseMessage);
+				
+				$('#forward').empty();
+				if(rowData.status != 5){
+					$('#btnApproveModal, #btnDenyModal, #btnSendModal, #btnForward, #responseMessage').prop('disabled', true);
+				} else if(rowData.status == 5 && rowData.recipientId != userData.user.id){
+					$('#btnApproveModal, #btnDenyModal, #btnSendModal, #btnForward, #responseMessage').prop('disabled', true);
+				}
+				else {
+					if (rowData.recipientId == userData.user.id) {
+						if (rowData.forwardId != 0 && rowData.forwardName != null) {
+							$('#forward').append('<option value = "' + rowData.forwardId + '">' + rowData.forwardName + '</option>');
+							$('#btnForward').prop('disabled', false);
+						} else {
+							$('#btnForward').prop('disabled', true);
 						}
-						$('#btnApproveModal, #btnDenyModal, #btnSendModal, #forward, #responseMessage').prop('disabled', false);
 					}
+					$('#btnApproveModal, #btnDenyModal, #btnSendModal, #forward, #responseMessage').prop('disabled', false);
+				}
 				var firstOrLastChildTag = $(this).is(':first-child') || $(this).is(':last-child');
 				if(!firstOrLastChildTag){
 					$('#modalDetails').modal('show');
@@ -137,8 +136,7 @@
 						$('#confirmMsg').text("Bạn có chắc chắn muốn  " + action + " "+ numberOfRequest + " request này ?");
 					}
 					$('#requestTable input[type="checkbox"]:checked').each(function(){
-						var table = $('#requestTable').DataTable();
-						var rowData = table.row($(this).parent()).data();
+						var rowData = $('#requestTable').DataTable().row($(this).parent()).data();
 						var requestObj = {};
 						requestObj['id'] = rowData.id;
 						requestObj['update_date'] = rowData.updateDate;
@@ -155,8 +153,7 @@
 			
 			$('tbody').on('click', '.btnApprove, .btnDeny', function () {
 				requestObjArr = [];
-				var table = $('#requestTable').DataTable();
-				var rowData = table.row($(this).parent()).data();
+				var rowData = $('#requestTable').DataTable().row($(this).parent()).data();
 				var requestObj = {
 					"id" : rowData.id ,
 					"update_date": rowData.updateDate
@@ -224,11 +221,10 @@
 				success : function(resultData) {
 					if (resultData.status_info.status == 0) {
 						$('#modalDetails').modal('hide');
-						var loadTable = $('#requestTable').DataTable();
 						if (typeof isLoadTable == 'undefined')
 							isLoadTable = false;
 						if (isLoadTable)
-							loadTable.ajax.reload();
+							$('#requestTable').DataTable().ajax.reload();
 					} else {
 						$('#alertMessage').html(errors['APIResponseError'](resultData.status_info.error)).attr('class', 'alert alert-danger').show();
 					}
@@ -371,7 +367,7 @@
 							
 					<div class="form-group">
 							<label class="control-label">Từ: </label>
-						<div class="input-group date datepicker" data-provide="datepicker">
+						<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 							<input type="text" class="form-control" name="from_time" id="from" value=""/>
 							<div class="input-group-addon">
 								<span class="glyphicon glyphicon-calendar"></span>
@@ -381,7 +377,7 @@
 							
 					<div class="form-group">
 							<label class="control-label">Đến: </label>
-						<div class="input-group date datepicker" data-provide="datepicker">
+						<div class="input-group date datepicker mydatepicker" data-provide="datepicker">
 							<input type="text" class="form-control" name="to_time" id="to" value=""/>
 							<div class="input-group-addon">
 								<span class="glyphicon glyphicon-calendar"></span>
