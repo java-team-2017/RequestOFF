@@ -200,8 +200,7 @@
 					
 					$("#confirmTitle").html("Xác nhận xóa");
 					$("#confirmMessage").html("Bạn có chắc chắn muốn xóa request này?");
-					$("#yesConfirm").show();
-					$("#noConfirm").show();
+					$("#yesConfirm, #noConfirm").show();
 					$("#okConfirm").hide();
 					$("#confirmModal").modal('show');
 					deleteFlag = 1;
@@ -296,8 +295,7 @@
 						} else {
 							$("#confirmTitle").html("Xác nhận gửi");
 							$("#confirmMessage").html("Bạn có chắc chắn muốn gửi request này?");
-							$("#yesConfirm").show();
-							$("#noConfirm").show();
+							$("#yesConfirm, #noConfirm").show();
 							$("#okConfirm").hide();
 							$("#confirmModal").modal('show');
 							deleteFlag = 0;
@@ -325,14 +323,12 @@
 					if(deleteRequestIds.length == 0) {
 						$("#confirmTitle").html("Thông báo");
 						$("#confirmMessage").html("Bạn phải chọn ít nhất 1 request để xóa");
-						$("#yesConfirm").hide();
-						$("#noConfirm").hide();
+						$("#yesConfirm, #noConfirm").hide();
 						$("#okConfirm").show();
 					} else {
 						$("#confirmTitle").html("Xác nhận xóa");
 						$("#confirmMessage").html("Bạn có chắc chắn muốn xóa tất cả những request này?");
-						$("#yesConfirm").show();
-						$("#noConfirm").show();
+						$("#yesConfirm, #noConfirm").show();
 						$("#okConfirm").hide();
 					}
 					$("#confirmModal").modal('show');

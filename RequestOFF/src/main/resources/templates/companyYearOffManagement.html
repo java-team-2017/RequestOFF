@@ -24,7 +24,7 @@
 					if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
 						infoInput = 0;
 					}
-					if( !($('#reset').is(':checked') || $('#notReset').is(':checked')) ) { 
+					if( $('#reset').is(':checked') == false && $('#notReset').is(':checked') == false ) { 
 						infoInput = 0; 
 					}
 				});
@@ -49,10 +49,8 @@
 							var loadTable = $('#companyYearOffTable').DataTable();
 							loadTable.ajax.reload();
 							
-							//reset input fields to default value
-							$("#companyYearOffForm input").each(function(){
-								$(this).val("");
-							});
+							//reset input fields to default values
+							$('#numberOfDay').val("");
 							$("#notReset").prop("checked", true);
 							
 						},
@@ -130,7 +128,7 @@
 							<input name="resetOrNot" type="radio" value="1" id="reset"/> Reset
 						</div>
 						<div class="col-sm-3">
-							<input name="resetOrNot" type="radio" value="0" checked="checked" id="notReset"/> Not Reset
+							<input name="resetOrNot" type="radio" value="0" id="notReset" checked="checked" /> Not Reset
 						</div>
 					</div>
 				</div>
