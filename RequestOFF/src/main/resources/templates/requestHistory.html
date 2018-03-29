@@ -200,6 +200,9 @@
 					deleteRequestId.updateDate = rowData.updateDate;
 					
 					$("#confirmMessage").html("Bạn có chắc chắn muốn xóa request này?");
+					$("#yesConfirm").show();
+					$("#noConfirm").show();
+					$("#okConfirm").hide();
 					$("#confirmModal").modal('show');
 					deleteFlag = 1;
 				});
@@ -292,6 +295,9 @@
 							registRequest(requestRegistRequest);
 						} else {
 							$("#confirmMessage").html("Bạn có chắc chắn muốn gửi request này?");
+							$("#yesConfirm").hide();
+							$("#noConfirm").hide();
+							$("#okConfirm").show();
 							$("#confirmModal").modal('show');
 							deleteFlag = 0;
 						}
@@ -313,19 +319,24 @@
 						deleteRequestIds.splice(index, 1);
 					}
 					console.log(deleteRequestIds);
-					
-					if(deleteRequestIds.length > 0) {
-						$('#btnMultipleDelete').prop('disabled', false);
-					} else {
-						$('#btnMultipleDelete').prop('disabled', true);
-					}
 				});
 				
 				$('#btnMultipleDelete').on('click', function() {
-					if(deleteRequestIds.length > 1) {
+					if(deleteRequestIds.length == 0) {
+						$("#confirmMessage").html("Bạn phải chọn ít nhất 1 request để xóa");
+						$("#yesConfirm").hide();
+						$("#noConfirm").hide();
+						$("#okConfirm").show();
+					} else if(deleteRequestIds.length > 1) {
 						$("#confirmMessage").html("Bạn có chắc chắn muốn xóa tất cả những request này?");
+						$("#yesConfirm").show();
+						$("#noConfirm").show();
+						$("#okConfirm").hide();
 					} else {
 						$("#confirmMessage").html("Bạn có chắc chắn muốn xóa request này?");
+						$("#yesConfirm").show();
+						$("#noConfirm").show();
+						$("#okConfirm").hide();
 					}
 					$("#confirmModal").modal('show');
 					deleteFlag = 2;
@@ -712,7 +723,7 @@
 					</table>
 					
 					<div>
-						<button type="button" class="btn btn-primary" id="btnMultipleDelete" disabled="true">Xóa</button>
+						<button type="button" class="btn btn-primary" id="btnMultipleDelete">Xóa</button>
 					</div>
 					
 					<div class="modal fade" id="requestDetailsModal" role="dialog">
@@ -912,6 +923,7 @@
 								<div class="modal-footer">
 									<button type="button" class="btn btn-default" data-dismiss="modal" id="yesConfirm">Có</button>
 									<button type="button" class="btn btn-default" data-dismiss="modal" id="noConfirm">Không</button>
+									<button type="button" class="btn btn-default" data-dismiss="modal" id="okConfirm" style="display: none;">OK</button>
 								</div>
 								<input type="hidden" name="requestId_confirmModal" id="requestId_confirmModalId" />
 								<input type="hidden" name="updateDate_confirmModal" id="updateDate_confirmModalId" />
