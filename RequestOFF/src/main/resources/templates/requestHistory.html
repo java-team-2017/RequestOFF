@@ -135,7 +135,6 @@
 									$("#hiddenRecipientDiv").show();
 								}
 								else {
-									console.log(rowData.status + "====--");
 									$('#alertMessage_edit').html(rowData.recipientName + " - người nhận của request này hiện không còn là leader/manager của bạn. "
 																	+ "Vui lòng chọn một người nhận khác").attr('class', 'alert alert-warning').show();
 									$("#hiddenRecipientDiv").hide();
@@ -314,11 +313,10 @@
 							'updateDate' : rowData.updateDate
 						});
 					} else {
-						var index = deleteRequestIds.indexOf({
-							'id' : rowData.id,
-							'updateDate' : rowData.updateDate
-						});
-						deleteRequestIds.splice(index, 1);
+						var index = findObjById(deleteRequestIds, rowData.id);
+						if(index >= 0) {
+							deleteRequestIds.splice(index, 1);
+						}
 					}
 					console.log(deleteRequestIds);
 				});
@@ -526,6 +524,8 @@
 				
 				function deleteRequest(ids) {
 					if (ids instanceof Array){
+						$('#alertMessage_search').empty();
+						var success = 1;
 						$.each(deleteRequestIds, function(index, element) {
 							$.ajax({
 								type : "POST",
@@ -539,36 +539,41 @@
 								}),
 								success : function(returnData) {
 									if(returnData.status_info.status == 1) {
-										$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+										$('#alertMessage_search').append('<br/>' + returnData.status_info.error).attr('class', 'alert alert-danger').show();
+										success = 0;
 									} else {
-										table = $('#requestHistoryTable').DataTable();
-										table.ajax.reload();
-										$.ajax({
-											type : "POST",
-											contentType : "application/json",
-											url : /*[[@{/employee/getUser}]]*/,
-											dataType : 'json',
-											data : JSON.stringify({}),
-											success : function(returnData) {
-												if(returnData.status_info.status == 1) {
-													$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
-												} else {
-													remainHours = returnData.remainHours;
-													renderRemainHours(returnData.displayedRemainHours, 'remainHours');
-												}
-											},
-											error : function(e) {
-												$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-											}
-										});
-										$('#alertMessage_search').html("Delete successfully!").attr('class', 'alert alert-success').show();
-										
 										//remove id of deleted request
 										var index = findObjById(deleteRequestIds, element.id);
 										if(index >= 0) {
 											deleteRequestIds.splice(index, 1);
 										}
 										console.log(deleteRequestIds);
+										
+										if(deleteRequestIds.length == 0) {
+											table = $('#requestHistoryTable').DataTable();
+											table.ajax.reload();
+											$.ajax({
+												type : "POST",
+												contentType : "application/json",
+												url : /*[[@{/employee/getUser}]]*/,
+												dataType : 'json',
+												data : JSON.stringify({}),
+												success : function(returnData) {
+													if(returnData.status_info.status == 1) {
+														$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+													} else {
+														remainHours = returnData.remainHours;
+														renderRemainHours(returnData.displayedRemainHours, 'remainHours');
+													}
+												},
+												error : function(e) {
+													$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+												}
+											});
+											if(success == 1) {
+												$('#alertMessage_search').html("Delete successfully!").attr('class', 'alert alert-success').show();
+											}
+										}
 									}
 								},
 								error : function(e) {

@@ -76,7 +76,7 @@ public class CompanyYearOffScheduler {
 				newEos.setYearId(cyo.getId());
 				newEos.setEmployeeId(eos.getEmployeeId());
 				
-				//get approved requests of employee
+				//get approved requests
 				double totalNextYearOffHours = 0;
 				RequestSearchRequest rsr = new RequestSearchRequest();
 				rsr.setEmployeeId(eos.getEmployeeId() + "");
