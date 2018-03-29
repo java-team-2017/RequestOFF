@@ -10,6 +10,7 @@ import java.util.List;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -58,6 +59,15 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 	TeamEmployeeRepository teamEmployeeRepository;
 	@Autowired
 	TeamRepository teamRepository;
+	
+	@Value("${slack.postmessage.url}")
+	String urlPost;
+	@Value("${slack.postmessage.requestOffChannel}")
+	String requestOffChannel;
+	@Value("${slack.postmessage.birthdayChannel}")
+	String birthdayChannel;
+	@Value("${slack.postmessage.token}")
+	String token;
 
 	@Override
 	public long slackRequestRegist(SlackRequest slackRequest) {
@@ -336,9 +346,6 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 	public void sendRequestMsgToSlack(Request request) throws Exception{
 		Employee recipient = employeeRepository.findById(request.getRecipientId());
 		request.setRecipientName(recipient.getName());
-		String url = "https://slack.com/api/chat.postMessage";
-		String token = "xoxp-282152434071-281018004115-334900370514-b001a2686c8d3f22feabab9592703ec5";
-		String channel = "C94BSF83C";
 		String text = "Automatic Request Off : "+
 				"\n-Name: "+request.getEmployee().getName()+
 				"\n-Time off: "+request.getTotalTime()+  " hour(s)" +
@@ -347,8 +354,8 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 				"\n-Reason: "+request.getReason()+
 				"\n-Recipient: "+request.getRecipientName();
 		text = text.replaceAll(" ", "%20");
-		String urlParameters = "token="+token+"&channel="+channel+"&text="+text+"&pretty=1";
-		URL obj = new URL(url);
+		String urlParameters = "token="+token+"&channel="+requestOffChannel+"&text="+text+"&pretty=1";
+		URL obj = new URL(urlPost);
 		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 		con.setRequestMethod("POST");
 		con.setRequestProperty("Accept-Language", "UTF-8");
@@ -364,9 +371,6 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 	public void sendBirthdayMsgToEmployee(Employee employee) throws Exception {
 		TeamEmployee teamEmployee = teamEmployeeRepository.findByEmployeeId(employee.getId());
 		Team team = teamRepository.findById(teamEmployee.getTeamId());
-		String url = "https://slack.com/api/chat.postMessage";
-		String token = "xoxp-282152434071-281018004115-334900370514-b001a2686c8d3f22feabab9592703ec5";
-		String channel = "C94BSF83C";
 		String gender = "";
 		if(employee.getGender().equals("female")) {
 			gender = "her";
@@ -376,8 +380,8 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 		String text = " :birthday: Today is Birthday of " + employee.getName() + " who is belong to " + team.getName()
 				+ " Team :smile: Let give " + gender + " the best wishes :tada:";
 		text = text.replaceAll(" ", "%20");
-		String urlParameters = "token="+token+"&channel="+channel+"&text="+text+"&pretty=1";
-		URL obj = new URL(url);
+		String urlParameters = "token="+token+"&channel="+birthdayChannel+"&text="+text+"&pretty=1";
+		URL obj = new URL(urlPost);
 		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 		con.setRequestMethod("POST");
 		con.setDoOutput(true);
