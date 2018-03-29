@@ -346,6 +346,7 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 	public void sendRequestMsgToSlack(Request request) throws Exception{
 		Employee recipient = employeeRepository.findById(request.getRecipientId());
 		request.setRecipientName(recipient.getName());
+		String username = "Request Off Bot";
 		String text = "Automatic Request Off : "+
 				"\n-Name: "+request.getEmployee().getName()+
 				"\n-Time off: "+request.getTotalTime()+  " hour(s)" +
@@ -354,7 +355,7 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 				"\n-Reason: "+request.getReason()+
 				"\n-Recipient: "+request.getRecipientName();
 		text = text.replaceAll(" ", "%20");
-		String urlParameters = "token="+token+"&channel="+requestOffChannel+"&text="+text+"&pretty=1";
+		String urlParameters = "token="+token+"&channel="+requestOffChannel+"&text="+text+"&username="+username+"&pretty=1";
 		URL obj = new URL(urlPost);
 		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 		con.setRequestMethod("POST");
@@ -377,10 +378,11 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 		} else {
 			gender = "him";
 		}
+		String username = "Slack Bot";
 		String text = " :birthday: Today is Birthday of " + employee.getName() + " who is belong to " + team.getName()
 				+ " Team :smile: Let give " + gender + " the best wishes :tada:";
 		text = text.replaceAll(" ", "%20");
-		String urlParameters = "token="+token+"&channel="+birthdayChannel+"&text="+text+"&pretty=1";
+		String urlParameters = "token="+token+"&channel="+birthdayChannel+"&text="+text+"&username="+username+"&pretty=1";
 		URL obj = new URL(urlPost);
 		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 		con.setRequestMethod("POST");
