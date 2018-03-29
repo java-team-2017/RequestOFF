@@ -9,14 +9,19 @@
 	<body class="content-body">
 		<script th:inline="javascript">
 		/*<![CDATA[*/
-			var employee;
-			var employeeId;
-			var remainHours;
-			var listDayOffType;
-			var listRecipient = [];
-			var table;
-			
 			$(function() {
+				var employee;
+				var employeeId;
+				var remainHours;
+				var listDayOffType;
+				var listRecipient = [];
+				var table;
+				var deleteRequestId = {
+					'id' : '',
+					'updateDate' : ''
+				};
+				var deleteRequestIds = [];
+				
 				var requestRegistRequest = {
 					"id" : "",
 					"from_time" : "",
@@ -29,7 +34,8 @@
 					"recipient_id" : "",
 					"update_date" : ""
 				};
-				var deleteFlag = 0;
+				var deleteFlag = 0;	//0 -> update, 1 -> delete one request, 2 -> delete multiple requests
+				var rowData;
 				
 				//render day off type select
 				$.ajax({
@@ -81,11 +87,11 @@
 					$('#alertMessage_edit').hide();
 					
 					var index = $(this).index();
-					if(index <= 7) {
+					if(index >= 1 && index <= 8) {
 						table = $('#requestHistoryTable').DataTable();
 						rowData = table.row(this).data();
 						console.log(rowData);
-						if(index <= 6 || (index == 7 && rowData.status == 1 || rowData.status == 4)) {
+						if(index <= 7 || (index == 8 && rowData.status == 1) || (index == 8 && rowData.status == 4)) {
 							$("#modalRequestId").empty().append(rowData.id);
 							$("#modalStatus").empty().append(requestStatus[rowData.status]);
 							$("#modalTitle").empty().append(rowData.employee.name);
@@ -141,8 +147,6 @@
 								$("#modalRecipientDiv").show();
 							}
 							
-							
-							
 							$("#modalResponseMessage").val(rowData.responseMessage);
 							$("#modalUpdateDate").val(rowData.updateDate);
 							$("#modalTotalTime").val(rowData.totalTime);
@@ -190,63 +194,21 @@
 				});
 				
 				$("body").on("click", ".btnDelete", function(event) {
-					var row = $(this).closest("tr");	// Finds the closest row <tr> 
-					var id = row.find("td:nth-child(1)").html();	//Find the 1st <td> element
-					table = $('#requestHistoryTable').DataTable();
-					rowData = table.row($(this).parent()).data();
-					var updateDate = rowData.updateDate;
+					rowData = $('#requestHistoryTable').DataTable().row($(this).parent()).data();
 					
-					$("#requestId_confirmModalId").val(id);
-					$("#updateDate_confirmModalId").val(updateDate);
+					deleteRequestId.id = rowData.id;
+					deleteRequestId.updateDate = rowData.updateDate;
+					
 					$("#confirmMessage").html("Bạn có chắc chắn muốn xóa request này?");
 					$("#confirmModal").modal('show');
 					deleteFlag = 1;
 				});
 				
 				$("#yesConfirm").on("click", function(e) {
-					if(deleteFlag == 1) {
-						//update request
-						$.ajax({
-							type : "POST",
-							contentType : "application/json",
-							url : /*[[@{/request/regist}]]*/,
-							dataType : 'json',
-							data : JSON.stringify({
-								"id" : $("#requestId_confirmModalId").val(),
-								"valid_flag" : "0",
-								"update_date" : $("#updateDate_confirmModalId").val()
-							}),
-							success : function(returnData) {
-								if(returnData.status_info.status == 1) {
-									$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
-								} else {
-									table = $('#requestHistoryTable').DataTable();
-									table.ajax.reload();
-									$.ajax({
-										type : "POST",
-										contentType : "application/json",
-										url : /*[[@{/employee/getUser}]]*/,
-										dataType : 'json',
-										data : JSON.stringify({}),
-										success : function(returnData) {
-											if(returnData.status_info.status == 1) {
-												$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
-											} else {
-												remainHours = returnData.remainHours;
-												renderRemainHours(returnData.displayedRemainHours, 'remainHours');
-											}
-										},
-										error : function(e) {
-											$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-										}
-									});
-									$('#alertMessage_search').html("Delete successfully!").attr('class', 'alert alert-success').show();
-								}
-							},
-							error : function(e) {
-								$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-							}
-						});
+					if(deleteFlag == 1) {	//delete one request
+						deleteRequest(deleteRequestId);
+					} else if(deleteFlag == 2) {	//delete multiple requests
+						deleteRequest(deleteRequestIds);
 					} else {
 						requestRegistRequest.status = "5";
 						registRequest(requestRegistRequest);
@@ -280,10 +242,6 @@
 					if((editRequestData.reason_modalForm).length > 300) {
 						exceedLength = 1;
 					}
-// 					if(isNaN(editRequestData.offDays) == true || (parseFloat(editRequestData.offDays) % 1) !== 0
-// 							|| parseFloat(editRequestData.offDays) < 0) {
-// 						isNotNagativeInteger = 0;
-// 					}
 					if(offHours <= 0){
 						offHoursEqual0 = 1;
 					}
@@ -339,178 +297,338 @@
 						}
 					}
 				});
-			});
-		
-			function getRequestSearchRequest() {
-				var searchData = $('#requestHistoryForm').serializeJSON();
-				var from = searchData.fromTime;
-				var to = searchData.toTime;
-				if(from != "") {
-					from = from.substr(6, 4) + "-" + from.substr(0, 2) + "-" + from.substr(3, 2);
+				
+				$("body").on("click", ".btnSelect", function(event) {
+					rowData = $('#requestHistoryTable').DataTable().row($(this).parent()).data();
+					if($(this).is(":checked")) {
+						deleteRequestIds.push({
+							'id' : rowData.id,
+							'updateDate' : rowData.updateDate
+						});
+					} else {
+						var index = deleteRequestIds.indexOf({
+							'id' : rowData.id,
+							'updateDate' : rowData.updateDate
+						});
+						deleteRequestIds.splice(index, 1);
+					}
+					console.log(deleteRequestIds);
+					
+					if(deleteRequestIds.length > 0) {
+						$('#btnMultipleDelete').prop('disabled', false);
+					} else {
+						$('#btnMultipleDelete').prop('disabled', true);
+					}
+				});
+				
+				$('#btnMultipleDelete').on('click', function() {
+					if(deleteRequestIds.length > 1) {
+						$("#confirmMessage").html("Bạn có chắc chắn muốn xóa tất cả những request này?");
+					} else {
+						$("#confirmMessage").html("Bạn có chắc chắn muốn xóa request này?");
+					}
+					$("#confirmModal").modal('show');
+					deleteFlag = 2;
+				});
+				
+				function getRequestSearchRequest() {
+					var searchData = $('#requestHistoryForm').serializeJSON();
+					var from = searchData.fromTime;
+					var to = searchData.toTime;
+					if(from != "") {
+						from = from.substr(6, 4) + "-" + from.substr(0, 2) + "-" + from.substr(3, 2);
+					}
+					if(to != "") {
+						to = to.substr(6, 4) + "-" + to.substr(0, 2) + "-" + to.substr(3, 2);
+					}
+					
+					var requestSearchRequest = {
+						"employee_id" : employeeId,
+						"from_time" : from,
+						"to_time" : to,
+						"status" : searchData.requestType,
+						"valid_flag" : "1"
+					};
+					return requestSearchRequest;
 				}
 				
-				if(to != "") {
-					to = to.substr(6, 4) + "-" + to.substr(0, 2) + "-" + to.substr(3, 2);
+				function search(requestSearchRequest) {
+					$('#alertMessage_search').hide();
+					$('#requestHistoryTable').DataTable({
+						ajax: {
+							type : "POST",
+							contentType : "application/json",
+							url : /*[[@{/request/search}]]*/,
+							dataType : 'json',
+							data : function() {
+								return JSON.stringify(requestSearchRequest);
+							},
+							dataSrc: 'requests'
+						},
+						destroy: true,
+						searching: false,
+						order: [[ 1, "desc" ]],
+						pageLength: 50,
+						columnDefs: [
+							{
+								"targets": [ 0 ],
+								"orderable": false,
+								"className": "text-center",
+								"data": null,
+								"render": function(data, type, row) {
+									if(row.status == 1 || row.status == 4) {
+										var index = findObjById(deleteRequestIds, row.id);
+										if(index >= 0) {
+											return "<input class='btnSelect' type='checkbox' name='selectRequest' value='" + row.id + "' checked='true' />";
+										} else {
+											return "<input class='btnSelect' type='checkbox' name='selectRequest' value='" + row.id + "' />";
+										}
+									}
+									else {
+										return "<input class='not-active btnSelect' style='opacity: 0.5;' type='checkbox' name='selectRequest' value='" + row.id + "' />";
+									}
+								}
+							},
+							{
+								"className": 'hideColumn',
+								"targets": [ 1 ],
+								"data": 'id'
+							},
+							{
+								"targets": [ 2 ],
+								"data": 'insertDate',
+								"render": function(data, type, full, meta) {
+									return data.substr(0, data.length - 2);
+								}
+							},
+							{
+								"targets": [ 3 ],
+								"data": 'fromTime',
+								"render": function(data, type, full, meta) {
+									return data.substr(0, data.length - 5);
+								}
+							},
+							{
+								"targets": [ 4 ],
+								"data": 'toTime',
+								"render": function(data, type, full, meta) {
+									return data.substr(0, data.length - 5);
+								}
+							},
+							{
+								"targets": [ 5 ],
+								"data": 'totalTime',
+								"render": function(data, type, full, meta) {
+									var offDays = parseInt(parseFloat(data) / 8);
+									var offHours = parseFloat(data) - (offDays * 8);
+									return offDays + "d " + offHours + "h";
+								}
+							},
+							{
+								"targets": [ 6 ],
+								"data": 'reason'
+							},
+							{
+								"targets": [ 7 ],
+								"data": 'status',
+								"render": function(data, type, full, meta) {
+									return requestStatus[data];
+								}
+							},
+							{
+								"targets": [ 8 ],
+								"className": "text-center",
+								"data": null,
+								"render": function(data, type, row) {
+									if(row.status == 1 || row.status == 4) {
+										return "<a><span class='glyphicon glyphicon-pencil' style='cursor: pointer;'></span></a>";
+									}
+									else {
+										return "<a class='not-active'><span class='glyphicon glyphicon-pencil' style='opacity: 0.5;'></span></a>";
+									}
+								}
+							},
+							{
+								"targets": [ 9 ],
+								"className": "text-center",
+								"data": null,
+								"render": function(data, type, row) {
+									if(row.status == 1 || row.status == 4) {
+										return "<a class='btnDelete'><span class='glyphicon glyphicon-trash' style='cursor: pointer;'></span></a>";
+									}
+									else {
+										return "<a class='btnDelete not-active'><span class='glyphicon glyphicon-trash' style='opacity: 0.5;'></span></a>";
+									}
+								}
+							}
+						]
+					});
 				}
-
-				var requestSearchRequest = {
-					"id" : "",
-					"employee_id" : employeeId,
-					"from_time" : from,
-					"to_time" : to,
-					"total_time" : "",
-					"reason" : "",
-					"status" : searchData.requestType,
-					"response_message" : "",
-					"day_off_type_id" : "",
-					"recipient_id" : "",
-					"valid_flag" : "1"
-				};
-				return requestSearchRequest;
-			}
-			
-			function search(requestSearchRequest) {
-				$('#alertMessage_search').hide();
-				$('#requestHistoryTable').DataTable({
-					ajax: {
+				
+				function registRequest(registData) {
+					var notifyStr;
+					if(registData.status == 1) {
+						notifyStr = "Request của bạn đã được lưu";
+					} else {
+						notifyStr = "Request của bạn đã được gửi";
+					}
+					
+					console.log(registData);
+					$.ajax({
 						type : "POST",
 						contentType : "application/json",
-						url : /*[[@{/request/search}]]*/,
+						url : /*[[@{/request/regist}]]*/,
 						dataType : 'json',
-						data : function() {
-							return JSON.stringify(requestSearchRequest);
-						},
-						dataSrc: 'requests'
-					},
-					destroy: true,
-					searching: false,
-					order: [[ 1, "desc" ]],
-					pageLength: 50,
-					columnDefs: [
-						{
-							"targets": [ 0 ],
-							"data": 'id'
-						},
-						{
-							"targets": [ 1 ],
-							"data": 'insertDate',
-							"render": function(data, type, full, meta) {
-								return data.substr(0, data.length - 2);
+						data : JSON.stringify(registData),
+						success : function(returnData) {
+							if(returnData.status_info.status == 1) {
+								$('#alertMessage_edit').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+							} else {
+								table = $('#requestHistoryTable').DataTable();
+								table.ajax.reload();
+								$.ajax({
+									type : "POST",
+									contentType : "application/json",
+									url : /*[[@{/employee/getUser}]]*/,
+									dataType : 'json',
+									data : JSON.stringify({}),
+									success : function(returnData) {
+										if(returnData.status_info.status == 1) {
+											$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+										} else {
+											remainHours = returnData.remainHours;
+											renderRemainHours(returnData.displayedRemainHours, 'remainHours');
+										}
+									},
+									error : function(e) {
+										$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+									}
+								});
+								$('#requestDetailsModal').modal('hide');
+								$('#alertMessage_search').html(notifyStr).attr('class', 'alert alert-success').show();
 							}
 						},
-						{
-							"targets": [ 2 ],
-							"data": 'fromTime',
-							"render": function(data, type, full, meta) {
-								return data.substr(0, data.length - 5);
-							}
-						},
-						{
-							"targets": [ 3 ],
-							"data": 'toTime',
-							"render": function(data, type, full, meta) {
-								return data.substr(0, data.length - 5);
-							}
-						},
-						{
-							"targets": [ 4 ],
-							"data": 'totalTime',
-							"render": function(data, type, full, meta) {
-								var offDays = parseInt(parseFloat(data) / 8);
-								var offHours = parseFloat(data) - (offDays * 8);
-								return offDays + "d " + offHours + "h";
-							}
-						},
-						{
-							"targets": [ 5 ],
-							"data": 'reason'
-						},
-						{
-							"targets": [ 6 ],
-							"data": 'status',
-							"render": function(data, type, full, meta) {
-								return requestStatus[data];
-							}
-						},
-						{
-							"targets": [ 7 ],
-							"className": "text-center",
-							"data": null,
-							"render": function(data, type, row) {
-								if(row.status == 1 || row.status == 4) {
-									return "<a><span class='glyphicon glyphicon-pencil' style='cursor: pointer;'></span></a>";
-								}
-								else {
-									return "<a class='not-active'><span class='glyphicon glyphicon-pencil' style='opacity: 0.5;'></span></a>";
-								}
-							}
-						},
-						{
-							"targets": [ 8 ],
-							"className": "text-center",
-							"data": null,
-							"render": function(data, type, row) {
-								if(row.status == 1 || row.status == 4) {
-									return "<a class='btnDelete'><span class='glyphicon glyphicon-remove' style='cursor: pointer;'></span></a>";
-								}
-								else {
-									return "<a class='btnDelete not-active'><span class='glyphicon glyphicon-remove' style='opacity: 0.5;'></span></a>";
-								}
-							}
+						error : function(e) {
+							$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 						}
-					]
-				});
-			}
-			
-			function registRequest(registData) {
-				var notifyStr;
-				if(registData.status == 1) {
-					notifyStr = "Request của bạn đã được lưu";
-				} else {
-					notifyStr = "Request của bạn đã được gửi";
+					});
 				}
 				
-				console.log(registData);
-				$.ajax({
-					type : "POST",
-					contentType : "application/json",
-					url : /*[[@{/request/regist}]]*/,
-					dataType : 'json',
-					data : JSON.stringify(registData),
-					success : function(returnData) {
-						if(returnData.status_info.status == 1) {
-							$('#alertMessage_edit').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
-						} else {
-							table = $('#requestHistoryTable').DataTable();
-							table.ajax.reload();
+				function deleteRequest(ids) {
+					if (ids instanceof Array){
+						$.each(deleteRequestIds, function(index, element) {
 							$.ajax({
 								type : "POST",
 								contentType : "application/json",
-								url : /*[[@{/employee/getUser}]]*/,
+								url : /*[[@{/request/regist}]]*/,
 								dataType : 'json',
-								data : JSON.stringify({}),
+								data : JSON.stringify({
+									"id" : element.id,
+									"valid_flag" : "0",
+									"update_date" : element.updateDate
+								}),
 								success : function(returnData) {
 									if(returnData.status_info.status == 1) {
 										$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
 									} else {
-										remainHours = returnData.remainHours;
-										renderRemainHours(returnData.displayedRemainHours, 'remainHours');
+										table = $('#requestHistoryTable').DataTable();
+										table.ajax.reload();
+										$.ajax({
+											type : "POST",
+											contentType : "application/json",
+											url : /*[[@{/employee/getUser}]]*/,
+											dataType : 'json',
+											data : JSON.stringify({}),
+											success : function(returnData) {
+												if(returnData.status_info.status == 1) {
+													$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+												} else {
+													remainHours = returnData.remainHours;
+													renderRemainHours(returnData.displayedRemainHours, 'remainHours');
+												}
+											},
+											error : function(e) {
+												$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+											}
+										});
+										$('#alertMessage_search').html("Delete successfully!").attr('class', 'alert alert-success').show();
+										
+										//remove id of deleted request
+										var index = findObjById(deleteRequestIds, element.id);
+										if(index >= 0) {
+											deleteRequestIds.splice(index, 1);
+										}
+										console.log(deleteRequestIds);
 									}
 								},
 								error : function(e) {
 									$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
 								}
 							});
-							$('#requestDetailsModal').modal('hide');
-							$('#alertMessage_search').html(notifyStr).attr('class', 'alert alert-success').show();
-						}
-					},
-					error : function(e) {
-						$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+						});
+					} else {
+						$.ajax({
+							type : "POST",
+							contentType : "application/json",
+							url : /*[[@{/request/regist}]]*/,
+							dataType : 'json',
+							data : JSON.stringify({
+								"id" : ids.id,
+								"valid_flag" : "0",
+								"update_date" : ids.updateDate
+							}),
+							success : function(returnData) {
+								if(returnData.status_info.status == 1) {
+									$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+								} else {
+									table = $('#requestHistoryTable').DataTable();
+									table.ajax.reload();
+									$.ajax({
+										type : "POST",
+										contentType : "application/json",
+										url : /*[[@{/employee/getUser}]]*/,
+										dataType : 'json',
+										data : JSON.stringify({}),
+										success : function(returnData) {
+											if(returnData.status_info.status == 1) {
+												$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+											} else {
+												remainHours = returnData.remainHours;
+												renderRemainHours(returnData.displayedRemainHours, 'remainHours');
+											}
+										},
+										error : function(e) {
+											$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+										}
+									});
+									$('#alertMessage_search').html("Delete successfully!").attr('class', 'alert alert-success').show();
+									
+									//remove id of deleted request
+									var index = findObjById(deleteRequestIds, ids.id);
+									if(index >= 0) {
+										deleteRequestIds.splice(index, 1);
+									}
+									console.log(deleteRequestIds);
+								}
+							},
+							error : function(e) {
+								$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+							}
+						});
 					}
-				});
-			}
-			
+				}
+				
+				function findObjById(objectArr, objectId) {
+					var returnIndex = -1;
+					$.each(objectArr, function(index, element) {
+						if(element.id == objectId) {
+							returnIndex = index;
+						}
+					});
+					return returnIndex;
+				}
+			});
+		
 		/*]]>*/
 		</script>
 		
@@ -575,7 +693,8 @@
 					<table class="display table table-bordered" cellspacing="0" width="100%" id="requestHistoryTable">
 						<thead>
 							<tr>
-								<th class="text-center idCell">ID</th>
+								<th class="text-center idCell" ></th>
+								<th class="text-center idCell hideColumn">ID</th>
 								<th class="text-center timeOfCreationCell">Ngày tạo</th>
 								<th class="text-center fromCell">Từ</th>
 								<th class="text-center toCell">Đến</th>
@@ -591,6 +710,10 @@
 	
 						</tbody>
 					</table>
+					
+					<div>
+						<button type="button" class="btn btn-primary" id="btnMultipleDelete" disabled="true">Xóa</button>
+					</div>
 					
 					<div class="modal fade" id="requestDetailsModal" role="dialog">
 						<div class="modal-dialog modal-dialog-centered">
