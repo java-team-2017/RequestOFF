@@ -128,8 +128,8 @@
 				requestObjArr = [];
 				var status = $(this).attr('id') == 'btnApprove' ? 2 : 3;
 				var action = $(this).attr('id') == 'btnApprove' ? 'CHẤP NHẬN' : 'TỪ CHỐI';
-				if($('#requestTable input[type="checkbox"]:checked').length > 0){
-					var numberOfRequest = $('#requestTable input[type="checkbox"]:checked').length;
+				var numberOfRequest = $('#requestTable input[type="checkbox"]:checked').length;
+				if(numberOfRequest > 0){
 					if(numberOfRequest == 1){
 						$('#confirmMsg').text("Bạn có chắc chắn muốn " + action + " request này ?");
 					} else {

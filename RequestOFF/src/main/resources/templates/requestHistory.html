@@ -12,8 +12,6 @@
 			$(function() {
 				var employee;
 				var employeeId;
-				var remainHours;
-				var listDayOffType;
 				var listRecipient = [];
 				var table;
 				var deleteRequestId = {
@@ -37,30 +35,11 @@
 				var deleteFlag = 0;	//0 -> update, 1 -> delete one request, 2 -> delete multiple requests
 				var rowData;
 				
-				//render day off type select
-				$.ajax({
-					type : "POST",
-					contentType : "application/json",
-					url : /*[[@{/dayOffType/search}]]*/,
-					dataType : 'json',
-					data : JSON.stringify({"valid_flag_id" : "1"}),
-					success : function(returnData) {
-						listDayOffType = returnData.listDayOffType;
-						var option = "";
-						$.each(returnData.listDayOffType, function(i, element){
-							option += "<option value='" + element.id + "'>" + element.name + "</option>"; 
-						});
-						$("#modalDayOffType").append(option);
-					},
-					error : function(e) {
-						console.log(html(errors['APIResponseError'](e)));
-					}
-				});
+				renderDayOffTypeSelect('modalDayOffType');
 				
 				getLoggedUser(function(returnData){
 					employee = returnData.user;
 					employeeId = employee.id;
-					remainHours = returnData.displayedRemainHours;
 					listRecipient = returnData.listRecipients;
 					
 					renderRemainHours(returnData.displayedRemainHours, 'remainHours');
@@ -490,24 +469,14 @@
 							} else {
 								table = $('#requestHistoryTable').DataTable();
 								table.ajax.reload();
-								$.ajax({
-									type : "POST",
-									contentType : "application/json",
-									url : /*[[@{/employee/getUser}]]*/,
-									dataType : 'json',
-									data : JSON.stringify({}),
-									success : function(returnData) {
-										if(returnData.status_info.status == 1) {
-											$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
-										} else {
-											remainHours = returnData.remainHours;
-											renderRemainHours(returnData.displayedRemainHours, 'remainHours');
-										}
-									},
-									error : function(e) {
-										$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+								getLoggedUser(function(returnData){
+									if(returnData.status_info.status == 1) {
+										$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+									} else {
+										renderRemainHours(returnData.displayedRemainHours, 'remainHours');
 									}
 								});
+								
 								$('#requestDetailsModal').modal('hide');
 								$('#alertMessage_search').html(notifyStr).attr('class', 'alert alert-success').show();
 							}
@@ -548,22 +517,11 @@
 										if(deleteRequestIds.length == 0) {
 											table = $('#requestHistoryTable').DataTable();
 											table.ajax.reload();
-											$.ajax({
-												type : "POST",
-												contentType : "application/json",
-												url : /*[[@{/employee/getUser}]]*/,
-												dataType : 'json',
-												data : JSON.stringify({}),
-												success : function(returnData) {
-													if(returnData.status_info.status == 1) {
-														$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
-													} else {
-														remainHours = returnData.remainHours;
-														renderRemainHours(returnData.displayedRemainHours, 'remainHours');
-													}
-												},
-												error : function(e) {
-													$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+											getLoggedUser(function(returnData){
+												if(returnData.status_info.status == 1) {
+													$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+												} else {
+													renderRemainHours(returnData.displayedRemainHours, 'remainHours');
 												}
 											});
 											if(success == 1) {
@@ -594,22 +552,11 @@
 								} else {
 									table = $('#requestHistoryTable').DataTable();
 									table.ajax.reload();
-									$.ajax({
-										type : "POST",
-										contentType : "application/json",
-										url : /*[[@{/employee/getUser}]]*/,
-										dataType : 'json',
-										data : JSON.stringify({}),
-										success : function(returnData) {
-											if(returnData.status_info.status == 1) {
-												$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
-											} else {
-												remainHours = returnData.remainHours;
-												renderRemainHours(returnData.displayedRemainHours, 'remainHours');
-											}
-										},
-										error : function(e) {
-											$('#alertMessage_search').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+									getLoggedUser(function(returnData){
+										if(returnData.status_info.status == 1) {
+											$('#alertMessage_search').html(returnData.status_info.error).attr('class', 'alert alert-danger').show();
+										} else {
+											renderRemainHours(returnData.displayedRemainHours, 'remainHours');
 										}
 									});
 									$('#alertMessage_search').html("Delete successfully!").attr('class', 'alert alert-success').show();
