@@ -138,9 +138,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 		long managerId = department.getManagerId();
 		int requestInProcessing = requestRepository.getNumberOfRequestReceivedInProcessing(managerId);
 		if(teams.size() > 0) {
-			Employee manager = employeeRepository.findById(department.getManagerId());
-			throw new Exception(manager.getName() + " đang quản lý team thuộc " + department.getName() + " Department.<br/>"
-					+ "Vui lòng xóa tất cả team trước khi xóa Department.");
+//			Employee manager = employeeRepository.findById(department.getManagerId());
+			throw new Exception("Vui lòng xóa tất cả team thuộc " + department.getName() + " Department trước khi xóa " + department.getName() +" Department.");
 		} 
 		else if(requestInProcessing > 0) {
 			Employee em = employeeRepository.findById(managerId);

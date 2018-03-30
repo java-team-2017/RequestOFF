@@ -46,6 +46,36 @@
 				}
 			});
 			
+			$('#employee').typeahead({
+				name: 'suggest-employee',
+				limit: 100,
+				hint: false,
+				remote: {
+					rateLimitWait: 1000,
+					url : /*[[@{/employee/search}]]*/,
+					replace: function (url, uriEncodedQuery){
+						return url + "#" + uriEncodedQuery;
+					},
+					beforeSend: function (jqXhr, settings) {
+						jqXhr.setRequestHeader('Content-Type','application/json');
+						settings.type = 'POST';
+						settings.hasContent = true;
+						settings.data = JSON.stringify({"name": $('#employee').val(), "name_match_status": "0"});
+					},
+					filter: function (data) {
+						var result = data.employees;
+						var sourceArr = [];
+						$.each(result, function(index, object) {
+							sourceArr.push(object.name);
+						});
+						return sourceArr;
+					}
+				}
+			}).bind('typeahead:selected', function(obj, selected, name) {
+				$(this).typeahead('setQuery', $("<div/>").html(selected.value).text());
+				return false;
+			});
+			
 			$('#requestTable').on('click', 'td', function () {
 				var rowData = $('#requestTable').DataTable().row(this).data();
 				dataReturnRequest = rowData;
@@ -177,36 +207,6 @@
 					else 
 						updateRequest(object, false);
 				});
-			});
-			
-			$('#employee').typeahead({
-				name: 'suggest-employee',
-				limit: 100,
-				hint: false,
-				remote: {
-					rateLimitWait: 1000,
-					url : /*[[@{/employee/search}]]*/,
-					replace: function (url, uriEncodedQuery){
-						return url + "#" + uriEncodedQuery;
-					},
-					beforeSend: function (jqXhr, settings) {
-						jqXhr.setRequestHeader('Content-Type','application/json');
-						settings.type = 'POST';
-						settings.hasContent = true;
-						settings.data = JSON.stringify({"name": $('#employee').val(), "name_match_status": "0"});
-					},
-					filter: function (data) {
-						var result = data.employees;
-						var sourceArr = [];
-						$.each(result, function(index, object) {
-							sourceArr.push(object.name);
-						});
-						return sourceArr;
-					}
-				}
-			}).bind('typeahead:selected', function(obj, selected, name) {
-				$(this).typeahead('setQuery', $("<div/>").html(selected.value).text());
-				return false;
 			});
 			
 		});
