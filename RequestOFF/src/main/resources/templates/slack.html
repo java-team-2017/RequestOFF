@@ -22,6 +22,8 @@
 			$(this).datepicker('hide');
 		});
 		
+		$('[data-toggle="tooltip"]').tooltip();
+		
 		getLoggedUser(function(returnData){
 			if(returnData.user.position.code == 2 || returnData.leaderFlag == 1){
 				renderNumberOfRequest(returnData.user.id);
@@ -106,7 +108,7 @@
 						data: null,
 						render: function (data, type, row){
 							if(row.isValidMsg != 1 && row.processFlag != 1) {
-								return "<a class='btnDeny'><span class='glyphicon glyphicon-remove' style='cursor: pointer;'></span></a>";
+								return '<a data-toggle="tooltip" title="Từ chối" class="btnDeny"><span class="glyphicon glyphicon-remove" style="cursor: pointer;"></span></a>';
 							}
 							else {
 								return "<a class='btnDeny not-active'><span class='glyphicon glyphicon-remove' style='opacity: 0.5;'></span></a>";
@@ -124,7 +126,6 @@
 			if(index > 7) return;
 			row = $('#slackRequestTable').DataTable().row(this);
 			rowData = $('#slackRequestTable').DataTable().row(this).data();
-			console.log(rowData);
 			$('#modalMsg').hide();
 			if (rowData.processFlag == 1 || (rowData.processFlag == 0 && rowData.isValidMsg == 1)) {
 				$('#modalDenyBtn, #modalApproveBtn').hide();
@@ -342,7 +343,6 @@
 				}
 				
 			} else if (action == 'table deny') { // click deny sign on table
-// 				rowData = $('#slackRequestTable').DataTable().row($(this).parent()).data();
 				updateData = {
 					id: rowData.id,
 					update_date: rowData.updateDate,
@@ -350,8 +350,6 @@
 				}
 			}
 			
-			console.log("update data");
-			console.log(updateData);
 			$.ajax({
 				url : /*[[@{/slack/regist}]]*/,
 				type : "post",
@@ -466,7 +464,7 @@
 						<th class="text-center"></th>
 					</tr>
 				</thead>
-				<tbody class="text-center">
+				<tbody class="text-center" style="cursor: pointer;">
 				</tbody>
 			</table>
 		</div>

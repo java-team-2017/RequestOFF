@@ -111,7 +111,6 @@ function renderDayOffTypeSelect(containerId) {
 		type : "POST",
 		contentType : "application/json",
 		url : webRootPath + "dayOffType/search",
-//		url : /*[[@{/dayOffType/search}]]*/,
 		dataType : 'json',
 		data : JSON.stringify({"valid_flag_id" : "1"}),
 		success : function(returnData) {

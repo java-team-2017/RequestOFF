@@ -14,7 +14,6 @@
 			"department_id": $('#department').val(),
 			"valid_flag": 1
 		};
-		console.log(requestSearch);
 		$('#teamTable').DataTable( {
 			ajax: {
 				type: "POST",
@@ -58,7 +57,6 @@
 		var selectedRow; // data of selected row of teamTable
 		
 		function reloadPage() {
-			var teamTable = $('#teamTable').DataTable();
 			var teamId = $('#team').val();
 			renderTeamSelect("team", function(teams) {
 				listTeam = teams;
@@ -131,8 +129,6 @@
 			var teamTable = $('#teamTable').DataTable();
 			var rowData = teamTable.row(this).data();
 			selectedRow = rowData;
-			console.log("rowData");
-			console.log(rowData);
 			
 			$('#detailDepartment').val(rowData.department.name);
 			$('#detailTeam').val(rowData.name);
@@ -211,9 +207,6 @@
 					if (response.status_info.status != 0) {
 						$('#teamEditMsg').html(errors['APIResponseError'](response.status_info.error)).attr('class', 'alert alert-danger').show();
 					} else {
-						console.log("response")
-						console.log(response);
-						
 						$('#editLeader').empty();
 						$('#editMemberInTeam').empty();
 						if (isCreateEvent == false) { // update
@@ -321,8 +314,6 @@
 					$('#teamEditModal').modal('hide');
 				}
 			});
-			console.log("teamData");
-			console.log(teamData);
 		});
 		
 		//=====================================================================
@@ -332,7 +323,7 @@
 			var button = $(this);
 			$(this).confirmation({
 				placement: 'left',
-				title: "Bạn có chắc chắn muốn xóa?",
+				title: "Bạn có chắc không?",
 				btnOkLabel: "Có",
 				btnCancelLabel: "Không",
 				onConfirm: function() {
@@ -413,7 +404,7 @@
 							<th class="text-center" name="delete" style="width: 40px;"><span>Xóa</span></th>
 						</tr>
 					</thead>
-					<tbody class="text-center">
+					<tbody class="text-center" style="cursor: pointer;">
 					</tbody>
 				</table>
 			</div>

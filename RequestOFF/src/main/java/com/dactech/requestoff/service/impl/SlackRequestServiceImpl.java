@@ -352,8 +352,8 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 		String text = "Automatic Request Off : "+
 				"\n-Name: "+request.getEmployee().getName()+
 				"\n-Time off: "+request.getTotalTime()+  " hour(s)" +
-				"\n-From: "+request.getFromTime()+
-				"\n-To: "+request.getToTime()+
+				"\n-From: "+request.getFromTime().substring(0, request.getFromTime().length() - 5)+
+				"\n-To: "+request.getToTime().substring(0, request.getToTime().length() - 5)+
 				"\n-Reason: "+request.getReason()+
 				"\n-Recipient: "+request.getRecipientName();
 		text = text.replaceAll(" ", "%20");
