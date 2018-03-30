@@ -9,3 +9,11 @@
 .hideColumn {
 	display : none;
 }
+
+.dateOfBirthCell, .startWorkingDateCell {
+	width: 10%;
+}
+
+.teamCell, .departmentCell {
+	width: 15%;
+}

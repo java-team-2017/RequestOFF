@@ -2,10 +2,6 @@
 	margin-top: 3px; /* make space between table and pagination */
 }
 
-.customButton {
-	width: 100px;
-}
-
 .requestHistoryFormButton {
 	margin: 0px 20px;
 }
@@ -14,8 +10,12 @@
 	margin-bottom: 20px;
 }
 
-.idCell, .editCell, .deleteCell {
+.editCell, .deleteCell {
 	width: 5%;
+}
+
+.idCell, .selectCell {
+	width: 4%;
 }
 
 .statusCell {
@@ -26,12 +26,12 @@
 	width: 15%;
 }
 
-.fromCell, .toCell, .timeOfCreationCell, .offHoursCell {
-	width: 13%;
+.fromCell, .toCell, .timeOfCreationCell {
+	width: 11%;
 }
 
-.pleaseFillIn {
-	background-color: moccasin;
+.offHoursCell, .dayOffTypeCell {
+	width: 9%;
 }
 
 .mydatepicker {

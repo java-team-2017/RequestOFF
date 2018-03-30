@@ -66,11 +66,11 @@
 					$('#alertMessage_edit').hide();
 					
 					var index = $(this).index();
-					if(index >= 1 && index <= 8) {
+					if(index >= 1 && index <= 9) {
 						table = $('#requestHistoryTable').DataTable();
 						rowData = table.row(this).data();
 						console.log(rowData);
-						if(index <= 7 || (index == 8 && rowData.status == 1) || (index == 8 && rowData.status == 4)) {
+						if(index <= 8 || (index == 9 && rowData.status == 1) || (index == 9 && rowData.status == 4)) {
 							$("#modalRequestId").empty().append(rowData.id);
 							$("#modalStatus").empty().append(requestStatus[rowData.status]);
 							$("#modalTitle").empty().append(rowData.employee.name);
@@ -409,17 +409,28 @@
 							},
 							{
 								"targets": [ 6 ],
-								"data": 'reason'
+								"data": 'dayOffType',
+								"render": function(data, type, full, meta) {
+									if(data.paymentFlag == 1) {
+										return "có lương";
+									} else {
+										return "không lương";
+									}
+								}
 							},
 							{
 								"targets": [ 7 ],
+								"data": 'reason'
+							},
+							{
+								"targets": [ 8 ],
 								"data": 'status',
 								"render": function(data, type, full, meta) {
 									return requestStatus[data];
 								}
 							},
 							{
-								"targets": [ 8 ],
+								"targets": [ 9 ],
 								"className": "text-center",
 								"data": null,
 								"render": function(data, type, row) {
@@ -432,7 +443,7 @@
 								}
 							},
 							{
-								"targets": [ 9 ],
+								"targets": [ 10 ],
 								"className": "text-center",
 								"data": null,
 								"render": function(data, type, row) {
@@ -648,15 +659,16 @@
 					</fieldset>
 					
 					<br/>
-					<table class="display table table-bordered" cellspacing="0" width="100%" id="requestHistoryTable">
+					<table class="display table table-bordered table-striped table-hover" cellspacing="0" width="100%" id="requestHistoryTable">
 						<thead>
 							<tr>
-								<th class="text-center idCell" ></th>
+								<th class="text-center selectCell" ></th>
 								<th class="text-center idCell hideColumn">ID</th>
 								<th class="text-center timeOfCreationCell">Ngày tạo</th>
 								<th class="text-center fromCell">Từ</th>
 								<th class="text-center toCell">Đến</th>
 								<th class="text-center offHoursCell">Thời gian nghỉ</th>
+								<th class="text-center dayOffTypeCell">Loại ngày nghỉ</th>
 								<th class="text-center reasonCell">Lý do</th>
 								<th class="text-center statusCell">Trạng thái</th>
 								<th class="text-center editCell">Sửa</th>
