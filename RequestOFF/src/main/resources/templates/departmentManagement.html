@@ -249,11 +249,13 @@
 				{ data: 'name' },
 				{ data: 'manager.name' },
 				{
+					"orderable": false,
 					render: function (index) {
 							return '<a class="glyphiconEdit"><span class="glyphicon glyphicon-pencil" style="cursor: pointer;" value="' + index + '"></span></a>';
 					},
 				},
 				{
+					"orderable": false,
 					render: function (index) {
 							return '<a class="btnDelete"><span class="glyphicon glyphicon-trash" style="cursor: pointer;" value="' + index + '"></span></a>';
 					},

@@ -283,6 +283,7 @@
 				columns: [
 					{
 						data: 'status',
+						"orderable": false,
 						render: function (data, type, row) {
 							if(row.status != 5 ){
 								return '<input id="checkbox" type="checkbox" disabled="disabled">';
@@ -323,6 +324,7 @@
 					{ data: 'reason' },
 					{
 						data: 'status',
+						"orderable": false,
 						render: function (data, type, row) {
 							if(row.status == 5 && row.recipientId == userData.user.id) {
 								return '<a data-toggle="tooltip" title="Chấp nhận" class="btnApprove"><span class="glyphicon glyphicon-ok" style="cursor: pointer;">&nbsp;&nbsp;<a data-toggle="tooltip" title="Từ chối" class="btnDeny"><span class="glyphicon glyphicon-remove" style="cursor: pointer;"></span></a></a>';

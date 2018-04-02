@@ -1,6 +1,6 @@
 package com.dactech.requestoff.service.impl;
 
-import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -666,17 +666,30 @@ public class EmployeeServiceImpl implements EmployeeService {
 		return false;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public List<Employee> listEmployeeHaveBirthday() {
 		List<Employee> listEmployee = employeeRepository.findAll();
 		List<Employee> listEmployeeHaveBirthday = new ArrayList<Employee>();
 		
-		DateFormat dateFormat = new SimpleDateFormat("MM-dd");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date currentDate = new Date();
-		String currentDateFormat = dateFormat.format(currentDate);
+		//String currentDateFormat = dateFormat.format(currentDate);
+		String currentDateFormat = (currentDate.getMonth()+1) + "-" + currentDate.getDate();//cách 1
 		for(Employee employee : listEmployee) {
-			String birthDayOfEmployee = employee.getBirthday().substring(5, employee.getBirthday().length());
-			if(birthDayOfEmployee.equals(currentDateFormat)) {
+			String birthday = null;
+			String birthDayOfEmployee = employee.getBirthday();
+			try {
+				Date date = dateFormat.parse(birthDayOfEmployee); // convert from String to Date
+				//System.out.println(dateFormat.format(date));// convert from Date to String
+				birthday = (date.getMonth()+1) + "-" + date.getDate();
+				//cách 2: format date lần 2
+				//SimpleDateFormat df = new SimpleDateFormat("MM-dd");
+				//System.out.println("day format:" +df.format(date));
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			if(birthday.equals(currentDateFormat)) {
 				listEmployeeHaveBirthday.add(employee);
 			}
 		}
