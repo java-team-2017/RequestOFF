@@ -2,6 +2,27 @@ var webRootPath = '/';
 
 $(function() {
 	$(".only-number").on("keypress", function(event) {
+		if ((event.keyCode < 48 && event.keyCode != 45) || event.keyCode > 57) {
+			event.preventDefault();
+		}
+		if($(this).val() == '') {
+			if ((event.keyCode < 48 && event.keyCode != 45) || event.keyCode > 57) {
+				event.preventDefault();
+			}
+		} else if($(this).val()[0] == '-') {
+			if (event.keyCode == 45) {
+				event.preventDefault();
+			}
+			$(this).attr('maxlength', '3');
+		} else {
+			if (event.keyCode == 45) {
+				event.preventDefault();
+			}
+			$(this).attr('maxlength', '2');
+		}
+	});
+	
+	$(".only-positive-number").on("keypress", function(event) {
 		if (event.keyCode < 48 || event.keyCode > 57) {
 			event.preventDefault();
 		}

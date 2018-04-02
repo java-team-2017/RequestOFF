@@ -87,6 +87,9 @@
 		
 		// edit remain off time modal
 		$('#editHours').empty();
+		for (var i = -7.5; i < 0 ; i += 0.5) {
+			$('#editHours').append('<option value="' + i + '">' + i + '</option>');
+		}
 		for (var i = 0; i < 8 ; i += 0.5) {
 			$('#editHours').append('<option value="' + i + '">' + i + '</option>');
 		}
@@ -177,7 +180,13 @@
 									return "No Data";
 								}
 								if (data == "") data = 0;
-								return Math.floor(data/8) + "d " + (data % 8) + "h";
+// 								else if(data > 0) {
+// // 									return Math.floor(data/8) + "d " + (data % 8) + "h";
+// 								} else {
+// 									data = 0 - data;
+// 									return "-" + Math.floor(data/8) + "d " + "-" + (data % 8) + "h";
+// 								}
+								return parseInt(data/8) + "d " + (data % 8) + "h";
 							} else { // for sort and type detection
 								if (row.employee.employeeOffStatus == null) {
 									data = 0;
@@ -245,7 +254,8 @@
 				$('#detailRemainDay').val("No Data");
 			} else {
 				remainHours = statisticsObj.employee.employeeOffStatus.remainHours;
-				$('#detailRemainDay').val(Math.floor(remainHours/8) + "d " + (remainHours % 8) + "h");
+// 				$('#detailRemainDay').val(Math.floor(remainHours/8) + "d " + (remainHours % 8) + "h");
+				$('#detailRemainDay').val(parseInt(remainHours/8) + "d " + (remainHours % 8) + "h");
 			}
 			
 			
@@ -337,8 +347,9 @@
 			$('#editEmployee').val(statisticsObj.employee.name);
 			
 			var remainHours = statisticsObj.employee.employeeOffStatus.remainHours;
-			$('#editRemainDay').val(Math.floor(remainHours/8) + "d " + (remainHours % 8) + "h");
-			$('#editDays').val(Math.floor(remainHours/8));
+			
+			$('#editRemainDay').val(parseInt(remainHours/8) + "d " + (remainHours % 8) + "h");
+			$('#editDays').val(parseInt(remainHours/8));
 			$('#editHours').val(remainHours % 8);
 			
 			$('#editMsg').hide();
@@ -350,40 +361,36 @@
 			var days = parseFloat($('#editDays').val());
 			var hours = parseFloat($('#editHours').val());
 			console.log("day " + days + " hours : " + hours);
-			if (isNaN(parseInt(days)) || parseInt(days) != parseFloat(days) || parseInt(days) < 0) {
-				$('#editMsg').html("Số ngày nghỉ phải là số nguyên dương").show();
-			} else {
-				console.log(editEmployee);
-				var remainHours = days * 8 + hours;
-				eOSRequest = {
-					'year_id': editEmployee.employeeOffStatus.yearId,
-					'employee_id': editEmployee.id,
-					'remain_hours': remainHours,
-					'update_date': editEmployee.employeeOffStatus.updateDate,
-					"valid_flag": 1
-				}
-				
-				$.ajax({
-					url : /*[[@{/employeeOffStatus/regist}]]*/,
-					type : "post",
-					dataType :"json",
-					contentType : "application/json",
-					data : JSON.stringify(eOSRequest),
-					success : function (teamSearchResponse){
-						if (teamSearchResponse.status_info.status != 0) {
-							$('#alertMessage').html(errors['APIResponseError'](teamSearchResponse.status_info.error)).attr('class', 'alert alert-danger').show();
-						} else {
-							$('#alertMessage').html("Sửa thành công").attr('class', 'alert alert-success').show();
-						}
-						$('#editRemainHoursModal').modal('hide');
-						var statisticsTable = $('#statisticsTable').DataTable();
-						statisticsTable.ajax.reload();
-					},
-					error : function(e) {
-						$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
-					}
-				});
+			console.log(editEmployee);
+			var remainHours = days * 8 + hours;
+			eOSRequest = {
+				'year_id': editEmployee.employeeOffStatus.yearId,
+				'employee_id': editEmployee.id,
+				'remain_hours': remainHours,
+				'update_date': editEmployee.employeeOffStatus.updateDate,
+				"valid_flag": 1
 			}
+			
+			$.ajax({
+				url : /*[[@{/employeeOffStatus/regist}]]*/,
+				type : "post",
+				dataType :"json",
+				contentType : "application/json",
+				data : JSON.stringify(eOSRequest),
+				success : function (teamSearchResponse){
+					if (teamSearchResponse.status_info.status != 0) {
+						$('#alertMessage').html(errors['APIResponseError'](teamSearchResponse.status_info.error)).attr('class', 'alert alert-danger').show();
+					} else {
+						$('#alertMessage').html("Sửa thành công").attr('class', 'alert alert-success').show();
+					}
+					$('#editRemainHoursModal').modal('hide');
+					var statisticsTable = $('#statisticsTable').DataTable();
+					statisticsTable.ajax.reload();
+				},
+				error : function(e) {
+					$('#alertMessage').html(errors['APIResponseError'](e)).attr('class', 'alert alert-danger').show();
+				}
+			});
 		});
 		
 		$("#clearBtn").on('click', function() {
@@ -578,11 +585,10 @@
 						<div class="row">
 							<label class="col-sm-4 col-form-label">Thời gian nghỉ phép còn lại mới</label>
 							<div class="col-sm-2">
-								<input id="editDays" class="col-sm-3 form-control only-number" type="text" maxlength="2"></input>
+								<input id="editDays" class="col-sm-3 form-control only-number" type="text"></input>
 							</div>
 							<label class="col-sm-1">ngày</label>
-							<div class="col-sm-1"></div>
-							<div class="col-sm-2">
+							<div class="col-sm-3">
 								<select id="editHours" class="form-control"></select>
 							</div>
 							<label class="col-sm-1 col-form-label">giờ</label>
