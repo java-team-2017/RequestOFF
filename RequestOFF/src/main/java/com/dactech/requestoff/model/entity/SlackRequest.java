@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 @Entity
 public class SlackRequest {
@@ -18,6 +19,8 @@ public class SlackRequest {
 	private long executeId;
 	private String msgUserId;
 	private String name;
+	@Transient
+	private String employeeId;
 	private String msgContent;
 	private long msgTime; // time of slack message (milliseconds from 1970)
 	private String dayOffFrom;
@@ -33,14 +36,21 @@ public class SlackRequest {
 	private String updateDate;
 	private long updateOperator;
 
-	public SlackRequest(long id, long executeId, String msgUserId, String name, String msgContent, long msgTime,
-			String dayOffFrom, String dayOffTo, double totalHours, String reason, int processFlag, int isValidMsg,
-			String errMsg, int validFlag, String insertDate, long insertOperator, String updateDate,
+	public SlackRequest() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public SlackRequest(long id, long executeId, String msgUserId, String name, String employeeId, String msgContent,
+			long msgTime, String dayOffFrom, String dayOffTo, double totalHours, String reason, int processFlag,
+			int isValidMsg, String errMsg, int validFlag, String insertDate, long insertOperator, String updateDate,
 			long updateOperator) {
+		super();
 		this.id = id;
 		this.executeId = executeId;
 		this.msgUserId = msgUserId;
 		this.name = name;
+		this.employeeId = employeeId;
 		this.msgContent = msgContent;
 		this.msgTime = msgTime;
 		this.dayOffFrom = dayOffFrom;
@@ -55,9 +65,6 @@ public class SlackRequest {
 		this.insertOperator = insertOperator;
 		this.updateDate = updateDate;
 		this.updateOperator = updateOperator;
-	}
-
-	public SlackRequest() {
 	}
 
 	public long getId() {
@@ -90,6 +97,14 @@ public class SlackRequest {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getEmployeeId() {
+		return employeeId;
+	}
+
+	public void setEmployeeId(String employeeId) {
+		this.employeeId = employeeId;
 	}
 
 	public String getMsgContent() {
@@ -202,6 +217,22 @@ public class SlackRequest {
 
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
+	}
+
+	public static int getValidRequestMsg() {
+		return VALID_REQUEST_MSG;
+	}
+
+	public static int getInvalidRequestMsg() {
+		return INVALID_REQUEST_MSG;
+	}
+
+	public static int getProcessed() {
+		return PROCESSED;
+	}
+
+	public static int getUnprocessed() {
+		return UNPROCESSED;
 	}
 
 }

@@ -140,15 +140,24 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 			throw new Exception("Tin nhắn không phải là request");
 		}
 		Request request = new Request();
-		List<Employee> employees = employeeRepository.findByNameLike(StringUtil.standardizeName(slackRequest.getName()));
-		if (employees == null || employees.size() == 0) {
-			throw new Exception("Không tìm thấy nhân viên");
+		
+		Employee employee;
+		if(StringUtil.isEmpty(slackRequest.getEmployeeId())) {
+			List<Employee> employees = employeeRepository.findByNameLike(StringUtil.standardizeName(slackRequest.getName()));
+			if (employees == null || employees.size() == 0) {
+				throw new Exception("Không tìm thấy nhân viên");
+			}
+			if (employees.size() > 1) {
+				StringBuilder errMsg = new StringBuilder("Tìm thấy nhiều hơn 1 nhân viên với tên : " + slackRequest.getName());
+				throw new Exception(errMsg.toString());
+			}
+			employee = employees.get(0);
+		} else {
+			employee = employeeRepository.findById(Long.parseLong(slackRequest.getEmployeeId()));
+			if(employee == null) {
+				throw new Exception("Không tìm thấy nhân viên với id " + slackRequest.getEmployeeId());
+			}
 		}
-		if (employees.size() > 1) {
-			StringBuilder errMsg = new StringBuilder("Tìm thấy nhiều hơn 1 nhân viên với tên : " + slackRequest.getName());
-			throw new Exception(errMsg.toString());
-		}
-		Employee employee = employees.get(0);
 		request.setEmployee(employee);
 
 		request.setFromTime(slackRequest.getDayOffFrom());
@@ -208,6 +217,9 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 			}
 			if (StringUtil.isNotEmpty(request.getName())) {
 				slackRequest.setName(request.getName());
+			}
+			if (StringUtil.isNotEmpty(request.getEmployeeId())) {
+				slackRequest.setEmployeeId(request.getEmployeeId());
 			}
 			if (StringUtil.isNotEmpty(request.getMsgContent())) {
 				slackRequest.setMsgContent(request.getMsgContent());

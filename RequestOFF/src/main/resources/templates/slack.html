@@ -329,7 +329,8 @@
 				updateData = {
 					id: rowData.id,
 					update_date: rowData.updateDate,
-					name: $('#detailName').val(),
+					name: selectedEmployee.name,
+					employee_id: selectedEmployee.id,
 					day_off_from: fromTimeString,
 					day_off_to: toTimeString,
 					total_hours: totalTime,

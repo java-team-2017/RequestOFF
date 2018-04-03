@@ -7,6 +7,8 @@ public class SlackRequestRegistRequest {
 	@JsonProperty("msg_user_id")
 	private String msgUserId;
 	private String name;
+	@JsonProperty("employee_id")
+	private String employeeId;
 	@JsonProperty("msg_content")
 	private String msgContent;
 	@JsonProperty("msg_time")
@@ -34,13 +36,14 @@ public class SlackRequestRegistRequest {
 		// TODO Auto-generated constructor stub
 	}
 
-	public SlackRequestRegistRequest(String id, String msgUserId, String name, String msgContent, String msgTime,
-			String dayOffFrom, String dayOffTo, String totalHours, String reason, String processFlag, String isValidMsg,
-			String errMsg, String validFlag, String updateDate) {
+	public SlackRequestRegistRequest(String id, String msgUserId, String name, String employeeId, String msgContent,
+			String msgTime, String dayOffFrom, String dayOffTo, String totalHours, String reason, String processFlag,
+			String isValidMsg, String errMsg, String validFlag, String updateDate) {
 		super();
 		this.id = id;
 		this.msgUserId = msgUserId;
 		this.name = name;
+		this.employeeId = employeeId;
 		this.msgContent = msgContent;
 		this.msgTime = msgTime;
 		this.dayOffFrom = dayOffFrom;
@@ -76,6 +79,14 @@ public class SlackRequestRegistRequest {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getEmployeeId() {
+		return employeeId;
+	}
+
+	public void setEmployeeId(String employeeId) {
+		this.employeeId = employeeId;
 	}
 
 	public String getMsgContent() {
