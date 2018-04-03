@@ -1,5 +1,6 @@
 package com.dactech.requestoff.service;
 
+import java.text.ParseException;
 import java.util.List;
 
 import com.dactech.requestoff.model.entity.Employee;
@@ -43,5 +44,5 @@ public interface EmployeeService {
 	
 	public boolean changePassword(EmployeeChangePasswordRequest employeeChangePasswordRequest) throws Exception;
 	
-	public List<Employee> getListBirthdayOfEmployee();
+	public List<Employee> getListBirthdayOfEmployee() throws ParseException;
 }

@@ -24,6 +24,12 @@
 		
 		$('[data-toggle="tooltip"]').tooltip();
 		
+		$('#slackForm').keypress(function(e) {
+			if(e.which == 13) {
+				search();
+			}
+		});
+		
 		getLoggedUser(function(returnData){
 			if(returnData.user.position.code == 2 || returnData.leaderFlag == 1){
 				renderNumberOfRequest(returnData.user.id);

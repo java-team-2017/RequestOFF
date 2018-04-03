@@ -667,25 +667,24 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public List<Employee> getListBirthdayOfEmployee() {
+	public List<Employee> getListBirthdayOfEmployee() throws ParseException {
 		List<Employee> listEmployee = employeeRepository.findAll();
 		List<Employee> listEmployeeHaveBirthday = new ArrayList<Employee>();
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date currentDate = new Date();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(currentDate);
+		int currentMonth = cal.get(Calendar.MONTH) + 1;
+		int currentDay = cal.get(Calendar.DATE);
+		
 		for(Employee employee : listEmployee) {
-			String birthdayFormat = null;
-			String currentDateFormat = null;
-			String birthDayOfEmployee = employee.getBirthday();
-			try {
-				Date date = dateFormat.parse(birthDayOfEmployee);
-				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd");
-				birthdayFormat = simpleDateFormat.format(date);
-				currentDateFormat = simpleDateFormat.format(currentDate);
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-			if(birthdayFormat.equals(currentDateFormat)) {
+			Date birthday = dateFormat.parse(employee.getBirthday());
+			cal.setTime(birthday);
+			int birthdayMonth = cal.get(Calendar.MONTH) +1;
+			int birthdayDay = cal.get(Calendar.DATE);
+			
+			if(birthdayDay == currentDay && birthdayMonth == currentMonth ) {
 				listEmployeeHaveBirthday.add(employee);
 			}
 		}
