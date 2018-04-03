@@ -666,7 +666,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 		return false;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public List<Employee> getListBirthdayOfEmployee() {
 		List<Employee> listEmployee = employeeRepository.findAll();
@@ -674,22 +673,19 @@ public class EmployeeServiceImpl implements EmployeeService {
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date currentDate = new Date();
-		//String currentDateFormat = dateFormat.format(currentDate);
-		String currentDateFormat = (currentDate.getMonth()+1) + "-" + currentDate.getDate();//cách 1
 		for(Employee employee : listEmployee) {
-			String birthday = null;
+			String birthdayFormat = null;
+			String currentDateFormat = null;
 			String birthDayOfEmployee = employee.getBirthday();
 			try {
-				Date date = dateFormat.parse(birthDayOfEmployee); // convert from String to Date
-				//System.out.println(dateFormat.format(date));// convert from Date to String
-				birthday = (date.getMonth()+1) + "-" + date.getDate();
-				//cách 2: format date lần 2
-				//SimpleDateFormat df = new SimpleDateFormat("MM-dd");
-				//System.out.println("day format:" +df.format(date));
+				Date date = dateFormat.parse(birthDayOfEmployee);
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd");
+				birthdayFormat = simpleDateFormat.format(date);
+				currentDateFormat = simpleDateFormat.format(currentDate);
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
-			if(birthday.equals(currentDateFormat)) {
+			if(birthdayFormat.equals(currentDateFormat)) {
 				listEmployeeHaveBirthday.add(employee);
 			}
 		}

@@ -37,7 +37,10 @@ public class SlackUtil {
 			if (line.toLowerCase().indexOf("has joined the channel") != -1 || line.indexOf("Automatic Request Off") != -1) {
 				slackRequest.setProcessFlag(SlackRequest.PROCESSED);
 				slackRequest.setIsValidMsg(SlackRequest.INVALID_REQUEST_MSG);
+				slackRequest.setSaveFlag(SlackRequest.NOT_SAVE_REQUEST);
 				return slackRequest;
+			} else {
+				slackRequest.setSaveFlag(SlackRequest.SAVE_REQUEST);
 			}
 		}
 

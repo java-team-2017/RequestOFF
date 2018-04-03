@@ -312,41 +312,43 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 		slackExecuteImportRepository.save(slackExecuteImport);
 		
 		for (SlackRequest slackRequest : slackRequests) {
-			try {
-				if (slackRequest.getIsValidMsg() == SlackRequest.VALID_REQUEST_MSG) {
-					Request request = convertSlackRequest(slackRequest);
-					
-					// update remain time
-					int year = 0;
-					int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-					try {
-						String from = request.getFromTime();
-						year = Integer.parseInt(from.substring(0, 4)); // yyyy-MM-dd
-					} catch (Exception ex) {
-						System.err.println("Warning: Parse year error, do not update remain hours");
+			if(slackRequest.getSaveFlag() == SlackRequest.SAVE_REQUEST) {
+				try {
+					if (slackRequest.getIsValidMsg() == SlackRequest.VALID_REQUEST_MSG) {
+						Request request = convertSlackRequest(slackRequest);
+						
+						// update remain time
+						int year = 0;
+						int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+						try {
+							String from = request.getFromTime();
+							year = Integer.parseInt(from.substring(0, 4)); // yyyy-MM-dd
+						} catch (Exception ex) {
+							System.err.println("Warning: Parse year error, do not update remain hours");
+						}
+						
+						if (year != currentYear) {
+							System.err.println("Warning: Do not update remain hours because the time is not current year");
+						} else {
+							double newRemainHours;
+							Employee e = request.getEmployee();
+							EmployeeOffStatus eos = employeeOffStatusRepository.findById(year, e.getId());
+							newRemainHours = eos.getRemainHours() - request.getTotalTime();
+							eos.setRemainHours(newRemainHours);
+							employeeOffStatusRepository.save(eos);
+						}
+						
+						requestRepository.save(request);
+						slackRequest.setProcessFlag(SlackRequest.PROCESSED);
 					}
-					
-					if (year != currentYear) {
-						System.err.println("Warning: Do not update remain hours because the time is not current year");
-					} else {
-						double newRemainHours;
-						Employee e = request.getEmployee();
-						EmployeeOffStatus eos = employeeOffStatusRepository.findById(year, e.getId());
-						newRemainHours = eos.getRemainHours() - request.getTotalTime();
-						eos.setRemainHours(newRemainHours);
-						employeeOffStatusRepository.save(eos);
-					}
-					
-					requestRepository.save(request);
-					slackRequest.setProcessFlag(SlackRequest.PROCESSED);
+				} catch (Exception e) {
+					slackRequest.setErrMsg(e.getMessage());
+					slackRequest.setIsValidMsg(SlackRequest.INVALID_REQUEST_MSG);
 				}
-			} catch (Exception e) {
-				slackRequest.setErrMsg(e.getMessage());
-				slackRequest.setIsValidMsg(SlackRequest.INVALID_REQUEST_MSG);
+				slackRequest.setExecuteId(slackExecuteImport.getExecuteId());
+				
+				slackRequestRepository.save(slackRequest);
 			}
-			slackRequest.setExecuteId(slackExecuteImport.getExecuteId());
-
-			slackRequestRepository.save(slackRequest);
 		}
 		return slackRequests.size();
 	}

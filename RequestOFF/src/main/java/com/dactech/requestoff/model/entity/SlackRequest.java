@@ -12,6 +12,8 @@ public class SlackRequest {
 	public static final int INVALID_REQUEST_MSG = 0;
 	public static final int PROCESSED = 1;
 	public static final int UNPROCESSED = 0;
+	public static final int SAVE_REQUEST = 1;
+	public static final int NOT_SAVE_REQUEST = 0;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -36,36 +38,8 @@ public class SlackRequest {
 	private String updateDate;
 	private long updateOperator;
 
-	public SlackRequest() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-	public SlackRequest(long id, long executeId, String msgUserId, String name, String employeeId, String msgContent,
-			long msgTime, String dayOffFrom, String dayOffTo, double totalHours, String reason, int processFlag,
-			int isValidMsg, String errMsg, int validFlag, String insertDate, long insertOperator, String updateDate,
-			long updateOperator) {
-		super();
-		this.id = id;
-		this.executeId = executeId;
-		this.msgUserId = msgUserId;
-		this.name = name;
-		this.employeeId = employeeId;
-		this.msgContent = msgContent;
-		this.msgTime = msgTime;
-		this.dayOffFrom = dayOffFrom;
-		this.dayOffTo = dayOffTo;
-		this.totalHours = totalHours;
-		this.reason = reason;
-		this.processFlag = processFlag;
-		this.isValidMsg = isValidMsg;
-		this.errMsg = errMsg;
-		this.validFlag = validFlag;
-		this.insertDate = insertDate;
-		this.insertOperator = insertOperator;
-		this.updateDate = updateDate;
-		this.updateOperator = updateOperator;
-	}
+	@Transient
+	private int saveFlag;
 
 	public long getId() {
 		return id;
@@ -217,6 +191,43 @@ public class SlackRequest {
 
 	public void setUpdateOperator(long updateOperator) {
 		this.updateOperator = updateOperator;
+	}
+
+	public int getSaveFlag() {
+		return saveFlag;
+	}
+
+	public void setSaveFlag(int saveFlag) {
+		this.saveFlag = saveFlag;
+	}
+
+	public SlackRequest() {
+	}
+
+	public SlackRequest(long id, long executeId, String msgUserId, String name, String employeeId, String msgContent,
+			long msgTime, String dayOffFrom, String dayOffTo, double totalHours, String reason, int processFlag,
+			int isValidMsg, String errMsg, int validFlag, String insertDate, long insertOperator, String updateDate,
+			long updateOperator, int saveFlag) {
+		this.id = id;
+		this.executeId = executeId;
+		this.msgUserId = msgUserId;
+		this.name = name;
+		this.employeeId = employeeId;
+		this.msgContent = msgContent;
+		this.msgTime = msgTime;
+		this.dayOffFrom = dayOffFrom;
+		this.dayOffTo = dayOffTo;
+		this.totalHours = totalHours;
+		this.reason = reason;
+		this.processFlag = processFlag;
+		this.isValidMsg = isValidMsg;
+		this.errMsg = errMsg;
+		this.validFlag = validFlag;
+		this.insertDate = insertDate;
+		this.insertOperator = insertOperator;
+		this.updateDate = updateDate;
+		this.updateOperator = updateOperator;
+		this.saveFlag = saveFlag;
 	}
 
 	public static int getValidRequestMsg() {

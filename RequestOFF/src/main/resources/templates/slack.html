@@ -63,6 +63,7 @@
 			$('#slackRequestTable').DataTable({
 				destroy: true,
 				searching: false,
+				order : [1, 'desc'],
 				ajax: {
 					'url' : /*[[@{/slack/search}]]*/,
 					'type': "POST",
