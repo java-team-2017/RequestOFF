@@ -668,7 +668,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public List<Employee> listEmployeeHaveBirthday() {
+	public List<Employee> getListBirthdayOfEmployee() {
 		List<Employee> listEmployee = employeeRepository.findAll();
 		List<Employee> listEmployeeHaveBirthday = new ArrayList<Employee>();
 		

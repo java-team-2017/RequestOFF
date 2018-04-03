@@ -25,7 +25,7 @@ public class SlackBirthdayMessage {
 	
 	@Scheduled(cron = "0 0 8 * * *") //chay vao 8h moi ngay
 	public void getBirthdayOfEmployee() throws Exception {
-		List<Employee> listEmployeeHaveBirthday = employeeService.listEmployeeHaveBirthday();
+		List<Employee> listEmployeeHaveBirthday = employeeService.getListBirthdayOfEmployee();
 		if(listEmployeeHaveBirthday.size() != 0) {
 			for(Employee employee : listEmployeeHaveBirthday) {
 				slackRequestService.sendBirthdayMsgToEmployee(employee);

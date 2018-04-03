@@ -43,5 +43,5 @@ public interface EmployeeService {
 	
 	public boolean changePassword(EmployeeChangePasswordRequest employeeChangePasswordRequest) throws Exception;
 	
-	public List<Employee> listEmployeeHaveBirthday();
+	public List<Employee> getListBirthdayOfEmployee();
 }
