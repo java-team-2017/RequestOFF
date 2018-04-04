@@ -40,13 +40,9 @@
 					listRole = roles;
 				});
 				
-				for (var i = -7.5; i < 0 ; i += 0.5) {
+				for (var i = -7.5; i < 8 ; i += 0.5) {
 					$('#remainHoursModalDetailsId').append('<option value="' + i + '">' + i + '</option>');
 				}
-				for (var i = 0; i < 8 ; i += 0.5) {
-					$('#remainHoursModalDetailsId').append('<option value="' + i + '">' + i + '</option>');
-				}
-				
 				for (var i = -7.5; i < 8 ; i += 0.5) {
 					$('#totalHoursModalDetailsId').append('<option value="' + i + '">' + i + '</option>');
 				}
@@ -134,7 +130,6 @@
 						$("#updateDateModalDetailsId").val(rowData.updateDate);
 						$("#roleModalDetailsId option").prop("selected", false);
 						$.each(rowData.listRole, function(i, e){
-							console.log(e.role);
 							$("#roleModalDetailsId option[value='" + e.id + "']").prop("selected", true);
 						});
 						
@@ -144,7 +139,6 @@
 						$("#totalHoursModalDetailsId").val(hours);
 						days = parseInt(rowData.employeeOffStatus.remainHours / 8);
 						hours = rowData.employeeOffStatus.remainHours - (days * 8);
-						console.log(days + " ----- " + hours);
 						$("#remainDaysModalDetailsId").val(days);
 						$("#remainHoursModalDetailsId").val(hours);
 						if(rowData.validFlag == 1) {
@@ -228,7 +222,6 @@
 					if(birthday.localeCompare(startWorkingDate) >= 0 || startWorkingDate.localeCompare(officialWorkingDate) >= 0) {
 						dateError = 1;
 					}
-
 					//----------end validate---------
 					
 					if(complete == 0) {
@@ -306,7 +299,7 @@
 					var remain = parseInt(updateData.remainDaysModalDetails) * 8 + parseFloat(updateData.remainHoursModalDetails);
 					
 					//---------validate------------
-					var complete = 1, exceedLength = 0, dateError = 0, valid = 1;
+					var complete = 1, exceedLength = 0, dateError = 0, valid = 1, isNumber = 1;
 					var listInput = $("#modalDetailsForm").find(':input').not("#teamModalDetailsId, #departmentModalDetailsId, #passwordModalDetailsId, #roleModalDetailsId, #isQuitModalDetailsId");
 					$.each(listInput, function() {
 						if($(this).val() == "" || $(this).val() === undefined || $(this).val() === null) {
@@ -327,6 +320,9 @@
 					if(total < remain) {
 						valid = 0;
 					}
+					if(isNaN(updateData.totalDaysModalDetails) || isNaN(updateData.remainDaysModalDetails)) {
+						isNumber = 0;
+					}
 					//---------end validate----------
 					
 					if(complete == 0) {
@@ -340,6 +336,9 @@
 					}
 					else if(valid == 0) {
 						$('#alertMessage_modalDetails').html("Tổng thời gian nghỉ phép phải lớn hơn hoặc bằng thời gian nghỉ phép còn lại").attr('class', 'alert alert-danger').show();
+					}
+					else if(isNumber == 0) {
+						$('#alertMessage_modalDetails').html("Số ngày nghỉ phép và số ngày nghỉ phép còn lại phải là số nguyên").attr('class', 'alert alert-danger').show();
 					}
 					else {
 						var validFlag;

@@ -5,19 +5,9 @@ $(function() {
 		if ((event.keyCode < 48 && event.keyCode != 45) || event.keyCode > 57) {
 			event.preventDefault();
 		}
-		if($(this).val() == '') {
-			if ((event.keyCode < 48 && event.keyCode != 45) || event.keyCode > 57) {
-				event.preventDefault();
-			}
-		} else if($(this).val()[0] == '-') {
-			if (event.keyCode == 45) {
-				event.preventDefault();
-			}
+		if($(this).val()[0] == '-') {
 			$(this).attr('maxlength', '3');
 		} else {
-			if (event.keyCode == 45) {
-				event.preventDefault();
-			}
 			$(this).attr('maxlength', '2');
 		}
 	});
@@ -38,7 +28,6 @@ $(function() {
 		$(this).parent().find('i.filter-toggle-icon').addClass("glyphicon-triangle-right");
 	});
 	
-	
 	var pathname = $(location).attr('pathname');
 	$('#navbarOfMe').find('li').each(function(i, li) {
 		var selectedHref = $(this).find("a").attr('href');
@@ -46,7 +35,6 @@ $(function() {
 			$(this).addClass('active-menu');
 		}
 	});
-	
 });
 
 var errors = {

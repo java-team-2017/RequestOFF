@@ -355,11 +355,17 @@
 		});
 		
 		$("#editOk").on('click', function() {
+			if(isNaN($('#editDays').val())) {
+				$('#editMsg').html("Số ngày nghỉ còn lại phải là số nguyên").attr('class', 'alert alert-danger').show();
+				return;
+			}
+			
 			var days = parseFloat($('#editDays').val());
 			var hours = parseFloat($('#editHours').val());
 			console.log("day " + days + " hours : " + hours);
 			console.log(editEmployee);
 			var remainHours = days * 8 + hours;
+			
 			eOSRequest = {
 				'year_id': editEmployee.employeeOffStatus.yearId,
 				'employee_id': editEmployee.id,
