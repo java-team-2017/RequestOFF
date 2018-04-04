@@ -24,7 +24,13 @@
 		
 		$('[data-toggle="tooltip"]').tooltip();
 		
-		$('#slackForm').keypress(function(e) {
+		$("#slackForm select").keydown(function(e){
+			if(e.keyCode == 13) {
+				this.blur();
+			}
+		});
+		
+		$(document).keypress(function(e) {
 			if(e.which == 13) {
 				search();
 			}

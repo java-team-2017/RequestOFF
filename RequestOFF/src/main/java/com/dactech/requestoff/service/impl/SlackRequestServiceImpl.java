@@ -1,15 +1,9 @@
 package com.dactech.requestoff.service.impl;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import javax.net.ssl.HttpsURLConnection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -371,30 +365,7 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 				"\n-Reason: "+request.getReason()+
 				"\n-Recipient: "+request.getRecipientName();
 		text = text.replaceAll(" ", "%20");
-		String urlParameters = "token="+token+"&channel="+requestOffChannel+"&text="+text+"&username="+username+"&pretty=1";
-		URL obj = new URL(urlPost);
-		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
-		con.setRequestMethod("POST");
-		con.setRequestProperty("Accept-Language", "UTF-8");
-		con.setDoOutput(true);
-		DataOutputStream dataOutput = new DataOutputStream(con.getOutputStream());
-		dataOutput.writeBytes(urlParameters);
-		dataOutput.flush();
-		dataOutput.close();
-		
-		//print result return
-		BufferedReader in = new BufferedReader( new InputStreamReader(con.getInputStream()));
-		StringBuffer response = new StringBuffer();
-		String inputLine;
-		while ((inputLine = in.readLine()) != null) {
-			response.append(inputLine);
-		}
-		
-		System.out.println("response:" + response);
-		System.out.println("Response Code: " + con.getResponseCode());
-		if(response.toString().contains("false")) {
-			throw new Exception(response.substring(response.indexOf("\"error\""), response.length()-1)+"<br/>No authentication token provided.");
-		}
+		SlackUtil.sendMsgToSlack(urlPost,requestOffChannel, token, text, username);
 	}
 
 	@Override
@@ -411,26 +382,7 @@ public class SlackRequestServiceImpl implements SlackRequestService {
 		String text = " :birthday: Today is Birthday of " + employee.getName() + " who is belong to " + team.getName()
 				+ " Team :smile: Let give " + gender + " the best wishes :tada:";
 		text = text.replaceAll(" ", "%20");
-		String urlParameters = "token="+token+"&channel="+birthdayChannel+"&text="+text+"&username="+username+"&pretty=1";
-		URL obj = new URL(urlPost);
-		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
-		con.setRequestMethod("POST");
-		con.setDoOutput(true);
-		DataOutputStream dataOutput = new DataOutputStream(con.getOutputStream());
-		dataOutput.writeBytes(urlParameters);
-		dataOutput.flush();
-		dataOutput.close();
-		
-		BufferedReader in = new BufferedReader( new InputStreamReader(con.getInputStream()));
-		String inputLine;
-		StringBuffer response = new StringBuffer();
-		while ((inputLine = in.readLine()) != null) {
-			response.append(inputLine);
-		}
-		if(response.toString().contains("false")) {
-			throw new Exception(response.substring(response.indexOf("\"error\""), response.length()-1));
-		}
-		in.close();
+		SlackUtil.sendMsgToSlack(urlPost,requestOffChannel, token, text, username);
 	}
 
 }

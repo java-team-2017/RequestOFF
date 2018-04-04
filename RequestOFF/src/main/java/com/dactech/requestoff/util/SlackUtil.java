@@ -1,11 +1,17 @@
 package com.dactech.requestoff.util;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -196,5 +202,31 @@ public class SlackUtil {
 		}
 		slackRequest.setErrMsg(errMsg);
 		return slackRequest;
+	}
+	public static void sendMsgToSlack(String urlPost, String channel, String token, String text, String username) throws Exception {
+		String urlParameters = "token="+token+"&channel="+channel+"&text="+text+"&username="+username+"&pretty=1";
+		URL obj = new URL(urlPost);
+		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
+		con.setRequestMethod("POST");
+		con.setRequestProperty("Accept-Language", "UTF-8");
+		con.setDoOutput(true);
+		DataOutputStream dataOutput = new DataOutputStream(con.getOutputStream());
+		dataOutput.writeBytes(urlParameters);
+		dataOutput.flush();
+		dataOutput.close();
+		
+		//print result return
+		BufferedReader in = new BufferedReader( new InputStreamReader(con.getInputStream()));
+		StringBuffer response = new StringBuffer();
+		String inputLine;
+		while ((inputLine = in.readLine()) != null) {
+			response.append(inputLine);
+		}
+		
+		System.out.println("response:" + response);
+		System.out.println("Response Code: " + con.getResponseCode());
+		if(response.toString().contains("false")) {
+			throw new Exception(response.substring(response.indexOf("\"error\""), response.length()-1)+"<br/>No authentication token provided.");
+		}
 	}
 }
