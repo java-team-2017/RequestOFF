@@ -10,7 +10,8 @@
 		var dayOffResetStatus = {
 			'0' : 'Not Reset',
 			'1' : 'Reset'
-		}
+		};
+		
 		$(function(){
 			var nextYear = (new Date()).getFullYear() + 1;
 			$('#yearOfSetting').append(nextYear);
@@ -62,7 +63,12 @@
 					$('#alertMessage').html(errors['incompleteFields']).attr('class', 'alert alert-danger').show();
 				}
 			});
+			
+			$('#btnClear').on('click', function() {
+				$('#alertMessage').hide();
+			});
 		});
+		
 		function search(){
 			var requestData = $('#companyYearOffForm').serializeJSON();
 			var requestSearch = {
