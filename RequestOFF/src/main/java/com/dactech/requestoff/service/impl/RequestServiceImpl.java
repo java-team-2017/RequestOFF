@@ -15,6 +15,7 @@ import com.dactech.requestoff.model.request.RequestDetailsRequest;
 import com.dactech.requestoff.model.request.RequestRegistRequest;
 import com.dactech.requestoff.model.request.RequestSearchRequest;
 import com.dactech.requestoff.model.request.RequestViewRequest;
+import com.dactech.requestoff.model.response.GetUserResponse.IdName;
 import com.dactech.requestoff.model.response.RequestBrowsingResponse;
 import com.dactech.requestoff.model.response.RequestDetailsResponse;
 import com.dactech.requestoff.model.response.RequestRegistResponse;
@@ -26,6 +27,7 @@ import com.dactech.requestoff.repository.EmployeeOffStatusRepository;
 import com.dactech.requestoff.repository.EmployeeRepository;
 import com.dactech.requestoff.repository.RequestRepository;
 import com.dactech.requestoff.service.CompanyYearOffService;
+import com.dactech.requestoff.service.EmployeeService;
 import com.dactech.requestoff.service.RequestService;
 import com.dactech.requestoff.service.SlackRequestService;
 import com.dactech.requestoff.util.StringUtil;
@@ -46,6 +48,8 @@ public class RequestServiceImpl implements RequestService{
 	SlackRequestService slackRequestService;
 	@Autowired
 	DepartmentRepository departmentRepository;
+	@Autowired
+	EmployeeService employeeService;
 	
 	@Override
 	public RequestRegistResponse regist(RequestRegistRequest requestRegistRequest) throws Exception {
@@ -231,10 +235,23 @@ public class RequestServiceImpl implements RequestService{
 	}
 
 	@Override
-	public RequestBrowsingResponse requestBrowsing(RequestBrowsingRequest request) throws Exception {
-		List<Request> requests = requestRepository.browseRequest(request);
+	public RequestBrowsingResponse requestBrowsing(RequestBrowsingRequest requestBrowsingRequest) throws Exception {
+		List<Request> listRequests = requestRepository.browseRequest(requestBrowsingRequest);
+		List<IdName> leaderAndManager;
 		RequestBrowsingResponse response = new RequestBrowsingResponse();
-		response.setRequests(requests);
+		response.setRequests(listRequests);
+		for (Request request : listRequests) {
+			long senderId = request.getEmployee().getId();
+			leaderAndManager = employeeService.getListRecipients(senderId);
+			for(int index = 0; index < leaderAndManager.size(); index++) {
+				if(request.getRecipientId() == leaderAndManager.get(index).getId()) {
+					leaderAndManager.remove(index);
+					break;
+				}
+			}
+			request.setListForward(leaderAndManager);
+		}
+		
 		return response;
 	}
 

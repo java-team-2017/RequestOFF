@@ -1,5 +1,7 @@
 package com.dactech.requestoff.model.entity;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -8,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
+
+import com.dactech.requestoff.model.response.GetUserResponse.IdName;
 
 @Entity
 public class Request {
@@ -38,13 +42,11 @@ public class Request {
 	private long insertOperator;
 	private String updateDate;
 	private long updateOperator;
+	@Transient
+	private List<IdName> listForward;
 
 	@Transient
 	private String recipientName;
-	@Transient
-	private long forwardId;
-	@Transient
-	private String forwardName;
 
 	public Request() {
 		super();
@@ -53,9 +55,8 @@ public class Request {
 
 	public Request(long id, Employee employee, String fromTime, String toTime, double totalTime, String reason,
 			int status, String responseMessage, DayOffType dayOffType, long recipientId, int validFlag,
-			String insertDate, long insertOperator, String updateDate, long updateOperator, String recipientName,
-			long forwardId, String forwardName) {
-		super();
+			String insertDate, long insertOperator, String updateDate, long updateOperator, List<IdName> listForward,
+			String recipientName) {
 		this.id = id;
 		this.employee = employee;
 		this.fromTime = fromTime;
@@ -71,9 +72,8 @@ public class Request {
 		this.insertOperator = insertOperator;
 		this.updateDate = updateDate;
 		this.updateOperator = updateOperator;
+		this.listForward = listForward;
 		this.recipientName = recipientName;
-		this.forwardId = forwardId;
-		this.forwardName = forwardName;
 	}
 
 	public long getId() {
@@ -196,28 +196,20 @@ public class Request {
 		this.updateOperator = updateOperator;
 	}
 
+	public List<IdName> getListForward() {
+		return listForward;
+	}
+
+	public void setListForward(List<IdName> listForward) {
+		this.listForward = listForward;
+	}
+
 	public String getRecipientName() {
 		return recipientName;
 	}
 
 	public void setRecipientName(String recipientName) {
 		this.recipientName = recipientName;
-	}
-
-	public long getForwardId() {
-		return forwardId;
-	}
-
-	public void setForwardId(long forwardId) {
-		this.forwardId = forwardId;
-	}
-
-	public String getForwardName() {
-		return forwardName;
-	}
-
-	public void setForwardName(String forwardName) {
-		this.forwardName = forwardName;
 	}
 
 	public static int getRequestStatusSaved() {

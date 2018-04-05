@@ -93,23 +93,23 @@
 				$('#statusDetails').val(requestStatus[rowData.status]);
 				$('#dayOffTypeDetails').val(rowData.dayOffType.name);
 				$('#responseMessage').val(rowData.responseMessage);
-				
+				console.log(rowData.listForward);
 				$('#forward').empty();
 				if(rowData.status != 5){
 					$('#btnApproveModal, #btnDenyModal, #btnSendModal, #btnForward, #responseMessage').prop('disabled', true);
-				} else if(rowData.status == 5 && rowData.recipientId != userData.user.id){
+				} else if(rowData.recipientId != userData.user.id){
 					$('#btnApproveModal, #btnDenyModal, #btnSendModal, #btnForward, #responseMessage').prop('disabled', true);
 				}
 				else {
-					if (rowData.recipientId == userData.user.id) {
-						if (rowData.forwardId != 0 && rowData.forwardName != null) {
-							$('#forward').append('<option value = "' + rowData.forwardId + '">' + rowData.forwardName + '</option>');
-							$('#btnForward').prop('disabled', false);
-						} else {
-							$('#btnForward').prop('disabled', true);
-						}
-					}
 					$('#btnApproveModal, #btnDenyModal, #btnSendModal, #forward, #responseMessage').prop('disabled', false);
+					if(rowData.listForward.length > 0){
+						$('#btnForward').prop('disabled', false);
+						$.each(rowData.listForward, function(index, forward) {
+							$('#forward').append('<option value = "' + forward.id + '">' + forward.name + '</option>');
+						});
+					} else {
+						$('#btnForward').prop('disabled', true);
+					}
 				}
 				var firstOrLastChildTag = $(this).is(':first-child') || $(this).is(':last-child');
 				if(!firstOrLastChildTag){
