@@ -7,11 +7,14 @@ import org.springframework.stereotype.Service;
 
 import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
+import com.dactech.requestoff.model.entity.Request;
 import com.dactech.requestoff.model.entity.Team;
+import com.dactech.requestoff.model.entity.TeamEmployee;
 import com.dactech.requestoff.model.request.DepartmentDetailsRequest;
 import com.dactech.requestoff.model.request.DepartmentInfoRequest;
 import com.dactech.requestoff.model.request.DepartmentRegistRequest;
 import com.dactech.requestoff.model.request.DepartmentSearchRequest;
+import com.dactech.requestoff.model.request.RequestSearchRequest;
 import com.dactech.requestoff.model.response.DepartmentDetailsResponse;
 import com.dactech.requestoff.model.response.DepartmentInfoResponse;
 import com.dactech.requestoff.model.response.DepartmentRegistResponse;
@@ -59,24 +62,38 @@ public class DepartmentServiceImpl implements DepartmentService {
 					department.setName(departmentRegistRequest.getName());
 				}
 				if(StringUtil.isNotEmpty(departmentRegistRequest.getManagerId())) {
+					long id = department.getId();
 					long oldManagerId = department.getManagerId();
 					long newManagerId = Long.parseLong(departmentRegistRequest.getManagerId());
 					if (oldManagerId != newManagerId) {
-						int requestInProcessing = requestRepository.getNumberOfRequestInProcessing(oldManagerId);
-						int requestReceivedInProcessing = requestRepository.getNumberOfRequestReceivedInProcessing(oldManagerId);
-						if (requestInProcessing > 0 || requestReceivedInProcessing >0) { // employee has requests which are in processing
+//						RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
+//						requestSearchRequest.setStatus(Integer.toString(Request.REQUEST_STATUS_WAITING));
+//						requestSearchRequest.setRecipientId(Long.toString(oldManagerId));
+//						requestSearchRequest.setValidFlag("1");
+						int requestInProcessing = requestRepository.countRequestInProcessingInDepartment(oldManagerId, id);
+						int requestReceivedInProcessing = requestRepository.countRequestReceivedInProcessingInDepartment(oldManagerId, id);
+						if (requestInProcessing > 0 || requestReceivedInProcessing > 0) {
 							Employee em = employeeRepository.findById(oldManagerId);
 							throw new Exception(em.getName()
 									+ " có request đang chờ anh ấy/cô ấy xử lý.<br/>Vui lòng để anh ấy/cô ấy xử lý trước khi thay đổi manager mới");
 						}
 						
-						requestInProcessing = requestRepository.getNumberOfRequestInProcessing(newManagerId);
-						requestReceivedInProcessing = requestRepository.getNumberOfRequestReceivedInProcessing(newManagerId);
-						if (requestInProcessing > 0 || requestReceivedInProcessing >0) { // employee has requests which are in processing
+						requestInProcessing = requestRepository.countRequestInProcessingInDepartment(newManagerId, id);
+						requestReceivedInProcessing = requestRepository.countRequestReceivedInProcessingInDepartment(newManagerId, id);
+						if (requestInProcessing > 0 || requestReceivedInProcessing > 0) {
 							Employee em = employeeRepository.findById(newManagerId);
 							throw new Exception (em.getName() + " có request đang chờ được xử lý.<br/>"
 									+ "Vui lòng xử lý tất cả request trước khi xóa");
 						}
+						
+//						List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
+//						
+//						if(requests != null && requests.size() > 0) {
+//							Employee manager = employeeRepository.findById(department.getManagerId());
+//							throw new Exception(manager.getName()
+//								+ " có request đang chờ anh ấy/cô ấy xử lý.<br/>Vui lòng để anh ấy/cô ấy xử lý trước khi thay đổi manager mới");
+//						}
+						
 						department.setManagerId(newManagerId);
 					}
 				}
@@ -130,7 +147,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 		}
 		List<Team> teams = teamRepository.findByDepartmentId(departmentId);
 		long managerId = department.getManagerId();
-		int requestInProcessing = requestRepository.getNumberOfRequestReceivedInProcessing(managerId);
+		long id = department.getId();
+		int requestInProcessing = requestRepository.countRequestReceivedInProcessingInDepartment(managerId, id);
 		if(teams.size() > 0) {
 //			Employee manager = employeeRepository.findById(department.getManagerId());
 			throw new Exception("Vui lòng xóa tất cả team thuộc " + department.getName() + " Department trước khi xóa " + department.getName() +" Department.");
