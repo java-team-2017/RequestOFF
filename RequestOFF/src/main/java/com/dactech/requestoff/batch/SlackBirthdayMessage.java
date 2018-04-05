@@ -23,7 +23,7 @@ public class SlackBirthdayMessage {
 	public void initialize() {
 	}
 	
-	@Scheduled(cron = "0 0 8 * * *") //chay vao 8h moi ngay
+	@Scheduled(cron = "0 0 8 * * *")
 	public void getBirthdayOfEmployee() throws Exception {
 		List<Employee> listEmployeeHaveBirthday = employeeService.getListBirthdayOfEmployee();
 		if(listEmployeeHaveBirthday.size() != 0) {

@@ -13,15 +13,10 @@ import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.dactech.requestoff.model.entity.SlackRequest;
 import com.dactech.requestoff.model.response.SlackRequestGetResponse.SlackMsg;
-import com.dactech.requestoff.service.EmployeeService;
 
 public class SlackUtil {
-	@Autowired
-	EmployeeService employeeService;
 
 	public static SlackRequest processSlackMessage(SlackMsg message) {
 		SlackRequest slackRequest = new SlackRequest();
