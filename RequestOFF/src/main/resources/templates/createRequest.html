@@ -34,13 +34,14 @@
 				getLoggedUser(function(returnData){
 					employee = returnData.user;
 					employeeId = employee.id;
+					console.log(employee);
 					
 					renderRemainHours(returnData.displayedRemainHours, 'remainHours');
 					renderRecipientSelect(returnData.listRecipients, 'id_recipient');
 					
 					if(returnData.listRecipients.length == 0) {
 						$('#alertMessage').html("Bạn chưa thuộc team hoặc department nào nên không được phép tạo request!").attr('class', 'alert alert-danger').show();
-						$("#btnSave, #btnSend").prop('disabled', true);
+						$("#btnSave, #btnSend, #btnClear").prop('disabled', true);
 					}
 					
 					if(employee.position.code == 2 || returnData.leaderFlag == 1){
