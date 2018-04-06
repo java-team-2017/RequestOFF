@@ -79,22 +79,33 @@ public class TeamServiceImpl implements TeamService {
 				long oldLeaderId = team.getLeaderId();
 				if (oldLeaderId != newLeaderId) { // change leader
 					// check whether old leader has waiting requests which need to process
-					
-					List<Request> request = requestRepository.getRequestReceivedInProcessingInTeam(oldLeaderId, teamId);
-					if (request.size() > 0) {
-						Employee leader = employeeRepository.findById(oldLeaderId);
-						throw new Exception(leader.getName()
-							+ " có request đang chờ xử lý. <br/>Vui lòng để " + leader.getName() + " xử lý những request này trước khi đổi sang leader mới");
+					List<Request> oldLeaderReceivedRequests = requestRepository.getRequestReceivedInProcessingInTeam(oldLeaderId, teamId);
+					for(Request request : oldLeaderReceivedRequests) {
+						if(request.getEmployee().getId() != newLeaderId) {
+							request.setRecipientId(newLeaderId);
+						} else {
+							request.setRecipientId(team.getDepartment().getManagerId());
+						}
 					}
-					
 					team.setLeaderId(newLeaderId);
 				}
 			}
 			
 			if (StringUtil.isNotEmpty(teamRegistRequest.getDepartmentId())) {
-				Department department = new Department();
-				department.setId(Long.parseLong(teamRegistRequest.getDepartmentId()));
-				team.setDepartment(department);
+				Department newDepartment = departmentRepository.findById(Long.parseLong(teamRegistRequest.getDepartmentId()));
+				long newManagerId = newDepartment.getManagerId();
+				long oldManagerId = team.getDepartment().getManagerId();
+				
+				if(newManagerId != oldManagerId) {
+					List<Request> oldManagerReceivedRequests = requestRepository.getRequestReceivedInProcessingInTeam(oldManagerId, teamId);
+					for(Request request : oldManagerReceivedRequests) {
+						request.setRecipientId(newManagerId);
+					}
+					
+					Department department = new Department();
+					department.setId(Long.parseLong(teamRegistRequest.getDepartmentId()));
+					team.setDepartment(department);
+				}
 			}
 			
 			if (StringUtil.isNotEmpty(teamRegistRequest.getValidFlag())) {
@@ -131,12 +142,9 @@ public class TeamServiceImpl implements TeamService {
 				}
 			}
 			for(TeamEmployee te : TEmployees) {
-				int requestInProcessing = requestRepository.countRequestInProcessingInDepartment(te.getEmployeeId(), team.getDepartment().getId());
-				int requestReceivedInProcessing = requestRepository.countRequestReceivedInProcessingInDepartment(te.getEmployeeId(), team.getDepartment().getId());
-				if (requestInProcessing > 0 || requestReceivedInProcessing > 0) { // employee has requests which are in processing
-					Employee em = employeeRepository.findById(te.getEmployeeId());
-					throw new Exception (em.getName() + " có request đang chờ xử lý.<br/>Vui lòng để " + em.getName()
-					+ " xử lý những request này trước khi dời khỏi team");
+				List<Request> waitingRequest = requestRepository.getRequestInProcessing(te.getEmployeeId());
+				for(Request request : waitingRequest) {
+					request.setStatus(Request.REQUEST_STATUS_SAVED);
 				}
 				TERepository.delete(te);
 			}
@@ -189,25 +197,24 @@ public class TeamServiceImpl implements TeamService {
 		}
 		
 		List<TeamEmployee> listTE = TERepository.findByTeamId(teamId);
-		for (TeamEmployee te : listTE) {
-			
-			Employee employee = employeeRepository.findById(te.getEmployeeId());
-			if (employee != null ) {
-				int requestInProcessing = requestRepository.countRequestInProcessingInTeam(te.getEmployeeId(), te.getTeamId());
-				if (requestInProcessing > 0) {
-					throw new Exception (employee.getName() + " có request đang chờ xử lý.<br/>Vui lòng để " + employee.getName()
-							+ " xử lý những request này trước khi xóa");
-				}
-				if (te.getLeaderFlag() == 1) { // employee is a leader
-					int numOfRequest = requestRepository.countRequestReceivedInProcessingInTeam(te.getEmployeeId(), te.getTeamId());
-					if (numOfRequest > 0) {
-						throw new Exception(employee.getName() + " có request đang chờ xử lý.<br/>Vui lòng để " + employee.getName()
-								+ " xử lý những request này trước khi đổi sang leader mới");
-					}
-				}
-			}
-			TERepository.delete(te);
-		}
+//		for (TeamEmployee te : listTE) {
+//			Employee employee = employeeRepository.findById(te.getEmployeeId());
+//			if (employee != null ) {
+//				int requestInProcessing = requestRepository.countRequestInProcessingInTeam(te.getEmployeeId(), te.getTeamId());
+//				if (requestInProcessing > 0) {
+//					throw new Exception (employee.getName() + " có request đang chờ xử lý.<br/>Vui lòng để " + employee.getName()
+//							+ " xử lý những request này trước khi xóa");
+//				}
+//				if (te.getLeaderFlag() == 1) { // employee is a leader
+//					int numOfRequest = requestRepository.countRequestReceivedInProcessingInTeam(te.getEmployeeId(), te.getTeamId());
+//					if (numOfRequest > 0) {
+//						throw new Exception(employee.getName() + " có request đang chờ xử lý.<br/>Vui lòng để " + employee.getName()
+//								+ " xử lý những request này trước khi đổi sang leader mới");
+//					}
+//				}
+//			}
+//			TERepository.delete(te);
+//		}
 		
 		teamRepository.delete(team);
 		return true;

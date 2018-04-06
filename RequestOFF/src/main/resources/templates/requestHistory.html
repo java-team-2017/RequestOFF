@@ -42,6 +42,11 @@
 					employeeId = employee.id;
 					listRecipient = returnData.listRecipients;
 					
+					//employee doesn't belong to any team
+					if(listRecipient.length == 0) {
+						$("#btnMultipleDelete").prop('disabled', true);
+					}
+					
 					renderRemainHours(returnData.displayedRemainHours, 'remainHours');
 					renderRecipientSelect(listRecipient, 'modalRecipient');
 					
@@ -106,7 +111,6 @@
 								}
 							});
 							if(check == 0) { //recipient is old manager or old leader
-								console.log(rowData.status + "----");
 								if(parseInt(rowData.status) != 1 && parseInt(rowData.status) != 4) {
 									console.log(rowData.status + "----");
 									$("#modalRecipientDiv").hide();
@@ -114,8 +118,10 @@
 									$("#hiddenRecipientDiv").show();
 								}
 								else {
-									$('#alertMessage_edit').html(rowData.recipientName + " - người nhận của request này hiện không còn là leader/manager của bạn. "
-																	+ "Vui lòng chọn một người nhận khác").attr('class', 'alert alert-warning').show();
+									if(listRecipient.length > 0) {
+										$('#alertMessage_edit').html(rowData.recipientName + " - người nhận của request này hiện không còn là leader/manager của bạn. "
+												+ "Vui lòng chọn một người nhận khác").attr('class', 'alert alert-warning').show();
+									}
 									$("#hiddenRecipientDiv").hide();
 									$("#modalRecipientDiv").show();
 								}
@@ -129,7 +135,7 @@
 							$("#modalUpdateDate").val(rowData.updateDate);
 							$("#modalTotalTime").val(rowData.totalTime);
 						
-							if(rowData.status == "1" || rowData.status == "4") {
+							if((rowData.status == "1" || rowData.status == "4") && listRecipient.length > 0) {
 								$("#modalForm :input").prop('disabled', false);
 								$("#btnSave_modal, #btnSend_modal").show();
 							} else {
@@ -359,7 +365,11 @@
 								"className": "text-center",
 								"data": null,
 								"render": function(data, type, row) {
-									if(row.status == 1 || row.status == 4) {
+									//employee doesn't belong to any team
+									if(listRecipient.length == 0) {
+										return "<input class='not-active btnSelect' style='opacity: 0.5;' type='checkbox' name='selectRequest' value='" + row.id + "' />";
+									}
+									else if(row.status == 1 || row.status == 4) {
 										var index = findObjById(deleteRequestIds, row.id);
 										if(index >= 0) {
 											return "<input class='btnSelect' type='checkbox' name='selectRequest' value='" + row.id + "' checked='true' />";
@@ -435,7 +445,11 @@
 								"className": "text-center",
 								"data": null,
 								"render": function(data, type, row) {
-									if(row.status == 1 || row.status == 4) {
+									//employee doesn't belong to any team
+									if(listRecipient.length == 0) {
+										return "<a class='not-active'><span class='glyphicon glyphicon-pencil' style='opacity: 0.5;'></span></a>";
+									}
+									else if(row.status == 1 || row.status == 4) {
 										return "<a><span class='glyphicon glyphicon-pencil' style='cursor: pointer;'></span></a>";
 									}
 									else {
@@ -449,7 +463,11 @@
 								"className": "text-center",
 								"data": null,
 								"render": function(data, type, row) {
-									if(row.status == 1 || row.status == 4) {
+									//employee doesn't belong to any team
+									if(listRecipient.length == 0) {
+										return "<a class='btnDelete not-active'><span class='glyphicon glyphicon-trash' style='opacity: 0.5;'></span></a>";
+									}
+									else if(row.status == 1 || row.status == 4) {
 										return "<a class='btnDelete'><span class='glyphicon glyphicon-trash' style='cursor: pointer;'></span></a>";
 									}
 									else {

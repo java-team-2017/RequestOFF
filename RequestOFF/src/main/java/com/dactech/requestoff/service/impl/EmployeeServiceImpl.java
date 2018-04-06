@@ -196,6 +196,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 						throw new Exception(employee.getName() + " hiện đang là thành viên của team : " + employee.getListTeam().get(0).getName()
 											+ ".<br/>Vui lòng xóa " + employee.getName() + " khỏi team này trước khi thay đổi trạng thái làm việc");
 					}
+					
+					RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
+					requestSearchRequest.setEmployeeId(employeeId + "");
+					requestSearchRequest.setValidFlag("1");
+					List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
+					for(Request request : requests) {
+						request.setValidFlag(0);
+					}
 				}
 					
 				EmployeeOffStatusSearchRequest eosRequest = new EmployeeOffStatusSearchRequest("", employeeId + "", "", "", "");
