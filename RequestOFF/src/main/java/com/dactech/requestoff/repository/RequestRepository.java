@@ -10,6 +10,7 @@ import com.dactech.requestoff.repository.custom.RequestRepositoryCustom;
 
 public interface RequestRepository extends JpaRepository<Request, Long>, RequestRepositoryCustom{
 	public Request findById(long id);
+	public List<Request> findByEmployeeId(long employeeId);
 	
 	@Query(value = "SELECT * FROM request WHERE employee_id = ?1 AND ( from_time BETWEEN ?2 AND ?3 ) "
 			+ "AND status = 2 " // approved
