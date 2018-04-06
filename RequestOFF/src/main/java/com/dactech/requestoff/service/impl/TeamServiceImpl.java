@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
+import com.dactech.requestoff.model.entity.Request;
 import com.dactech.requestoff.model.entity.Team;
 import com.dactech.requestoff.model.entity.TeamEmployee;
 import com.dactech.requestoff.model.request.TeamDetailsRequest;
@@ -79,8 +80,8 @@ public class TeamServiceImpl implements TeamService {
 				if (oldLeaderId != newLeaderId) { // change leader
 					// check whether old leader has waiting requests which need to process
 					
-					int numOfRequest = requestRepository.countRequestReceivedInProcessingInTeam(oldLeaderId, teamId);
-					if (numOfRequest > 0) {
+					List<Request> request = requestRepository.getRequestReceivedInProcessingInTeam(oldLeaderId, teamId);
+					if (request.size() > 0) {
 						Employee leader = employeeRepository.findById(oldLeaderId);
 						throw new Exception(leader.getName()
 							+ " có request đang chờ xử lý. <br/>Vui lòng để " + leader.getName() + " xử lý những request này trước khi đổi sang leader mới");
