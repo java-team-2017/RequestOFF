@@ -155,8 +155,90 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom {
 		
 		for (Request request : listRequests) {
 			Employee recipient = employeeRepository.findById(request.getRecipientId());
+			Employee sender = request.getEmployee();
+			TeamEmployee recipientTeamEmployee = teamEmployeeRepository.findByEmployeeId((request.getRecipientId()));
+			TeamEmployee teamEmployee = teamEmployeeRepository.findByEmployeeId((sender.getId()));
 			// set recipient Name
 			request.setRecipientName(recipient.getName());
+			
+//			// set forward ID and name
+//			if(request.getStatus() == Request.REQUEST_STATUS_WAITING) {
+//				if (recipient.getPosition().getCode() == Position.CODE_EMPLOYEE) {
+//					if(recipientTeamEmployee != null && recipientTeamEmployee.getLeaderFlag() == 1) {// recipient is a leader, forward to manager
+//						Department employeeDepartment = recipient.getListTeam().get(0).getDepartment();
+//						if(employeeDepartment != null) {
+//							Employee manager = employeeRepository.findById(employeeDepartment.getManagerId());
+//							if(manager != null) {
+//								request.setForwardId(manager.getId());
+//								request.setForwardName(manager.getName());
+//							}
+//						}
+////						String queryStr = "SELECT * FROM employee e INNER JOIN department d ON e.id = d.manager_id "
+////								+ " INNER JOIN team t ON t.department_id = d.id"
+////								+ " WHERE t.leader_id = " + recipient.getId();
+////						Query queryObj = entityManager.createNativeQuery(queryStr.toString(), Employee.class);
+////						List<Employee> managers = queryObj.getResultList();
+//					}
+//					else {
+//						throw new Exception("Người đăng nhập " + request.getRecipientName() + " chỉ là thành viên trong team");
+//					}
+//				} else if (recipient.getPosition().getCode() == Position.CODE_MANAGER) {
+//					if(recipientTeamEmployee != null && recipientTeamEmployee.getLeaderFlag() == 1) {//user is manager and leader
+//						if (sender.getPosition().getCode() == Position.CODE_EMPLOYEE) {//sender is employee
+//							if(teamEmployee != null && teamEmployee.getLeaderFlag() == 1 && sender.getPosition().getCode() == Position.CODE_MANAGER ) {
+//								String queryStr = "SELECT * from employee e INNER JOIN team t on e.id = t.leader_id INNER JOIN team_employee te ON t.id = te.team_id "
+//										+ "WHERE te.employee_id = " + request.getEmployee().getId() + " AND e.id <> " + recipient.getId();
+//								Query queryObj = entityManager.createNativeQuery(queryStr.toString(), Employee.class);
+//								List<Employee> leader = queryObj.getResultList();
+//								if(leader != null && leader.size() > 0) {
+//									request.setForwardId(leader.get(0).getId());
+//									request.setForwardName(leader.get(0).getName());
+//								}
+//							} 
+//						} 
+//					} else { //user is just manager
+//						if (sender.getPosition().getCode() == Position.CODE_EMPLOYEE) {
+//							if(teamEmployee != null && teamEmployee.getLeaderFlag() != 1 && sender.getPosition().getCode() != Position.CODE_MANAGER ) {
+//								String queryStr = "SELECT * FROM employee e INNER JOIN team t on e.id = t.leader_id INNER JOIN team_employee te ON t.id = te.team_id "
+//										+ "WHERE te.employee_id = " + request.getEmployee().getId();
+//								Query queryObj = entityManager.createNativeQuery(queryStr.toString(), Employee.class);
+//								List<Employee> leader = queryObj.getResultList();
+//								if(leader != null && leader.size() > 0) {
+//									request.setForwardId(leader.get(0).getId());
+//									request.setForwardName(leader.get(0).getName());
+//								}
+//							} 
+//						}
+//					}
+//				}
+//			}
+			
+//			// set department name and team name for request sender
+//			if(sender.getPosition().getCode() == Position.CODE_EMPLOYEE) {
+//				if(teamEmployee != null && teamEmployee.getValidFlag() == 1) {
+//					Team team = teamRepository.findByLeaderId(sender.getId());
+//					if (team != null) {
+//						sender.setTeamName(team.getName());
+//						sender.setDepartmentName(team.getDepartment().getName());
+//					} else {
+//						sender.setTeamName("Không có team");
+//					}
+//				}
+//			} else if (sender.getPosition().getCode() == Position.CODE_MANAGER) {
+//				Department dept = departmentRepository.findByManagerId(sender.getId());
+//				if (dept != null) {
+//					sender.setTeamName("");
+//					sender.setDepartmentName(dept.getName());
+//				} else {
+//					sender.setDepartmentName("Không có Department");
+//				}
+//			} else {
+//				Employee employee = employeeRepository.findById(sender.getId());
+//				if(employee != null) {
+//					sender.setTeamName(employee.getTeamName());
+//					sender.setDepartmentName(employee.getDepartmentName());
+//				}
+//			}
 		}
 		return listRequests;
 	}
