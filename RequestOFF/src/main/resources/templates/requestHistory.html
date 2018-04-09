@@ -42,11 +42,6 @@
 					employeeId = employee.id;
 					listRecipient = returnData.listRecipients;
 					
-					//employee doesn't belong to any team
-					if(listRecipient.length == 0) {
-						$("#btnMultipleDelete").prop('disabled', true);
-					}
-					
 					renderRemainHours(returnData.displayedRemainHours, 'remainHours');
 					renderRecipientSelect(listRecipient, 'modalRecipient');
 					
@@ -343,6 +338,13 @@
 				
 				function search(requestSearchRequest) {
 					$('#alertMessage_search').hide();
+					
+					//employee doesn't belong to any team
+					if(listRecipient.length == 0) {
+						$('#alertMessage_search').html("Bạn chưa thuộc team hoặc department nào!").attr('class', 'alert alert-warning').show();
+						$("#btnMultipleDelete").prop('disabled', true);
+					}
+					
 					$('#requestHistoryTable').DataTable({
 						ajax: {
 							type : "POST",

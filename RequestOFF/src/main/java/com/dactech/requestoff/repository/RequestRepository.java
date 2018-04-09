@@ -62,4 +62,7 @@ public interface RequestRepository extends JpaRepository<Request, Long>, Request
 	@Query(value = "SELECT * FROM request WHERE employee_id = ?1 "
 			+ "AND status in (" + Request.REQUEST_STATUS_WAITING + " ) AND valid_flag = 1", nativeQuery = true)
 	public List<Request> getRequestInProcessing(long employeeId);
+	
+	@Query(value = "SELECT * FROM request WHERE employee_id = ?1 ", nativeQuery = true)
+	public List<Request> getAllRequests(long employeeId);
 }

@@ -216,6 +216,17 @@ public class TeamServiceImpl implements TeamService {
 //			TERepository.delete(te);
 //		}
 		
+		for (TeamEmployee te : listTE) {
+			Employee employee = employeeRepository.findById(te.getEmployeeId());
+			if (employee != null ) {
+				List<Request> requestInProcessing = requestRepository.getRequestInProcessing(te.getEmployeeId());
+				for(Request r : requestInProcessing) {
+					r.setStatus(Request.REQUEST_STATUS_SAVED);
+				}
+			}
+			TERepository.delete(te);
+		}
+		
 		teamRepository.delete(team);
 		return true;
 	}

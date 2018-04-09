@@ -36,8 +36,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 	TeamRepository teamRepository;
 	@Autowired
 	RequestRepository requestRepository;
-	@Autowired
-	TeamEmployee teamEmployee;
+//	@Autowired
+//	TeamEmployee teamEmployee;
 	
 	public DepartmentRegistResponse registDepartment(DepartmentRegistRequest departmentRegistRequest) throws Exception {
 		Department department;
@@ -64,47 +64,18 @@ public class DepartmentServiceImpl implements DepartmentService {
 					department.setName(departmentRegistRequest.getName());
 				}
 				if(StringUtil.isNotEmpty(departmentRegistRequest.getManagerId())) {
-					long id = department.getId();
 					long oldManagerId = department.getManagerId();
 					long newManagerId = Long.parseLong(departmentRegistRequest.getManagerId());
 					if (oldManagerId != newManagerId) {
-//						RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
-//						requestSearchRequest.setStatus(Integer.toString(Request.REQUEST_STATUS_WAITING));
-						
-//						requestSearchRequest.setRecipientId(Long.toString(oldManagerId));
-//						requestSearchRequest.setValidFlag("1");
-//						int requestInProcessing = requestRepository.countRequestInProcessingInDepartment(oldManagerId, id);
-						List<Request> requestReceivedInProcessing = requestRepository.getRequestReceivedInProcessingInDepartment(oldManagerId, id);
-						if ( requestReceivedInProcessing.size() > 0) {
-							Employee em = employeeRepository.findById(oldManagerId);
-//							TeamEmployee teamEmployee = team
-							for(Request listRequest : requestReceivedInProcessing) {
-								listRequest.setRecipientId(newManagerId);
-							}
-							List<Request> requestList = requestRepository.findByEmployeeId(newManagerId);
-							for(Request listRequest : requestList) {
-								listRequest.setStatus(Request.REQUEST_STATUS_APPROVED);
-							}
-//							throw new Exception(em.getName()
-//									+ " có request đang chờ anh ấy/cô ấy xử lý.<br/>Vui lòng để anh ấy/cô ấy xử lý trước khi thay đổi manager mới");
+						List<Request> requestReceivedInProcessing = requestRepository.getRequestReceivedInProcessingInDepartment(oldManagerId, department.getId());
+						for(Request r : requestReceivedInProcessing) {
+							r.setRecipientId(newManagerId);
 						}
 						
-						
-//						requestInProcessing = requestRepository.countRequestInProcessingInDepartment(newManagerId, id);
-//						requestReceivedInProcessing = requestRepository.countRequestReceivedInProcessingInDepartment(newManagerId, id);
-//						if (requestInProcessing > 0 || requestReceivedInProcessing > 0) {
-//							Employee em = employeeRepository.findById(newManagerId);
-//							throw new Exception (em.getName() + " có request đang chờ được xử lý.<br/>"
-//									+ "Vui lòng xử lý tất cả request trước khi xóa");
-//						}
-						
-//						List<Request> requests = requestRepository.searchRequest(requestSearchRequest);
-//						
-//						if(requests != null && requests.size() > 0) {
-//							Employee manager = employeeRepository.findById(department.getManagerId());
-//							throw new Exception(manager.getName()
-//								+ " có request đang chờ anh ấy/cô ấy xử lý.<br/>Vui lòng để anh ấy/cô ấy xử lý trước khi thay đổi manager mới");
-//						}
+						List<Request> requestInProcessing = requestRepository.getRequestInProcessing(newManagerId);
+						for(Request r : requestInProcessing) {
+							r.setStatus(Request.REQUEST_STATUS_APPROVED);
+						}
 						
 						department.setManagerId(newManagerId);
 					}
@@ -158,22 +129,10 @@ public class DepartmentServiceImpl implements DepartmentService {
 			throw new Exception("Không thể tìm thấy department với id " + departmentId);
 		}
 		List<Team> teams = teamRepository.findByDepartmentId(departmentId);
-		long managerId = department.getManagerId();
-		long id = department.getId();
-		List<Request> requestInProcessing = requestRepository.getRequestReceivedInProcessingInDepartment(managerId, id);
 		if(teams.size() > 0) {
-//			Employee manager = employeeRepository.findById(department.getManagerId());
-			throw new Exception("Vui lòng xóa tất cả team thuộc " + department.getName() + " Department trước khi xóa " + department.getName() +" Department.");
+			throw new Exception("Vui lòng xóa tất cả team thuộc " + department.getName() + " trước khi xóa department này");
 		} 
-//		else
-		if(requestInProcessing.size() > 0) {
-			Employee em = employeeRepository.findById(managerId);
-			throw new Exception (em.getName() + " có request đang chờ được xử lý. <br/>"
-					+ "Vui lòng xử lý tất cả request trước khi xóa");
-		} 
-		else {
-			departmentRepository.delete(department);
-		}
+		departmentRepository.delete(department);
 		return true;
 	}
 

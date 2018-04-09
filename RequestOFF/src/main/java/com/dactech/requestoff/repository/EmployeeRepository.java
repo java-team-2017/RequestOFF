@@ -13,7 +13,10 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, Emplo
 	public Employee findById(long id);
 	public Employee findByEmail(String email);
 	
-	@Query(value = "SELECT * FROM employee WHERE name like %?1% ", nativeQuery = true)
+//	@Query(value = "SELECT * FROM employee WHERE name like %?1% ", nativeQuery = true)
+//	public List<Employee> findByNameLike(String name);
+	
+	@Query(value = "SELECT * FROM employee WHERE english_name = ?1 ", nativeQuery = true)
 	public List<Employee> findByNameLike(String name);
 	
 	@Query(value = "SELECT * FROM employee e INNER JOIN position p ON e.position_id = p.id "

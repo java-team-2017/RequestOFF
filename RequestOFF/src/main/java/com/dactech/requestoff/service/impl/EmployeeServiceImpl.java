@@ -615,20 +615,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 			employeeRoleRepository.delete(er);
 		}
 		
-		RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
-		requestSearchRequest.setEmployeeId(employeeId + "");
-		requestSearchRequest.setStatus(2 + "");
-		List<Request> listRequest = requestRepository.searchRequest(requestSearchRequest);
-		requestSearchRequest.setStatus(3 + "");
-		listRequest.addAll(requestRepository.searchRequest(requestSearchRequest));
+		List<Request> listRequest = requestRepository.getAllRequests(employeeId);
 		for(Request request : listRequest) {
-//			request.setValidFlag(0);
-//			requestRepository.save(request);
 			requestRepository.delete(request);
 		}
 
-//		employee.setValidFlag(0);
-//		employeeRepository.save(employee);
 		employeeRepository.delete(employee);
 		return true;
 	}
