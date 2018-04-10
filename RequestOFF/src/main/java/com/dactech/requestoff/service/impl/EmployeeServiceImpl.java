@@ -138,8 +138,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 				if((oldPosition.getCode() == Position.CODE_MANAGER && position.getCode() != Position.CODE_MANAGER)) {
 					Department dept = departmentRepository.findByManagerId(employeeId);
 					if(dept != null) {
-						throw new Exception(employee.getName() + " hiện đang là manager của department " + dept.getName() + ".<br/>Vui lòng xóa " + employee.getName() 
-											+ " khỏi vị trí manager của department này trước khi thay đổi vị trí");
+						throw new Exception(employee.getName() + " hiện đang là manager của department " + dept.getName() + ".<br/>Vui lòng chuyển " + employee.getName() 
+											+ " ra khỏi vị trí manager của department này trước khi thay đổi vị trí");
 					}
 				}
 				employee.setPosition(position);
@@ -178,23 +178,32 @@ public class EmployeeServiceImpl implements EmployeeService {
 				int oldValidFlag = employee.getValidFlag();
 				int validFlag = Integer.parseInt(erRequest.getValidFlag());
 				if(validFlag == 0 && oldValidFlag == 1) {
-					if (isLeader(employeeId)) {
-						Team team = teamRepository.findByLeaderId(employeeId);
-						if (team != null) {
-							throw new Exception(employee.getName() + " hiện đang là leader của team : " + team.getName() + ".<br/>Vui lòng xóa "
-												+ employee.getName() + " khỏi team này trước khi thay đổi trạng thái làm việc");
-						}
-					}
-					if (position.getCode() == Position.CODE_MANAGER) {
-						Department dept = departmentRepository.findByManagerId(employeeId);
-						if (dept != null) {
-							throw new Exception(employee.getName() + " hiện đang là manager của department : " + dept.getName() + ".<br/>Vui lòng xóa "
-												+ employee.getName() + " khỏi vị trí manager của department này trước khi thay đổi trạng thái làm việc");
-						}
-					}
-					if (employee.getListTeam() != null && employee.getListTeam().size() > 0 && employee.getListTeam().get(0)!= null) {
-						throw new Exception(employee.getName() + " hiện đang là thành viên của team : " + employee.getListTeam().get(0).getName()
-											+ ".<br/>Vui lòng xóa " + employee.getName() + " khỏi team này trước khi thay đổi trạng thái làm việc");
+//					if (isLeader(employeeId)) {
+//						Team team = teamRepository.findByLeaderId(employeeId);
+//						if (team != null) {
+//							throw new Exception(employee.getName() + " hiện đang là leader của team : " + team.getName() + ".<br/>Vui lòng chuyển "
+//												+ employee.getName() + " ra khỏi team này trước khi thay đổi trạng thái làm việc");
+//						}
+//					}
+//					if (position.getCode() == Position.CODE_MANAGER) {
+//						Department dept = departmentRepository.findByManagerId(employeeId);
+//						if (dept != null) {
+//							throw new Exception(employee.getName() + " hiện đang là manager của department : " + dept.getName() + ".<br/>Vui lòng chuyển "
+//												+ employee.getName() + " ra khỏi vị trí manager của department này trước khi thay đổi trạng thái làm việc");
+//						}
+//					}
+//					if (employee.getListTeam() != null && employee.getListTeam().size() > 0 && employee.getListTeam().get(0)!= null) {
+//						throw new Exception(employee.getName() + " hiện đang là thành viên của team : " + employee.getListTeam().get(0).getName()
+//											+ ".<br/>Vui lòng chuyển " + employee.getName() + " ra khỏi team này trước khi thay đổi trạng thái làm việc");
+//					}
+					
+					Department dept = departmentRepository.findByManagerId(employeeId);
+					if(dept != null) {
+						throw new Exception(employee.getName() + " hiện đang là manager của department : " + dept.getName() + ".<br/>Vui lòng chuyển "
+								+ employee.getName() + " ra khỏi vị trí manager của department này trước khi thay đổi trạng thái làm việc");
+					} else if(employee.getListTeam() != null && employee.getListTeam().size() > 0 && employee.getListTeam().get(0)!= null) {
+						throw new Exception(employee.getName() + " hiện đang thuộc team : " + employee.getListTeam().get(0).getName()
+								+ ".<br/>Vui lòng chuyển " + employee.getName() + " ra khỏi team này trước khi thay đổi trạng thái làm việc");
 					}
 					
 					RequestSearchRequest requestSearchRequest = new RequestSearchRequest();
@@ -581,23 +590,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 			throw new Exception("Không tìm thấy nhân viên với id " + employeeId);
 		}
 		
-		if (isLeader(employeeId)) {
-			Team team = teamRepository.findByLeaderId(employeeId);
-			if (team != null) {
-				throw new Exception(employee.getName() + " hiện đang là leader của team : " + team.getName() + ".<br/>Vui lòng xóa "
-									+ employee.getName() + " khỏi vị trí leader của team này trước khi xóa");
-			}
-		}
-		if (employee.getPosition().getCode() == Position.CODE_MANAGER) {
-			Department dept = departmentRepository.findByManagerId(employeeId);
-			if (dept != null) {
-				throw new Exception(employee.getName() + " hiện đang là manager của department : " + dept.getName() + ".<br/>Vui lòng xóa "
-									+ employee.getName() + " khỏi vị trí manager của department này trước khi xóa");
-			}
-		}
-		if (employee.getListTeam() != null && employee.getListTeam().size() > 0 && employee.getListTeam().get(0)!= null) {
-			throw new Exception(employee.getName() + " hiện đang là thành viên của team : " + employee.getListTeam().get(0).getName()
-								+ ".<br/>Vui lòng xóa " + employee.getName() + " khỏi team này trước khi xóa");
+		Department managerDept = departmentRepository.findByManagerId(employeeId);
+		if(managerDept != null) {
+			throw new Exception(employee.getName() + " hiện đang là manager của department : " + managerDept.getName() + ".<br/>Vui lòng chuyển "
+					+ employee.getName() + " ra khỏi vị trí manager của department này trước khi xóa");
+		} else if(employee.getListTeam() != null && employee.getListTeam().size() > 0 && employee.getListTeam().get(0)!= null) {
+			throw new Exception(employee.getName() + " hiện đang thuộc team : " + employee.getListTeam().get(0).getName()
+					+ ".<br/>Vui lòng chuyển " + employee.getName() + " ra khỏi team này trước khi xóa");
 		}
 		
 		EmployeeOffStatusSearchRequest eosRequest = new EmployeeOffStatusSearchRequest("", employeeId + "", "", "", "");
