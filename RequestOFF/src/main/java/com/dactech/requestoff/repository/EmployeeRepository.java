@@ -40,4 +40,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, Emplo
 			+ "id IN (SELECT DISTINCT employee_id from team_employee WHERE valid_flag = 1 AND team_id = ?1) AND "
 			+ "valid_flag = 1", nativeQuery = true)
 	public List<Employee> findByTeamId(long teamId);
+	
+	@Query(value = "SELECT * FROM employee", nativeQuery = true)
+	public List<Employee> getAllEmployees();
 }

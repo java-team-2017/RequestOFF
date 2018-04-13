@@ -9,12 +9,10 @@ import com.dactech.requestoff.model.entity.Department;
 import com.dactech.requestoff.model.entity.Employee;
 import com.dactech.requestoff.model.entity.Request;
 import com.dactech.requestoff.model.entity.Team;
-import com.dactech.requestoff.model.entity.TeamEmployee;
 import com.dactech.requestoff.model.request.DepartmentDetailsRequest;
 import com.dactech.requestoff.model.request.DepartmentInfoRequest;
 import com.dactech.requestoff.model.request.DepartmentRegistRequest;
 import com.dactech.requestoff.model.request.DepartmentSearchRequest;
-import com.dactech.requestoff.model.request.RequestSearchRequest;
 import com.dactech.requestoff.model.response.DepartmentDetailsResponse;
 import com.dactech.requestoff.model.response.DepartmentInfoResponse;
 import com.dactech.requestoff.model.response.DepartmentRegistResponse;
@@ -36,8 +34,6 @@ public class DepartmentServiceImpl implements DepartmentService {
 	TeamRepository teamRepository;
 	@Autowired
 	RequestRepository requestRepository;
-//	@Autowired
-//	TeamEmployee teamEmployee;
 	
 	public DepartmentRegistResponse registDepartment(DepartmentRegistRequest departmentRegistRequest) throws Exception {
 		Department department;

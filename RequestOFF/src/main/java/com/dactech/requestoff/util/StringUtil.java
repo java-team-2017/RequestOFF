@@ -20,6 +20,13 @@ public class StringUtil {
 		name2 = removeAccent(name2);
 		return name1.equals(name2);
 	}
+	
+	//convert Vietnamese name to English name (remove accent from Vietnamese name)
+	public static String convertToEnglishName(String name) {
+		String str = Normalizer.normalize(name, Normalizer.Form.NFD);
+		str = str.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+		return str;
+	}
 
 	// function remove accent, white space, _ for name comparing function
 	public static String removeAccent(String s) {

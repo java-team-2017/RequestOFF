@@ -83,6 +83,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 		if (StringUtil.isEmpty(erRequest.getId())) { // create new Employee
 			employee = new Employee();
 			employee.setName(erRequest.getName());
+			
+			String engName = StringUtil.convertToEnglishName(erRequest.getName());
+			employee.setEnglishName(engName);
+			
 			employee.setGender(erRequest.getGender());
 			employee.setBirthday(erRequest.getBirthday());
 
@@ -125,6 +129,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 			if (StringUtil.isNotEmpty(erRequest.getName())) {
 				employee.setName(erRequest.getName());
+				
+				String engName = StringUtil.convertToEnglishName(erRequest.getName());
+				employee.setEnglishName(engName);
 			}
 			if (StringUtil.isNotEmpty(erRequest.getGender())) {
 				employee.setGender(erRequest.getGender());

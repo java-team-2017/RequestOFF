@@ -39,7 +39,7 @@ public class CompanyYearOffScheduler {
 	
 	@Scheduled(cron = "00 59 23 31 12 *") // excute every year end
 //	@Scheduled(cron = "00 23 14 23 3 *") // excute every year end
-	public void reportCurrentTime() throws Exception {
+	public void resetCompanyYearOff() throws Exception {
 		System.out.println("excute every year end");
 		long currentYear, nextYear;
 		currentYear = companyYearOffService.getCurrentYear();

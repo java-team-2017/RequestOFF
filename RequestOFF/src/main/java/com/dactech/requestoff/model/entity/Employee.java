@@ -20,6 +20,7 @@ public class Employee {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	private String name;
+	private String englishName;
 	private String gender;
 	private String birthday;
 	@ManyToOne
@@ -56,20 +57,22 @@ public class Employee {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	public Employee(long id, String name) {
 		super();
 		this.id = id;
 		this.name = name;
 	}
 
-	public Employee(long id, String name, String gender, String birthday, Position position, String email,
-			String password, String phone, String startWorkingDate, String officialWorkingDate, int validFlag,
-			String insertDate, long insertOperator, String updateDate, long updateOperator, List<Team> listTeam,
-			List<Role> listRole, String departmentName, String teamName, EmployeeOffStatus employeeOffStatus) {
+	public Employee(long id, String name, String englishName, String gender, String birthday, Position position,
+			String email, String password, String phone, String startWorkingDate, String officialWorkingDate,
+			int validFlag, String insertDate, long insertOperator, String updateDate, long updateOperator,
+			List<Team> listTeam, List<Role> listRole, String departmentName, String teamName,
+			EmployeeOffStatus employeeOffStatus) {
 		super();
 		this.id = id;
 		this.name = name;
+		this.englishName = englishName;
 		this.gender = gender;
 		this.birthday = birthday;
 		this.position = position;
@@ -104,6 +107,14 @@ public class Employee {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getEnglishName() {
+		return englishName;
+	}
+
+	public void setEnglishName(String englishName) {
+		this.englishName = englishName;
 	}
 
 	public String getGender() {
