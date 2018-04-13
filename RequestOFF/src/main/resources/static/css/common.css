@@ -225,3 +225,14 @@ legend {
 .mydatepicker {
 	padding: 0px;
 }
+
+#header a:hover {
+	color: white;
+}
+
+.modal-header > .modal-title{
+	font-weight: bold;
+}
+.modal-body div{
+	padding-bottom: 5px;
+}

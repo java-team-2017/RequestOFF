@@ -3,8 +3,6 @@ package com.dactech.requestoff.batch;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -31,11 +29,6 @@ public class CompanyYearOffScheduler {
 	EmployeeOffStatusRepository employeeOffStatusRepository;
 	@Autowired
 	RequestRepository requestRepository;
-	
-	@PostConstruct
-	public void initialize() {
-		System.out.println("do 1 time at first");
-	}
 	
 	@Scheduled(cron = "00 59 23 31 12 *") // excute every year end
 //	@Scheduled(cron = "00 23 14 23 3 *") // excute every year end
